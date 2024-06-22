@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react';
-import TableriseContext from './TableRiseContext';
+import TableriseContext from '@/context/TableriseContext';
 
 export default function TableriseProvider({ children }: Readonly<{
     children: React.ReactNode;

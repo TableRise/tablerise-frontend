@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import TableriseProvider from '../context/TableriseProvider';
-import './globals.css';
+import TableriseProvider from '@/context/TableriseProvider';
+import '@/globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
