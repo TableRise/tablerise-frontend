@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:cy": "cypress open"
+    "test:cy": "cypress open",
+    "prepare": "husky"
   },
   "dependencies": {
     "next": "14.2.4",
