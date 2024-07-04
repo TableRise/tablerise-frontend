@@ -1,0 +1,7 @@
+build
+coverage
+scripts
+.githooks
+.github
+.vscode
+node_modules
