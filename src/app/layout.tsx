@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { DM_Sans } from 'next/font/google';
 import TableriseProvider from '@/context/TableriseProvider';
 import '@/app/globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const dm_sans = DM_Sans({ variable: '--dm-sans-base', subsets: ['latin'] });
 
 export const metadata: Metadata = {
-    title: 'TableRise - Sua mesa virtual de RPG online - Rápida e prática',
-    description: 'Sua mesa virtual de RPG online - Rápida e prática',
+    title: 'TableRise - Sua mesa virtual de RPG online',
+    description: 'Sua mesa virtual de RPG online',
 };
 
 export default function RootLayout({
@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={inter.className}>
+            <body className={dm_sans.className}>
                 <TableriseProvider>{children}</TableriseProvider>
             </body>
         </html>
