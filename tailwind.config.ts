@@ -9,7 +9,8 @@ const config: Config = {
     theme: {
         extend: {
             colors: {
-                'tr-primary-color/gradient': 'linear-gradient(129deg, #0A328A 27.44%, #0D255C 114.68%)',
+                'tr-primary-color/gradient':
+                    'linear-gradient(129deg, #0A328A 27.44%, #0D255C 114.68%)',
                 'tr-primary-color/500': '#1B8BFF',
                 'tr-primary-color/800': '#0542C8',
                 'tr-primary-color/900': '#0A358A',
@@ -24,8 +25,8 @@ const config: Config = {
                 'tr-grey-color/950': '#292929',
                 'tr-support-color/success': '#12AD00',
                 'tr-support-color/alert': '#F42C04',
-            }
-        }
+            },
+        },
     },
     plugins: [],
 };
