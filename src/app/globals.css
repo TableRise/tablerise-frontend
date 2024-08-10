@@ -7,3 +7,266 @@
     margin: 0;
     scroll-behavior: smooth;
 }
+
+@layer base {
+    /* ----------- Font Patterns ----------- */
+    .font-XXL-bold {
+        font-family: var('--dm-sans-base');
+        font-weight: 700;
+        font-style: normal;
+        font-size: 2.6rem;
+        line-height: 2.7rem;
+    }
+
+    .font-XL-bold {
+        font-family: var('--dm-sans-base');
+        font-weight: 700;
+        font-style: normal;
+        font-size: 2rem;
+        line-height: 2.2rem;
+    }
+
+    .font-L-semibold {
+        font-family: var('--dm-sans-base');
+        font-weight: 600;
+        font-style: normal;
+        font-size: 1.5rem;
+        line-height: 1.6rem;
+    }
+
+    .font-M-semibold {
+        font-family: var('--dm-sans-base');
+        font-weight: 600;
+        font-style: normal;
+        font-size: 1.2rem;
+        line-height: 1.5rem;
+    }
+
+    .font-M-regular {
+        font-family: var('--dm-sans-base');
+        font-weight: 400;
+        font-style: normal;
+        font-size: 1.2rem;
+        line-height: 1.5rem;
+    }
+
+    .font-S-bold {
+        font-family: var('--dm-sans-base');
+        font-weight: 700;
+        font-style: normal;
+        font-size: 1rem;
+        line-height: 1.2rem;
+    }
+
+    .font-S-regular {
+        font-family: var('--dm-sans-base');
+        font-weight: 400;
+        font-style: normal;
+        font-size: 1rem;
+        line-height: 1.2rem;
+    }
+
+    .font-XS-bold {
+        font-family: var('--dm-sans-base');
+        font-weight: 700;
+        font-style: normal;
+        font-size: 0.8rem;
+        line-height: 1.1rem;
+    }
+
+    .font-XS-regular {
+        font-family: var('--dm-sans-base');
+        font-weight: 400;
+        font-style: normal;
+        font-size: 0.8rem;
+        line-height: 1.1rem;
+    }
+
+    .font-XXS-bold {
+        font-family: var('--dm-sans-base');
+        font-weight: 700;
+        font-style: normal;
+        font-size: 0.7rem;
+        line-height: 1rem;
+    }
+
+    .font-XXS-regular {
+        font-family: var('--dm-sans-base');
+        font-weight: 400;
+        font-style: normal;
+        font-size: 0.7rem;
+        line-height: 1rem;
+    }
+    /* ----------- Input Patterns ----------- */
+    input {
+        outline: none;
+    }
+
+    .input-default-light {
+        @apply bg-color-greyScale/50 border border-color-greyScale/300 text-color-greyScale/500;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 0.5rem 0.7rem;
+        width: auto;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+    }
+
+    .input-active-light {
+        @apply bg-color-greyScale/50 border border-color-primary/default_900 text-color-greyScale/950;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 0.5rem 0.7rem;
+        width: auto;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+    }
+
+    .input-error-light {
+        @apply bg-color-greyScale/50 border border-color-suport/alert text-color-greyScale/500;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 0.5rem 0.7rem;
+        width: auto;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+    }
+
+    .input-i1-light {
+        @apply bg-color-greyScale/50 border border-color-greyScale/300 text-color-greyScale/500;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 0.5rem 0.7rem 0.5rem 0.5rem;
+        gap: 0.5rem;
+        width: auto;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+    }
+
+    .input-i2-light {
+        @apply bg-color-greyScale/50 border border-color-greyScale/300 text-color-greyScale/500;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        padding: 0.5rem 0.7rem;
+        gap: 0.5rem;
+        width: auto;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+    }
+
+    .input-success-light {
+        @apply bg-color-greyScale/50 border border-color-suport/success text-color-greyScale/950;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        padding: 0.5rem 0.7rem;
+        gap: 0.5rem;
+        width: auto;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+    }
+
+    .input-default-dark {
+        @apply bg-color-greyScale/900 border border-color-greyScale/700 text-color-greyScale/300;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 0.5rem 0.7rem;
+        width: auto;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+    }
+
+    .input-i1-dark {
+        @apply bg-color-greyScale/900 border border-color-greyScale/700 text-color-greyScale/300;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 0.5rem 0.7rem 0.5rem 0.5rem;
+        gap: 0.5rem;
+        width: auto;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+    }
+
+    .input-i2-dark {
+        @apply bg-color-greyScale/900 border border-color-greyScale/700 text-color-greyScale/300;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        padding: 0.5rem 0.7rem;
+        gap: 0.5rem;
+        width: auto;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+    }
+
+    .input-active-dark {
+        @apply bg-color-greyScale/900 border border-color-primary/default_900 text-color-greyScale/950;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 0.5rem 0.7rem;
+        width: auto;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+    }
+
+    .input-error-light {
+        @apply bg-color-greyScale/900 border border-color-suport/alert text-color-greyScale/950;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 0.5rem 0.7rem;
+        width: auto;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+    }
+
+    .input-success-light {
+        @apply bg-color-greyScale/900 border border-color-suport/success text-color-greyScale/950;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        padding: 0.5rem 0.7rem;
+        gap: 0.5rem;
+        width: auto;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+    }
+
+    .input-icon {
+        @apply w-6 h-6 bg-color-greyScale/500;
+    }
+    /* ----------- Checkbox Patterns ----------- */
+    .checkbox-default {
+        @apply m-1 w-4 h-4 box-border border-2 border-color-greyScale/500 rounded;
+    }
+
+    .checkbox-icon {
+        @apply m-1 w-4 h-4 box-border border-2 border-color-primary/default_900 rounded;
+    }
+}
