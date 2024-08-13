@@ -1,8 +1,13 @@
-'use client'
+'use client';
 import React, { useState } from 'react';
 import ExpandBtn from './ExpandBtnn';
 
-export default function FAQItem() {
+type FAQItemProps = {
+    question: string,
+    answer: string
+}
+
+export default function FAQItem({ question, answer }: FAQItemProps) {
     const [expand, setExpand] = useState<boolean>(false);
 
     function handleFAQItem(): void {
@@ -10,12 +15,14 @@ export default function FAQItem() {
     }
 
     return (
-        <li className='w-full bg-[#292929] p-4 rounded-xl flex flex-col gap-3'>
+        <li className='w-full bg-[#292929] p-4 rounded-xl flex flex-col gap-2'>
             <div className='w-full flex justify-between'>
-                <h2 className='font-L-semibold'>Title</h2>
+                <h2 className='font-L-semibold'>{ question }</h2>
                 <ExpandBtn handler={ handleFAQItem } expandState={ expand } />
             </div>
-            <p hidden={ !expand }>Answer</p>
+            <section hidden={ !expand } className='bg-color-greyScale/900 p-3 rounded-lg'>
+                <p>{ answer }</p>
+            </section>
         </li>
     )
 
