@@ -3,6 +3,7 @@ import FAQItem from './FAQItem';
 import VerMais from './VerMais';
 
 export default function FAQ() {
+    // Question bank
     const questions = [
         { question: 'O que é TableRise?', answer: 'É uma plataforma VTT (Virtual Table Top) para jogar RPG online com amigos.' },
         { question: 'TableRise é pago?', answer: 'Nâo, todas nossas funcionalidades são gratuitas.' },
@@ -11,8 +12,10 @@ export default function FAQ() {
     ];
 
     return (
+        // The whole container
         <section className='text-white bg-[#141414] font-M-regular'>
             <h1 className='py-4 font-XL-bold'>Perguntas frequentes</h1>
+            { /* Where questions are being iterated and rendered as FAQItem components */ }
             <ul className='flex flex-col gap-3'>
                 { questions.map(({ question, answer }, index) => (
                     <FAQItem
@@ -22,6 +25,7 @@ export default function FAQ() {
                     />
                     )) }
             </ul>
+            { /* Last container with a button to more FAQ questions */ }
             <div className='py-4 flex items-center gap-6'>
                 <p>Ainda com dúvidas?</p>
                 <VerMais />
