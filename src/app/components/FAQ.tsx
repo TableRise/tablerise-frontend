@@ -13,7 +13,7 @@ export default function FAQ() {
 
     return (
         // The whole container
-        <section className='text-white bg-[#141414] font-M-regular'>
+        <section className='bg-[#141414] text-color-greyScale/50 font-M-regular'>
             <h1 className='py-4 font-XL-bold'>Perguntas frequentes</h1>
             { /* Where questions are being iterated and rendered as FAQItem components */ }
             <ul className='flex flex-col gap-3'>
@@ -26,7 +26,7 @@ export default function FAQ() {
                     )) }
             </ul>
             { /* Last container with a button to more FAQ questions */ }
-            <div className='py-4 flex items-center gap-6'>
+            <div className='py-4 flex items-center gap-6 text-color-greyScale/100'>
                 <p>Ainda com dúvidas?</p>
                 <VerMais />
             </div>
