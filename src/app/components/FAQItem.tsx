@@ -26,10 +26,12 @@ export default function FAQItem({ question, answer }: FAQItemProps) {
                 <ExpandBtn handler={ handleFAQItem } expandState={ expand } />
             </div>
 
-            <div hidden={ !expand } className='bg-color-greyScale/900 p-3 rounded-lg'>
-                { /* Contains the FAQ answer and start with a hidden property set to false. It changes whenever the expand button is clicked */ }
-                <p>{ answer }</p>
-            </div>
+            { expand && (
+                <div className='bg-color-greyScale/900 p-3 rounded-lg'>
+                    { /* Conditionally renders the FAQ answer whenever the expand button is clicked */ }
+                    <p>{ answer }</p>
+                </div>
+            )}
         </li>
     )
 
