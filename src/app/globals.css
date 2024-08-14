@@ -278,4 +278,50 @@
     .button-white-default {
         @apply w-[5.3rem] h-8 box-border border bg-color-greyScale/50 border-color-greyScale/50 flex items-center justify-center text-color-primary/default_900 rounded-lg;
     }
+
+    @media (min-width: 1920px) {
+        .font-XXL-bold {
+            font-size: 2.8rem;
+        }
+
+        .font-XL-bold {
+            font-size: 2.2rem;
+        }
+
+        .font-L-semibold {
+            font-size: 1.7rem;
+        }
+
+        .font-M-semibold {
+            font-size: 1.4rem;
+        }
+
+        .font-M-regular {
+            font-size: 1.4rem;
+        }
+
+        .font-S-bold {
+            font-size: 1.2rem;
+        }
+
+        .font-S-regular {
+            font-size: 1.2rem;
+        }
+
+        .font-XS-bold {
+            font-size: 1rem;
+        }
+
+        .font-XS-regular {
+            font-size: 1rem;
+        }
+
+        .font-XXS-bold {
+            font-size: 0.9rem;
+        }
+
+        .font-XXS-regular {
+            font-size: 0.9rem;
+        }
+    }
 }

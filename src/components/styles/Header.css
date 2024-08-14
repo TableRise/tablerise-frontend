@@ -8,26 +8,26 @@
     }
 
     header .menu-and-buttons {
-        @apply w-[40%] flex justify-between;
+        @apply w-fit flex;
     }
 
     header .menu {
-        @apply w-[50%] h-8 flex items-center;
+        @apply w-fit h-8 flex items-center justify-center;
     }
 
     header .menu-list {
-        @apply flex justify-between w-full;
+        @apply flex w-full;
     }
 
     header .menu-list li {
-        @apply text-color-greyScale/50;
+        @apply mx-3 my-2 text-color-greyScale/50;
     }
 
     header .buttons-header {
-        @apply flex justify-between items-center;
+        @apply ml-12 flex items-center;
     }
 
-    header .buttons-header button {
-        @apply mx-3;
+    header .buttons-header button:nth-child(2) {
+        @apply ml-3;
     }
 }
