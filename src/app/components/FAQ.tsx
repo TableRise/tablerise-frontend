@@ -1,6 +1,6 @@
 import React from 'react';
 import FAQItem from './FAQItem';
-import VerMais from './VerMais';
+import MoreDetailsBtn from './MoreDetailsBtn';
 
 export default function FAQ() {
     // Question bank
@@ -23,12 +23,12 @@ export default function FAQ() {
                         question={ question }
                         answer={ answer }
                     />
-                    )) }
+                )) }
             </ul>
             { /* Last container with a button to more FAQ questions */ }
             <div className='py-4 flex items-center gap-6 text-color-greyScale/100'>
                 <p>Ainda com dúvidas?</p>
-                <VerMais />
+                <MoreDetailsBtn />
             </div>
         </section>
     )

@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import ExpandBtn from './ExpandBtnn';
+import ExpandBtn from './ExpandBtn';
 
 type FAQItemProps = {
     question: string,
@@ -17,7 +17,7 @@ export default function FAQItem({ question, answer }: FAQItemProps) {
     }
 
     return (
-        <li className='w-full bg-[#292929] p-4 rounded-xl flex flex-col gap-2'>
+        <li className='w-full bg-color-greyScale/950 p-4 rounded-xl flex flex-col gap-2'>
             { /* The whole question container, divided into two */ }
 
             <div className='w-full flex justify-between'>
