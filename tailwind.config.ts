@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
@@ -23,6 +24,9 @@ const config: Config = {
                 'color-greyScale/950': '#292929',
                 'color-suport/success': '#12AD00',
                 'color-suport/alert': '#F42C04',
+            },
+            backgroundImage: {
+                'side-image-background': "url('/images/SideImageBackground.svg')",
             },
         },
     },
