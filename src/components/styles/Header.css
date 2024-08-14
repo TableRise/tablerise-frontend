@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    header {
+        @apply w-[82.5%] h-[4.5rem] px-6 py-3 flex items-center justify-between bg-color-primary/default_900 rounded-xl;
+    }
+
+    header .menu-and-buttons {
+        @apply w-[40%] flex justify-between;
+    }
+
+    header .menu {
+        @apply w-[50%] h-8 flex items-center;
+    }
+
+    header .menu-list {
+        @apply flex justify-between w-full;
+    }
+
+    header .menu-list li {
+        @apply text-color-greyScale/50;
+    }
+
+    header .buttons-header {
+        @apply flex justify-between items-center;
+    }
+
+    header .buttons-header button {
+        @apply mx-3;
+    }
+}

@@ -269,4 +269,13 @@
     .checkbox-icon {
         @apply m-1 w-4 h-4 box-border border-2 border-color-primary/default_900 rounded;
     }
+
+    /* ----------- Button Patterns ----------- */
+    .button-transparent-default {
+        @apply w-16 h-8 box-border border border-color-greyScale/50 flex items-center justify-center text-color-greyScale/50 rounded-lg;
+    }
+
+    .button-white-default {
+        @apply w-[5.3rem] h-8 box-border border bg-color-greyScale/50 border-color-greyScale/50 flex items-center justify-center text-color-primary/default_900 rounded-lg;
+    }
 }
