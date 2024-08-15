@@ -1,8 +1,15 @@
-export default function Home() {
+import Form from './components/Form';
+
+export default function Login() {
+
     return (
-        <section>
-            <h1>TableRise</h1>
-            <input placeholder="Teste" className="input-active-light font-XS-regular" />
-        </section>
+        <main>
+            <Form />
+            <div>
+                <hr />
+                <span>ou continue com</span>
+            </div>
+            {/* <Button /> */}
+        </main>
     );
 }
