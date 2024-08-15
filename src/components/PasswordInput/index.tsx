@@ -7,9 +7,13 @@ type PasswordInputProps = {
 
 export default function PasswordInput({ label, placeholder }: PasswordInputProps) {
     return (
-        <label className="flex-col">
-            <h1>{label}</h1>
-            <input placeholder={placeholder} type="password" />
+        <label className="w-full">
+            <h1 className="font-S-bold text-color-greyScale/950">{label}</h1>
+            <input
+                className="w-full h-10 input-i2-light font-XS-regular text-color-greyScale/500"
+                placeholder={placeholder}
+                type="password"
+            />
         </label>
     );
 }

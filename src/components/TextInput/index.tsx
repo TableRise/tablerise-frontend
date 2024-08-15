@@ -7,9 +7,13 @@ type TextInputProps = {
 
 export default function TextInput({ label, placeholder }: TextInputProps) {
     return (
-        <label className="flex-col">
-            <h1>{label}</h1>
-            <input placeholder={placeholder} type="text" />
+        <label className="w-full">
+            <h1 className="font-S-bold text-color-greyScale/950">{label}</h1>
+            <input
+                className="w-full h-10 input-default-light font-XS-regular text-color-greyScale/500"
+                placeholder={placeholder}
+                type="text"
+            />
         </label>
     );
 }

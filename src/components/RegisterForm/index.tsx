@@ -7,7 +7,7 @@ import SubmitButton from '../SubmitButton';
 
 export default function RegisterForm() {
     return (
-        <form className="flex-col">
+        <form className="flex flex-col w-full">
             <TextInput
                 label="Nome de usuário"
                 placeholder="Insira o seu nome de usuário"
@@ -15,7 +15,11 @@ export default function RegisterForm() {
             <EmailInput label="E-mail" placeholder="Insira o seu e-mail" />
             <PasswordInput label="Senha" placeholder="Insira a sua senha" />
             <PasswordInput label="Confirmar senha" placeholder="Confirme a sua senha" />
-            <CheckBoxField label="Eu li e concordo com os termos e condições" />
+            <CheckBoxField
+                label="Eu li e concordo com os "
+                labelWithLink=" termos e condições"
+                srcLink="/terms"
+            />
             <SubmitButton title="Confirmar" />
         </form>
     );
