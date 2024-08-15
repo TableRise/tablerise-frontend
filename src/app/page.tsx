@@ -1,9 +1,11 @@
 import Form from './components/Form';
 import SocialLogin from './components/SocialLogin';
+import Header from '@/components/Header';
 
-export default function Login() {
-
+export default function Home() {
     return (
+        <section>
+            <Header />
         <main>
             <Form />
             <div>
@@ -12,5 +14,6 @@ export default function Login() {
             </div>
             <SocialLogin />
         </main>
+        </section>
     );
 }
