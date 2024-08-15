@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
-import expand from '../../../assets/icons/nav/add-16.svg';
-import reduce from '../../../assets/icons/nav/reduce.svg';
+import expand from '@assets/icons/nav/add-16.svg';
+import reduce from '@assets/icons/nav/reduce.svg';
 
 type ExpandBtnProps = {
     handler: () => void,
