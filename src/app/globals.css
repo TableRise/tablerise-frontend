@@ -8,6 +8,13 @@
     scroll-behavior: smooth;
 }
 
+svg {
+	fill: currentColor;
+}
+path {
+	fill: currentColor;
+}
+
 @layer base {
     /* ----------- Font Patterns ----------- */
     .font-XXL-bold {
