@@ -1,4 +1,6 @@
 export default function Form() {
+    const MAX_LENGTH_EMAIL = 30;
+    const MAX_LENGTH_PASS = 50;
     return (
         <main>
             <div>
@@ -9,12 +11,12 @@ export default function Form() {
             <form>
                 <div>
                     <label htmlFor='eField' />E-mail
-                    <input type='email' placeholder="Insira o seu e-mail" />
+                    <input type='email' maxLength={MAX_LENGTH_EMAIL} placeholder="Insira o seu e-mail" />
                     {/* limitar e validar */}
                 </div>
                 <div>
                     <label htmlFor='pField' />Senha
-                    <input type='password' placeholder="Insira a sua senha" /> <i></i>
+                    <input type='password' maxLength={MAX_LENGTH_PASS} placeholder="Insira a sua senha" /> <i></i>
                     {/* limitar e validar */}
                 </div>
                 <a href="#">Esqueceu a senha?</a> {/* levar p reset de senha */}
