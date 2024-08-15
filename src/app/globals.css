@@ -9,10 +9,10 @@
 }
 
 svg {
-	fill: currentColor;
+    fill: currentColor;
 }
 path {
-	fill: currentColor;
+    fill: currentColor;
 }
 
 @layer base {
