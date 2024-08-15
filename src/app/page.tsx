@@ -1,4 +1,5 @@
 import Form from './components/Form';
+import SocialLogin from './components/SocialLogin';
 
 export default function Login() {
 
@@ -9,7 +10,7 @@ export default function Login() {
                 <hr />
                 <span>ou continue com</span>
             </div>
-            {/* <Button /> */}
+            <SocialLogin />
         </main>
     );
 }
