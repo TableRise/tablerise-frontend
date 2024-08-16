@@ -6,7 +6,7 @@ export default function SideImage() {
     return (
         <article className="bg-side-image-background absolute w-full h-full left-0 top-0">
             <div className=" absolute opacity-70 w-full h-full left-0 top-0 bg-gradient-to-r from-color-primary/default_900 to-color-primary/950"></div>
-            <div className="absolute w-1/2 h-full">
+            <div className="absolute w-[55%] h-full">
                 <Image
                     src={TableriseLogo}
                     alt="Tablerise logo"

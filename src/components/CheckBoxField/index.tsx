@@ -13,7 +13,7 @@ export default function CheckBoxField({
     srcLink,
 }: CheckBoxFieldProps) {
     return (
-        <label className="flex items-center">
+        <label className="flex items-center mb-6">
             <input
                 className="
             
@@ -21,6 +21,7 @@ export default function CheckBoxField({
                 checkbox-default
                 checked:checkbox-icon
                 checked:bg-color-primary/default_900
+                mr-2
                 "
                 type="checkbox"
             />

@@ -7,7 +7,7 @@ import SubmitButton from '../SubmitButton';
 
 export default function RegisterForm() {
     return (
-        <form className="flex flex-col w-full">
+        <form className="flex flex-col w-full mb-6">
             <TextInput
                 label="Nome de usuário"
                 placeholder="Insira o seu nome de usuário"

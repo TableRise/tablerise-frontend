@@ -8,15 +8,9 @@ type SocialLoginButtonProps = {
 export default function SocialLoginButton({ title, Icon }: SocialLoginButtonProps) {
     return (
         <button
-            className="flex justify-center items-center w-48 h-10 button-M-outline-il rounded-lg border-2 border-color-greyScale/300"
+            className="flex justify-center items-center w-48 h-10 button-M-outline-il rounded-lg border-2 border-color-greyScale/300 gap-2"
             type="button"
         >
-            {/* <Image
-                className="text-color-greyScale/800 fill-current"
-                src={imageSrc}
-                alt={`${title} logo`}
-            /> */}
-
             <Icon style={{ color: '#464646' }} />
             <p className="font-XS-bold text-color-greyScale/800">{title}</p>
         </button>
