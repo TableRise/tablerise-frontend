@@ -24,4 +24,3 @@ export default function SocialLoginButton({ title, socialType }: SocialLoginButt
         </button>
     );
 }
-
