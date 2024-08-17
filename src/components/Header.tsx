@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import TableRiseLightMark from '../../assets/icons/logo.svg';
+import TableRiseLightMark from '../../assets/icons/logo.svg?url';
 import '@/components/styles/Header.css';
 
 const alts = require('../../assets/alts');

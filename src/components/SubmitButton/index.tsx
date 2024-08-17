@@ -14,3 +14,4 @@ export default function SubmitButton({ title }: SubmitButtonProps) {
         </button>
     );
 }
+

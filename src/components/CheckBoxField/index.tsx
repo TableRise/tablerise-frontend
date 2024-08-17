@@ -5,12 +5,16 @@ type CheckBoxFieldProps = {
     label: string;
     labelWithLink?: string;
     srcLink?: string;
+    onChangeState: React.Dispatch<React.SetStateAction<boolean>>;
+    inputValue: boolean;
 };
 
 export default function CheckBoxField({
     label,
     labelWithLink,
     srcLink,
+    onChangeState,
+    inputValue,
 }: CheckBoxFieldProps) {
     return (
         <label className="flex items-center mb-6">
@@ -24,6 +28,8 @@ export default function CheckBoxField({
                 mr-2
                 "
                 type="checkbox"
+                onChange={({ target: { checked } }) => onChangeState(checked)}
+                checked={inputValue}
             />
             <h3 className="font-XS-regular text-color-greyScale/950">
                 {label}{' '}
@@ -40,3 +46,4 @@ export default function CheckBoxField({
         </label>
     );
 }
+

@@ -1,8 +1,7 @@
 import RegisterForm from '@/components/RegisterForm';
 import SideImage from '@/components/SideImage';
 import SocialLoginButton from '../../components/SocialLoginButton';
-import discordLogo from '../../../assets/icons/social-midia/discord.svg';
-import googleLogo from '../../../assets/icons/social-midia/google.svg';
+
 import React from 'react';
 import Link from 'next/link';
 
@@ -33,11 +32,12 @@ export default function Register() {
                         ou continue com
                     </h3>
                     <div className="flex flex-row w-full items-center justify-center gap-3">
-                        <SocialLoginButton Icon={discordLogo} title="Discord" />
-                        <SocialLoginButton Icon={googleLogo} title="Google" />
+                        <SocialLoginButton title="Discord" socialType={'discord'} />
+                        <SocialLoginButton title="Google" socialType={'google'} />
                     </div>
                 </div>
             </div>
         </section>
     );
 }
+
