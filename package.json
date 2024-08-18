@@ -10,6 +10,7 @@
         "prettier": "npx prettier --check .",
         "prettier:fix": "npx prettier . --write",
         "test:cy": "cypress open",
+        "test:cy:run": "cypress run",
         "prepare": "husky install"
     },
     "dependencies": {
