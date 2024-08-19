@@ -1,7 +1,7 @@
-import FAQItem from '@/components/FAQItem';
+import FAQItem from '@/components/home/FAQItem';
 import MoreDetailsBtn from '@/components/MoreDetailsBtn';
 import { questions } from '@/utils/faqQuestions';
-import '@/components/styles/FAQ.css';
+import '@/components/home/styles/FAQ.css';
 
 export default function FAQ() {
     return (

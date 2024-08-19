@@ -4,7 +4,7 @@
 
 @layer base {
     .faq-container {
-        @apply w-[82.5%] bg-color-greyScale/950 text-color-greyScale/50;
+        @apply w-[82.5%] bg-color-greyScale/100 text-color-primary/default_900;
     }
 
     .faq-title {
@@ -16,11 +16,11 @@
     }
 
     .faq-extra {
-        @apply py-4 flex items-center gap-6 text-color-greyScale/100;
+        @apply py-4 flex items-center gap-6 text-color-greyScale/950;
     }
 
     .faq-item-container {
-        @apply w-full bg-color-greyScale/950 p-4 rounded-xl flex flex-col gap-2;
+        @apply w-full bg-color-greyScale/50 p-4 rounded-xl flex flex-col gap-2;
     }
 
     .faq-item-question {
@@ -28,6 +28,6 @@
     }
 
     .faq-item-answer {
-        @apply bg-color-greyScale/900 p-3 rounded-lg;
+        @apply bg-color-greyScale/100 text-color-greyScale/950 p-3 rounded-lg;
     }
 }

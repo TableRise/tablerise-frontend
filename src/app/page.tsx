@@ -1,5 +1,5 @@
 import React from 'react';
-import FAQ from '@/components/FAQ';
+import FAQ from '@/components/home/FAQ';
 import Header from '@/components/Header';
 
 export default function Home() {

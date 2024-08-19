@@ -23,5 +23,4 @@ export default function FAQItem({ question, answer }: FAQItemProps) {
             )}
         </li>
     )
-
 }
