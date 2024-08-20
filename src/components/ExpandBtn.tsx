@@ -1,4 +1,4 @@
-import ExpandIcon from './ExpandIcon';
+import ExpandIcon from './icons/ExpandIcon';
 import { ExpandBtnProps } from '@/types/modules/components/ExpandBtn';
 import '@/components/styles/ExpandBtn.css';
 
