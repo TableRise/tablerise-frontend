@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    section {
+        @apply flex w-screen h-screen;
+    }
+
+    section .side-image-container {
+        @apply w-[55%];
+    }
+
+    section .side-form-container {
+        @apply flex flex-col justify-center items-center py-0 px-28 absolute w-[45%] h-full right-0 top-0 bg-color-greyScale/100 rounded-s-xl;
+    }
+
+    section .form-container {
+        @apply flex flex-col justify-center items-center w-full;
+    }
+}
