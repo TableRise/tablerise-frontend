@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import ExpandBtn from '@/components/ExpandBtn';
-import { FAQItemProps } from '@/types/modules/components/FAQItem';
+import { FAQItemProps } from '@/types/modules/components/home/FAQItem';
 
 export default function FAQItem({ question, answer }: FAQItemProps) {
     const [expand, setExpand] = useState<boolean>(false);
