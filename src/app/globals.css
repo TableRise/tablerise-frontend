@@ -239,7 +239,7 @@ path {
         border-radius: 0.5rem;
     }
 
-    .input-error-light {
+    .input-error-dark {
         @apply bg-color-greyScale/900 border border-color-suport/alert text-color-greyScale/950;
         box-sizing: border-box;
         display: flex;
@@ -252,7 +252,7 @@ path {
         border-radius: 0.5rem;
     }
 
-    .input-success-light {
+    .input-success-dark {
         @apply bg-color-greyScale/900 border border-color-suport/success text-color-greyScale/950;
         box-sizing: border-box;
         display: flex;
