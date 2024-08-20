@@ -5,6 +5,8 @@ type PasswordInputProps = {
     placeholder: string;
     onChangeState: React.Dispatch<React.SetStateAction<string>>;
     inputValue: string;
+    errorId: string;
+    errorList: any;
 };
 
 export default function PasswordInput({
@@ -12,7 +14,10 @@ export default function PasswordInput({
     placeholder,
     onChangeState,
     inputValue,
+    errorId,
+    errorList,
 }: PasswordInputProps) {
+    const hasError = errorList.inputId === errorId;
     return (
         <label className="w-full mb-4">
             <h1 className="font-S-bold text-color-greyScale/950 mb-2">{label}</h1>
@@ -23,6 +28,11 @@ export default function PasswordInput({
                 onChange={({ target: { value } }) => onChangeState(value)}
                 value={inputValue}
             />
+            {hasError && (
+                <p className="font-XXS-bold text-color-suport/alert">
+                    {errorList.message}
+                </p>
+            )}
         </label>
     );
 }
