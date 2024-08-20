@@ -1,3 +1,5 @@
+import React from 'react';
+import FAQ from '@/components/home/FAQ';
 import Header from '@/components/Header';
 import Banner from '@/components/home/Banner';
 import Promo from '@/components/home/Promo';
@@ -16,6 +18,7 @@ export default function Home(): JSX.Element {
                 <Promo />
                 <Features />
                 <SecondPromo />
+                <FAQ />
             </section>
         </main>
     );
