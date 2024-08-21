@@ -8,7 +8,7 @@ export default function Input({ props }: any) {
                 <input
                     id={props.id}
                     type={props.type}
-                    maxLength={props.type === "email" ? MAX_LENGTH_EMAIL : MAX_LENGTH_PASS }
+                    maxLength={props.type === 'email' ? MAX_LENGTH_EMAIL : MAX_LENGTH_PASS }
                     placeholder={props.placeholder}
                     onChange={({ target }) => props.onChange(target.value)}
                 />
