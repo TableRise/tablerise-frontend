@@ -4,6 +4,6 @@
 
 @layer base {
     .expand-btn {
-        @apply border border-color-greyScale/300 rounded-[4px] w-6 h-6 flex items-center justify-center
+        @apply border border-color-greyScale/300 rounded-[4px] w-6 h-6 flex items-center justify-center;
     }
 }

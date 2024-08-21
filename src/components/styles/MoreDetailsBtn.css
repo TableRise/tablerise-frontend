@@ -4,6 +4,6 @@
 
 @layer base {
     .moredetails-btn {
-        @apply flex pl-4 pr-2 gap-2 h-[40px] items-center border-solid border-color-greyScale/300 border rounded-lg
+        @apply flex pl-4 pr-2 gap-2 h-[40px] items-center border-solid border-color-greyScale/300 border rounded-lg;
     }
 }

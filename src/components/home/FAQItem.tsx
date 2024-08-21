@@ -11,16 +11,16 @@ export default function FAQItem({ question, answer }: FAQItemProps) {
     }
 
     return (
-        <li className='faq-item-container'>
-            <div className='faq-item-question'>
-                <h2 className='font-L-semibold'>{ question }</h2>
-                <ExpandBtn handler={ handleFAQItem } expandState={ expand } />
+        <li className="faq-item-container">
+            <div className="faq-item-question">
+                <h2 className="font-L-semibold">{question}</h2>
+                <ExpandBtn handler={handleFAQItem} expandState={expand} />
             </div>
-            { expand && (
-                <div className='faq-item-answer font-S-regular'>
-                    <p>{ answer }</p>
+            {expand && (
+                <div className="faq-item-answer font-S-regular">
+                    <p>{answer}</p>
                 </div>
             )}
         </li>
-    )
+    );
 }
