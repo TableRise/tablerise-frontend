@@ -6,5 +6,4 @@
     .button-submit {
         @apply w-full h-12 rounded-xl text-color-greyScale/50;
     }
-
 }

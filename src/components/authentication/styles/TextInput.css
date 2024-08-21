@@ -18,5 +18,4 @@
     label .error-message {
         @apply text-color-suport/alert;
     }
-
 }

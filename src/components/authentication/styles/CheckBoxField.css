@@ -12,7 +12,7 @@
     }
 
     .checkbox-container .checkbox-label .input-checkbox {
-        @apply  appearance-none checked:bg-color-primary/default_900 mr-2;
+        @apply appearance-none checked:bg-color-primary/default_900 mr-2;
     }
 
     .checkbox-container .checkbox-label .checkbox-text {
@@ -26,10 +26,4 @@
     .checkbox-container .error-message {
         @apply text-color-suport/alert;
     }
-
-
-    
-
-
-
 }
