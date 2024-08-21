@@ -36,12 +36,14 @@ export default function Form() {
         return true
     }
 
-
     function handleLogin(data: any) {
-        console.log(data);
-        //PEGAR DADOS DO CONTEXT
-        "response = api.post({data}"
-        "if response nao for ok return (erro)"
+        const isValid = validateInput(data.userEmail, data.userPassword)
+        if(isValid) {
+            console.log("efetuar login")
+            const response = "api.post({data}"
+            return response;
+        }
+        console.log("dados inválidos. login falha")
     }
 
     return (
