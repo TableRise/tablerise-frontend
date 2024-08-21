@@ -1,4 +1,4 @@
-import { uuid } from 'uuidv4';
+import { v4 as uuid } from 'uuid';
 import Image from 'next/image';
 import { Elements } from '@/types/modules/components/home/FeatureCards';
 import '@/components/styles/FeatureCards.css';
