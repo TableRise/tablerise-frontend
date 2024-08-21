@@ -1,13 +1,14 @@
 'use client';
 import React, { useState } from 'react';
 import SocialLoginButton from './SocialLoginButton';
+import '@/components/authentication/styles/SocialLoginContainer.css';
 
 export default function SocialLoginContainer() {
     const [error, setError] = useState<boolean>(false);
 
     return (
         <div>
-            <div className="flex flex-row w-full items-center justify-center gap-3">
+            <div className="buttons-container">
                 <SocialLoginButton
                     title="Discord"
                     socialType={'discord'}
@@ -19,7 +20,7 @@ export default function SocialLoginContainer() {
                     setError={setError}
                 />
             </div>
-            <p className="font-XXS-bold text-color-suport/alert" hidden={!error}>
+            <p className="error-message font-XXS-bold" hidden={!error}>
                 Erro ao fazer login
             </p>
         </div>

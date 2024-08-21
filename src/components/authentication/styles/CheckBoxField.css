@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .checkbox-container {
+        @apply flex flex-col  mb-6;
+    }
+
+    .checkbox-container .checkbox-label {
+        @apply flex items-center;
+    }
+
+    .checkbox-container .checkbox-label .input-checkbox {
+        @apply  appearance-none checked:bg-color-primary/default_900 mr-2;
+    }
+
+    .checkbox-container .checkbox-label .checkbox-text {
+        @apply text-color-greyScale/950;
+    }
+
+    .checkbox-container .checkbox-label .checkbox-text .checkbox-link {
+        @apply underline text-color-primary/800;
+    }
+
+    .checkbox-container .error-message {
+        @apply text-color-suport/alert;
+    }
+
+
+    
+
+
+
+}

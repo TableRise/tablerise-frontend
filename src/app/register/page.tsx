@@ -14,11 +14,9 @@ export default function Register() {
             </div>
             <div className="side-form-container">
                 <div className="form-container">
-                    <div className="flex flex-col w-full mb-6">
-                        <h1 className="font-L-semibold text-color-primary/default_900 mb-1">
-                            Criar Conta
-                        </h1>
-                        <h2 className="font-XS-regular text-color-greyScale/950">
+                    <div className="title-container">
+                        <h1 className="title-text font-L-semibold">Criar Conta</h1>
+                        <h2 className="subtitle-text font-XS-regular">
                             Já possui uma conta?{' '}
                             <Link
                                 href={'/login'}
@@ -29,9 +27,7 @@ export default function Register() {
                         </h2>
                     </div>
                     <RegisterForm />
-                    <h3 className="px-3 py-0 font-S-bold text-color-greyScale/950 mb-3">
-                        ou continue com
-                    </h3>
+                    <h3 className="divide-container font-S-bold">ou continue com</h3>
                     <SocialLoginContainer />
                 </div>
             </div>

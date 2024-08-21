@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import React from 'react';
+import '@/components/authentication/styles/CheckBoxField.css';
 
 type CheckBoxFieldProps = {
     label: string;
@@ -22,27 +23,20 @@ export default function CheckBoxField({
 }: CheckBoxFieldProps) {
     const hasError = errorList.inputId === errorId;
     return (
-        <div className="flex flex-col  mb-6">
-            <label className="flex items-center">
+        <div className="checkbox-container">
+            <label className="checkbox-label">
                 <input
-                    className="
-            
-                    appearance-none
-                    checkbox-default
-                    checked:checkbox-icon
-                    checked:bg-color-primary/default_900
-                    mr-2
-                    "
+                    className="input-checkbox checkbox-default checked:checkbox-icon"
                     type="checkbox"
                     onChange={({ target: { checked } }) => onChangeState(checked)}
                     checked={inputValue}
                 />
-                <h3 className="font-XS-regular text-color-greyScale/950">
+                <h3 className="checkbox-text font-XS-regular">
                     {label}{' '}
                     {labelWithLink && (
                         <Link
                             href={srcLink || ''}
-                            className="font-XS-regular underline text-color-primary/800"
+                            className="checkbox-link font-XS-regular"
                         >
                             {' '}
                             {labelWithLink}
@@ -51,9 +45,7 @@ export default function CheckBoxField({
                 </h3>
             </label>
             {hasError && (
-                <p className="font-XXS-bold text-color-suport/alert">
-                    {errorList.message}
-                </p>
+                <p className="error-message font-XXS-bold">{errorList.message}</p>
             )}
         </div>
     );

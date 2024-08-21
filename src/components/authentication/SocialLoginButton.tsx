@@ -4,6 +4,7 @@ import DiscordLogo from '../../../assets/icons/social-midia/discord.svg';
 import GoogleLogo from '../../../assets/icons/social-midia/google.svg';
 import { getGoogleLogin, getDiscordLogin } from '@/server/users/api';
 import { useRouter } from 'next/navigation';
+import '@/components/authentication/styles/SocialLoginButton.css';
 
 type SocialLoginButtonProps = {
     title: string;
@@ -42,15 +43,15 @@ export default function SocialLoginButton({
     };
 
     return (
-        <div className="flex flex-col">
+        <div className="button-container">
             <button
-                className="flex justify-center items-center w-48 h-10 button-M-outline-il rounded-lg border-2 border-color-greyScale/300 gap-2"
+                className="social-button button-M-outline-il"
                 type="button"
                 onClick={socialLoginHandlers[socialType]}
             >
                 {socialType === 'discord' && <DiscordLogo style={{ color: '#464646' }} />}
                 {socialType === 'google' && <GoogleLogo style={{ color: '#464646' }} />}
-                <p className="font-XS-bold text-color-greyScale/800">{title}</p>
+                <p className="button-text font-XS-bold">{title}</p>
             </button>
         </div>
     );

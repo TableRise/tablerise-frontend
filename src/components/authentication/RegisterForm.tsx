@@ -9,6 +9,7 @@ import SubmitButton from './SubmitButton';
 import { postRegister } from '@/server/users/api';
 import { useRouter } from 'next/navigation';
 import errorHandler from '@/utils/errorHandler';
+import '@/components/authentication/styles/RegisterForm.css';
 
 export default function RegisterForm(): JSX.Element {
     const [userName, setUserName] = useState<string>('');
@@ -43,10 +44,7 @@ export default function RegisterForm(): JSX.Element {
     };
 
     return (
-        <form
-            className="flex flex-col w-full mb-6"
-            onSubmit={(event) => handleSubmit(event)}
-        >
+        <form className="form" onSubmit={(event) => handleSubmit(event)}>
             <TextInput
                 label="Nome de usuário"
                 placeholder="Insira o seu nome de usuário"

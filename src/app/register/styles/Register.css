@@ -18,4 +18,22 @@
     section .form-container {
         @apply flex flex-col justify-center items-center w-full;
     }
+
+    section .title-container {
+        @apply flex flex-col w-full mb-6;
+    }
+
+    section .title-container .title-text {
+        @apply text-color-primary/default_900 mb-1;
+    }
+
+    section .title-container .subtitle-text {
+        @apply text-color-greyScale/950;
+    }
+
+    section .divide-container {
+        @apply px-3 py-0 text-color-greyScale/950 mb-3;
+    }
+
+
 }

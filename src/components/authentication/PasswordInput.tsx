@@ -1,4 +1,5 @@
 import React from 'react';
+import '@/components/authentication/styles/TextInput.css';
 
 type PasswordInputProps = {
     label: string;
@@ -19,19 +20,19 @@ export default function PasswordInput({
 }: PasswordInputProps) {
     const hasError = errorList.inputId === errorId;
     return (
-        <label className="w-full mb-4">
-            <h1 className="font-S-bold text-color-greyScale/950 mb-2">{label}</h1>
+        <label className="label">
+            <h1 className="label-text font-S-bold">{label}</h1>
             <input
-                className="w-full h-10 input-i2-light font-XS-regular text-color-greyScale/500"
+                className={` ${
+                    hasError ? 'input-error-light' : 'input-i2-light'
+                } input font-XS-regular focus:input-active-light`}
                 placeholder={placeholder}
                 type="password"
                 onChange={({ target: { value } }) => onChangeState(value)}
                 value={inputValue}
             />
             {hasError && (
-                <p className="font-XXS-bold text-color-suport/alert">
-                    {errorList.message}
-                </p>
+                <p className="error-message font-XXS-bold">{errorList.message}</p>
             )}
         </label>
     );
