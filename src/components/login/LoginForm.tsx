@@ -26,21 +26,15 @@ export default function Form() {
         onChange: setPassword,
     }
 
-/*     function validateInput(value: string, type: string) {
+    function validateInput(email: string, password: string) {
         const MIN_LENGTH_PASS = 6;
-        if(type === 'email') { 
-            const validHas: RegExp =  /^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/;
-            if(validHas.test(value)) {
-                console.log('OK');
-                
-            }
-            console.log("email invalido");
-            
+        const validHas: RegExp =  /^[_a-z0-9-]+(\.[_a-z0-9-]+)@[a-z0-9-]+(\.[a-z0-9-]+)(\.[a-z]{2,4})$/;
+
+        if(!validHas.test(email) || (password.length < MIN_LENGTH_PASS)) {
+            return false
         }
-        else if (value.length < MIN_LENGTH_PASS) {
-            console.log(`campo vermelho enquanto menos de 6 caracteres` );
-        }
-    } */
+        return true
+    }
 
 
     function handleLogin(data: any) {
