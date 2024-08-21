@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .second-promo-section {
+        @apply my-20 p-6 flex justify-center items-center w-[82.5%] rounded-xl bg-color-greyScale/50;
+    }
+
+    .second-promo-image {
+        @apply mr-6 w-[40.8rem] h-80 rounded-xl;
+    }
+
+    .second-promo-text h2 {
+        @apply mb-2 text-color-primary/default_900;
+    }
+
+    .second-promo-text p {
+        @apply w-[80%] mb-2 text-color-greyScale/950;
+    }
+}

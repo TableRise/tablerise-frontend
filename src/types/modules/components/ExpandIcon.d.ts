@@ -1,4 +1,4 @@
 export type ExpandIconProps = {
-    className?: string,
-    expandState: boolean
-}
+    className?: string;
+    expandState: boolean;
+};

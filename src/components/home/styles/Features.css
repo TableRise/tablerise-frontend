@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .features-section {
+        @apply w-[82.5%] flex flex-col;
+    }
+
+    .features-text {
+        @apply mb-6;
+    }
+
+    .features-text h2 {
+        @apply mb-2 text-color-primary/default_900;
+    }
+
+    .features-text p {
+        @apply text-color-greyScale/950;
+    }
+
+    .features-cards {
+        @apply flex justify-between;
+    }
+}

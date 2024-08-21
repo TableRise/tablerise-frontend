@@ -10,12 +10,14 @@
         "prettier": "npx prettier --check .",
         "prettier:fix": "npx prettier . --write",
         "test:cy": "cypress open",
+        "test:cy:run": "cypress run",
         "prepare": "husky install"
     },
     "dependencies": {
         "next": "14.2.4",
         "react": "18",
-        "react-dom": "18"
+        "react-dom": "18",
+        "uuidv4": "^6.2.13"
     },
     "devDependencies": {
         "@types/node": "20",
