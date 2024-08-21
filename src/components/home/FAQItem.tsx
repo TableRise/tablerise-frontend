@@ -17,7 +17,7 @@ export default function FAQItem({ question, answer }: FAQItemProps) {
                 <ExpandBtn handler={ handleFAQItem } expandState={ expand } />
             </div>
             { expand && (
-                <div className='faq-item-answer'>
+                <div className='faq-item-answer font-S-regular'>
                     <p>{ answer }</p>
                 </div>
             )}
