@@ -5,10 +5,10 @@ import { input } from '@/types/login/types';
 import Link from 'next/link';
 
 export default function Form() {
-    const [showPass, setShowPass] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [userEmail, setEmail] = useState('');
-    const [userPassword, setPassword] = useState('');
+    const [showPass, setShowPass] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [userEmail, setEmail] = useState<string>('');
+    const [userPassword, setPassword] = useState<string>('');
 
     const emailProps: input = {
         type: 'email',
@@ -26,9 +26,9 @@ export default function Form() {
         onChange: setPassword,
     }
 
-    function validateInput(email: string, password: string) {
+    function validateInput(email: string, password: string): boolean {
         const MIN_LENGTH_PASS = 6;
-        const validHas: RegExp = /^[_a-z0-9-]+(\.[_a-z0-9-]+)@[a-z0-9-]+(\.[a-z0-9-]+)(\.[a-z]{2,4})$/;
+        const validHas: RegExp = /^[_a-z0-9-]+(\.[_a-z0-9-]+)@[a-z0-9-]+(\.[a-z0-9-]+)(\.[a-z]{2, 4})$/;
 
         if (!validHas.test(email) || (password.length < MIN_LENGTH_PASS)) {
             return false
@@ -36,15 +36,14 @@ export default function Form() {
         return true
     }
 
-
-    function handleLogin(data: any) {
-        const isValid = validateInput(data.userEmail, data.userPassword)
+    function handleLogin(data: any): string {
+        const isValid: boolean = validateInput(data.userEmail, data.userPassword)
         if (isValid) {
             console.log('efetuar login')
             const response = 'api.post({data}'
             return response;
         }
-        console.log('dados inválidos. login falha')
+        return ('dados inválidos. login falha');
     }
 
     return (
