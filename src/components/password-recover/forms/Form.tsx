@@ -1,6 +1,6 @@
-import { ButtonHTMLAttributes, forwardRef, HTMLProps, InputHTMLAttributes, LabelHTMLAttributes } from 'react';
-import './styles/Form.css';
+import { ButtonHTMLAttributes, forwardRef, HTMLAttributes, HtmlHTMLAttributes, HTMLProps, InputHTMLAttributes, LabelHTMLAttributes } from 'react';
 import { FieldError } from 'react-hook-form';
+import './styles/Form.css';
 
 function Title(props: HTMLProps<HTMLHeadingElement>) {
 
@@ -49,6 +49,15 @@ const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
     )
 })
 
+function Span(props: HTMLAttributes<HTMLSpanElement>) {
+    return (
+        <span
+            className='text-red-500 font-XXS-regular'
+            {...props}
+        />
+    )
+}
+
 function ButtonSubmit(props: ButtonHTMLAttributes<HTMLButtonElement>) {
 
     return (
@@ -76,6 +85,7 @@ export default {
     Description,
     Label,
     Input,
+    Span,
     ButtonSubmit,
     ButtonCancel,
 }
