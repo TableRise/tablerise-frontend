@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .form-input {
+        @apply w-96 h-10 text-color-greyScale/500 focus:w-96;
+    }
+
+    .container-button {
+        @apply flex flex-col gap-2;
+    }
+
+    form .form-button-submit {
+        @apply w-96 h-10 rounded-lg text-color-greyScale/50 bg-color-primary/default_900;
+    }
+
+    .form-button-cancel {
+        @apply w-96 h-10 text-color-greyScale/500;
+    }
+}
