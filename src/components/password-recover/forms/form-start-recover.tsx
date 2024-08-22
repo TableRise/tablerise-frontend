@@ -23,12 +23,14 @@ export default function FormStartRecover() {
             <Form.Input
                 {...register('email')}
                 error={errors.email}
+                type="email"
                 placeholder="Insira o seu e-mail"
             />
+
             {errors.email &&
-                <span className="text-red-500 font-XXS-regular">
+                <Form.Span>
                     {errors.email.message}
-                </span>
+                </Form.Span>
             }
 
             <div className="container-button">

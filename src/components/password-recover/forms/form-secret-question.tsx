@@ -25,6 +25,7 @@ export default function FormSecretQuestion() {
                 <Form.Input
                     id="secretAnswer"
                     {...register('secretAnswer')}
+                    type="text"
                     error={errors.secretAnswer}
                     placeholder="Insira a sua resposta secreta"
                 />
