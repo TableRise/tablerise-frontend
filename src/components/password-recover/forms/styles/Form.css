@@ -15,7 +15,7 @@
         @apply w-96 h-10 rounded-lg text-color-greyScale/50 bg-color-primary/default_900;
     }
 
-    .form-button-cancel {
+    form .form-button-cancel {
         @apply w-96 h-10 text-color-greyScale/500;
     }
 }

@@ -26,7 +26,7 @@ function Label(props: LabelHTMLAttributes<HTMLLabelElement>) {
 
     return (
         <label
-            className='font-S-bold text-color-greyScale/950'
+            className='flex flex-col font-S-bold text-color-greyScale/950 gap-2'
             {...props}
         />
     )
@@ -41,7 +41,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
     return (
         <input
             ref={ref}
-            className={`form-input input-default-light font-XS-regular focus:input-active-light focus:text-black
+            className={`form-input input-default-light font-XS-regular focus:input-active-light focus:text-black text-black
                 ${error ? 'mb-0 input-error-light focus:input-error-light text-black': 'mb-6'}
             `}
             {...rest}
@@ -64,7 +64,7 @@ function ButtonCancel(props: ButtonHTMLAttributes<HTMLButtonElement>) {
 
     return (
         <button
-            className='form-button-cancel font-S-bold
+            className='font-S-bold form-button-cancel
                 button-L-ghost'
             {...props}
         />
