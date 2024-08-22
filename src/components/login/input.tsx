@@ -1,16 +1,24 @@
-export default function Input({ props }: any) {
+import { input } from "@/types/login/types";
+
+export default function Input({
+    type,
+    name,
+    placeholder,
+    onChange,
+    id,
+    }: input) {
     const MAX_LENGTH_EMAIL = 30;
     const MAX_LENGTH_PASS = 50;
 
     return (
         <div>
-            <label htmlFor={props.type}>{props.name}
+            <label htmlFor={type}>{name}
                 <input
-                    id={props.id}
-                    type={props.type}
-                    maxLength={props.type === 'email' ? MAX_LENGTH_EMAIL : MAX_LENGTH_PASS }
-                    placeholder={props.placeholder}
-                    onChange={({ target }) => props.onChange(target.value)}
+                    id={id}
+                    type={type}
+                    maxLength={type === 'email' ? MAX_LENGTH_EMAIL : MAX_LENGTH_PASS }
+                    placeholder={placeholder}
+                    onChange={({ target }) => onChange(target.value)}
                 />
             </label>
         </div>

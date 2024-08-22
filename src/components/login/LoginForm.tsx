@@ -10,22 +10,6 @@ export default function Form() {
     const [userEmail, setEmail] = useState<string>('');
     const [userPassword, setPassword] = useState<string>('');
 
-    const emailProps: input = {
-        type: 'email',
-        name: 'E-mail',
-        placeholder: 'Insira o seu e-mail',
-        id: 'emailInput',
-        onChange: setEmail,
-    }
-
-    const passProps: input = {
-        type: 'password',
-        name: 'password',
-        placeholder: 'Insira a sua senha',
-        id: 'passwordInput',
-        onChange: setPassword,
-    }
-
     function validateInput(email: string, password: string): boolean {
         const MIN_LENGTH_PASS = 6;
         const validHas: RegExp = /^[_a-z0-9-]+(\.[_a-z0-9-]+)@[a-z0-9-]+(\.[a-z0-9-]+)(\.[a-z]{2, 4})$/;
@@ -53,8 +37,8 @@ export default function Form() {
                 <span>Não possui uma conta? <Link href={'/register'} />Criar conta!</span>
             </div>
             <form onSubmit={(event) => { event.preventDefault(), handleLogin('data') }}>
-                <Input props={emailProps} onChange={setEmail} />
-                <Input props={passProps} onChange={setPassword} />
+                <Input type='email' name='E-mail' placeholder='Insira o seu e-mail' id='emailInput' onChange={setEmail} />
+                <Input type='password' name='password' placeholder='Insira a sua senha' id='passwordInput' onChange={setPassword} />
                 <a href='#'>Esqueceu a senha?</a> {/* levar p reset de senha */}
                 <button type='button' onClick={(event) => handleLogin({ userEmail, userPassword })
                 }>Entrar</button>
