@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .section-container {
+        @apply flex justify-center items-center px-[119px] absolute w-[622px] h-screen bg-color-greyScale/100 rounded-l-xl;
+    }
+}

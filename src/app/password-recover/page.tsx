@@ -1,5 +1,9 @@
+import StartRecover from "@/components/password-recover/StartRecover";
+
 export default function PasswordRecover() {
-    <main className="w-full h-screen">
-        Password Recover
-    </main>
+    return (
+        <section>
+            <StartRecover />
+        </section>
+    )
 }
