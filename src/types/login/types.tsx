@@ -8,3 +8,7 @@ export type input = {
     id: string;
 }
 
+export type userData = {
+    userEmail: string;
+    userPassword: string;
+}

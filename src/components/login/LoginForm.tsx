@@ -1,8 +1,9 @@
 'use client'
 import { useState } from 'react';
 import Input from './input';
-import { input } from '@/types/login/types';
 import Link from 'next/link';
+import { api } from '@/server/users/examples';
+import { userData } from '@/types/login/types';
 
 export default function Form() {
     const [showPass, setShowPass] = useState<boolean>(false);
@@ -20,12 +21,12 @@ export default function Form() {
         return true
     }
 
-    function handleLogin(data: any): string {
+    async function handleLogin(data: userData): Promise<string> {
         const isValid: boolean = validateInput(data.userEmail, data.userPassword)
+        console.log('api.post(data.userEmail, data.userPassword)')
         if (isValid) {
-            console.log('efetuar login')
-            const response = 'api.post({data}'
-            return response;
+            const response = await api.post(data.userEmail, data.userPassword);
+            console.log(response);
         }
         return ('dados inválidos. login falha');
     }
@@ -36,12 +37,11 @@ export default function Form() {
                 <p>Entrar</p>
                 <span>Não possui uma conta? <Link href={'/register'} />Criar conta!</span>
             </div>
-            <form onSubmit={(event) => { event.preventDefault(), handleLogin('data') }}>
+            <form onSubmit={(event) => { event.preventDefault() }}>
                 <Input type='email' name='E-mail' placeholder='Insira o seu e-mail' id='emailInput' onChange={setEmail} />
                 <Input type='password' name='password' placeholder='Insira a sua senha' id='passwordInput' onChange={setPassword} />
                 <a href='#'>Esqueceu a senha?</a> {/* levar p reset de senha */}
-                <button type='button' onClick={(event) => handleLogin({ userEmail, userPassword })
-                }>Entrar</button>
+                <button type='button' onClick={() => handleLogin({ userEmail, userPassword })}>Entrar</button>
                 {/* salvar user e token no localstorage e redirecionar p home */}
             </form>
         </main>
