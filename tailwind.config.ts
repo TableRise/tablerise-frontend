@@ -29,6 +29,9 @@ const config: Config = {
             backgroundImage: {
                 'side-image-background': "url('/images/SideImageBackground.svg')",
             },
+            content: {
+                checked: "url('/icons/check.svg')",
+            },
         },
     },
     plugins: [],

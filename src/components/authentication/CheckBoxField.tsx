@@ -15,12 +15,13 @@ export default function CheckBoxField({
     const hasError = errorList.inputId === errorId;
     return (
         <div className="checkbox-container">
-            <label className="checkbox-label">
+            <label className="checkbox-label" htmlFor="checkBtn">
                 <input
                     className="input-checkbox checkbox-default checked:checkbox-icon"
                     type="checkbox"
                     onChange={({ target: { checked } }) => onChangeState(checked)}
                     checked={inputValue}
+                    id="checkBtn"
                 />
                 <h3 className="checkbox-text font-XS-regular">
                     {label}{' '}

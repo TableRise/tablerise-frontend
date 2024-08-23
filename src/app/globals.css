@@ -274,7 +274,7 @@ path {
     }
 
     .checkbox-icon {
-        @apply m-1 w-4 h-4 box-border border-2 border-color-primary/default_900 rounded;
+        @apply m-1 w-4 h-4 box-border border-2 border-color-primary/default_900 rounded content-checked;
     }
 
     /* ----------- Button Patterns ----------- */
