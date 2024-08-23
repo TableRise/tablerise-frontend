@@ -27,7 +27,13 @@ export default function Register(): JSX.Element {
                         </h2>
                     </div>
                     <RegisterForm />
-                    <h3 className="divide-container font-S-bold">ou continue com</h3>
+                    <div className="divider-container">
+                        <div className="divider-line"></div>
+                        <span className="dividee-content font-S-bold">
+                            ou continue com
+                        </span>
+                        <div className="divider-line"></div>
+                    </div>
                     <SocialLoginContainer />
                 </div>
             </div>

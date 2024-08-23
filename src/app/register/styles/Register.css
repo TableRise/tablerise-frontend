@@ -31,7 +31,15 @@
         @apply text-color-greyScale/950;
     }
 
-    section .divide-container {
-        @apply px-3 py-0 text-color-greyScale/950 mb-3;
+    section .divider-container {
+        @apply flex justify-center items-center w-full mb-3 gap-2;
+    }
+
+    section .divider-line {
+        @apply flex-grow border-t-2 border-color-greyScale/300;
+    }
+
+    section .divider-content {
+        @apply px-2 py-0 text-color-greyScale/950;
     }
 }
