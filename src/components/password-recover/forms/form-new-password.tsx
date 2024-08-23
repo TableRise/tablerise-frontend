@@ -27,7 +27,7 @@ export default function FormNewPassword() {
                 Nova senha
                 <div
                     className="flex items-center justify-center relative"
-                    style={{ marginBottom: errors.newPassword? '0rem' : '1.5rem' }}
+                    style={{ marginBottom: errors.newPassword ? '0rem' : '1.5rem' }}
                 >
                     <Form.Input
                         {...register('newPassword')}
@@ -54,7 +54,7 @@ export default function FormNewPassword() {
                 Confirmar
                 <div
                     className="flex items-center justify-center relative"
-                    style={{ marginBottom: errors.confirmPassword? '0rem' : '1.5rem' }}
+                    style={{ marginBottom: errors.confirmPassword ? '0rem' : '1.5rem' }}
                 >
                     <Form.Input
                         {...register('confirmPassword')}
@@ -77,13 +77,15 @@ export default function FormNewPassword() {
                 </Form.Span>
             }
 
-            <Form.ButtonSubmit>
-                Confirmar
-            </Form.ButtonSubmit>
+            <div className="container-button">
+                <Form.ButtonSubmit>
+                    Confirmar
+                </Form.ButtonSubmit>
 
-            <Form.ButtonCancel>
-                Cancelar
-            </Form.ButtonCancel>
+                <Form.ButtonCancel>
+                    Cancelar
+                </Form.ButtonCancel>
+            </div>
         </form>
     )
 }
