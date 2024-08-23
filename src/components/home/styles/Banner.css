@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .banner-home {
+        @apply mt-20 mb-[8.3rem] w-[82.5%] justify-between flex items-center;
+    }
+
+    .main-text p:nth-child(1) {
+        @apply mb-3 text-color-greyScale/50;
+    }
+
+    .main-text p:nth-child(2) {
+        @apply mb-6 text-color-greyScale/100;
+    }
+
+    .main-text button {
+        @apply w-36 h-14;
+    }
+
+    .main-image {
+        @apply w-[40.2rem] h-[30.3rem] bg-[url('../../../../assets/images/image_dnd_5e_01.jpg')] bg-cover;
+    }
+}

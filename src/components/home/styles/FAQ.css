@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .faq-container {
+        @apply w-[82.5%] text-color-primary/default_900;
+    }
+
+    .faq-title {
+        @apply py-4;
+    }
+
+    .faq-question-list {
+        @apply flex flex-col gap-3;
+    }
+
+    .faq-extra {
+        @apply pt-6 mb-20 flex items-center gap-6 text-color-greyScale/950;
+    }
+
+    .faq-item-container {
+        @apply w-full bg-color-greyScale/50 p-4 rounded-xl flex flex-col gap-2;
+    }
+
+    .faq-item-question {
+        @apply w-full flex justify-between;
+    }
+
+    .faq-item-answer {
+        @apply bg-color-greyScale/100 text-color-greyScale/950 p-3 rounded-lg;
+    }
+}

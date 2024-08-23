@@ -27,7 +27,7 @@
         @apply ml-12 flex items-center;
     }
 
-    header .buttons-header button:nth-child(2) {
+    header .buttons-header a:nth-child(2) {
         @apply ml-3;
     }
 }

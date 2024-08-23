@@ -11,6 +11,7 @@ const config: Config = {
         extend: {
             colors: {
                 'color-primary/500': '#1B8BFF',
+                'color-primary/700': '#0052F8',
                 'color-primary/800': '#0542C8',
                 'color-primary/default_900': '#0A358A',
                 'color-primary/950': '#0C255F',
