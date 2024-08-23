@@ -1,16 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
 import '@/components/authentication/styles/CheckBoxField.css';
-
-type CheckBoxFieldProps = {
-    label: string;
-    labelWithLink?: string;
-    srcLink?: string;
-    onChangeState: React.Dispatch<React.SetStateAction<boolean>>;
-    inputValue: boolean;
-    errorId: string;
-    errorList: any;
-};
+import { CheckBoxFieldProps } from '@/types/modules/components/authentication/CheckBoxField';
 
 export default function CheckBoxField({
     label,
@@ -20,7 +11,7 @@ export default function CheckBoxField({
     inputValue,
     errorId,
     errorList,
-}: CheckBoxFieldProps) {
+}: CheckBoxFieldProps): JSX.Element {
     const hasError = errorList.inputId === errorId;
     return (
         <div className="checkbox-container">

@@ -10,6 +10,7 @@ import { postRegister } from '@/server/users/api';
 import { useRouter } from 'next/navigation';
 import errorHandler from '@/utils/errorHandler';
 import '@/components/authentication/styles/RegisterForm.css';
+import { errorListTypes } from '@/types/shared/errorHandler';
 
 export default function RegisterForm(): JSX.Element {
     const [userName, setUserName] = useState<string>('');
@@ -17,7 +18,7 @@ export default function RegisterForm(): JSX.Element {
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
     const [termsCheckBox, setRermsCheckBox] = useState<boolean>(false);
-    const [errorList, setErrorList] = useState<any>({});
+    const [errorList, setErrorList] = useState<errorListTypes>({});
     const router = useRouter();
 
     const handleSubmit = async (

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import SocialLoginButton from './SocialLoginButton';
 import '@/components/authentication/styles/SocialLoginContainer.css';
 
-export default function SocialLoginContainer() {
+export default function SocialLoginContainer(): JSX.Element {
     const [error, setError] = useState<boolean>(false);
 
     return (

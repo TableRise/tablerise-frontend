@@ -1,14 +1,6 @@
 import React from 'react';
 import '@/components/authentication/styles/TextInput.css';
-
-type TextInputProps = {
-    label: string;
-    placeholder: string;
-    onChangeState: React.Dispatch<React.SetStateAction<string>>;
-    inputValue: string;
-    errorId: string;
-    errorList: any;
-};
+import { TextInputProps } from '@/types/modules/components/authentication/TextInput';
 
 export default function TextInput({
     label,
@@ -17,7 +9,7 @@ export default function TextInput({
     inputValue,
     errorId,
     errorList,
-}: TextInputProps) {
+}: TextInputProps): JSX.Element {
     const hasError = errorList.inputId === errorId;
     return (
         <label className="label">

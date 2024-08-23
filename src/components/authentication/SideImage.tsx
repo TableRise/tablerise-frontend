@@ -3,7 +3,7 @@ import React from 'react';
 import TableriseLogo from '../../../public/images/LogoTablerise.svg?url';
 import '@/components/authentication/styles/SideImage.css';
 
-export default function SideImage() {
+export default function SideImage(): JSX.Element {
     return (
         <article className="article">
             <div className="image-filter"></div>

@@ -1,14 +1,6 @@
 import React from 'react';
 import '@/components/authentication/styles/TextInput.css';
-
-type EmailInputProps = {
-    label: string;
-    placeholder: string;
-    onChangeState: React.Dispatch<React.SetStateAction<string>>;
-    inputValue: string;
-    errorId: string;
-    errorList: any;
-};
+import { EmailInputProps } from '@/types/modules/components/authentication/EmailInput';
 
 export default function EmailInput({
     label,
@@ -17,7 +9,7 @@ export default function EmailInput({
     inputValue,
     errorId,
     errorList,
-}: EmailInputProps) {
+}: EmailInputProps): JSX.Element {
     const hasError = errorList.inputId === errorId;
 
     return (

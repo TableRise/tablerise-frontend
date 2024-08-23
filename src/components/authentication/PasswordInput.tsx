@@ -1,14 +1,6 @@
 import React from 'react';
 import '@/components/authentication/styles/TextInput.css';
-
-type PasswordInputProps = {
-    label: string;
-    placeholder: string;
-    onChangeState: React.Dispatch<React.SetStateAction<string>>;
-    inputValue: string;
-    errorId: string;
-    errorList: any;
-};
+import { PasswordInputProps } from '@/types/modules/components/authentication/PasswordInput';
 
 export default function PasswordInput({
     label,
@@ -17,7 +9,7 @@ export default function PasswordInput({
     inputValue,
     errorId,
     errorList,
-}: PasswordInputProps) {
+}: PasswordInputProps): JSX.Element {
     const hasError = errorList.inputId === errorId;
     return (
         <label className="label">

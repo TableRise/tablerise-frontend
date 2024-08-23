@@ -1,11 +1,8 @@
 import React from 'react';
 import '@/components/authentication/styles/SubmitButton.css';
+import { SubmitButtonProps } from '@/types/modules/components/authentication/SubmitButton';
 
-type SubmitButtonProps = {
-    title: string;
-};
-
-export default function SubmitButton({ title }: SubmitButtonProps) {
+export default function SubmitButton({ title }: SubmitButtonProps): JSX.Element {
     return (
         <button
             type="submit"

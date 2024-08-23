@@ -5,18 +5,13 @@ import GoogleLogo from '../../../assets/icons/social-midia/google.svg';
 import { getGoogleLogin, getDiscordLogin } from '@/server/users/api';
 import { useRouter } from 'next/navigation';
 import '@/components/authentication/styles/SocialLoginButton.css';
-
-type SocialLoginButtonProps = {
-    title: string;
-    socialType: 'discord' | 'google';
-    setError: any;
-};
+import { SocialLoginButtonProps } from '@/types/modules/components/authentication/SocialLoginButton';
 
 export default function SocialLoginButton({
     title,
     socialType,
     setError,
-}: SocialLoginButtonProps) {
+}: SocialLoginButtonProps): JSX.Element {
     const router = useRouter();
 
     const socialLoginHandlers = {

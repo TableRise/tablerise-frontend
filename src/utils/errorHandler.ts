@@ -1,4 +1,6 @@
-export default function errorHandler(error: string) {
+import { errorListTypes } from '@/types/shared/errorHandler';
+
+export default function errorHandler(error: string): errorListTypes {
     switch (error) {
         case 'username in use':
             return { inputId: 'username', message: 'Esse usuário já foi cadastrado' };

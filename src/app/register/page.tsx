@@ -6,7 +6,7 @@ import '@/app/register/styles/Register.css';
 import React from 'react';
 import Link from 'next/link';
 
-export default function Register() {
+export default function Register(): JSX.Element {
     return (
         <section className="section">
             <div className="side-image-container">
