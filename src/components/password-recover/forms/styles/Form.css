@@ -7,6 +7,10 @@
         @apply w-96 h-10 text-color-greyScale/500 focus:w-96;
     }
 
+    .form-opt-input {
+        @apply flex text-center w-14 h-10 mb-6 items-center justify-center bg-white;
+    }
+
     .container-button {
         @apply flex flex-col gap-2;
     }
