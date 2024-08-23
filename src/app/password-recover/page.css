@@ -4,6 +4,6 @@
 
 @layer base {
     .section-container {
-        @apply flex justify-center items-center px-[119px] absolute w-[622px] h-screen bg-color-greyScale/100 rounded-l-xl;
+        @apply flex justify-center items-center px-[119px] w-[622px] h-screen bg-color-greyScale/100 rounded-l-xl;
     }
 }
