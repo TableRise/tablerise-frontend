@@ -6,15 +6,12 @@ export const apiCall = async (
     method: string = 'GET',
     data?: any
 ) => {
-    const token = localStorage.getItem('token');
-
     try {
         const response = await axios({
             method,
             url: `${baseUrl}/${endpoint}`,
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
             },
             data,
         });
