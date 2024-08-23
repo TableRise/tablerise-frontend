@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes, forwardRef, HTMLAttributes, HtmlHTMLAttributes, HTMLProps, InputHTMLAttributes, LabelHTMLAttributes } from 'react';
+import { ButtonHTMLAttributes, forwardRef, HTMLAttributes, HTMLProps, InputHTMLAttributes, LabelHTMLAttributes } from 'react';
 import { FieldError } from 'react-hook-form';
 import './styles/Form.css';
 
@@ -36,13 +36,13 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     error: FieldError | undefined;
 }
 const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
-    const { error, ...rest} = props;
+    const { error, ...rest } = props;
 
     return (
         <input
             ref={ref}
             className={`form-input input-default-light font-XS-regular focus:input-active-light focus:text-black text-black
-                ${error ? 'mb-0 input-error-light focus:input-error-light text-black': 'mb-6'}
+                ${error ? 'mb-0 input-error-light focus:input-error-light text-black' : 'mb-6'}
             `}
             {...rest}
         />
