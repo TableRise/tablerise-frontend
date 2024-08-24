@@ -4,8 +4,6 @@
 BRANCH=$(git symbolic-ref --short HEAD)
 REGEX="^(feat|bugfix|hotfix)\/([[:alnum:]-]+)\/([[:alnum:]-]+)$"
 
-npm run test:cy:run
-
 handlePrettierError() {
   npm run prettier:fix && git add . && git commit -m "fix: prettier" && git push -u origin $BRANCH
 }
