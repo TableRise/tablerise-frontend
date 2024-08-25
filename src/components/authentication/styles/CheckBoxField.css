@@ -22,8 +22,4 @@
     .checkbox-container .checkbox-label .checkbox-text .checkbox-link {
         @apply underline text-color-primary/800;
     }
-
-    .checkbox-container .error-message {
-        @apply text-color-suport/alert;
-    }
 }
