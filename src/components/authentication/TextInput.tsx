@@ -1,6 +1,8 @@
 import React from 'react';
 import '@/components/authentication/styles/TextInput.css';
 import { TextInputProps } from '@/types/modules/components/authentication/TextInput';
+import InputErrorMessage from './inputErrorMessage';
+import { verifyError } from '@/utils/errorHandler';
 
 export default function TextInput({
     label,
@@ -8,9 +10,9 @@ export default function TextInput({
     onChangeState,
     inputValue,
     errorId,
-    errorList,
+    errorList = [],
 }: TextInputProps): JSX.Element {
-    const hasError = errorList.inputId === errorId;
+    const hasError = verifyError(errorList, errorId);
     return (
         <label className="label">
             <h1 className="label-text font-S-bold">{label}</h1>
@@ -23,9 +25,7 @@ export default function TextInput({
                 placeholder={placeholder}
                 type="text"
             />
-            {hasError && (
-                <p className="error-message font-XXS-bold">{errorList.message}</p>
-            )}
+            {hasError && <InputErrorMessage errorMessage={hasError.message} />}
         </label>
     );
 }

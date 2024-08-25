@@ -3,6 +3,8 @@ import '@/components/authentication/styles/TextInput.css';
 import { PasswordInputProps } from '@/types/modules/components/authentication/PasswordInput';
 import VisibilityIcon from '../../../assets/icons/sys/visibility.svg';
 import VisibilityOffIcon from '../../../assets/icons/sys/visibility-off.svg';
+import InputErrorMessage from './inputErrorMessage';
+import { verifyError } from '@/utils/errorHandler';
 
 export default function PasswordInput({
     label,
@@ -10,9 +12,10 @@ export default function PasswordInput({
     onChangeState,
     inputValue,
     errorId,
-    errorList,
+    errorList = [],
 }: PasswordInputProps): JSX.Element {
-    const hasError = errorList.inputId === errorId;
+    const hasError = verifyError(errorList, errorId);
+
     const [visible, setVisible] = useState<boolean>(false);
     return (
         <label className="label">
@@ -26,6 +29,8 @@ export default function PasswordInput({
                     type={visible ? 'text' : 'password'}
                     onChange={({ target: { value } }) => onChangeState(value)}
                     value={inputValue}
+                    minLength={8}
+                    maxLength={32}
                 />
                 <span
                     className="flex justify-around items-center"
@@ -44,9 +49,7 @@ export default function PasswordInput({
                     )}
                 </span>
             </div>
-            {hasError && (
-                <p className="error-message font-XXS-bold">{errorList.message}</p>
-            )}
+            {hasError && <InputErrorMessage errorMessage={hasError.message} />}
         </label>
     );
 }

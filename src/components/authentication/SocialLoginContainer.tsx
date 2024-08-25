@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import SocialLoginButton from './SocialLoginButton';
 import '@/components/authentication/styles/SocialLoginContainer.css';
+import InputErrorMessage from './inputErrorMessage';
 
 export default function SocialLoginContainer(): JSX.Element {
     const [error, setError] = useState<boolean>(false);
@@ -20,9 +21,7 @@ export default function SocialLoginContainer(): JSX.Element {
                     setError={setError}
                 />
             </div>
-            <p className="error-message font-XXS-bold" hidden={!error}>
-                Erro ao fazer login
-            </p>
+            {error && <InputErrorMessage errorMessage="Erro ao fazer login" />}
         </div>
     );
 }

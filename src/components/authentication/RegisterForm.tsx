@@ -6,41 +6,54 @@ import EmailInput from './EmailInput';
 import PasswordInput from './PasswordInput';
 import CheckBoxField from './CheckBoxField';
 import SubmitButton from './SubmitButton';
-import { postRegister } from '@/server/users/api';
+// import { postRegister } from '@/server/users/api';
 import { useRouter } from 'next/navigation';
-import errorHandler from '@/utils/errorHandler';
+// import errorHandler from '@/utils/errorHandler';
 import '@/components/authentication/styles/RegisterForm.css';
 import { errorListTypes } from '@/types/shared/errorHandler';
+import validateRagisterFields from '@/utils/validateRegisterFields';
 
 export default function RegisterForm(): JSX.Element {
-    const [userName, setUserName] = useState<string>('');
+    const [nickname, setNickname] = useState<string>('');
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
     const [termsCheckBox, setRermsCheckBox] = useState<boolean>(false);
-    const [errorList, setErrorList] = useState<errorListTypes>({});
+    const [errorList, setErrorList] = useState<errorListTypes[]>([]);
     const router = useRouter();
 
     const handleSubmit = async (
         event: React.FormEvent<HTMLFormElement>
     ): Promise<void> => {
         event.preventDefault();
-        const registerPayload = {
-            userName,
+
+        const fieldsValidation = validateRagisterFields({
+            nickname,
             email,
             password,
             confirmPassword,
             termsCheckBox,
-        };
+        });
 
-        try {
-            await postRegister(registerPayload);
-            router.push('/home');
-        } catch (error: any) {
-            const errorResponse = errorHandler('terms not accepted');
-            setErrorList(errorResponse);
+        if (fieldsValidation.length > 0) {
+            setErrorList(fieldsValidation);
+            return;
         }
 
+        // const registerPayload = {
+        //     nickname,
+        //     email,
+        //     password,
+        // };
+
+        // try {
+        //     await postRegister(registerPayload);
+        //     router.push('/home');
+        // } catch (error: any) {
+        //     const errorResponse = errorHandler('terms not accepted');
+        //     setErrorList(errorResponse);
+        // }
+        setErrorList([]);
         return;
     };
 
@@ -49,9 +62,9 @@ export default function RegisterForm(): JSX.Element {
             <TextInput
                 label="Nome de usuário"
                 placeholder="Insira o seu nome de usuário"
-                onChangeState={setUserName}
-                inputValue={userName}
-                errorId={'username'}
+                onChangeState={setNickname}
+                inputValue={nickname}
+                errorId={'nickname'}
                 errorList={errorList}
             />
             <EmailInput

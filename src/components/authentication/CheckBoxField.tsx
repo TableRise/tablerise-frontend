@@ -2,6 +2,8 @@ import Link from 'next/link';
 import React from 'react';
 import '@/components/authentication/styles/CheckBoxField.css';
 import { CheckBoxFieldProps } from '@/types/modules/components/authentication/CheckBoxField';
+import { verifyError } from '@/utils/errorHandler';
+import InputErrorMessage from './inputErrorMessage';
 
 export default function CheckBoxField({
     label,
@@ -10,9 +12,9 @@ export default function CheckBoxField({
     onChangeState,
     inputValue,
     errorId,
-    errorList,
+    errorList = [],
 }: CheckBoxFieldProps): JSX.Element {
-    const hasError = errorList.inputId === errorId;
+    const hasError = verifyError(errorList, errorId);
     return (
         <div className="checkbox-container">
             <label className="checkbox-label" htmlFor="checkBtn">
@@ -36,9 +38,7 @@ export default function CheckBoxField({
                     )}
                 </h3>
             </label>
-            {hasError && (
-                <p className="error-message font-XXS-bold">{errorList.message}</p>
-            )}
+            {hasError && <InputErrorMessage errorMessage={hasError.message} />}
         </div>
     );
 }

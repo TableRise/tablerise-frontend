@@ -1,6 +1,8 @@
 import React from 'react';
 import '@/components/authentication/styles/TextInput.css';
 import { EmailInputProps } from '@/types/modules/components/authentication/EmailInput';
+import { verifyError } from '@/utils/errorHandler';
+import InputErrorMessage from './inputErrorMessage';
 
 export default function EmailInput({
     label,
@@ -8,9 +10,9 @@ export default function EmailInput({
     onChangeState,
     inputValue,
     errorId,
-    errorList,
+    errorList = [],
 }: EmailInputProps): JSX.Element {
-    const hasError = errorList.inputId === errorId;
+    const hasError = verifyError(errorList, errorId);
 
     return (
         <label className="label">
@@ -24,9 +26,7 @@ export default function EmailInput({
                 onChange={({ target: { value } }) => onChangeState(value)}
                 value={inputValue}
             />
-            {hasError && (
-                <p className="error-message font-XXS-bold">{errorList.message}</p>
-            )}
+            {hasError && <InputErrorMessage errorMessage={hasError.message} />}
         </label>
     );
 }
