@@ -8,5 +8,5 @@ export type CheckBoxFieldProps = {
     onChangeState: React.Dispatch<React.SetStateAction<boolean>>;
     inputValue: boolean;
     errorId: string;
-    errorList: errorListTypes;
+    errorList: errorListTypes[];
 };

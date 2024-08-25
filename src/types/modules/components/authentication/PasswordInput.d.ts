@@ -7,5 +7,5 @@ export type PasswordInputProps = {
     onChangeState: React.Dispatch<React.SetStateAction<string>>;
     inputValue: string;
     errorId: string;
-    errorList: errorListTypes;
+    errorList: errorListTypes[];
 };
