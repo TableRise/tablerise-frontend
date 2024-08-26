@@ -13,13 +13,13 @@ export default function FormStartRecover() {
         resolver: zodResolver(emailSchema),
     });
 
-    const consoleFields = (data: EmailSchema) => {
-        console.log(data);
+    const sendEmail = async ({ email }: EmailSchema) => {
+        console.log(email);
     }
 
 
     return (
-        <form onSubmit={handleSubmit(consoleFields)}>
+        <form onSubmit={handleSubmit(sendEmail)}>
             <Form.Input
                 {...register('email')}
                 error={errors.email}

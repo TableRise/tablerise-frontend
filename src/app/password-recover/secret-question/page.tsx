@@ -5,15 +5,10 @@ import TwoFactor from "@/components/password-recover/TwoFactor";
 import AditionalTwoFactor from "@/components/password-recover/AditionalTwoFactor";
 import Congratulation from "@/components/password-recover/Congratulations";
 
-export default function PasswordRecover() {
+export default function Page() {
     return (
         <section>
-            <StartRecover />
-            {/* <SecretQuestion /> */}
-            {/* <NewPassword /> */}
-            {/* <TwoFactor /> */}
-            {/* <AditionalTwoFactor /> */}
-            {/* <Congratulation /> */}
+            <SecretQuestion />
         </section>
     )
 }
