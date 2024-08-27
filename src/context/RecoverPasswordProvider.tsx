@@ -27,8 +27,8 @@ export default function RecoverPasswordProvider({
             })
 
             setUserVerify({
-                email,
                 ...userVerify,
+                email,
             });
         } catch (error: AxiosError | unknown) {
             console.log(error);
@@ -37,9 +37,17 @@ export default function RecoverPasswordProvider({
 
     }
 
+    const setCode = (code: string) => {
+        setUserVerify({
+            ...userVerify,
+            code,
+        })
+    }
+
     const value = {
         verify,
         userVerify,
+        setCode,
     };
 
     return (

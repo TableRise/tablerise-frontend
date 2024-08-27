@@ -5,7 +5,8 @@ interface RecoverPasswordContext {
     userVerify: {
         email: string,
         code: string,
-    }
+    },
+    setCode: (code: string) => void,
 }
 
 const RecoverPasswordContext = createContext({} as RecoverPasswordContext);
