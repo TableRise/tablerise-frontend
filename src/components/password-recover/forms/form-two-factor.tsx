@@ -61,11 +61,9 @@ export default function FormTwoFactor() {
     };
 
     const consoleFormTwoFactor = (data: TwoFactorSchema) => {
-        const code = Object.values(data).join('');
+        const code = Object.values(data).join('').toUpperCase();
 
         setCode(code);
-
-        console.log(userVerify)
 
         router.push('/password-recover/new-password');
     }
