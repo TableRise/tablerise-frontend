@@ -3,22 +3,40 @@ import { useForm } from "react-hook-form"
 import { newPasswordSchema, NewPasswordSchema } from "./schemas/form-new-password-schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import Form from "./Form"
-import { useState } from "react"
+import { useContext, useState } from "react"
+import { useRouter } from "next/router"
+import RecoverPasswordContext from "@/context/RecoverPasswordContext"
 
 export default function FormNewPassword() {
+    const { updatePassword } = useContext(RecoverPasswordContext);
+
+    const router = useRouter();
+
     const [newPassVisible, setNewPassVisible] = useState(false);
     const [confirmPassVisible, setConfirmPassVisible] = useState(false);
 
     const {
         register,
         handleSubmit,
+        setError,
         formState: { errors }
     } = useForm<NewPasswordSchema>({
         resolver: zodResolver(newPasswordSchema),
     })
 
-    const consoleNewPassword = (data: NewPasswordSchema) => {
-        console.log(data);
+    const consoleNewPassword = async ({ newPassword }: NewPasswordSchema) => {
+        try {
+            await updatePassword(newPassword);
+
+            router.push('/password-recover/congratulations')
+        } catch (error) {
+            setError('confirmPassword',
+                {
+                    type: 'manual',
+                    message: 'Não foi possivel atualizar sua senha'
+                }
+            );
+        }
     }
 
     return (
