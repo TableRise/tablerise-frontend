@@ -60,7 +60,7 @@ export default function FormTwoFactor() {
         }
     };
 
-    const consoleFormTwoFactor = (data: TwoFactorSchema) => {
+    const sendCode = (data: TwoFactorSchema) => {
         const code = Object.values(data).join('').toUpperCase();
 
         setCode(code);
@@ -69,7 +69,7 @@ export default function FormTwoFactor() {
     }
 
     return (
-        <form onSubmit={handleSubmit(consoleFormTwoFactor)}>
+        <form onSubmit={handleSubmit(sendCode)}>
             <Form.Label>
                 Insira o código de verificação, indicado em seu e-mail.
 

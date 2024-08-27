@@ -26,7 +26,7 @@ export default function FormNewPassword() {
         resolver: zodResolver(newPasswordSchema),
     })
 
-    const consoleNewPassword = async ({ newPassword }: NewPasswordSchema) => {
+    const sendNewPassword = async ({ newPassword }: NewPasswordSchema) => {
         try {
             await updatePassword(newPassword);
 
@@ -42,7 +42,7 @@ export default function FormNewPassword() {
     }
 
     return (
-        <form onSubmit={handleSubmit(consoleNewPassword)}>
+        <form onSubmit={handleSubmit(sendNewPassword)}>
             <Form.Label id='newPassword'>
                 Nova senha
                 <div
