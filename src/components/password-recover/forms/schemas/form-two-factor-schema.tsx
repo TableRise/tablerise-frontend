@@ -8,11 +8,11 @@ export const twoFactorSchema = z.object({
     fild4: z.string(),
     fild5: z.string(),
 }).refine((data) => {
-    // Verifica se todos os campos são números e não estão vazios
-    return Object.values(data).every((value) => value.trim() !== "" && /^\d+$/.test(value));
+    // Verifica se todos os campos não estão vazios ou nulos
+    return Object.values(data).every((value) => value !== null && value.trim() !== "");
 }, {
-    message: "Todos os campos devem ser preenchidos com números.",
+    message: "Todos os campos devem ser preenchidos.",
     path: ["fild0"], // Define um erro global
-});
+});;
 
 export type TwoFactorSchema = z.infer<typeof twoFactorSchema>
