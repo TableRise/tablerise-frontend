@@ -1,5 +1,13 @@
 import { createContext } from 'react';
 
-const RecoverPasswordContext = createContext({});
+interface RecoverPasswordContext {
+    verify: (email: string) => Promise<void>,
+    userVerify: {
+        email: string,
+        code: string,
+    }
+}
+
+const RecoverPasswordContext = createContext({} as RecoverPasswordContext);
 
 export default RecoverPasswordContext;
