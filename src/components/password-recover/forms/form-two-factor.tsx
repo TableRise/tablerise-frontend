@@ -85,7 +85,7 @@ export default function FormTwoFactor() {
                                 onKeyDown={(e) => handleKeyPress(e, index)}
                                 onInput={(e) => nextInput(e, index)}
                                 className={`
-                                    form-opt-input
+                                    form-opt-input font-XS-regular
                                     ${errors.fild0 ? 'input-error-light mb-0' : 'input-default-light'}
                                 `}
                             />
