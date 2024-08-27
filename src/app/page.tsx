@@ -5,6 +5,10 @@ import Banner from '@/components/home/Banner';
 import Promo from '@/components/home/Promo';
 import Features from '@/components/home/Features';
 import SecondPromo from '@/components/home/SecondPromo';
+<<<<<<< HEAD
+=======
+import Footer from '@/components/home/Footer';
+>>>>>>> develop
 import '@/app/page.css';
 
 export default function Home(): JSX.Element {
@@ -19,6 +23,10 @@ export default function Home(): JSX.Element {
                 <Features />
                 <SecondPromo />
                 <FAQ />
+<<<<<<< HEAD
+=======
+                <Footer />
+>>>>>>> develop
             </section>
         </main>
     );

@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    section {
+        @apply flex w-screen h-screen;
+    }
+
+    section .side-image-container {
+        @apply w-[55%];
+    }
+
+    section .side-form-container {
+        @apply flex flex-col justify-center items-center py-0 px-28 absolute w-[45%] h-full right-0 top-0 bg-color-greyScale/100 rounded-s-xl;
+    }
+
+    section .form-container {
+        @apply flex flex-col justify-center items-center w-full;
+    }
+
+    section .title-container {
+        @apply flex flex-col w-full mb-6;
+    }
+
+    section .title-container .title-text {
+        @apply text-color-primary/default_900 mb-1;
+    }
+
+    section .title-container .subtitle-text {
+        @apply text-color-greyScale/950;
+    }
+
+    section .divider-container {
+        @apply flex justify-center items-center w-full mb-3 gap-2;
+    }
+
+    section .divider-line {
+        @apply flex-grow border-t-2 border-color-greyScale/300;
+    }
+
+    section .divider-content {
+        @apply px-2 py-0 text-color-greyScale/950;
+    }
+}

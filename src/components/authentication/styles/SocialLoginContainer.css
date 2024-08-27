@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .buttons-container {
+        @apply flex flex-row w-full items-center justify-center gap-3;
+    }
+}
