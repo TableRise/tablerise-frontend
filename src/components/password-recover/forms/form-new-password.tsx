@@ -4,7 +4,7 @@ import { newPasswordSchema, NewPasswordSchema } from "./schemas/form-new-passwor
 import { zodResolver } from "@hookform/resolvers/zod"
 import Form from "./Form"
 import { useContext, useState } from "react"
-import { useRouter } from "next/router"
+import { useRouter } from "next/navigation"
 import RecoverPasswordContext from "@/context/RecoverPasswordContext"
 
 export default function FormNewPassword() {
@@ -100,7 +100,7 @@ export default function FormNewPassword() {
                     Confirmar
                 </Form.ButtonSubmit>
 
-                <Form.ButtonCancel>
+                <Form.ButtonCancel onClick={() => router.push('/password-recover')}>
                     Cancelar
                 </Form.ButtonCancel>
             </div>
