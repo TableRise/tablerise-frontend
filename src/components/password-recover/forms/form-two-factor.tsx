@@ -25,7 +25,7 @@ export default function FormTwoFactor() {
     const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
         const inputElement = e.currentTarget;
         
-        if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
+        if (!/^[a-zA-Z0-9]$/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
             e.preventDefault(); // Impede qualquer caractere que não seja número
             return;
         }
@@ -81,8 +81,6 @@ export default function FormTwoFactor() {
                                 id={`fild${index}`}
                                 key={index}
                                 type="text"
-                                inputMode="numeric"
-                                pattern="[0-9]*"
                                 maxLength={1}
                                 onKeyDown={(e) => handleKeyPress(e, index)}
                                 onInput={(e) => nextInput(e, index)}
