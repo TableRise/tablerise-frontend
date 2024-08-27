@@ -7,6 +7,7 @@ interface RecoverPasswordContext {
         code: string,
     },
     setCode: (code: string) => void,
+    updatePassword: (newPassword: string) => void,
 }
 
 const RecoverPasswordContext = createContext({} as RecoverPasswordContext);

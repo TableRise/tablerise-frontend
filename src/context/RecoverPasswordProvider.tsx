@@ -9,7 +9,7 @@ export default function RecoverPasswordProvider({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const [userVerify, setUserVerify] = useState<any>({
+    const [userVerify, setUserVerify] = useState<{ email: string, code: string }>({
         email: '',
         code: ''
     });
@@ -44,10 +44,35 @@ export default function RecoverPasswordProvider({
         })
     }
 
+    const updatePassword = async (newPassword: string) => {
+        const { email, code } = userVerify;
+        try {
+            await axios.patch('api',
+            {
+                password: newPassword,
+            },
+            {
+                params: {
+                    email,
+                    code,
+                },
+                headers: {
+                    'header-secret': 'key',
+                    'Content-Type': 'application/json',
+                }
+            })
+        } catch (error: AxiosError | unknown) {
+            console.log(error);
+            throw new Error('Email invalido');
+        }
+
+    }
+
     const value = {
         verify,
         userVerify,
         setCode,
+        updatePassword,
     };
 
     return (
