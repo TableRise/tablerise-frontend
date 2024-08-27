@@ -6,6 +6,8 @@ import Form from "./Form"
 import { useContext, useState } from "react"
 import { useRouter } from "next/navigation"
 import RecoverPasswordContext from "@/context/RecoverPasswordContext"
+import VisibilityOff from "@/components/icons/password-recover/Visibility-off"
+import Visibility from "@/components/icons/password-recover/Visibility"
 
 export default function FormNewPassword() {
     const { updatePassword } = useContext(RecoverPasswordContext);
@@ -56,10 +58,13 @@ export default function FormNewPassword() {
                         id='newPassword'
                     >
                     </Form.Input>
-                    <div
+                    <button
+                        type="button"
                         onClick={() => setNewPassVisible(!newPassVisible)}
-                        className="absolute w-6 h-6 right-4 bg-color-greyScale/500"
-                    />
+                        className="absolute w-6 h-6 right-4 text-color-greyScale/500"
+                    >
+                        {newPassVisible ? <VisibilityOff /> : <Visibility />}
+                    </button>
                 </div>
             </Form.Label>
             {errors.newPassword &&
@@ -82,10 +87,13 @@ export default function FormNewPassword() {
                         placeholder="Confirme a nova senha"
                         id='confirmPassword'
                     />
-                    <div
+                    <button
+                        type="button"
                         onClick={() => setConfirmPassVisible(!confirmPassVisible)}
-                        className="absolute w-6 h-6 right-4 bg-color-greyScale/500"
-                    />
+                        className="absolute w-6 h-6 right-4 text-color-greyScale/500"
+                    >
+                        {newPassVisible ? <VisibilityOff /> : <Visibility />}
+                    </button>
                 </div>
             </Form.Label>
 
