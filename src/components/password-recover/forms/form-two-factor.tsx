@@ -18,9 +18,23 @@ export default function FormTwoFactor() {
         register,
         handleSubmit,
         formState: { errors },
+        setValue,
     } = useForm<TwoFactorSchema>({
         resolver: zodResolver(twoFactorSchema),
     })
+
+    const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>, index: number) => {
+        e.preventDefault();
+        const clipboardData = e.clipboardData.getData('Text');
+        const inputs = document.querySelectorAll('input');
+    
+        clipboardData.split('').forEach((char, idx) => {
+          if (inputs[idx]) {
+            (inputs[idx] as HTMLInputElement).value = char;
+            setValue(`fild${idx}` as `fild${1}`, char); // Atualiza o valor do formulário
+          }
+        });
+      };
 
     const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
         const inputElement = e.currentTarget;
@@ -82,6 +96,7 @@ export default function FormTwoFactor() {
                                 key={index}
                                 type="text"
                                 maxLength={1}
+                                onPaste={(e) => handlePaste(e, index)}
                                 onKeyDown={(e) => handleKeyPress(e, index)}
                                 onInput={(e) => nextInput(e, index)}
                                 className={`
