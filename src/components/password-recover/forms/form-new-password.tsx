@@ -92,7 +92,7 @@ export default function FormNewPassword() {
                         onClick={() => setConfirmPassVisible(!confirmPassVisible)}
                         className="absolute w-6 h-6 right-4 text-color-greyScale/500"
                     >
-                        {newPassVisible ? <VisibilityOff /> : <Visibility />}
+                        {confirmPassVisible ? <VisibilityOff /> : <Visibility />}
                     </button>
                 </div>
             </Form.Label>
