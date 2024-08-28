@@ -6,9 +6,9 @@ export type input = {
     placeholder: string;
     onChange: Dispatch<SetStateAction<string>>;
     id: string;
-}
+};
 
 export type userData = {
     userEmail: string;
     userPassword: string;
-}
+};
