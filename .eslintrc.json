@@ -7,9 +7,12 @@
         "no-return-await": "warn",
         "eol-last": "warn",
         "space-before-function-paren": "off",
-        "prettier/prettier": ["warn", {
-            "endOfLine":"auto"
-        }],
+        "prettier/prettier": [
+            "warn",
+            {
+                "endOfLine": "auto"
+            }
+        ],
         "linebreak-style": "off"
     }
 }

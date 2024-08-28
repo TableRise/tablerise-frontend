@@ -4,7 +4,7 @@
 
 @layer base {
     .faq-container {
-        @apply w-[82.5%] bg-color-greyScale/100 text-color-primary/default_900;
+        @apply w-[82.5%] text-color-primary/default_900;
     }
 
     .faq-title {
@@ -16,7 +16,7 @@
     }
 
     .faq-extra {
-        @apply py-4 flex items-center gap-6 text-color-greyScale/950;
+        @apply pt-6 mb-20 flex items-center gap-6 text-color-greyScale/950;
     }
 
     .faq-item-container {

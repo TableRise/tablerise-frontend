@@ -1,4 +1,4 @@
 export type ExpandBtnProps = {
-    handler: () => void,
-    expandState: boolean
+    handler: () => void;
+    expandState: boolean;
 };

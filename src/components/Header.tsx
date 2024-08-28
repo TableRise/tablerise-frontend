@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import TableRiseLightMark from '../../assets/icons/logo.svg';
 import '@/components/styles/Header.css';
 
@@ -15,18 +16,28 @@ export default function Header(): JSX.Element {
             <div className="menu-and-buttons">
                 <nav className="menu">
                     <ul className="menu-list font-XS-bold">
-                        <li>Inicio</li>
-                        <li>Tutorial</li>
-                        <li>Sobre</li>
+                        <li>
+                            <Link href="/">Inicio</Link>
+                        </li>
+                        <li>
+                            <Link href="/guide">Tutorial</Link>
+                        </li>
+                        <li>
+                            <Link href="/about">Sobre</Link>
+                        </li>
                     </ul>
                 </nav>
                 <div className="buttons-header">
-                    <button className="font-XS-bold button-transparent-default">
-                        Entrar
-                    </button>
-                    <button className="font-XS-bold button-white-default">
-                        Registrar
-                    </button>
+                    <Link href="/login">
+                        <button className="font-XS-bold button-transparent-default">
+                            Entrar
+                        </button>
+                    </Link>
+                    <Link href="/register">
+                        <button className="font-XS-bold button-white-default">
+                            Registrar
+                        </button>
+                    </Link>
                 </div>
             </div>
         </header>
