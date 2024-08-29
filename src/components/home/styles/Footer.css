@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* .footer-media-links {
+    @apply flex flex-col lg:flex-row justify-between items-center space-y-8 lg:space-y-0;
+}
+
+.social-media-icons {
+    @apply bg-blue-500 flex flex-row flex-wrap justify-center lg:justify-start space-x-6;
+}
+
+.footer-links {
+    @apply bg-blue-400 flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-16;
+} */
+
+.footer {
+    @apply w-full flex flex-col bg-blue-900 text-white py-0;
+}
+
+.footer-media-links {
+    @apply bg-slate-500 ml-40 mr-40 flex flex-row flex-wrap justify-between items-stretch;
+}
+
+.social-media-icons {
+    @apply bg-blue-500 flex flex-row flex-wrap lg:flex-row sm:flex-col space-x-[1.5rem];
+}
+
+.footer-links {
+    @apply  bg-blue-400 flex flex-col;
+}
+
+.footer-links h5 {
+    @apply font-semibold;
+}
+
+.footer-links ul {
+    @apply space-y-2;
+}
+
+.footer-links a {
+    @apply hover:text-gray-400;
+}
+
+.footer-bottom {
+    @apply  ml-40 mr-40 mt-8 border-t border-gray-500 pt-4 flex flex-col  lg:flex-row justify-between  space-y-4 lg:space-y-0;
+}
+
+.footer-bottom p {
+    @apply text-xs;
+}
+
+.theme-toggle {
+    @apply flex items-center space-x-2;
+}
+
+.theme-toggle-label {
+    @apply font-semibold;
+}
+
+/* Specific styles for the theme-switch */
+.theme-switch {
+    @apply relative inline-flex items-center cursor-pointer;
+}
+
+.theme-switch div {
+    @apply w-11 h-6 bg-gray-200 rounded-full dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white;
+    position: relative;
+}
+
+.theme-switch div::after {
+    content: '';
+    @apply absolute top-0.5 left-[2px] bg-white border-gray-300 border rounded-full h-5 w-5 transition-all;
+}
