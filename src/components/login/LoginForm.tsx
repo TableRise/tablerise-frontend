@@ -22,7 +22,7 @@ export default function Form() {
         return true;
     }
 
-    async function handleLogin(data: userData): Promise<string|number> {
+    async function handleLogin(data: userData): Promise<string | number> {
         const { userEmail, userPassword } = data;
         const isValid: boolean = validateInput(userEmail, userPassword);
         if (isValid) {
@@ -30,7 +30,7 @@ export default function Form() {
                 const response = await api.post('/login', data);
                 return response.status;
             } catch (error: any) {
-                console.log(error.message);
+                //console.log(error.message);
                 return error;
             }
         }
