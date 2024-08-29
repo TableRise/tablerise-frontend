@@ -2,32 +2,37 @@
 import { useState } from 'react';
 import Input from './input';
 import Link from 'next/link';
-import { api } from '@/server/users/examples';
+import { api } from '@/server/users/api';
 import { userData } from '@/types/login/types';
 
 export default function Form() {
-    const [showPass, setShowPass] = useState<boolean>(false);
-    const [loading, setLoading] = useState<boolean>(false);
+    //const [showPass, setShowPass] = useState<boolean>(false);
+    //const [loading, setLoading] = useState<boolean>(false);
     const [userEmail, setEmail] = useState<string>('');
     const [userPassword, setPassword] = useState<string>('');
 
     function validateInput(email: string, password: string): boolean {
         const MIN_LENGTH_PASS = 6;
-        const validHas: RegExp =
-            /^[_a-z0-9-]+(\.[_a-z0-9-]+)@[a-z0-9-]+(\.[a-z0-9-]+)(\.[a-z]{2, 4})$/;
+        //const validHas: RegExp = /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.[a-z]?$/i;
 
-        if (!validHas.test(email) || password.length < MIN_LENGTH_PASS) {
+        //temporary validation
+        if (!email.includes('@') || password.length < MIN_LENGTH_PASS) {
             return false;
         }
         return true;
     }
 
-    async function handleLogin(data: userData): Promise<string> {
-        const isValid: boolean = validateInput(data.userEmail, data.userPassword);
-        // console.log('api.post(data.userEmail, data.userPassword)');
+    async function handleLogin(data: userData): Promise<string|number> {
+        const { userEmail, userPassword } = data;
+        const isValid: boolean = validateInput(userEmail, userPassword);
         if (isValid) {
-            const response = await api.post(data.userEmail, data.userPassword);
-            // console.log(response);
+            try {
+                const response = await api.post('/login', data);
+                return response.status;
+            } catch (error: any) {
+                console.log(error.message);
+                return error;
+            }
         }
         return 'dados inválidos. login falha';
     }
