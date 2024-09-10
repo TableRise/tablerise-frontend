@@ -8,6 +8,13 @@
     scroll-behavior: smooth;
 }
 
+svg {
+    fill: currentColor;
+}
+path {
+    fill: currentColor;
+}
+
 @layer base {
     /* ----------- Font Patterns ----------- */
     .font-XXL-bold {
@@ -232,7 +239,7 @@
         border-radius: 0.5rem;
     }
 
-    .input-error-light {
+    .input-error-dark {
         @apply bg-color-greyScale/900 border border-color-suport/alert text-color-greyScale/950;
         box-sizing: border-box;
         display: flex;
@@ -245,7 +252,7 @@
         border-radius: 0.5rem;
     }
 
-    .input-success-light {
+    .input-success-dark {
         @apply bg-color-greyScale/900 border border-color-suport/success text-color-greyScale/950;
         box-sizing: border-box;
         display: flex;
@@ -267,7 +274,7 @@
     }
 
     .checkbox-icon {
-        @apply m-1 w-4 h-4 box-border border-2 border-color-primary/default_900 rounded;
+        @apply m-1 w-4 h-4 box-border border-2 border-color-primary/default_900 rounded content-checked;
     }
 
     /* ----------- Button Patterns ----------- */

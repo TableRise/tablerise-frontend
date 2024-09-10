@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .button-container {
+        @apply flex flex-col;
+    }
+
+    .button-container .social-button {
+        @apply flex justify-center items-center w-48 h-10 rounded-lg border-2 border-color-greyScale/300 gap-2;
+    }
+
+    .button-container .social-button .button-text {
+        @apply text-color-greyScale/800;
+    }
+}

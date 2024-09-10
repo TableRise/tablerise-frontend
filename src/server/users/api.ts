@@ -1,10 +1,31 @@
-import axios from 'axios';
+import { apiCall } from '../wrapper';
 
-export const api = axios.create({
-    baseURL: 'http://127.0.0.1:3001/users',
-    headers: {
-        'Access-Control-Allow-Origin': 'http://localhost:3000/',
-        'Content-Type': 'application/json',
-    },
-    method: 'POST',
-});
+const usersBaseUrl = process.env.API_USERS;
+const oauthBaseUrl = process.env.API_OAUTH;
+
+export const getGoogleLogin = async () => {
+    try {
+        const response = await apiCall(oauthBaseUrl, '/google', 'GET');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getDiscordLogin = async () => {
+    try {
+        const response = await apiCall(oauthBaseUrl, '/discord', 'GET');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const postRegister = async (payload: any) => {
+    try {
+        const response = await apiCall(usersBaseUrl, '/register', 'POST', payload);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
