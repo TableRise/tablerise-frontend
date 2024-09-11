@@ -29,3 +29,11 @@ export const postRegister = async (payload: any) => {
         throw error;
     }
 };
+export const postLogin = async (payload: any) => {
+    try {
+        const response = await apiCall(usersBaseUrl, '/login', 'POST', payload);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
