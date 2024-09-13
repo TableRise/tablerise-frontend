@@ -6,9 +6,9 @@ import EmailInput from './EmailInput';
 import PasswordInput from './PasswordInput';
 import CheckBoxField from './CheckBoxField';
 import SubmitButton from './SubmitButton';
-// import { postRegister } from '@/server/users/api';
+import { postRegister } from '@/server/users/api';
 import { useRouter } from 'next/navigation';
-// import errorHandler from '@/utils/errorHandler';
+import errorHandler from '@/utils/errorHandler';
 import '@/components/authentication/styles/RegisterForm.css';
 import { errorListTypes } from '@/types/shared/errorHandler';
 import validateRagisterFields from '@/utils/validateRegisterFields';
@@ -40,19 +40,24 @@ export default function RegisterForm(): JSX.Element {
             return;
         }
 
-        // const registerPayload = {
-        //     nickname,
-        //     email,
-        //     password,
-        // };
+        const registerPayload = {
+            nickname,
+            email,
+            password,
+        };
 
-        // try {
-        //     await postRegister(registerPayload);
-        //     router.push('/home');
-        // } catch (error: any) {
-        //     const errorResponse = errorHandler('terms not accepted');
-        //     setErrorList(errorResponse);
-        // }
+        try {
+            await postRegister(registerPayload);
+            router.push('/');
+        } catch (error: any) {
+            const errorResponse = errorHandler({
+                errorMessage: error.response.data.message,
+            });
+            console.log(errorResponse);
+
+            setErrorList(errorResponse);
+            return;
+        }
         setErrorList([]);
         return;
     };
