@@ -10,8 +10,10 @@ export const apiCall = async (
         const response = await axios({
             method,
             url: `${baseUrl}/${endpoint}`,
+            withCredentials: true,
             headers: {
                 'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
             },
             data,
         });
