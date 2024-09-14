@@ -53,7 +53,6 @@ export default function RegisterForm(): JSX.Element {
             const errorResponse = errorHandler({
                 errorMessage: error.response.data.message,
             });
-            console.log(errorResponse);
 
             setErrorList(errorResponse);
             return;
