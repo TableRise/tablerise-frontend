@@ -21,9 +21,9 @@ export default function errorHandler({
 
 const errorSerializer = (errorMessage: string): errorListTypes => {
     switch (errorMessage) {
-        case 'username in use':
+        case 'Nickname already exists in database':
             return { inputId: 'username', message: 'Esse usuário já foi cadastrado' };
-        case 'email in use':
+        case 'Email already exists in database':
             return { inputId: 'email', message: 'Esse e-mail já foi cadastrado' };
         case 'password not match':
             return { inputId: 'password', message: 'Esses campos não coincidem' };
