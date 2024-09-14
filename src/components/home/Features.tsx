@@ -41,3 +41,4 @@ export default function Features(): JSX.Element {
         </section>
     );
 }
+
