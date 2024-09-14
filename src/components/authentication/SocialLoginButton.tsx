@@ -6,48 +6,27 @@ import { getGoogleLogin, getDiscordLogin } from '@/server/users/api';
 import { useRouter } from 'next/navigation';
 import '@/components/authentication/styles/SocialLoginButton.css';
 import { SocialLoginButtonProps } from '@/types/modules/components/authentication/SocialLoginButton';
+import Link from 'next/link';
 
 export default function SocialLoginButton({
     title,
     socialType,
-    setError,
 }: SocialLoginButtonProps): JSX.Element {
     const router = useRouter();
 
-    const socialLoginHandlers = {
-        google: async () => handleGoogleLogin(),
-        discord: async () => handleDiscordLogin(),
-    };
-
-    const handleGoogleLogin = async () => {
-        try {
-            await getGoogleLogin();
-            router.push('/home');
-        } catch (error) {
-            setError(true);
-        }
-    };
-
-    const handleDiscordLogin = async () => {
-        try {
-            await getDiscordLogin();
-            router.push('/home');
-        } catch (error) {
-            setError(true);
-        }
-    };
-
     return (
         <div className="button-container">
-            <button
-                className="social-button button-M-outline-il"
-                type="button"
-                onClick={socialLoginHandlers[socialType]}
-            >
-                {socialType === 'discord' && <DiscordLogo style={{ color: '#464646' }} />}
-                {socialType === 'google' && <GoogleLogo style={{ color: '#464646' }} />}
-                <p className="button-text font-XS-bold">{title}</p>
-            </button>
+            <Link href={`${process.env.API_OAUTH}/${socialType}`}>
+                <button className="social-button button-M-outline-il" type="button">
+                    {socialType === 'discord' && (
+                        <DiscordLogo style={{ color: '#464646' }} />
+                    )}
+                    {socialType === 'google' && (
+                        <GoogleLogo style={{ color: '#464646' }} />
+                    )}
+                    <p className="button-text font-XS-bold">{title}</p>
+                </button>
+            </Link>
         </div>
     );
 }
