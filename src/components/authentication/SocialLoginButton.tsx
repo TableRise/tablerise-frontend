@@ -2,7 +2,6 @@
 import React from 'react';
 import DiscordLogo from '../../../assets/icons/social-midia/discord.svg';
 import GoogleLogo from '../../../assets/icons/social-midia/google.svg';
-import { getGoogleLogin, getDiscordLogin } from '@/server/users/api';
 import { useRouter } from 'next/navigation';
 import '@/components/authentication/styles/SocialLoginButton.css';
 import { SocialLoginButtonProps } from '@/types/modules/components/authentication/SocialLoginButton';
