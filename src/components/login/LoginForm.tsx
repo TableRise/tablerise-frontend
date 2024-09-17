@@ -13,10 +13,9 @@ export default function Form() {
 
     function validateInput(email: string, password: string): boolean {
         const MIN_LENGTH_PASS = 6;
-        //const validHas: RegExp = /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.[a-z]?$/i;
+        const validHas: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
 
-        //temporary validation
-        if (!email.includes('@') || password.length < MIN_LENGTH_PASS) {
+        if (!validHas.test(email) || password.length < MIN_LENGTH_PASS) {
             return false;
         }
         return true;
@@ -25,14 +24,12 @@ export default function Form() {
     async function handleLogin(data: userData): Promise<string | number> {
         const { userEmail, userPassword } = data;
         const isValid: boolean = validateInput(userEmail, userPassword);
-        console.log(isValid);
         if (isValid) {
             try {
                 const response = await postLogin(data);
-                console.log("FRONT", response);
-                return 'response.status';
+                return response.status;
             } catch (error: any) {
-                //console.log(error.message);
+                console.log('Usuário não encontrado. Deseja se cadastrar?');
                 return error;
             }
         }
