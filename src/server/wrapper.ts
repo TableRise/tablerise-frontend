@@ -9,7 +9,7 @@ export const apiCall = async (
     try {
         const response = await axios({
             method,
-            url: `${baseUrl}/${endpoint}`,
+            url: `${baseUrl}${endpoint}`,
             headers: {
                 'Content-Type': 'application/json',
             },
