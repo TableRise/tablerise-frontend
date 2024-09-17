@@ -2,8 +2,8 @@
 import { useState } from 'react';
 import Input from './input';
 import Link from 'next/link';
-import { api } from '@/server/users/api';
 import { userData } from '@/types/login/types';
+import { postLogin } from '@/server/users/api';
 
 export default function Form() {
     //const [showPass, setShowPass] = useState<boolean>(false);
@@ -25,10 +25,12 @@ export default function Form() {
     async function handleLogin(data: userData): Promise<string | number> {
         const { userEmail, userPassword } = data;
         const isValid: boolean = validateInput(userEmail, userPassword);
+        console.log(isValid);
         if (isValid) {
             try {
-                const response = await api.post('/login', data);
-                return response.status;
+                const response = await postLogin(data);
+                console.log("FRONT", response);
+                return 'response.status';
             } catch (error: any) {
                 //console.log(error.message);
                 return error;
