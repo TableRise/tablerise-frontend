@@ -33,7 +33,8 @@ export default function Form() {
                 return error;
             }
         }
-        return 'dados inválidos. login falha';
+        console.log('dados inválidos');
+        return 'dados inválidos';
     }
 
     return (
@@ -41,8 +42,7 @@ export default function Form() {
             <div id="form-title">
                 <p>Entrar</p>
                 <span>
-                    Não possui uma conta? <Link href={'/register'} />
-                    Criar conta!
+                    Não possui uma conta? <Link href={'/register'}>Criar conta!</Link>
                 </span>
             </div>
             <form
