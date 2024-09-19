@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import FAQ from '@/components/home/FAQ';
 import Header from '@/components/Header';
@@ -7,6 +8,7 @@ import Features from '@/components/home/Features';
 import SecondPromo from '@/components/home/SecondPromo';
 import Footer from '@/components/home/Footer';
 import '@/app/page.css';
+import Login from './login/page';
 
 export default function Home(): JSX.Element {
     return (
@@ -20,7 +22,8 @@ export default function Home(): JSX.Element {
                 <Features />
                 <SecondPromo />
                 <FAQ />
-                <Footer />
+                <Login />
+                {/* <Footer /> */}
             </section>
         </main>
     );
