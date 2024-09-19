@@ -22,8 +22,7 @@ export default function Home(): JSX.Element {
                 <Features />
                 <SecondPromo />
                 <FAQ />
-                <Login />
-                {/* <Footer /> */}
+                <Footer />
             </section>
         </main>
     );
