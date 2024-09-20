@@ -35,8 +35,9 @@ export default function Form() {
     }
 
     return (
-        <main>
+        <main className="h-300 w-5/6">
             <form
+                className="flex flex-col w-4/4"
                 onSubmit={(event) => {
                     event.preventDefault();
                 }}
@@ -50,7 +51,7 @@ export default function Form() {
                 />
                 <Input
                     type="password"
-                    name="password"
+                    name="Password"
                     placeholder="Insira a sua senha"
                     id="passwordInput"
                     onChange={setPassword}
@@ -62,7 +63,7 @@ export default function Form() {
                 >
                     Entrar
                 </button>
-                {/* salvar user e token no localstorage e redirecionar p home */}
+                {/* salvar response do login no localstorage e redirecionar p home */}
             </form>
         </main>
     );

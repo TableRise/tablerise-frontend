@@ -9,6 +9,7 @@ export default function Input({ type, name, placeholder, onChange, id }: input) 
             <label htmlFor={type}>
                 {name}
                 <input
+                    className="w-full h-10 rounded-lg"
                     id={id}
                     type={type}
                     maxLength={type === 'email' ? MAX_LENGTH_EMAIL : MAX_LENGTH_PASS}
