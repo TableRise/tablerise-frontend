@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    label {
+        @apply w-full mb-4;
+    }
+
+    label .label-text {
+        @apply text-color-greyScale/950 mb-2;
+    }
+
+    label .input {
+        @apply w-full h-10 focus:w-full focus:h-10;
+    }
+}
