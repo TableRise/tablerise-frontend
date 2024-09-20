@@ -29,22 +29,14 @@ export default function Form() {
                 const response = await postLogin(data);
                 return response.status;
             } catch (error: any) {
-                console.log('Usuário não encontrado. Deseja se cadastrar?');
                 return error;
             }
         }
-        console.log('dados inválidos');
         return 'dados inválidos';
     }
 
     return (
         <main>
-            <div id="form-title">
-                <p>Entrar</p>
-                <span>
-                    Não possui uma conta? <Link href={'/register'}>Criar conta!</Link>
-                </span>
-            </div>
             <form
                 onSubmit={(event) => {
                     event.preventDefault();
