@@ -27,6 +27,13 @@ const nextConfig = {
 
         return config;
     },
+    env: {
+        API_BASE_URL: process.env.API_BASE_URL,
+        API_USERS: process.env.API_USERS,
+        API_OAUTH: process.env.API_OAUTH,
+        API_CAMPAIGNS: process.env.API_CAMPAIGNS,
+        API_DD5E: process.env.API_DD5E,
+    },
 };
 
 export default nextConfig;
