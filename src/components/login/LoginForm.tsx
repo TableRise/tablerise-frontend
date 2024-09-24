@@ -3,6 +3,8 @@ import { useState } from 'react';
 import Input from './input';
 import { userData } from '@/types/login/types';
 import { postLogin } from '@/server/users/api';
+import { RequestCookies } from 'next/dist/compiled/@edge-runtime/cookies';
+import { getToken } from '@/utils/getCookie';
 
 export default function Form() {
     //const [showPass, setShowPass] = useState<boolean>(false);
@@ -20,13 +22,16 @@ export default function Form() {
         return true;
     }
 
-    async function handleLogin(data: userData): Promise<string | number> {
+    async function handleLogin(data: userData): Promise<string | RequestCookies> {
         const { userEmail, userPassword } = data;
         const isValid: boolean = validateInput(userEmail, userPassword);
         if (isValid) {
             try {
-                const response = await postLogin(data);
-                return response.status;
+                const token = await getToken();
+                if (token) {
+                    const login = await postLogin(data);
+                    localStorage.setItem('login', login);
+                }
             } catch (error: any) {
                 return error;
             }
@@ -63,7 +68,7 @@ export default function Form() {
                 >
                     Entrar
                 </button>
-                {/* salvar response do login no localstorage e redirecionar p home */}
+                {/* salvar response do login no localstorage e token nos cookies (1dia)redirecionar p home */}
             </form>
         </main>
     );

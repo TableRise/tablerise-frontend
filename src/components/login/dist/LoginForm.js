@@ -39,8 +39,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var react_1 = require("react");
 var input_1 = require("./input");
-var link_1 = require("next/link");
 var api_1 = require("@/server/users/api");
+var getCookie_1 = require("@/utils/getCookie");
 function Form() {
     //const [showPass, setShowPass] = useState<boolean>(false);
     //const [loading, setLoading] = useState<boolean>(false);
@@ -48,50 +48,48 @@ function Form() {
     var _b = react_1.useState(''), userPassword = _b[0], setPassword = _b[1];
     function validateInput(email, password) {
         var MIN_LENGTH_PASS = 6;
-        //const validHas: RegExp = /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.[a-z]?$/i;
-        //temporary validation
-        if (!email.includes('@') || password.length < MIN_LENGTH_PASS) {
+        var validHas = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+        if (!validHas.test(email) || password.length < MIN_LENGTH_PASS) {
             return false;
         }
         return true;
     }
     function handleLogin(data) {
         return __awaiter(this, void 0, Promise, function () {
-            var userEmail, userPassword, isValid, response, error_1;
+            var userEmail, userPassword, isValid, token, login, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         userEmail = data.userEmail, userPassword = data.userPassword;
                         isValid = validateInput(userEmail, userPassword);
-                        if (!isValid) return [3 /*break*/, 4];
+                        if (!isValid) return [3 /*break*/, 6];
                         _a.label = 1;
                     case 1:
-                        _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, api_1.api.post('/login', data)];
+                        _a.trys.push([1, 5, , 6]);
+                        return [4 /*yield*/, getCookie_1.getToken()];
                     case 2:
-                        response = _a.sent();
-                        return [2 /*return*/, response.status];
+                        token = _a.sent();
+                        if (!token) return [3 /*break*/, 4];
+                        return [4 /*yield*/, api_1.postLogin(data)];
                     case 3:
+                        login = _a.sent();
+                        localStorage.setItem('login', login);
+                        _a.label = 4;
+                    case 4: return [3 /*break*/, 6];
+                    case 5:
                         error_1 = _a.sent();
-                        //console.log(error.message);
                         return [2 /*return*/, error_1];
-                    case 4: return [2 /*return*/, 'dados inválidos. login falha'];
+                    case 6: return [2 /*return*/, 'dados inválidos'];
                 }
             });
         });
     }
-    return (React.createElement("main", null,
-        React.createElement("div", { id: "form-title" },
-            React.createElement("p", null, "Entrar"),
-            React.createElement("span", null,
-                "N\u00E3o possui uma conta? ",
-                React.createElement(link_1["default"], { href: '/register' }),
-                "Criar conta!")),
-        React.createElement("form", { onSubmit: function (event) {
+    return (React.createElement("main", { className: "h-300 w-5/6" },
+        React.createElement("form", { className: "flex flex-col w-4/4", onSubmit: function (event) {
                 event.preventDefault();
             } },
             React.createElement(input_1["default"], { type: "email", name: "E-mail", placeholder: "Insira o seu e-mail", id: "emailInput", onChange: setEmail }),
-            React.createElement(input_1["default"], { type: "password", name: "password", placeholder: "Insira a sua senha", id: "passwordInput", onChange: setPassword }),
+            React.createElement(input_1["default"], { type: "password", name: "Password", placeholder: "Insira a sua senha", id: "passwordInput", onChange: setPassword }),
             React.createElement("a", { href: "#" }, "Esqueceu a senha?"),
             " ",
             React.createElement("button", { type: "button", onClick: function () { return handleLogin({ userEmail: userEmail, userPassword: userPassword }); } }, "Entrar"))));
