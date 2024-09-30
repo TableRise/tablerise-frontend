@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import RecoverPasswordContext from '@/context/RecoverPasswordContext';
 import axios, { AxiosError } from 'axios';
+import { sendConfirmEmail, sendNewPassword } from '@/server/users/update-password';
 
 export default function RecoverPasswordProvider({
     children,
@@ -14,29 +15,6 @@ export default function RecoverPasswordProvider({
         code: ''
     });
 
-    const verify = async (email: string) => {
-        try {
-            await axios.get('api', {
-                params: {
-                    email,
-                },
-                headers: {
-                    'header-secret': 'key',
-                    'Content-Type': 'application/json',
-                }
-            })
-
-            setUserVerify({
-                ...userVerify,
-                email,
-            });
-        } catch (error: AxiosError | unknown) {
-            console.log(error);
-            throw new Error('Email invalido');
-        }
-
-    }
-
     const setCode = (code: string) => {
         setUserVerify({
             ...userVerify,
@@ -44,25 +22,25 @@ export default function RecoverPasswordProvider({
         })
     }
 
+    const verify = async (email: string) => {
+        try {
+            await sendConfirmEmail(email);
+
+            setUserVerify({
+                ...userVerify,
+                email,
+            });
+        } catch (error: AxiosError | unknown) {
+            throw new Error('Email invalido');
+        }
+
+    }
+
     const updatePassword = async (newPassword: string) => {
         const { email, code } = userVerify;
         try {
-            await axios.patch('api',
-            {
-                password: newPassword,
-            },
-            {
-                params: {
-                    email,
-                    code,
-                },
-                headers: {
-                    'header-secret': 'key',
-                    'Content-Type': 'application/json',
-                }
-            })
+            await sendNewPassword({ email, newPassword, code });
         } catch (error: AxiosError | unknown) {
-            console.log(error);
             throw new Error('Email invalido');
         }
 
