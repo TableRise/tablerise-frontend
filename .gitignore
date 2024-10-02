@@ -15,8 +15,8 @@
 /out/
 
 # production
-/build
-*.js
+dist
+**.js
 
 # misc
 .DS_Store
