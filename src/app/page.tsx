@@ -8,7 +8,6 @@ import Features from '@/components/home/Features';
 import SecondPromo from '@/components/home/SecondPromo';
 import Footer from '@/components/home/Footer';
 import '@/app/page.css';
-import Login from './login/page';
 
 export default function Home(): JSX.Element {
     return (
