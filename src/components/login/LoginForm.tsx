@@ -51,7 +51,7 @@ export default function Form() {
                     id="passwordInput"
                     onChange={setPassword}
                 />
-                <a href="#">Esqueceu a senha?</a> {/* levar p reset de senha */}
+                <a href="/users/update/password">Esqueceu a senha?</a> {/* levar p reset de senha */}
                 <button
                     type="button"
                     onClick={() => handleLogin({ userEmail, userPassword })}
