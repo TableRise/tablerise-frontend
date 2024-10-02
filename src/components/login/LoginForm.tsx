@@ -4,7 +4,7 @@ import Input from './input';
 import { userData } from '@/types/login/types';
 import { postLogin } from '@/server/users/api';
 import { RequestCookies } from 'next/dist/compiled/@edge-runtime/cookies';
-import { getToken } from '@/utils/getCookie';
+import { useRouter } from 'next/navigation';
 
 export default function Form() {
     //const [showPass, setShowPass] = useState<boolean>(false);
@@ -12,8 +12,10 @@ export default function Form() {
     const [userEmail, setEmail] = useState<string>('');
     const [userPassword, setPassword] = useState<string>('');
 
+    const router = useRouter();
+
     function validateInput(email: string, password: string): boolean {
-        const MIN_LENGTH_PASS = 6;
+        const MIN_LENGTH_PASS = 8;
         const validHas: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
 
         if (!validHas.test(email) || password.length < MIN_LENGTH_PASS) {
@@ -22,21 +24,18 @@ export default function Form() {
         return true;
     }
 
-    async function handleLogin(data: userData): Promise<string | RequestCookies> {
+    async function handleLogin(data: userData): Promise<void | RequestCookies> {
         const { userEmail, userPassword } = data;
         const isValid: boolean = validateInput(userEmail, userPassword);
         if (isValid) {
             try {
-                const token = await getToken();
-                if (token) {
-                    const login = await postLogin(data);
-                    localStorage.setItem('login', login);
-                }
+                const login = await postLogin(data);
+                localStorage.setItem('login', login);
+                router.push('/');
             } catch (error: any) {
                 return error;
             }
         }
-        return 'dados inválidos';
     }
 
     return (
@@ -68,7 +67,6 @@ export default function Form() {
                 >
                     Entrar
                 </button>
-                {/* salvar response do login no localstorage e token nos cookies (1dia)redirecionar p home */}
             </form>
         </main>
     );
