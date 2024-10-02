@@ -16,7 +16,7 @@
 
 # production
 dist
-**.js
+*.js
 
 # misc
 .DS_Store
@@ -38,3 +38,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+src/components/login/dist/LoginForm.js
