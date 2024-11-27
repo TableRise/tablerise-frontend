@@ -4,7 +4,7 @@
 
 @layer base {
     .form-input {
-        @apply w-96 h-10 text-color-greyScale/500 focus:w-96;
+        @apply w-full h-10 text-color-greyScale/500 focus:w-full;
     }
 
     .form-opt-input {
@@ -16,10 +16,10 @@
     }
 
     .form-button-submit {
-        @apply w-96 h-10 rounded-lg text-color-greyScale/50 bg-color-primary/default_900;
+        @apply w-full h-10 rounded-lg text-color-greyScale/50 bg-color-primary/default_900 border;
     }
 
     .form-button-cancel {
-        @apply w-96 h-10 text-color-greyScale/500;
+        @apply w-full h-10 text-color-greyScale/500;
     }
 }
