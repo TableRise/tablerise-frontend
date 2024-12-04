@@ -2,46 +2,78 @@
 
 import { useState } from 'react';
 import RecoverPasswordContext from '@/context/RecoverPasswordContext';
-import axios, { AxiosError } from 'axios';
-import { sendConfirmEmail, sendNewPassword } from '@/server/users/update-password';
+import { authenticate2fa, authenticateEmail, authenticateSecretQuestion, sendConfirmEmail, sendNewPassword } from '@/server/users/update-password';
+import { useRouter } from 'next/navigation';
 
 export default function RecoverPasswordProvider({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const [userVerify, setUserVerify] = useState<{ email: string, code: string }>({
+    const router = useRouter();
+
+    const [userVerify, setUserVerify] = useState<{ email: string, id: string, secretQuestion: string }>({
         email: '',
-        code: ''
+        id: '',
+        secretQuestion: '',
     });
 
-    const setCode = (code: string) => {
-        setUserVerify({
-            ...userVerify,
-            code,
-        })
-    }
 
     const verify = async (email: string) => {
         try {
             await sendConfirmEmail(email);
 
-            setUserVerify({
-                ...userVerify,
-                email,
-            });
-        } catch (error: AxiosError | unknown) {
-            throw new Error('Email invalido');
+            setUserVerify({ ...userVerify, email });
+        } catch (error: any) {
+            throw new Error(error.message);
+        }
+
+    }
+
+    const setCode = async (code: string) => {
+        try {
+            const { accountSecurityMethod, secretQuestion } = await authenticateEmail(userVerify.email, code);
+            if(secretQuestion) setUserVerify({ ...userVerify, secretQuestion });
+
+            if (accountSecurityMethod == 'secret-question') router.push('/password-recover/secret-question');
+
+            if (accountSecurityMethod == 'two-factor') router.push('/password-recover/two-factor');
+
+        } catch (error: any) {
+            throw new Error(error.message);
+        }
+
+    }
+
+    const sendSecretQuestion = async (answer: string) => {
+        try {
+            await authenticateSecretQuestion(userVerify.email, userVerify.secretQuestion, answer);
+
+            router.push('/password-recover/new-password');
+        } catch (error: any) {
+            throw new Error(error.message);
+        }
+
+    }
+
+    const twoFactor = async (code: string) => {
+        try {
+            const result = await authenticate2fa(userVerify.email, code);
+
+            router.push('/password-recover/new-password');
+        } catch (error: any) {
+            throw new Error(error.message);
         }
 
     }
 
     const updatePassword = async (newPassword: string) => {
-        const { email, code } = userVerify;
+        const { email } = userVerify;
+
         try {
-            await sendNewPassword({ email, newPassword, code });
-        } catch (error: AxiosError | unknown) {
-            throw new Error('Email invalido');
+            await sendNewPassword(email, newPassword);
+        } catch (error: any) {
+            throw new Error(error.message);
         }
 
     }
@@ -51,6 +83,8 @@ export default function RecoverPasswordProvider({
         userVerify,
         setCode,
         updatePassword,
+        sendSecretQuestion,
+        twoFactor,
     };
 
     return (
