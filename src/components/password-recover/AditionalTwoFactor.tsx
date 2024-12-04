@@ -1,5 +1,5 @@
 import Form from "./forms/Form";
-import FormTwoFactor from "./forms/form-two-factor";
+import FormAditionalTwoFactor from "./forms/form-aditional-two-factor";
 
 export default function AditionalTwoFactor() {
     return (
@@ -11,7 +11,7 @@ export default function AditionalTwoFactor() {
                 Para garantir a segurança da sua conta, uma verificação adicional é necessária.
             </Form.Description>
 
-            <FormTwoFactor />
+            <FormAditionalTwoFactor />
         </div>
     )
 }
