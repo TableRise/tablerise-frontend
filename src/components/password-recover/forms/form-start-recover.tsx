@@ -28,10 +28,10 @@ export default function FormStartRecover() {
 
             reset();
             router.push('/password-recover/verify-code');
-        } catch (error) {
+        } catch (error: any) {
             setError("email", {
                 type: "manual",
-                message: "Email não cadastrado",
+                message: `${error.message}`,
             });
         }
     }

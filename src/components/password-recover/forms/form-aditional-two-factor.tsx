@@ -3,14 +3,21 @@ import Form from "./Form";
 import { useForm } from "react-hook-form";
 import { twoFactorSchema, TwoFactorSchema } from "./schemas/form-two-factor-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useContext } from "react";
+import RecoverPasswordContext from "@/context/RecoverPasswordContext";
+import { useRouter } from "next/navigation";
 
-export default function FormTwoFactor() {
+export default function FormAditionalTwoFactor() {
+    const router = useRouter();
     const num6 = new Array(6).fill("");
+
+    const { twoFactor } = useContext(RecoverPasswordContext);
 
     const {
         register,
         handleSubmit,
         formState: { errors },
+        setError,
     } = useForm<TwoFactorSchema>({
         resolver: zodResolver(twoFactorSchema),
     })
@@ -53,9 +60,18 @@ export default function FormTwoFactor() {
         }
     };
 
-    const consoleFormTwoFactor = (data: TwoFactorSchema) => {
-        console.log(data);
-    }
+    const consoleFormTwoFactor = async (data: TwoFactorSchema) => {
+        const code = Object.values(data).join('');
+
+        try {
+            await twoFactor(code);
+            
+        } catch (error: any) {
+            setError('fild0', {
+                type: 'manual',
+                message: `${error.message}`
+            })
+        }    }
 
     return (
         <form onSubmit={handleSubmit(consoleFormTwoFactor)}>
@@ -96,7 +112,7 @@ export default function FormTwoFactor() {
                     Confirmar
                 </Form.ButtonSubmit>
 
-                <Form.ButtonCancel>
+                <Form.ButtonCancel onClick={() => router.push('/password-recover')}>
                     Cancelar
                 </Form.ButtonCancel>
             </div>

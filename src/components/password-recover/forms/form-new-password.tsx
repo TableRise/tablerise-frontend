@@ -31,11 +31,11 @@ export default function FormNewPassword() {
             await updatePassword(newPassword);
 
             router.push('/password-recover/congratulations')
-        } catch (error) {
+        } catch (error: any) {
             setError('confirmPassword',
                 {
                     type: 'manual',
-                    message: 'Não foi possivel atualizar sua senha'
+                    message: `${error.message}`
                 }
             );
         }

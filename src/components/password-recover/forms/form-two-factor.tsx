@@ -12,13 +12,14 @@ export default function FormTwoFactor() {
     
     const num6 = new Array(6).fill("");
 
-    const { setCode, userVerify } = useContext(RecoverPasswordContext);
+    const { setCode } = useContext(RecoverPasswordContext);
 
     const {
         register,
         handleSubmit,
         formState: { errors },
         setValue,
+        setError,
     } = useForm<TwoFactorSchema>({
         resolver: zodResolver(twoFactorSchema),
     })
@@ -74,12 +75,18 @@ export default function FormTwoFactor() {
         }
     };
 
-    const sendCode = (data: TwoFactorSchema) => {
+    const sendCode = async (data: TwoFactorSchema) => {
         const code = Object.values(data).join('').toUpperCase();
 
-        setCode(code);
-
-        router.push('/password-recover/new-password');
+        try {
+            await setCode(code);
+            
+        } catch (error: any) {
+            setError('fild0', {
+                type: 'manual',
+                message: `${error.message}`
+            })
+        }
     }
 
     return (
