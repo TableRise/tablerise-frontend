@@ -1,21 +1,21 @@
-'use client'
-import { useForm } from "react-hook-form"
-import { zodResolver } from '@hookform/resolvers/zod'
-import { emailSchema, EmailSchema } from "./schemas/form-start-recover-schema";
-import Form from "./Form";
-import { useContext } from "react";
-import RecoverPasswordContext from "@/context/RecoverPasswordContext";
-import { useRouter } from "next/navigation";
+'use client';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { emailSchema, EmailSchema } from './schemas/form-start-recover-schema';
+import Form from './Form';
+import { useContext } from 'react';
+import RecoverPasswordContext from '@/context/RecoverPasswordContext';
+import { useRouter } from 'next/navigation';
 
 export default function FormStartRecover() {
     const router = useRouter();
-    
+
     const {
         register,
         handleSubmit,
         setError,
         reset,
-        formState: { errors }
+        formState: { errors },
     } = useForm<EmailSchema>({
         resolver: zodResolver(emailSchema),
     });
@@ -29,13 +29,12 @@ export default function FormStartRecover() {
             reset();
             router.push('/password-recover/verify-code');
         } catch (error: any) {
-            setError("email", {
-                type: "manual",
+            setError('email', {
+                type: 'manual',
                 message: `${error.message}`,
             });
         }
-    }
-
+    };
 
     return (
         <>
@@ -47,16 +46,10 @@ export default function FormStartRecover() {
                     placeholder="Insira o seu e-mail"
                 />
 
-                {errors.email &&
-                    <Form.Span>
-                        {errors.email.message}
-                    </Form.Span>
-                }
+                {errors.email && <Form.Span>{errors.email.message}</Form.Span>}
 
                 <div className="container-button">
-                    <Form.ButtonSubmit>
-                        Enviar
-                    </Form.ButtonSubmit>
+                    <Form.ButtonSubmit>Enviar</Form.ButtonSubmit>
 
                     <Form.ButtonCancel onClick={() => router.push('/')}>
                         Cancelar
@@ -64,5 +57,5 @@ export default function FormStartRecover() {
                 </div>
             </form>
         </>
-    )
+    );
 }

@@ -1,35 +1,31 @@
-import { ButtonHTMLAttributes, forwardRef, HTMLAttributes, HTMLProps, InputHTMLAttributes, LabelHTMLAttributes } from 'react';
+import {
+    ButtonHTMLAttributes,
+    forwardRef,
+    HTMLAttributes,
+    HTMLProps,
+    InputHTMLAttributes,
+    LabelHTMLAttributes,
+} from 'react';
 import { FieldError } from 'react-hook-form';
 import './styles/Form.css';
 
 function Title(props: HTMLProps<HTMLHeadingElement>) {
-
     return (
-        <h1
-            className='font-L-semibold text-color-primary/default_900 pb-1'
-            {...props}
-        />
-    )
+        <h1 className="font-L-semibold text-color-primary/default_900 pb-1" {...props} />
+    );
 }
 
 function Description(props: HTMLProps<HTMLHeadingElement>) {
-
-    return (
-        <p
-            className='font-XS-regular text-color-greyScale/950 pb-6'
-            {...props}
-        />
-    )
+    return <p className="font-XS-regular text-color-greyScale/950 pb-6" {...props} />;
 }
 
 function Label(props: LabelHTMLAttributes<HTMLLabelElement>) {
-
     return (
         <label
-            className='flex flex-col font-S-bold text-color-greyScale/950 gap-2'
+            className="flex flex-col font-S-bold text-color-greyScale/950 gap-2"
             {...props}
         />
-    )
+    );
 }
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -42,42 +38,39 @@ const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
         <input
             ref={ref}
             className={`form-input input-default-light font-XS-regular focus:input-active-light focus:text-black text-black
-                ${error ? 'mb-0 input-error-light focus:input-error-light text-black' : 'mb-6'}
+                ${
+                    error
+                        ? 'mb-0 input-error-light focus:input-error-light text-black'
+                        : 'mb-6'
+                }
             `}
             {...rest}
         />
-    )
-})
+    );
+});
 
 function Span(props: HTMLAttributes<HTMLSpanElement>) {
-    return (
-        <span
-            className='text-red-500 font-XXS-regular'
-            {...props}
-        />
-    )
+    return <span className="text-red-500 font-XXS-regular" {...props} />;
 }
 
 function ButtonSubmit(props: ButtonHTMLAttributes<HTMLButtonElement>) {
-
     return (
         <button
-            className='font-S-bold form-button-submit
-                button-L-fill'
+            className="font-S-bold form-button-submit
+                button-L-fill"
             {...props}
         />
-    )
+    );
 }
 
 function ButtonCancel(props: ButtonHTMLAttributes<HTMLButtonElement>) {
-
     return (
         <button
-            className='font-S-bold form-button-cancel
-                button-L-ghost'
+            className="font-S-bold form-button-cancel
+                button-L-ghost"
             {...props}
         />
-    )
+    );
 }
 
 export default {
@@ -88,4 +81,4 @@ export default {
     Span,
     ButtonSubmit,
     ButtonCancel,
-}
+};

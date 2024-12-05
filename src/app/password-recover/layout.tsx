@@ -5,9 +5,5 @@ export default function Layout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    return (
-        <RecoverPasswordProvider>
-            {children}
-        </RecoverPasswordProvider>
-    );
+    return <RecoverPasswordProvider>{children}</RecoverPasswordProvider>;
 }

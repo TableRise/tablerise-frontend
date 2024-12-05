@@ -1,13 +1,13 @@
-'use client'
-import { useForm } from "react-hook-form"
-import { newPasswordSchema, NewPasswordSchema } from "./schemas/form-new-password-schema"
-import { zodResolver } from "@hookform/resolvers/zod"
-import Form from "./Form"
-import { useContext, useState } from "react"
-import { useRouter } from "next/navigation"
-import RecoverPasswordContext from "@/context/RecoverPasswordContext"
-import VisibilityOff from "@/components/icons/password-recover/Visibility-off"
-import Visibility from "@/components/icons/password-recover/Visibility"
+'use client';
+import { useForm } from 'react-hook-form';
+import { newPasswordSchema, NewPasswordSchema } from './schemas/form-new-password-schema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Form from './Form';
+import { useContext, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import RecoverPasswordContext from '@/context/RecoverPasswordContext';
+import VisibilityOff from '@/components/icons/password-recover/Visibility-off';
+import Visibility from '@/components/icons/password-recover/Visibility';
 
 export default function FormNewPassword() {
     const { updatePassword } = useContext(RecoverPasswordContext);
@@ -21,29 +21,27 @@ export default function FormNewPassword() {
         register,
         handleSubmit,
         setError,
-        formState: { errors }
+        formState: { errors },
     } = useForm<NewPasswordSchema>({
         resolver: zodResolver(newPasswordSchema),
-    })
+    });
 
     const sendNewPassword = async ({ newPassword }: NewPasswordSchema) => {
         try {
             await updatePassword(newPassword);
 
-            router.push('/password-recover/congratulations')
+            router.push('/password-recover/congratulations');
         } catch (error: any) {
-            setError('confirmPassword',
-                {
-                    type: 'manual',
-                    message: `${error.message}`
-                }
-            );
+            setError('confirmPassword', {
+                type: 'manual',
+                message: `${error.message}`,
+            });
         }
-    }
+    };
 
     return (
         <form onSubmit={handleSubmit(sendNewPassword)}>
-            <Form.Label id='newPassword'>
+            <Form.Label id="newPassword">
                 Nova senha
                 <div
                     className="flex items-center justify-center relative"
@@ -55,9 +53,8 @@ export default function FormNewPassword() {
                         error={errors.newPassword}
                         type={newPassVisible ? 'text' : 'password'}
                         placeholder="Insira a sua nova senha"
-                        id='newPassword'
-                    >
-                    </Form.Input>
+                        id="newPassword"
+                    ></Form.Input>
                     <button
                         type="button"
                         onClick={() => setNewPassVisible(!newPassVisible)}
@@ -67,13 +64,9 @@ export default function FormNewPassword() {
                     </button>
                 </div>
             </Form.Label>
-            {errors.newPassword &&
-                <Form.Span>
-                    {errors.newPassword.message}
-                </Form.Span>
-            }
+            {errors.newPassword && <Form.Span>{errors.newPassword.message}</Form.Span>}
 
-            <Form.Label id='confirmPassword'>
+            <Form.Label id="confirmPassword">
                 Confirmar
                 <div
                     className="flex items-center justify-center relative"
@@ -85,7 +78,7 @@ export default function FormNewPassword() {
                         style={{ marginBottom: '0px' }}
                         type={confirmPassVisible ? 'text' : 'password'}
                         placeholder="Confirme a nova senha"
-                        id='confirmPassword'
+                        id="confirmPassword"
                     />
                     <button
                         type="button"
@@ -97,21 +90,17 @@ export default function FormNewPassword() {
                 </div>
             </Form.Label>
 
-            {errors.confirmPassword &&
-                <Form.Span>
-                    {errors.confirmPassword.message}
-                </Form.Span>
-            }
+            {errors.confirmPassword && (
+                <Form.Span>{errors.confirmPassword.message}</Form.Span>
+            )}
 
             <div className="container-button">
-                <Form.ButtonSubmit>
-                    Confirmar
-                </Form.ButtonSubmit>
+                <Form.ButtonSubmit>Confirmar</Form.ButtonSubmit>
 
                 <Form.ButtonCancel onClick={() => router.push('/password-recover')}>
                     Cancelar
                 </Form.ButtonCancel>
             </div>
         </form>
-    )
+    );
 }

@@ -1,18 +1,14 @@
-'use client'
-import { useRouter } from "next/navigation";
-import Form from "./forms/Form";
+'use client';
+import { useRouter } from 'next/navigation';
+import Form from './forms/Form';
 
 export default function Congratulation() {
     const router = useRouter();
 
     return (
         <div>
-            <Form.Title>
-                Parabéns!
-            </Form.Title>
-            <Form.Description>
-                Você recuperou a sua senha
-            </Form.Description>
+            <Form.Title>Parabéns!</Form.Title>
+            <Form.Description>Você recuperou a sua senha</Form.Description>
 
             <Form.ButtonSubmit onClick={() => router.push('/')}>
                 Iniciar sessão
@@ -21,5 +17,5 @@ export default function Congratulation() {
                 Voltar
             </Form.ButtonCancel>
         </div>
-    )
+    );
 }
