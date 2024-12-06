@@ -31,7 +31,7 @@ function Label(props: LabelHTMLAttributes<HTMLLabelElement>) {
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     error: FieldError | undefined;
 }
-const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+const Input = forwardRef<HTMLInputElement, InputProps>(function Input(props, ref) {
     const { error, ...rest } = props;
 
     return (
@@ -73,7 +73,7 @@ function ButtonCancel(props: ButtonHTMLAttributes<HTMLButtonElement>) {
     );
 }
 
-export default {
+const Form = {
     Title,
     Description,
     Label,
@@ -82,3 +82,5 @@ export default {
     ButtonSubmit,
     ButtonCancel,
 };
+
+export default Form;

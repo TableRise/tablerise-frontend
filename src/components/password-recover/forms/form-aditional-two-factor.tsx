@@ -117,9 +117,7 @@ export default function FormAditionalTwoFactor() {
             {errors.fild0 && <Form.Span>{errors.fild0.message}</Form.Span>}
 
             <div className="container-button">
-                <Form.ButtonSubmit onClick={() => console.log(errors)}>
-                    Confirmar
-                </Form.ButtonSubmit>
+                <Form.ButtonSubmit>Confirmar</Form.ButtonSubmit>
 
                 <Form.ButtonCancel onClick={() => router.push('/password-recover')}>
                     Cancelar
