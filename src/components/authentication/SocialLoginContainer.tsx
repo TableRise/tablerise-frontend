@@ -8,16 +8,16 @@ import InputErrorMessage from './inputErrorMessage';
 
 export default function SocialLoginContainer(): JSX.Element {
     const searchParams = useSearchParams();
-    const error = searchParams.get('error')
-    const [hasError, setHasError] = useState<string | undefined>()
+    const error = searchParams.get('error');
+    const [hasError, setHasError] = useState<string | undefined>();
 
     useEffect(() => {
         if (error) {
-            const errorList = errorHandler({ errorMessage: error })
+            const errorList = errorHandler({ errorMessage: error });
             setHasError(errorList[0].message);
         }
-    }, [])
-    
+    }, []);
+
     return (
         <div className="social-container">
             <div className="buttons-container">
