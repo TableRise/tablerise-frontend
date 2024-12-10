@@ -3,7 +3,7 @@ import SideImage from '@/components/authentication/SideImage';
 import SocialLoginContainer from '@/components/authentication/SocialLoginContainer';
 import '@/app/register/styles/Register.css';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
 
 export default function Register(): JSX.Element {
@@ -34,7 +34,9 @@ export default function Register(): JSX.Element {
                         </span>
                         <div className="divider-line"></div>
                     </div>
-                    <SocialLoginContainer />
+                    <Suspense>
+                        <SocialLoginContainer />
+                    </Suspense>
                 </div>
             </div>
         </section>

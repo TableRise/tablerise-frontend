@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState } from 'react';
 import SocialLoginButton from './SocialLoginButton';
 import '@/components/authentication/styles/SocialLoginContainer.css';
 import { useSearchParams } from 'next/navigation';
@@ -19,14 +19,12 @@ export default function SocialLoginContainer(): JSX.Element {
     }, []);
 
     return (
-        <Suspense>
-            <div className="social-container">
-                <div className="buttons-container">
-                    <SocialLoginButton title="Discord" socialType={'discord'} />
-                    <SocialLoginButton title="Google" socialType={'google'} />
-                </div>
-                {hasError && <InputErrorMessage errorMessage={hasError} />}
+        <div className="social-container">
+            <div className="buttons-container">
+                <SocialLoginButton title="Discord" socialType={'discord'} />
+                <SocialLoginButton title="Google" socialType={'google'} />
             </div>
-        </Suspense>
+            {hasError && <InputErrorMessage errorMessage={hasError} />}
+        </div>
     );
 }
