@@ -39,14 +39,16 @@ export default function FormStartRecover() {
     return (
         <>
             <form onSubmit={handleSubmit(sendEmail)}>
-                <Form.Input
-                    {...register('email')}
-                    error={errors.email}
-                    type="email"
-                    placeholder="Insira o seu e-mail"
-                />
+                <Form.Label>
+                    <Form.Input
+                        {...register('email')}
+                        error={errors.email}
+                        type="email"
+                        placeholder="Insira o seu e-mail"
+                    />
 
-                {errors.email && <Form.Span>{errors.email.message}</Form.Span>}
+                    {errors.email && <Form.Span>{errors.email.message}</Form.Span>}
+                </Form.Label>
 
                 <div className="container-button">
                     <Form.ButtonSubmit>Enviar</Form.ButtonSubmit>

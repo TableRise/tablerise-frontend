@@ -7,6 +7,10 @@
         @apply flex flex-col justify-center
     }
 
+    .form-span {
+        @apply pb-2 px-1
+    }
+
     .form-input {
         @apply w-full h-10 text-color-greyScale/500 focus:w-full;
     }
@@ -16,7 +20,7 @@
     }
 
     .container-button {
-        @apply flex flex-col gap-2;
+        @apply flex flex-col gap-2 relative;
     }
 
     .form-button-submit {

@@ -50,7 +50,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(props, ref
 });
 
 function Span(props: HTMLAttributes<HTMLSpanElement>) {
-    return <span className="text-red-500 font-XXS-regular" {...props} />;
+    return <span className="form-span text-red-500 font-XXS-regular" {...props} />;
 }
 
 function ButtonSubmit(props: ButtonHTMLAttributes<HTMLButtonElement>) {

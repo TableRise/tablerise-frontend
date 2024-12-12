@@ -88,11 +88,11 @@ export default function FormNewPassword() {
                         {/* {confirmPassVisible ? <VisibilityOff /> : <Visibility />} */}
                     </button>
                 </div>
+                {errors.confirmPassword && (
+                    <Form.Span>{errors.confirmPassword.message}</Form.Span>
+                )}
             </Form.Label>
 
-            {errors.confirmPassword && (
-                <Form.Span>{errors.confirmPassword.message}</Form.Span>
-            )}
 
             <div className="container-button">
                 <Form.ButtonSubmit id='confirm'>Confirmar</Form.ButtonSubmit>
