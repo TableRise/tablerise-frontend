@@ -46,9 +46,10 @@ export default function FormSecretQuestion() {
                     error={errors.secretAnswer}
                     placeholder="Insira a sua resposta secreta"
                 />
-                {errors.secretAnswer && <Form.Span>{errors.secretAnswer.message}</Form.Span>}
+                {errors.secretAnswer && (
+                    <Form.Span>{errors.secretAnswer.message}</Form.Span>
+                )}
             </Form.Label>
-
 
             <div className="container-button">
                 <Form.ButtonSubmit>Confirmar</Form.ButtonSubmit>

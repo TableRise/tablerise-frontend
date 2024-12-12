@@ -101,19 +101,17 @@ export default function FormAditionalTwoFactor() {
                             maxLength={1}
                             onKeyDown={(e) => handleKeyPress(e, index)}
                             onInput={(e) => nextInput(e, index)}
-                            className={`
-                                    form-opt-input
-                                    ${errors.fild0
+                            className={`form-opt-input ${
+                                errors.fild0
                                     ? 'input-error-light mb-0'
                                     : 'input-default-light'
-                                }
-                                `}
+                            }
+                            `}
                         />
                     ))}
                 </div>
                 {errors.fild0 && <Form.Span>{errors.fild0.message}</Form.Span>}
             </Form.Label>
-
 
             <div className="container-button">
                 <Form.ButtonSubmit>Confirmar</Form.ButtonSubmit>

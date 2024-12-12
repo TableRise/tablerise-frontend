@@ -4,11 +4,11 @@
 
 @layer base {
     form {
-        @apply flex flex-col justify-center
+        @apply flex flex-col justify-center;
     }
 
     .form-span {
-        @apply pb-2 px-1
+        @apply pb-2 px-1;
     }
 
     .form-input {

@@ -117,17 +117,17 @@ export default function FormTwoFactor() {
                             onInput={(e) => nextInput(e, index)}
                             className={`
                                     form-opt-input font-XS-regular
-                                    ${errors.fild0
-                                    ? 'input-error-light mb-0'
-                                    : 'input-default-light'
-                                }
+                                    ${
+                                        errors.fild0
+                                            ? 'input-error-light mb-0'
+                                            : 'input-default-light'
+                                    }
                                 `}
                         />
                     ))}
                 </div>
                 {errors.fild0 && <Form.Span>{errors.fild0.message}</Form.Span>}
             </Form.Label>
-
 
             <div className="container-button">
                 <Form.ButtonSubmit>Confirmar</Form.ButtonSubmit>

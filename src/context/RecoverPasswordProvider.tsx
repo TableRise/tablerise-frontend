@@ -65,7 +65,7 @@ export default function RecoverPasswordProvider({
                 answer
             );
 
-            if(result == 200) router.push('/password-recover/new-password');
+            if (result == 200) router.push('/password-recover/new-password');
         } catch (error: any) {
             throw new Error(error.message);
         }
@@ -75,7 +75,7 @@ export default function RecoverPasswordProvider({
         try {
             const result = await authenticate2fa(userVerify.email, code);
 
-            if(result == 200) router.push('/password-recover/new-password');
+            if (result == 200) router.push('/password-recover/new-password');
         } catch (error: any) {
             throw new Error(error.message);
         }
