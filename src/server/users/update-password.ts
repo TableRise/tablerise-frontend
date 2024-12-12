@@ -14,8 +14,9 @@ export const sendConfirmEmail = async (email: string) => {
         await apiUser.get('/verify', {
             params: { email, flow: 'update-password' },
         });
-    } catch ({ response: { data } }: AxiosError | any) {
-        throw new Error(data.message);
+    } catch ({ response }: AxiosError | any) {
+        if(response.status == 404) throw new Error('Email não encontrado');
+        if(response.status == 500) throw new Error('Erro no servidor');
     }
 };
 
@@ -30,14 +31,17 @@ export const authenticateEmail = async (email: string, code: string) => {
         );
 
         return data;
-    } catch ({ response: { data } }: AxiosError | any) {
-        throw new Error(data.message);
+    } catch ({ response }: AxiosError | any) {
+        if (response.status == 400) throw new Error('Nenhum ID ou e-mail foi fornecido para validar o código de e-mail');
+        if (response.status == 422) throw new Error('Código de verificação de e-mail inválido');
+        if(response.status == 500) throw new Error('Erro no servidor');
+        throw new Error(response.message)
     }
 };
 
 export const authenticate2fa = async (email: string, code: string) => {
     try {
-        const response: AxiosResponse<Response> = await apiUser.patch(
+        const { status }: AxiosResponse<Response> = await apiUser.patch(
             '/authenticate/2fa',
             null,
             {
@@ -45,9 +49,11 @@ export const authenticate2fa = async (email: string, code: string) => {
             }
         );
 
-        return response;
-    } catch ({ response: { data } }: AxiosError | any) {
-        throw new Error(data.message);
+        return status;
+    } catch ({ response }: AxiosError | any) {
+        if(response.status == 400) throw new Error('2FA não ativado para este usuário');
+        if(response.status == 401) throw new Error('Codigo 2FA incorreto');
+        if(response.status == 500) throw new Error('Erro no servidor');
     }
 };
 
@@ -57,7 +63,7 @@ export const authenticateSecretQuestion = async (
     answer: string
 ) => {
     try {
-        const { data }: AxiosResponse<Response> = await apiUser.patch(
+        const response: AxiosResponse<Response> = await apiUser.patch(
             '/authenticate/secret-question',
             { question, answer },
             {
@@ -65,9 +71,12 @@ export const authenticateSecretQuestion = async (
             }
         );
 
-        return data;
-    } catch ({ response: { data } }: AxiosError | any) {
-        throw new Error(data.message);
+        console.log(response);
+
+        return response.status;
+    } catch ({ response }: AxiosError | any) {
+        if(response.status == 401) throw new Error('A resposta está incorreta');
+        if(response.status == 500) throw new Error('Erro no servidor');
     }
 };
 
@@ -82,7 +91,8 @@ export const sendNewPassword = async (email: string, newPassword: string) => {
                 params: { email },
             }
         );
-    } catch ({ response: { data } }: AxiosError | any) {
-        throw new Error(data.message);
+    } catch ({ response }: AxiosError | any) {
+        if(response.status == 400) throw new Error('O status do usuário é inválido para realizar esta operação');
+        if(response.status == 500) throw new Error('Erro no servidor');
     }
 };
