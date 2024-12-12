@@ -3,12 +3,16 @@
 @tailwind utilities;
 
 @layer base {
+    form {
+        @apply flex flex-col justify-center
+    }
+
     .form-input {
         @apply w-full h-10 text-color-greyScale/500 focus:w-full;
     }
 
     .form-opt-input {
-        @apply flex text-center w-14 h-10 mb-6 items-center justify-center bg-white text-color-greyScale/500 uppercase;
+        @apply flex text-center w-[15%] h-12 mb-6 items-center justify-center bg-white text-color-greyScale/500 uppercase;
     }
 
     .container-button {

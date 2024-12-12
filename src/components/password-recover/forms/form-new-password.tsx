@@ -95,7 +95,7 @@ export default function FormNewPassword() {
             )}
 
             <div className="container-button">
-                <Form.ButtonSubmit>Confirmar</Form.ButtonSubmit>
+                <Form.ButtonSubmit id='confirm'>Confirmar</Form.ButtonSubmit>
 
                 <Form.ButtonCancel onClick={() => router.push('/password-recover')}>
                     Cancelar
