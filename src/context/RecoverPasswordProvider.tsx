@@ -59,13 +59,13 @@ export default function RecoverPasswordProvider({
 
     const sendSecretQuestion = async (answer: string) => {
         try {
-            await authenticateSecretQuestion(
+            const result = await authenticateSecretQuestion(
                 userVerify.email,
                 userVerify.secretQuestion,
                 answer
             );
 
-            router.push('/password-recover/new-password');
+            if(result == 200) router.push('/password-recover/new-password');
         } catch (error: any) {
             throw new Error(error.message);
         }
@@ -75,7 +75,7 @@ export default function RecoverPasswordProvider({
         try {
             const result = await authenticate2fa(userVerify.email, code);
 
-            router.push('/password-recover/new-password');
+            if(result == 200) router.push('/password-recover/new-password');
         } catch (error: any) {
             throw new Error(error.message);
         }
