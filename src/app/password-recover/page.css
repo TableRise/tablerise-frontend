@@ -6,4 +6,8 @@
     .section-container {
         @apply flex justify-center items-center px-[9.4%] w-[45.5%] h-screen bg-color-greyScale/100 rounded-l-xl;
     }
+
+    .section-container section {
+        @apply w-full;
+    }
 }
