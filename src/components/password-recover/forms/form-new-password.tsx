@@ -6,8 +6,8 @@ import Form from './Form';
 import { useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import RecoverPasswordContext from '@/context/RecoverPasswordContext';
-// import VisibilityOff from '@/components/icons/password-recover/Visibility-off';
-// import Visibility from '@/components/icons/password-recover/Visibility';
+import VisibilityOff from '@assets/icons/sys/visibility-off.svg';
+import Visibility from '@assets/icons/sys/visibility.svg';
 
 export default function FormNewPassword() {
     const { updatePassword } = useContext(RecoverPasswordContext);
@@ -60,7 +60,7 @@ export default function FormNewPassword() {
                         onClick={() => setNewPassVisible(!newPassVisible)}
                         className="absolute w-6 h-6 right-4 text-color-greyScale/500"
                     >
-                        {/* {newPassVisible ? <VisibilityOff /> : <Visibility />} */}
+                        {newPassVisible ? <VisibilityOff /> : <Visibility />}
                     </button>
                 </div>
             </Form.Label>
@@ -85,7 +85,7 @@ export default function FormNewPassword() {
                         onClick={() => setConfirmPassVisible(!confirmPassVisible)}
                         className="absolute w-6 h-6 right-4 text-color-greyScale/500"
                     >
-                        {/* {confirmPassVisible ? <VisibilityOff /> : <Visibility />} */}
+                        {confirmPassVisible ? <VisibilityOff /> : <Visibility />}
                     </button>
                 </div>
                 {errors.confirmPassword && (
