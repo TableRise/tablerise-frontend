@@ -10,7 +10,7 @@ import { useContext } from 'react';
 import RecoverPasswordContext from '@/context/RecoverPasswordContext';
 import { useRouter } from 'next/navigation';
 
-export default function FormSecretQuestion() {
+export default function     FormSecretQuestion() {
     const { sendSecretQuestion, userVerify, loading, setLoading } =
         useContext(RecoverPasswordContext);
 
@@ -42,7 +42,7 @@ export default function FormSecretQuestion() {
     return (
         <form onSubmit={handleSubmit(sendAnswer)}>
             <Form.Label id="secretAnswer">
-                {userVerify.secretQuestion}
+                {userVerify.secretQuestion.charAt(0).toUpperCase() + userVerify.secretQuestion.slice(1)}
                 <Form.Input
                     id="secretAnswer"
                     {...register('secretAnswer')}
