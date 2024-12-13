@@ -11,7 +11,7 @@ export default function FormAditionalTwoFactor() {
     const router = useRouter();
     const num6 = new Array(6).fill('');
 
-    const { twoFactor } = useContext(RecoverPasswordContext);
+    const { twoFactor, loading, setLoading } = useContext(RecoverPasswordContext);
 
     const {
         register,
@@ -72,10 +72,13 @@ export default function FormAditionalTwoFactor() {
 
     const consoleFormTwoFactor = async (data: TwoFactorSchema) => {
         const code = Object.values(data).join('');
+        setLoading(true);
 
         try {
             await twoFactor(code);
+            setLoading(false);
         } catch (error: any) {
+            setLoading(false);
             setError('fild0', {
                 type: 'manual',
                 message: `${error.message}`,
@@ -114,7 +117,7 @@ export default function FormAditionalTwoFactor() {
             </Form.Label>
 
             <div className="container-button">
-                <Form.ButtonSubmit>Confirmar</Form.ButtonSubmit>
+                <Form.ButtonSubmit loading={loading}>Confirmar</Form.ButtonSubmit>
 
                 <Form.ButtonCancel onClick={() => router.push('/password-recover')}>
                     Cancelar

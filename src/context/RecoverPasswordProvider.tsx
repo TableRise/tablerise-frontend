@@ -18,6 +18,7 @@ export default function RecoverPasswordProvider({
 }>) {
     const router = useRouter();
 
+    const [loading, setLoading] = useState<boolean>(false);
     const [userVerify, setUserVerify] = useState<{
         email: string;
         id: string;
@@ -33,6 +34,7 @@ export default function RecoverPasswordProvider({
             await sendConfirmEmail(email);
 
             setUserVerify({ ...userVerify, email });
+            setLoading(false);
         } catch (error: any) {
             throw new Error(error.message);
         }
@@ -98,6 +100,8 @@ export default function RecoverPasswordProvider({
         updatePassword,
         sendSecretQuestion,
         twoFactor,
+        loading,
+        setLoading,
     };
 
     return (

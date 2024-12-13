@@ -10,7 +10,7 @@ import VisibilityOff from '@assets/icons/sys/visibility-off.svg';
 import Visibility from '@assets/icons/sys/visibility.svg';
 
 export default function FormNewPassword() {
-    const { updatePassword } = useContext(RecoverPasswordContext);
+    const { updatePassword, loading, setLoading } = useContext(RecoverPasswordContext);
 
     const router = useRouter();
 
@@ -27,11 +27,15 @@ export default function FormNewPassword() {
     });
 
     const sendNewPassword = async ({ newPassword }: NewPasswordSchema) => {
+        setLoading(true);
         try {
             await updatePassword(newPassword);
 
             router.push('/password-recover/congratulations');
+            setLoading(false);
         } catch (error: any) {
+            setLoading(false);
+
             setError('confirmPassword', {
                 type: 'manual',
                 message: `${error.message}`,
@@ -94,7 +98,9 @@ export default function FormNewPassword() {
             </Form.Label>
 
             <div className="container-button">
-                <Form.ButtonSubmit id="confirm">Confirmar</Form.ButtonSubmit>
+                <Form.ButtonSubmit loading={loading} id="confirm">
+                    Confirmar
+                </Form.ButtonSubmit>
 
                 <Form.ButtonCancel onClick={() => router.push('/password-recover')}>
                     Cancelar

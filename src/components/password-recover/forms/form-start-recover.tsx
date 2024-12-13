@@ -20,15 +20,18 @@ export default function FormStartRecover() {
         resolver: zodResolver(emailSchema),
     });
 
-    const { verify } = useContext(RecoverPasswordContext);
+    const { verify, loading, setLoading } = useContext(RecoverPasswordContext);
 
     const sendEmail = async ({ email }: EmailSchema) => {
+        setLoading(true);
         try {
             await verify(email);
 
             reset();
             router.push('/password-recover/verify-code');
+            setLoading(false);
         } catch (error: any) {
+            setLoading(false);
             setError('email', {
                 type: 'manual',
                 message: `${error.message}`,
@@ -51,7 +54,7 @@ export default function FormStartRecover() {
                 </Form.Label>
 
                 <div className="container-button">
-                    <Form.ButtonSubmit>Enviar</Form.ButtonSubmit>
+                    <Form.ButtonSubmit loading={loading}>Enviar</Form.ButtonSubmit>
 
                     <Form.ButtonCancel onClick={() => router.push('/')}>
                         Cancelar

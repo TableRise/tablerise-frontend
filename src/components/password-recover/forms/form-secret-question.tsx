@@ -11,7 +11,8 @@ import RecoverPasswordContext from '@/context/RecoverPasswordContext';
 import { useRouter } from 'next/navigation';
 
 export default function FormSecretQuestion() {
-    const { sendSecretQuestion, userVerify } = useContext(RecoverPasswordContext);
+    const { sendSecretQuestion, userVerify, loading, setLoading } =
+        useContext(RecoverPasswordContext);
 
     const router = useRouter();
 
@@ -25,9 +26,12 @@ export default function FormSecretQuestion() {
     });
 
     const sendAnswer = async ({ secretAnswer }: SecretQuestionSchema) => {
+        setLoading(true);
         try {
             await sendSecretQuestion(secretAnswer);
+            setLoading(false);
         } catch (error: any) {
+            setLoading(false);
             setError('secretAnswer', {
                 type: 'manual',
                 message: `${error.message}`,
@@ -52,7 +56,7 @@ export default function FormSecretQuestion() {
             </Form.Label>
 
             <div className="container-button">
-                <Form.ButtonSubmit>Confirmar</Form.ButtonSubmit>
+                <Form.ButtonSubmit loading={loading}>Confirmar</Form.ButtonSubmit>
 
                 <Form.ButtonCancel onClick={() => router.push('/password-recover')}>
                     Cancelar

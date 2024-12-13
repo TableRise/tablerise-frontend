@@ -7,6 +7,8 @@ interface RecoverPasswordContext {
     updatePassword: (newPassword: string) => void;
     sendSecretQuestion: (answer: string) => void;
     twoFactor: (code: string) => void;
+    loading: boolean;
+    setLoading: (loading: boolean) => void;
 }
 
 const RecoverPasswordContext = createContext({} as RecoverPasswordContext);

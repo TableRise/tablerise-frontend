@@ -53,11 +53,16 @@ function Span(props: HTMLAttributes<HTMLSpanElement>) {
     return <span className="form-span text-red-500 font-XXS-regular" {...props} />;
 }
 
-function ButtonSubmit(props: ButtonHTMLAttributes<HTMLButtonElement>) {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+    loading?: boolean;
+}
+
+function ButtonSubmit(props: ButtonProps) {
     return (
         <button
-            className="font-S-bold form-button-submit
-                button-L-fill"
+            className={`font-S-bold form-button-submit
+                button-L-fill ${props.loading ? 'opacity-50' : 'opacity-100'}`}
+            disabled={props.loading}
             {...props}
         />
     );
