@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import RecoverPasswordContext from '@/context/RecoverPasswordContext';
 import {
     authenticate2fa,
@@ -92,6 +92,12 @@ export default function RecoverPasswordProvider({
             throw new Error(error.message);
         }
     };
+
+    useEffect(() => {
+        if (!userVerify.email) {
+            router.push('/password-recover');
+        }
+    });
 
     const value = {
         verify,
