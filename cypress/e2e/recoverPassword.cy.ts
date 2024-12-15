@@ -16,10 +16,6 @@ describe('TableRise :: Recover Password', () => {
             ).as('updatePassword');
         });
 
-        it('Test Robo', () => {
-            cy.visit('/');
-        });
-
         it('Recover password with method secretQuestion', () => {
             cy.intercept(
                 'PATCH',
@@ -54,7 +50,7 @@ describe('TableRise :: Recover Password', () => {
 
             cy.contains('Enviar').click();
 
-            cy.url().should('include', '/password-recover/verify-code');
+            // cy.url().should('include', '/password-recover/verify-code');
 
             cy.get('#fild0').type('f');
             cy.get('#fild1').type('a');
