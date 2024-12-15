@@ -16,8 +16,11 @@ describe('TableRise :: Recover Password', () => {
             ).as('updatePassword');
         });
 
+        it('Test Robo', () => {
+            cy.visit('/');
+        });
+
         it('Recover password with method secretQuestion', () => {
-            console.log(process.env.API_TEST);
             cy.intercept(
                 'PATCH',
                 `**/users/authenticate/email?email=fake%40email.com&code=FAZOL1&flow=update-password`,
