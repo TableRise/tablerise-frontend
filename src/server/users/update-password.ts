@@ -75,8 +75,6 @@ export const authenticateSecretQuestion = async (
             }
         );
 
-        console.log(response);
-
         return response.status;
     } catch ({ response }: AxiosError | any) {
         if (response.status == 401) throw new Error('A resposta está incorreta');
