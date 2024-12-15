@@ -5,13 +5,13 @@ describe('TableRise :: Recover Password', () => {
 
             cy.intercept(
                 'GET',
-                `http://localhost:3001/users/verify?email=fake%40email.com&flow=update-password`,
+                `**/users/verify?email=fake%40email.com&flow=update-password`,
                 { statusCode: 200 }
             ).as('verifyEmail');
 
             cy.intercept(
                 'PATCH',
-                `http://localhost:3001/users/update/password?email=fake%40email.com`,
+                `**/users/update/password?email=fake%40email.com`,
                 { statusCode: 200 }
             ).as('updatePassword');
         });
@@ -20,7 +20,7 @@ describe('TableRise :: Recover Password', () => {
             console.log(process.env.API_TEST);
             cy.intercept(
                 'PATCH',
-                `http://localhost:3001/users/authenticate/email?email=fake%40email.com&code=FAZOL1&flow=update-password`,
+                `**/users/authenticate/email?email=fake%40email.com&code=FAZOL1&flow=update-password`,
                 {
                     statusCode: 200,
                     body: {
@@ -35,7 +35,7 @@ describe('TableRise :: Recover Password', () => {
 
             cy.intercept(
                 'PATCH',
-                'http://localhost:3001/users/authenticate/secret-question?email=fake%40email.com&flow=update-password',
+                '**/users/authenticate/secret-question?email=fake%40email.com&flow=update-password',
                 {
                     statusCode: 200,
                     body: {
@@ -81,7 +81,7 @@ describe('TableRise :: Recover Password', () => {
         it('Recover password with method 2TwoFactor', () => {
             cy.intercept(
                 'PATCH',
-                `http://localhost:3001/users/authenticate/email?email=fake%40email.com&code=FAZOL1&flow=update-password`,
+                `**/users/authenticate/email?email=fake%40email.com&code=FAZOL1&flow=update-password`,
                 {
                     statusCode: 200,
                     body: {
@@ -95,7 +95,7 @@ describe('TableRise :: Recover Password', () => {
 
             cy.intercept(
                 'PATCH',
-                'http://localhost:3001/users/authenticate/2fa?email=fake%40email.com&token=123456&flow=update-password',
+                '**/users/authenticate/2fa?email=fake%40email.com&token=123456&flow=update-password',
                 {
                     statusCode: 200,
                     body: {
