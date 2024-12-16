@@ -1,6 +1,8 @@
 describe('TableRise :: Recover Password', () => {
     context('When the user recover the password', () => {
         beforeEach(() => {
+            cy.visit('/password-recover');
+
             cy.intercept(
                 'GET',
                 `**/users/verify?email=fake%40email.com&flow=update-password`,
@@ -15,7 +17,6 @@ describe('TableRise :: Recover Password', () => {
         });
 
         it('Recover password with method secretQuestion', () => {
-            cy.visit('/password-recover');
             cy.intercept(
                 'PATCH',
                 `**/users/authenticate/email?email=fake%40email.com&code=FAZOL1&flow=update-password`,
@@ -49,6 +50,8 @@ describe('TableRise :: Recover Password', () => {
 
             cy.contains('Enviar').click();
 
+            cy.visit('/password-recover/verify-code');
+
             cy.url().should('include', '/password-recover/verify-code');
 
             cy.get('#fild0').type('f');
@@ -77,7 +80,6 @@ describe('TableRise :: Recover Password', () => {
         });
 
         it('Recover password with method 2TwoFactor', () => {
-            cy.visit('/password-recover');
             cy.intercept(
                 'PATCH',
                 `**/users/authenticate/email?email=fake%40email.com&code=FAZOL1&flow=update-password`,
