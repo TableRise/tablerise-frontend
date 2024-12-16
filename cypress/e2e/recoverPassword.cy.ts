@@ -46,7 +46,7 @@ describe('TableRise :: Recover Password', () => {
                 }
             ).as('authenticateQuestion');
 
-            cy.get('.form-input').type('jhonatasmidlane@gmail.com');
+            cy.get('.form-input').type('fake@email.com');
 
             cy.contains('Enviar').click();
 
