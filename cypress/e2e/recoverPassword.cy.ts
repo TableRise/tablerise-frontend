@@ -461,5 +461,128 @@ describe('TableRise :: Recover Password', () => {
                 .should('be.visible')
                 .and('contain', 'Erro no servidor')
         });
-    })
+    });
+
+    context('When the user recover the password - error when update password', () => {
+        beforeEach(() => {
+            cy.visit('/password-recover');
+
+            cy.intercept(
+                'GET',
+                `**/verify?email=fake%40email.com&flow=update-password`,
+                { statusCode: 200 }
+            ).as('verifyEmail');
+
+            cy.intercept(
+                'PATCH',
+                `**/authenticate/email?email=fake%40email.com&code=FAZOL1&flow=update-password`,
+                {
+                    statusCode: 200,
+                    body: {
+                        userId: '7e34509c-10ec-46d1-9734-97fa3e5132c6',
+                        userStatus: 'wait-to-second-auth',
+                        accountSecurityMethod: 'secret-question',
+                        secretQuestion: 'qual é esse pokemon?',
+                        lastUpdate: '2024-12-12T14:38:20.577Z',
+                    },
+                }
+            ).as('authenticateEmail');
+
+            cy.intercept(
+                'PATCH',
+                '**/authenticate/secret-question?email=fake%40email.com&flow=update-password',
+                {
+                    statusCode: 200,
+                    body: {
+                        userId: '7e34509c-10ec-46d1-9734-97fa3e5132c6',
+                        userStatus: 'wait-to-finish-password-change',
+                        accountSecurityMethod: 'secret-question',
+                        lastUpdate: '2024-12-12T14:38:20.577Z',
+                    },
+                }
+            ).as('authenticateQuestion');
+        });
+
+        it('User status invalid', () => {
+            cy.intercept(
+                'PATCH',
+                `**/update/password?email=fake%40email.com`,
+                { statusCode: 400 }
+            ).as('updatePassword');
+
+            cy.get('.form-input').type('fake@email.com');
+
+            cy.contains('Enviar').click();
+
+            cy.url().should('include', '/password-recover/verify-code');
+
+            cy.get('#fild0').type('f');
+            cy.get('#fild1').type('a');
+            cy.get('#fild2').type('z');
+            cy.get('#fild3').type('o');
+            cy.get('#fild4').type('l');
+            cy.get('#fild5').type('1');
+
+            cy.contains('Confirmar').click();
+
+            cy.url().should('include', '/password-recover/secret-question');
+
+            cy.get('.form-input').type('pikachu');
+
+            cy.contains('Confirmar').click();
+
+            cy.url().should('include', '/password-recover/new-password');
+
+            cy.get('#newPassword').type('Senhasupersecreta123!');
+            cy.get('#confirmPassword').type('Senhasupersecreta123!');
+
+            cy.get('#confirm').click();
+
+
+            cy.get('.form-span')
+                .should('be.visible')
+                .and('contain', 'O status do usuário é inválido para realizar esta operação')
+        });
+
+        it('If there is a server error', () => {
+            cy.intercept(
+                'PATCH',
+                `**/update/password?email=fake%40email.com`,
+                { statusCode: 500 }
+            ).as('updatePassword');
+
+            cy.get('.form-input').type('fake@email.com');
+
+            cy.contains('Enviar').click();
+
+            cy.url().should('include', '/password-recover/verify-code');
+
+            cy.get('#fild0').type('f');
+            cy.get('#fild1').type('a');
+            cy.get('#fild2').type('z');
+            cy.get('#fild3').type('o');
+            cy.get('#fild4').type('l');
+            cy.get('#fild5').type('1');
+
+            cy.contains('Confirmar').click();
+
+            cy.url().should('include', '/password-recover/secret-question');
+
+            cy.get('.form-input').type('pikachu');
+
+            cy.contains('Confirmar').click();
+
+            cy.url().should('include', '/password-recover/new-password');
+
+            cy.get('#newPassword').type('Senhasupersecreta123!');
+            cy.get('#confirmPassword').type('Senhasupersecreta123!');
+
+            cy.get('#confirm').click();
+
+
+            cy.get('.form-span')
+                .should('be.visible')
+                .and('contain', 'Erro no servidor')
+        });
+    });
 });
