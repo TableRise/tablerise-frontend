@@ -93,11 +93,11 @@ export default function RecoverPasswordProvider({
         }
     };
 
-    useEffect(() => {
-        if (!userVerify.email) {
-            router.push('/password-recover');
-        }
-    });
+    // useEffect(() => {
+    //     if (!userVerify.email) {
+    //         router.push('/password-recover');
+    //     }
+    // });
 
     const value = {
         verify,
