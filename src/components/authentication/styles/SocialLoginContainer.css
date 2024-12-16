@@ -6,4 +6,7 @@
     .buttons-container {
         @apply flex flex-row w-full items-center justify-center gap-3;
     }
+    .social-container {
+        @apply flex flex-col w-full items-center justify-center gap-3;
+    }
 }
