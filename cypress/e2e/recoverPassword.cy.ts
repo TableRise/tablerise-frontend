@@ -5,13 +5,13 @@ describe('TableRise :: Recover Password', () => {
 
             cy.intercept(
                 'GET',
-                `**/users/verify?email=fake%40email.com&flow=update-password`,
+                `**/verify?email=fake%40email.com&flow=update-password`,
                 { statusCode: 200 }
             ).as('verifyEmail');
 
             cy.intercept(
                 'PATCH',
-                `**/users/update/password?email=fake%40email.com`,
+                `**/update/password?email=fake%40email.com`,
                 { statusCode: 200 }
             ).as('updatePassword');
         });
@@ -19,7 +19,7 @@ describe('TableRise :: Recover Password', () => {
         it('Recover password with method secretQuestion', () => {
             cy.intercept(
                 'PATCH',
-                `**/users/authenticate/email?email=fake%40email.com&code=FAZOL1&flow=update-password`,
+                `**/authenticate/email?email=fake%40email.com&code=FAZOL1&flow=update-password`,
                 {
                     statusCode: 200,
                     body: {
@@ -34,7 +34,7 @@ describe('TableRise :: Recover Password', () => {
 
             cy.intercept(
                 'PATCH',
-                '**/users/authenticate/secret-question?email=fake%40email.com&flow=update-password',
+                '**/authenticate/secret-question?email=fake%40email.com&flow=update-password',
                 {
                     statusCode: 200,
                     body: {
@@ -80,7 +80,7 @@ describe('TableRise :: Recover Password', () => {
         it('Recover password with method 2TwoFactor', () => {
             cy.intercept(
                 'PATCH',
-                `**/users/authenticate/email?email=fake%40email.com&code=FAZOL1&flow=update-password`,
+                `**/authenticate/email?email=fake%40email.com&code=FAZOL1&flow=update-password`,
                 {
                     statusCode: 200,
                     body: {
@@ -94,7 +94,7 @@ describe('TableRise :: Recover Password', () => {
 
             cy.intercept(
                 'PATCH',
-                '**/users/authenticate/2fa?email=fake%40email.com&token=123456&flow=update-password',
+                '**/authenticate/2fa?email=fake%40email.com&token=123456&flow=update-password',
                 {
                     statusCode: 200,
                     body: {
