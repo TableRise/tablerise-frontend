@@ -50,8 +50,6 @@ describe('TableRise :: Recover Password', () => {
 
             cy.contains('Enviar').click();
 
-            cy.visit('/password-recover/verify-code');
-
             cy.url().should('include', '/password-recover/verify-code');
 
             cy.get('#fild0').type('f');
