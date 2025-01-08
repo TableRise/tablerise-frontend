@@ -75,7 +75,8 @@ export default function LoginForm(): JSX.Element {
                 <Link
                     href={'/register'}
                     className="font-XS-regular underline text-color-primary/800"
-                >Esqueceu a senha?
+                >
+                    Esqueceu a senha?
                 </Link>
             </h2>
             <SubmitButton title="Entrar" />
