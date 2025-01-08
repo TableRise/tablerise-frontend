@@ -1,24 +1,20 @@
 'use client';
 
 import React, { useState } from 'react';
-import TextInput from './TextInput';
+import Link from 'next/link';
 import EmailInput from './EmailInput';
 import PasswordInput from './PasswordInput';
-import CheckBoxField from './CheckBoxField';
 import SubmitButton from './SubmitButton';
 import { postRegister } from '@/server/users/api';
 import { useRouter } from 'next/navigation';
 import errorHandler from '@/utils/errorHandler';
 import '@/components/authentication/styles/RegisterForm.css';
 import { errorListTypes } from '@/types/shared/errorHandler';
-import validateRegisterFields from '@/utils/validateRegisterFields';
+import validateLoginFields from '@/utils/validateLoginFields';
 
-export default function RegisterForm(): JSX.Element {
-    const [nickname, setNickname] = useState<string>('');
+export default function LoginForm(): JSX.Element {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [confirmPassword, setConfirmPassword] = useState<string>('');
-    const [termsCheckBox, setRermsCheckBox] = useState<boolean>(false);
     const [errorList, setErrorList] = useState<errorListTypes[]>([]);
     const router = useRouter();
 
@@ -27,12 +23,9 @@ export default function RegisterForm(): JSX.Element {
     ): Promise<void> => {
         event.preventDefault();
 
-        const fieldsValidation = validateRegisterFields({
-            nickname,
+        const fieldsValidation = validateLoginFields({
             email,
             password,
-            confirmPassword,
-            termsCheckBox,
         });
 
         if (fieldsValidation.length > 0) {
@@ -41,7 +34,6 @@ export default function RegisterForm(): JSX.Element {
         }
 
         const registerPayload = {
-            nickname,
             email,
             password,
         };
@@ -63,14 +55,6 @@ export default function RegisterForm(): JSX.Element {
 
     return (
         <form className="form" onSubmit={(event) => handleSubmit(event)}>
-            <TextInput
-                label="Nome de usuário"
-                placeholder="Insira o seu nome de usuário"
-                onChangeState={setNickname}
-                inputValue={nickname}
-                errorId={'nickname'}
-                errorList={errorList}
-            />
             <EmailInput
                 label="E-mail"
                 placeholder="Insira o seu e-mail"
@@ -87,24 +71,14 @@ export default function RegisterForm(): JSX.Element {
                 errorId={'password'}
                 errorList={errorList}
             />
-            <PasswordInput
-                label="Confirmar senha"
-                placeholder="Confirme a sua senha"
-                onChangeState={setConfirmPassword}
-                inputValue={confirmPassword}
-                errorId={'password'}
-                errorList={errorList}
-            />
-            <CheckBoxField
-                label="Eu li e concordo com os "
-                labelWithLink=" termos e condições"
-                srcLink="/terms"
-                onChangeState={setRermsCheckBox}
-                inputValue={termsCheckBox}
-                errorId={'checkbox'}
-                errorList={errorList}
-            />
-            <SubmitButton title="Confirmar" />
+            <h2 className="subtitle-text font-XS-regular">
+                <Link
+                    href={'/register'}
+                    className="font-XS-regular underline text-color-primary/800"
+                >Esqueceu a senha?
+                </Link>
+            </h2>
+            <SubmitButton title="Entrar" />
         </form>
     );
 }

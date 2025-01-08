@@ -1,4 +1,4 @@
-export type validateRagisterFieldsTypes = {
+export type validateRegisterFieldsTypes = {
     nickname: string;
     email: string;
     password: string;
