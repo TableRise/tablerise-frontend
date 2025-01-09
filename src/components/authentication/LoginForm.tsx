@@ -71,7 +71,7 @@ export default function LoginForm(): JSX.Element {
                 errorId={'password'}
                 errorList={errorList}
             />
-            <h2 className="subtitle-text font-XS-regular">
+            <h2 className="subtitle-text font-XS-regular mb-6">
                 <Link
                     href={'/register'}
                     className="font-XS-regular underline text-color-primary/800"
