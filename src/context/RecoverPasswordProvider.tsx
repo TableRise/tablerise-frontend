@@ -42,17 +42,27 @@ export default function RecoverPasswordProvider({
 
     const setCode = async (code: string) => {
         try {
-            const { accountSecurityMethod, secretQuestion } = await authenticateEmail(
+            const { accountSecurityMethod } = await authenticateEmail(
                 userVerify.email,
                 code
             );
 
+            let securityMethod = accountSecurityMethod;
+            let secretQuestion: string | null = null;
+
+            if (accountSecurityMethod.startsWith('secret-question%')) {
+                console.log(accountSecurityMethod);
+                const split = accountSecurityMethod.split('%');
+                securityMethod = split[0]; // "secret-question"
+                secretQuestion = split[1]; // A pergunta secreta
+            }
+
             if (secretQuestion) setUserVerify({ ...userVerify, secretQuestion });
 
-            if (accountSecurityMethod == 'secret-question')
+            if (securityMethod == 'secret-question')
                 router.push('/password-recover/secret-question');
 
-            if (accountSecurityMethod == 'two-factor')
+            if (securityMethod == 'two-factor')
                 router.push('/password-recover/two-factor');
         } catch (error: any) {
             throw new Error(error.message);

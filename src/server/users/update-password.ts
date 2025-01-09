@@ -4,8 +4,7 @@ import { apiUser } from './api';
 type Response = {
     userId: string;
     userStatus: string;
-    accountSecurityMethod: 'secret-question' | 'two-factor' | '';
-    secretQuestion?: string;
+    accountSecurityMethod: string;
     lastUpdate: string;
 };
 
