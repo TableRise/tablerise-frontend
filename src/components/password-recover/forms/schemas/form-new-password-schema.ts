@@ -4,8 +4,8 @@ export const newPasswordSchema = z
     .object({
         newPassword: z
             .string()
-            .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9_.]).{6,}$/, {
-                message: 'Use 6+ caracteres, maiúscula, minúscula, número e símbolo',
+            .regex(/^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*\d).{8,32}$/, {
+                message: 'Use entre 8 e 32 caracteres, incluindo pelo menos uma letra maiúscula, um número e um dos símbolos: !@#$&*',
             }),
         confirmPassword: z.string().min(1, { message: 'O campo não pode estar vazio.' }),
     })
