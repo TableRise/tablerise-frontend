@@ -60,6 +60,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 function ButtonSubmit(props: ButtonProps) {
     return (
         <button
+            type='submit'
             className={`font-S-bold form-button-submit
                 button-L-fill ${props.loading ? 'opacity-50' : 'opacity-100'}`}
             disabled={props.loading}
@@ -71,6 +72,7 @@ function ButtonSubmit(props: ButtonProps) {
 function ButtonCancel(props: ButtonHTMLAttributes<HTMLButtonElement>) {
     return (
         <button
+            type='button'
             className="font-S-bold form-button-cancel
                 button-L-ghost"
             {...props}
