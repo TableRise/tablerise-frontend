@@ -61,7 +61,7 @@ function ButtonSubmit(props: ButtonProps) {
     return (
         <button
             type='submit'
-            className={`font-S-bold form-button-submit
+            className={`font-S-bold form-button-submit bg-color-primary/default_900
                 button-L-fill ${props.loading ? 'opacity-50' : 'opacity-100'}`}
             disabled={props.loading}
             {...props}
