@@ -1,6 +1,15 @@
 const chalk = require('chalk');
 const { execSync } = require('child_process');
 
+// Função para executar comandos sem mostrar a saída
+const execSilent = (command) => {
+    try {
+        execSync(command, { stdio: 'ignore' }); // Redireciona stdout e stderr para "nada"
+    } catch (error) {
+        console.error(chalk.red(`Erro ao executar comando: ${command}`));
+    }
+};
+
 // Obter o nome da branch
 const BRANCH = execSync('git symbolic-ref --short HEAD').toString().trim();
 
@@ -9,11 +18,10 @@ const REGEX = '/^(feat|bugfix|hotfix)\\/([a-zA-Z0-9-]+)\\/([a-zA-Z0-9-]+)$/';
 
 const handlePrettierError = () => {
     console.log(chalk.yellow('⚠️  Corrigindo o Prettier...'));
-    execSync('npm run prettier:fix', { stdio: 'inherit' });
-    execSync('git add .', { stdio: 'inherit' });
-    // Usando o comando de commit corretamente
-    execSync('git commit -m "fix: prettier"', { stdio: 'inherit' });
-    execSync('git push -u origin ' + BRANCH, { stdio: 'inherit' });
+    execSilent('npm run prettier:fix');
+    execSilent('git add .');
+    execSilent('git commit -m "fix: prettier"');
+    execSilent('git push -u origin ' + BRANCH);
     console.log(chalk.green('✅ Prettier corrigido e alterações enviadas.'));
 };
 
@@ -31,9 +39,9 @@ console.log(
     )
 );
 console.log(chalk.blue('🔍 Executando lint...'));
-execSync('npm run lint', { stdio: 'inherit' });
+execSilent('npm run lint');
 console.log(chalk.blue('🔍 Executando prettier...'));
-execSync('npm run prettier', { stdio: 'inherit' });
+execSilent('npm run prettier');
 
 // Verificação do nome da branch
 if (!REGEX.test(BRANCH)) {
