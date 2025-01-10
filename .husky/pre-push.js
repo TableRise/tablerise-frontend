@@ -4,7 +4,7 @@ const { execSync } = require('child_process');
 // Função para executar comandos sem mostrar a saída
 const execSilent = (command) => {
     try {
-        execSync(command, { stdio: 'ignore' }); // Redireciona stdout e stderr para "nada"
+        execSync(command, { stdio: 'inherit' }); // Redireciona stdout e stderr para "nada"
     } catch (error) {
         if (command === 'npm run prettier') return;
         process.exit(1);
