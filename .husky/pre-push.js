@@ -6,7 +6,8 @@ const execSilent = (command) => {
     try {
         execSync(command, { stdio: 'inherit' }); // Redireciona stdout e stderr para "nada"
     } catch (error) {
-        if (command === 'npm run prettier' || command.includes('github.com')) return;
+        if (command === 'npm run prettier' || error.message.includes('github.com'))
+            return;
         process.exit(1);
     }
 };
