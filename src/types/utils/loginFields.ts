@@ -1,4 +1,4 @@
-export type validateLoginFieldsTypes = {
+export type LoginFields = {
     email: string;
     password: string;
 };

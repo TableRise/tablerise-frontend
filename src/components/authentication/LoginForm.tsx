@@ -5,12 +5,13 @@ import Link from 'next/link';
 import EmailInput from './EmailInput';
 import PasswordInput from './PasswordInput';
 import SubmitButton from './SubmitButton';
-import { postRegister } from '@/server/users/api';
+import { postLogin } from '@/server/users/api';
 import { useRouter } from 'next/navigation';
-import errorHandler from '@/utils/errorHandler';
 import '@/components/authentication/styles/RegisterForm.css';
-import { errorListTypes } from '@/types/shared/errorHandler';
+import errorHandler from '@/utils/errorHandler';
 import validateLoginFields from '@/utils/validateLoginFields';
+import { errorListTypes } from '@/types/shared/errorHandler';
+import { LoginFields } from '@/types/utils/loginFields';
 
 export default function LoginForm(): JSX.Element {
     const [email, setEmail] = useState<string>('');
@@ -33,13 +34,13 @@ export default function LoginForm(): JSX.Element {
             return;
         }
 
-        const registerPayload = {
+        const loginPayload: LoginFields = {
             email,
             password,
         };
 
         try {
-            await postRegister(registerPayload);
+            await postLogin(loginPayload);
             router.push('/');
         } catch (error: any) {
             const errorResponse = errorHandler({
