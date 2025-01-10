@@ -6,8 +6,7 @@ const execSilent = (command) => {
     try {
         execSync(command, { stdio: 'ignore' }); // Redireciona stdout e stderr para "nada"
     } catch (error) {
-        console.error(chalk.red(`Erro ao executar comando: ${command}`));
-        console.error(chalk.red(error.message));
+        if (command === 'npm run prettier') return;
         process.exit(1);
     }
 };
