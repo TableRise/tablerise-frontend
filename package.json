@@ -14,20 +14,23 @@
         "prepare": "husky install"
     },
     "dependencies": {
+        "@hookform/resolvers": "^3.9.1",
         "@sentry/nextjs": "8.48.0",
         "axios": "1.7.4",
         "next": "14.2.4",
         "react": "18",
         "react-dom": "18",
         "sharp": "0.33.5",
-        "uuidv4": "6.2.13"
+        "uuidv4": "6.2.13",
+        "react-hook-form": "7.54.0",
+        "zod": "3.24.0"
     },
     "devDependencies": {
         "@svgr/webpack": "8.1.0",
         "@types/node": "20",
         "@types/react": "18",
         "@types/react-dom": "18",
-        "chalk": "^4.1.2",
+        "chalk": "4.1.2",
         "cypress": "13.12.0",
         "eslint": "8",
         "eslint-config-next": "14.2.4",
