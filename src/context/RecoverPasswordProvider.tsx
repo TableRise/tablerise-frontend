@@ -51,7 +51,6 @@ export default function RecoverPasswordProvider({
             let secretQuestion: string | null = null;
 
             if (accountSecurityMethod.startsWith('secret-question%')) {
-                console.log(accountSecurityMethod);
                 const split = accountSecurityMethod.split('%');
                 securityMethod = split[0]; // "secret-question"
                 secretQuestion = split[1]; // A pergunta secreta

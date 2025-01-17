@@ -1,4 +1,4 @@
-import { WrapperPayload } from '@/types/modules/server/serverWrapper';
+import { WrapperPayload } from '@/types/modules/server/ServerWrapper';
 import axios from 'axios';
 
 export const usersBaseUrl = process.env.API_USERS;
