@@ -1,5 +1,5 @@
 import { AxiosError, AxiosResponse } from 'axios';
-import { apiUser } from './api';
+import { apiCall, usersBaseUrl } from '../wrapper';
 
 type Response = {
     userId: string;
@@ -10,7 +10,10 @@ type Response = {
 
 export const sendConfirmEmail = async (email: string) => {
     try {
-        await apiUser.get('/verify', {
+        await apiCall({
+            baseUrl: usersBaseUrl,
+            endpoint: 'verify',
+            method: 'GET',
             params: { email, flow: 'update-password' },
         });
     } catch ({ response }: AxiosError | any) {
@@ -21,13 +24,12 @@ export const sendConfirmEmail = async (email: string) => {
 
 export const authenticateEmail = async (email: string, code: string) => {
     try {
-        const { data }: AxiosResponse<Response> = await apiUser.patch(
-            '/authenticate/email',
-            null,
-            {
-                params: { email, code, flow: 'update-password' },
-            }
-        );
+        const { data }: AxiosResponse<Response> = await apiCall({
+            baseUrl: usersBaseUrl,
+            endpoint: 'authenticate/email',
+            method: 'PATCH',
+            params: { email, code, flow: 'update-password' },
+        });
 
         return data;
     } catch ({ response }: AxiosError | any) {
@@ -44,13 +46,12 @@ export const authenticateEmail = async (email: string, code: string) => {
 
 export const authenticate2fa = async (email: string, code: string) => {
     try {
-        const { status }: AxiosResponse<Response> = await apiUser.patch(
-            '/authenticate/2fa',
-            null,
-            {
-                params: { email, token: code, flow: 'update-password' },
-            }
-        );
+        const { status }: AxiosResponse<Response> = await apiCall({
+            baseUrl: usersBaseUrl,
+            endpoint: 'authenticate/2fa',
+            method: 'PATCH',
+            params: { email, token: code, flow: 'update-password' },
+        });
 
         return status;
     } catch ({ response }: AxiosError | any) {
@@ -66,15 +67,15 @@ export const authenticateSecretQuestion = async (
     answer: string
 ) => {
     try {
-        const response: AxiosResponse<Response> = await apiUser.patch(
-            '/authenticate/secret-question',
-            { question, answer },
-            {
-                params: { email, flow: 'update-password' },
-            }
-        );
+        const { status }: AxiosResponse<Response> = await apiCall({
+            baseUrl: usersBaseUrl,
+            endpoint: 'authenticate/secret-question',
+            method: 'PATCH',
+            data: { question, answer },
+            params: { email, flow: 'update-password' },
+        });
 
-        return response.status;
+        return status;
     } catch ({ response }: AxiosError | any) {
         if (response.status == 401) throw new Error('A resposta está incorreta');
         if (response.status == 500) throw new Error('Erro no servidor');
@@ -83,15 +84,13 @@ export const authenticateSecretQuestion = async (
 
 export const sendNewPassword = async (email: string, newPassword: string) => {
     try {
-        await apiUser.patch(
-            '/update/password',
-            {
-                password: newPassword,
-            },
-            {
-                params: { email },
-            }
-        );
+        await apiCall({
+            baseUrl: usersBaseUrl,
+            endpoint: 'update/password',
+            method: 'PATCH',
+            data: { password: newPassword },
+            params: { email },
+        });
     } catch ({ response }: AxiosError | any) {
         if (response.status == 400)
             throw new Error('O status do usuário é inválido para realizar esta operação');

@@ -6,7 +6,7 @@ import EmailInput from './EmailInput';
 import PasswordInput from './PasswordInput';
 import CheckBoxField from './CheckBoxField';
 import SubmitButton from './SubmitButton';
-import { postRegister } from '@/server/users/api';
+import { postRegister } from '@/server/users/register';
 import { useRouter } from 'next/navigation';
 import errorHandler from '@/utils/errorHandler';
 import '@/components/authentication/styles/RegisterForm.css';
