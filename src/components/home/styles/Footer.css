@@ -7,7 +7,7 @@
 }
 
 .footer-media-links {
-    @apply ml-40 mr-40 mt-24 mb-8 flex flex-row flex-wrap justify-between items-stretch;
+    @apply w-[70.5rem] ml-auto mr-auto mt-24 mb-8 flex flex-row flex-wrap justify-between items-stretch;
 }
 
 .social-media-icons {
@@ -35,7 +35,7 @@
 }
 
 .footer-bottom {
-    @apply mb-24 ml-40 mr-40 border-t border-gray-500 pt-8 flex flex-col  lg:flex-row justify-between space-y-4 lg:space-y-0;
+    @apply mb-24 w-[70.5rem] ml-auto mr-auto border-t border-gray-500 pt-8 flex flex-col  lg:flex-row justify-between space-y-4 lg:space-y-0;
 }
 
 .footer-bottom p {

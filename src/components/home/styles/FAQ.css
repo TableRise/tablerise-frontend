@@ -4,7 +4,7 @@
 
 @layer base {
     .faq-container {
-        @apply w-[82.5%] text-color-primary/default_900;
+        @apply w-[70.5rem] text-color-primary/default_900;
     }
 
     .faq-title {

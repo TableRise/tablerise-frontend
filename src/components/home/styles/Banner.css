@@ -4,7 +4,7 @@
 
 @layer base {
     .banner-home {
-        @apply mt-20 mb-[8.3rem] w-[82.5%] justify-between flex items-center;
+        @apply mt-20 mb-[8.3rem] w-[70.5rem] justify-between flex items-center;
     }
 
     .main-text p:nth-child(1) {

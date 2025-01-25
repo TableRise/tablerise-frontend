@@ -4,7 +4,7 @@
 
 @layer base {
     .promo-section {
-        @apply w-[82.5%] flex flex-col items-center rounded-lg bg-color-greyScale/50 relative -top-14;
+        @apply w-[70.5rem] flex flex-col items-center rounded-lg bg-color-greyScale/50 relative -top-14;
     }
 
     .promo-section .promo-text {
