@@ -4,7 +4,7 @@
 
 @layer base {
     .features-section {
-        @apply w-[82.5%] flex flex-col;
+        @apply w-[70.5rem] flex flex-col;
     }
 
     .features-text {
@@ -20,6 +20,10 @@
     }
 
     .features-cards {
-        @apply flex justify-between;
+        @apply flex gap-6;
+    }
+
+    .feature-card {
+        @apply w-full;
     }
 }

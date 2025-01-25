@@ -4,7 +4,7 @@
 
 @layer base {
     header {
-        @apply w-[82.5%] h-[4.5rem] px-6 py-3 flex items-center justify-between bg-color-primary/default_900 rounded-xl;
+        @apply w-[70.5rem] h-[4.5rem] px-6 py-3 flex items-center justify-between bg-color-primary/default_900 rounded-xl;
     }
 
     header .menu-and-buttons {

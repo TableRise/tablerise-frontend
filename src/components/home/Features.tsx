@@ -18,7 +18,7 @@ export default function Features(): JSX.Element {
         },
         {
             image: AddCharInfoIcon,
-            text: 'Dê vida aos personagens adicionando fotos e criando histórias',
+            text: 'Dê vida aos personagens adicionando fotos',
         },
         {
             image: DiceIcon,

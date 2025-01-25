@@ -11,8 +11,16 @@
         @apply w-[55%];
     }
 
+    section .side-image-container .logo-container {
+        @apply flex justify-center;
+    }
+
+    section .side-image-container .logo-container .image-logo {
+        @apply w-[28rem];
+    }
+
     section .side-form-container {
-        @apply flex flex-col justify-center items-center py-0 px-28 absolute w-[45%] h-full right-0 top-0 bg-color-greyScale/100 rounded-s-xl;
+        @apply flex flex-col justify-center items-center py-0 px-28 absolute w-[38.8rem] h-full right-0 top-0 bg-color-greyScale/100 rounded-s-xl;
     }
 
     section .form-container {
