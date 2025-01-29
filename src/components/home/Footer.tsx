@@ -1,13 +1,13 @@
 import '@/components/home/styles/Footer.css';
 import Image from 'next/image';
 import Link from 'next/link';
-import DiscordLogo from '../../../assets/icons/social-midia/discord.svg?url';
-import LinkedinLogo from '../../../assets/icons/social-midia/linkedin.svg?url';
-import TwitchLogo from '../../../assets/icons/social-midia/twitch.svg?url';
-import XLogo from '../../../assets/icons/social-midia/x.svg?url';
-import InstagramLogo from '../../../assets/icons/social-midia/instagram.svg?url';
-import GitHubLogo from '../../../assets/icons/social-midia/github.svg?url';
-import LightModeLogo from '../../../assets/icons/light-dark-mode/light-mode-sun.svg?url';
+import DiscordLogo from '@assets/icons/social-midia/discord.svg?url';
+import LinkedinLogo from '@assets/icons/social-midia/linkedin.svg?url';
+import TwitchLogo from '@assets/icons/social-midia/twitch.svg?url';
+import XLogo from '@assets/icons/social-midia/x.svg?url';
+import InstagramLogo from '@assets/icons/social-midia/instagram.svg?url';
+import GitHubLogo from '@assets/icons/social-midia/github.svg?url';
+import LightModeLogo from '@assets/icons/light-dark-mode/light-mode-sun.svg?url';
 
 export default function Footer(): JSX.Element {
     return (
@@ -81,7 +81,7 @@ export default function Footer(): JSX.Element {
                             <Link href="/">Configurações de cookies</Link>
                         </li>
                         <li>
-                            <Link href="/">Suporte</Link>
+                            <Link href="/">supporte</Link>
                         </li>
                     </ul>
                 </div>

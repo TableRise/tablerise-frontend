@@ -14,7 +14,7 @@
         "prepare": "husky install"
     },
     "dependencies": {
-        "@hookform/resolvers": "^3.9.1",
+        "@hookform/resolvers": "3.9.1",
         "@sentry/nextjs": "8.48.0",
         "axios": "1.7.4",
         "next": "14.2.4",

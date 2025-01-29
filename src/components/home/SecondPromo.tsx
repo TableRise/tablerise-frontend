@@ -1,6 +1,6 @@
 import Image from 'next/image';
-import ImageDnD5E03 from '../../../assets/images/image_dnd_5e_03.jpg';
-import alts from '../../../assets/alts';
+import ImageDnD5E03 from '@assets/images/image_dnd_5e_03.jpg';
+import alts from '@assets/alts';
 import '@/components/home/styles/SecondPromo.css';
 
 export default function SecondPromo(): JSX.Element {

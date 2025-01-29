@@ -50,4 +50,8 @@
     section .divider-content {
         @apply px-2 py-0 text-color-greyScale/950;
     }
+
+    section .button-container .social-button {
+        @apply w-48;
+    }
 }

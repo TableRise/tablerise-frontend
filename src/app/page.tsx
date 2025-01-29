@@ -1,6 +1,6 @@
 import React from 'react';
 import FAQ from '@/components/home/FAQ';
-import Header from '@/components/Header';
+import Header from '@/components/home/Header';
 import Banner from '@/components/home/Banner';
 import Promo from '@/components/home/Promo';
 import Features from '@/components/home/Features';
