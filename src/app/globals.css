@@ -122,6 +122,10 @@ path {
         border-radius: 0.5rem;
     }
 
+    .input-default-light:focus {
+        border-color: rgb(10 53 138);
+    }
+
     .input-active-light {
         @apply bg-color-greyScale/50 border border-color-primary/default_900 text-color-greyScale/950;
         box-sizing: border-box;
@@ -136,7 +140,7 @@ path {
     }
 
     .input-error-light {
-        @apply bg-color-greyScale/50 border border-color-suport/alert text-color-greyScale/500;
+        @apply bg-color-greyScale/50 border border-color-support/alert text-color-greyScale/500;
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
@@ -175,7 +179,7 @@ path {
     }
 
     .input-success-light {
-        @apply bg-color-greyScale/50 border border-color-suport/success text-color-greyScale/950;
+        @apply bg-color-greyScale/50 border border-color-support/success text-color-greyScale/950;
         box-sizing: border-box;
         display: flex;
         flex-direction: row;
@@ -240,7 +244,7 @@ path {
     }
 
     .input-error-dark {
-        @apply bg-color-greyScale/900 border border-color-suport/alert text-color-greyScale/950;
+        @apply bg-color-greyScale/900 border border-color-support/alert text-color-greyScale/950;
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
@@ -253,7 +257,7 @@ path {
     }
 
     .input-success-dark {
-        @apply bg-color-greyScale/900 border border-color-suport/success text-color-greyScale/950;
+        @apply bg-color-greyScale/900 border border-color-support/success text-color-greyScale/950;
         box-sizing: border-box;
         display: flex;
         flex-direction: row;
@@ -278,6 +282,10 @@ path {
     }
 
     /* ----------- Button Patterns ----------- */
+    button:disabled {
+        opacity: 0.5;
+    }
+
     .button-transparent-default {
         @apply w-16 h-8 box-border border border-color-greyScale/50 flex items-center justify-center text-color-greyScale/50 rounded-lg;
     }
@@ -286,6 +294,16 @@ path {
         @apply w-[5.3rem] h-8 box-border border bg-color-greyScale/50 border-color-greyScale/50 flex items-center justify-center text-color-primary/default_900 rounded-lg;
     }
 
+    .button-L-fill {
+        @apply flex justify-center items-center px-3 py-4 w-auto h-12 bg-color-primary/default_900 rounded-lg;
+        font-family: var('--dm-sans-base');
+        font-weight: 700;
+        font-style: normal;
+        font-size: 1rem;
+        line-height: 1.2rem;
+    }
+
+    /* ----------- Media queries ----------- */
     @media (min-width: 1920px) {
         .font-XXL-bold {
             font-size: 2.8rem;

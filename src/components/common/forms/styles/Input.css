@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .generic-form-input .generic-input-error-message {
+        @apply mb-4;
+    }
+
+    .generic-form-input div {
+        @apply relative;
+    }
+
+    .generic-form-input div input {
+        @apply pr-9;
+    }
+
+    .generic-form-input div button {
+        @apply absolute top-2 right-5;
+    }
+}

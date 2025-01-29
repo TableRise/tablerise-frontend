@@ -4,6 +4,6 @@
 
 @layer base {
     .error-message {
-        @apply text-color-suport/alert;
+        @apply text-color-support/alert;
     }
 }

@@ -1,6 +1,6 @@
 import RegisterForm from '@/components/authentication/RegisterForm';
 import SideImage from '@/components/authentication/SideImage';
-import SocialLoginContainer from '@/components/authentication/SocialLoginContainer';
+import SocialLoginContainer from '@/components/common/SocialLoginContainer';
 import '@/app/register/styles/Register.css';
 
 import React, { Suspense } from 'react';

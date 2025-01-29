@@ -1,8 +1,8 @@
-import FeatureCards from '@/components/FeatureCards';
-import MapIconHome from '../../../assets/icons/map-icon-home.svg?url';
-import AddCharInfoIcon from '../../../assets/icons/add-char-info-icon.svg?url';
-import DiceIcon from '../../../assets/icons/dice-icon.svg?url';
-import MusicIcon from '../../../assets/icons/music-icon.svg?url';
+import FeatureCards from '@/components/home/FeatureCards';
+import MapIconHome from '@assets/icons/map-icon-home.svg?url';
+import AddCharInfoIcon from '@assets/icons/add-char-info-icon.svg?url';
+import DiceIcon from '@assets/icons/dice-icon.svg?url';
+import MusicIcon from '@assets/icons/music-icon.svg?url';
 import { Elements } from '@/types/modules/components/home/FeatureCards';
 import '@/components/home/styles/Features.css';
 

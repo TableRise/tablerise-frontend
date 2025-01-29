@@ -1,5 +1,5 @@
 import FAQItem from '@/components/home/FAQItem';
-import MoreDetailsBtn from '@/components/MoreDetailsBtn';
+import MoreDetailsBtn from '@/components/home/MoreDetailsBtn';
 import { questions } from '@/utils/faqQuestions';
 import '@/components/home/styles/FAQ.css';
 

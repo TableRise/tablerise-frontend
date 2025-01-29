@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import '@/components/authentication/styles/TextInput.css';
 import { PasswordInputProps } from '@/types/modules/components/authentication/PasswordInput';
-import VisibilityIcon from '../../../assets/icons/sys/visibility.svg';
-import VisibilityOffIcon from '../../../assets/icons/sys/visibility-off.svg';
+import VisibilityIcon from '@assets/icons/sys/visibility.svg';
+import VisibilityOffIcon from '@assets/icons/sys/visibility-off.svg';
 import InputErrorMessage from './inputErrorMessage';
 import { verifyError } from '@/utils/errorHandler';
 

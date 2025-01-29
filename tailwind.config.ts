@@ -23,8 +23,8 @@ const config: Config = {
                 'color-greyScale/800': '#464646',
                 'color-greyScale/900': '#3D3D3D',
                 'color-greyScale/950': '#292929',
-                'color-suport/success': '#12AD00',
-                'color-suport/alert': '#F42C04',
+                'color-support/success': '#12AD00',
+                'color-support/alert': '#F42C04',
             },
             backgroundImage: {
                 'side-image-background': "url('/images/SideImageBackground.svg')",
