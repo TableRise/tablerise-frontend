@@ -1,6 +1,8 @@
-import '@/components/home/styles/Footer.css';
+'use client';
+import { useContext } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import TableriseContext from '@/context/TableriseContext';
 import DiscordLogo from '@assets/icons/social-midia/discord.svg?url';
 import LinkedinLogo from '@assets/icons/social-midia/linkedin.svg?url';
 import TwitchLogo from '@assets/icons/social-midia/twitch.svg?url';
@@ -8,8 +10,16 @@ import XLogo from '@assets/icons/social-midia/x.svg?url';
 import InstagramLogo from '@assets/icons/social-midia/instagram.svg?url';
 import GitHubLogo from '@assets/icons/social-midia/github.svg?url';
 import LightModeLogo from '@assets/icons/light-dark-mode/light-mode-sun.svg?url';
+import DarkModeLogo from '@assets/icons/light-dark-mode/dark-mode-moon.svg?url';
+import '@/components/home/styles/Footer.css';
 
 export default function Footer(): JSX.Element {
+    const { darkModeOn, setDarkModeOn } = useContext(TableriseContext);
+
+    const handleDarkModeChange = () => {
+        setDarkModeOn(!darkModeOn);
+    };
+
     return (
         <footer className="footer">
             <div className="footer-media-links">
@@ -103,13 +113,21 @@ export default function Footer(): JSX.Element {
                 </p>
                 <div className="theme-toggle">
                     <span className="theme-toggle-label">Tema</span>
-                    <label className="theme-switch">
-                        <input type="checkbox" className="sr-only peer"></input>
-                        <div></div>
+                    <input
+                        type="checkbox"
+                        id="darkmode-toggle"
+                        onChange={handleDarkModeChange}
+                    />
+                    <label htmlFor="darkmode-toggle" className="label-darkmode-toggle">
                         <Image
                             src={LightModeLogo}
                             alt="Light Mode Logo"
                             className="light-mode-logo"
+                        />
+                        <Image
+                            src={DarkModeLogo}
+                            alt="Dark Mode Logo"
+                            className="dark-mode-logo"
                         />
                     </label>
                 </div>

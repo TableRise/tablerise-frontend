@@ -17,6 +17,7 @@ const config: Config = {
                 'color-primary/950': '#0C255F',
                 'color-greyScale/50': '#FFFFFF',
                 'color-greyScale/100': '#EFEFEF',
+                'color-greyScale/200': '#DCDCDC',
                 'color-greyScale/300': '#BDBDBD',
                 'color-greyScale/500': '#7C7C7C',
                 'color-greyScale/700': '#525252',

@@ -5,6 +5,7 @@ import Visibility from '@assets/icons/sys/visibility.svg';
 import TableriseContext from '@/context/TableriseContext';
 
 export default function ShowInfoEyeButton(): JSX.Element {
+    console.log(typeof window);
     const { newPassVisible, setNewPassVisible } = useContext(TableriseContext);
 
     return (

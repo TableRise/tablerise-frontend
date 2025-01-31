@@ -53,8 +53,13 @@ p.copy-right {
 }
 
 .light-mode-logo {
-    @apply absolute right-0;
+    @apply absolute right-0 select-none;
 }
+
+.dark-mode-logo {
+    @apply absolute left-1 select-none;
+}
+
 .theme-toggle {
     @apply flex items-center space-x-4;
 }
@@ -72,10 +77,37 @@ p.copy-right {
 }
 
 .theme-switch div {
-    @apply w-[60px] h-8 relative bg-gray-200 rounded-full dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white;
+    @apply w-[60px] h-8 relative bg-gray-200 rounded-full;
 }
 
 .theme-switch div::after {
     content: '';
-    @apply absolute top-0.5 left-[2px] bg-white border-gray-300 border rounded-full h-6 w-6 transition-all;
+    @apply absolute top-1 left-[2px] bg-white border-gray-300 border rounded-full h-6 w-6;
+}
+
+.label-darkmode-toggle {
+    @apply w-[3.75rem] h-8 bg-color-greyScale/200 relative flex items-center rounded-full cursor-pointer;
+    transition: 0.3s;
+}
+
+.label-darkmode-toggle:after {
+    @apply w-6 h-6 absolute top-1 left-1 bg-color-greyScale/50 rounded-3xl;
+    content: '';
+    transition: 0.3s;
+}
+
+.label-darkmode-toggle:active:after {
+    @apply w-8;
+}
+
+#darkmode-toggle {
+    @apply w-0 h-0 hidden;
+}
+
+#darkmode-toggle:checked + .label-darkmode-toggle {
+    @apply bg-color-greyScale/800;
+}
+
+#darkmode-toggle:checked + .label-darkmode-toggle:after {
+    @apply left-14 -translate-x-full;
 }
