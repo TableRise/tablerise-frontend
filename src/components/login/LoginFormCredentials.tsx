@@ -36,8 +36,6 @@ export default function LoginFormCredentials(): JSX.Element {
         });
     };
 
-    //test
-
     const validateLoginForm = (): boolean => {
         const validateLoginCredentials = zodValidator(loginZodSchema, loginCredentials);
 
