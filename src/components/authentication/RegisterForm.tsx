@@ -1,45 +1,35 @@
 'use client';
 
-import React, { useState } from 'react';
-import TextInput from './TextInput';
-import EmailInput from './EmailInput';
-import PasswordInput from './PasswordInput';
+import React, { useContext } from 'react';
 import CheckBoxField from './CheckBoxField';
-import SubmitButton from './SubmitButton';
 import { postRegister } from '@/server/users/register';
 import { useRouter } from 'next/navigation';
-import errorHandler from '@/utils/errorHandler';
 import '@/components/authentication/styles/RegisterForm.css';
-import { errorListTypes } from '@/types/shared/errorHandler';
-import validateRagisterFields from '@/utils/validateRegisterFields';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Input from '../common/forms/Input';
+import Button from '../common/forms/Button';
+import TableriseContext from '@/context/TableriseContext';
+import registerZodSchema, { RegisterPayload } from './schema/RegisterSchema';
 
 export default function RegisterForm(): JSX.Element {
-    const [nickname, setNickname] = useState<string>('');
-    const [email, setEmail] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
-    const [confirmPassword, setConfirmPassword] = useState<string>('');
-    const [termsCheckBox, setRermsCheckBox] = useState<boolean>(false);
-    const [errorList, setErrorList] = useState<errorListTypes[]>([]);
+    const {
+        register,
+        setError,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+    } = useForm<RegisterPayload>({
+        resolver: zodResolver(registerZodSchema),
+    });
+
+    const { newPassVisible } = useContext(TableriseContext);
     const router = useRouter();
 
-    const handleSubmit = async (
-        event: React.FormEvent<HTMLFormElement>
-    ): Promise<void> => {
-        event.preventDefault();
-
-        const fieldsValidation = validateRagisterFields({
-            nickname,
-            email,
-            password,
-            confirmPassword,
-            termsCheckBox,
-        });
-
-        if (fieldsValidation.length > 0) {
-            setErrorList(fieldsValidation);
-            return;
-        }
-
+    const sendRegister = async ({
+        nickname,
+        email,
+        password,
+    }: RegisterPayload): Promise<void> => {
         const registerPayload = {
             nickname,
             email,
@@ -50,61 +40,74 @@ export default function RegisterForm(): JSX.Element {
             await postRegister(registerPayload);
             router.push('/');
         } catch (error: any) {
-            const errorResponse = errorHandler({
-                errorMessage: error.response.data.message,
+            setError('confirmPassword', {
+                type: 'manual',
+                message: `${error.message}`,
             });
-
-            setErrorList(errorResponse);
-            return;
         }
-        setErrorList([]);
-        return;
     };
 
     return (
-        <form className="form" onSubmit={(event) => handleSubmit(event)}>
-            <TextInput
-                label="Nome de usuário"
+        <form className="form gap-4" onSubmit={handleSubmit(sendRegister)}>
+            <Input
+                title="Nome de usuário"
+                classProps="w-full mt-1"
+                inputStyle="input-default-light"
+                setter={register}
+                name="nickname"
+                type="text"
                 placeholder="Insira o seu nome de usuário"
-                onChangeState={setNickname}
-                inputValue={nickname}
-                errorId={'nickname'}
-                errorList={errorList}
+                errorMessage={errors.nickname}
             />
-            <EmailInput
-                label="E-mail"
+            <Input
+                title="E-mail"
+                inputStyle="input-default-light"
+                classProps="w-full mt-1"
+                setter={register}
+                name="email"
+                type="email"
                 placeholder="Insira o seu e-mail"
-                onChangeState={setEmail}
-                inputValue={email}
-                errorId={'email'}
-                errorList={errorList}
+                errorMessage={errors.email}
             />
-            <PasswordInput
-                label="Senha"
+            <Input
+                title="Senha"
+                inputStyle="input-default-light"
+                classProps="w-full mt-1"
+                setter={register}
+                name="password"
+                type={newPassVisible ? 'text' : 'password'}
                 placeholder="Insira a sua senha"
-                onChangeState={setPassword}
-                inputValue={password}
-                errorId={'password'}
-                errorList={errorList}
+                errorMessage={errors.password}
+                toggleVisibilityButton={true}
             />
-            <PasswordInput
-                label="Confirmar senha"
+            <Input
+                title="Confirmar senha"
+                inputStyle="input-default-light"
+                classProps="w-full mt-1"
+                setter={register}
+                name="confirmPassword"
+                type={newPassVisible ? 'text' : 'password'}
                 placeholder="Confirme a sua senha"
-                onChangeState={setConfirmPassword}
-                inputValue={confirmPassword}
-                errorId={'password'}
-                errorList={errorList}
+                errorMessage={errors.confirmPassword}
+                toggleVisibilityButton={true}
             />
+
             <CheckBoxField
                 label="Eu li e concordo com os "
                 labelWithLink=" termos e condições"
                 srcLink="/terms"
-                onChangeState={setRermsCheckBox}
-                inputValue={termsCheckBox}
-                errorId={'checkbox'}
-                errorList={errorList}
+                register={register}
+                name="termsCheckBox"
+                error={errors.termsCheckBox}
             />
-            <SubmitButton title="Confirmar" />
+
+            <Button
+                title="Entrar"
+                name="login-btn"
+                buttonStyle="button-L-fill"
+                props="font-S-bold text-color-greyScale/50"
+                disabled={isSubmitting}
+            />
         </form>
     );
 }
