@@ -4,7 +4,6 @@ import SocialLoginButton from './SocialLoginButton';
 import './styles/SocialLoginContainer.css';
 
 export default function SocialLoginContainer(): JSX.Element {
-
     return (
         <div className="social-container">
             <div className="buttons-container">
