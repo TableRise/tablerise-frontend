@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import regexCollection from '@/utils/regexCollection'
+import regexCollection from '@/utils/regexCollection';
 
 const loginZodSchema = z.object({
     email: z.string().email({ message: 'Endereço de e-mail inválido*' }),
