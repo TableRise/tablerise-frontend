@@ -2,7 +2,6 @@ import Link from 'next/link';
 import React from 'react';
 import '@/components/authentication/styles/CheckBoxField.css';
 import { CheckBoxFieldProps } from '@/types/modules/components/authentication/CheckBoxField';
-import InputErrorMessage from './inputErrorMessage';
 
 export default function CheckBoxField({
     label,
@@ -34,7 +33,7 @@ export default function CheckBoxField({
                     )}
                 </h3>
             </label>
-            {error && <InputErrorMessage errorMessage={error.message} />}
+            {error && <p className="error-message font-XXS-bold">{error.message}</p>}
         </div>
     );
 }
