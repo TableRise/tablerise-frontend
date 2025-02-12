@@ -80,7 +80,6 @@ export default function LoginFormCredentials(): JSX.Element {
                     props="font-S-bold text-color-greyScale/50"
                     disabled={isSubmitting}
                 />
-                {isSubmitting ? <span>test</span> : <span>fela</span>}
                 {errors.root && (
                     <span className="font-XXS-regular text-color-support/alert">
                         {errors.root.message}
