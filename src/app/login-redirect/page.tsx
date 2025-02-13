@@ -17,5 +17,5 @@ export default function LoginRedirect(): JSX.Element {
     }
   }, [router.query]);
 
-  return <></>;
+  return <p>...</p>;
 }
