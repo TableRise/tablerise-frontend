@@ -14,27 +14,20 @@ export default function Input({
     placeholder,
     disabled = false,
     toggleVisibilityButton = false,
+    errorMessage,
     errorMessageClass = 'generic-input-error-message font-XXS-regular text-color-support/alert',
-    errorToggles = {
-        hasErrors: false,
-        errorList: {},
-        showErrorInputClass: false,
-    },
 }: any): JSX.Element {
-    const { errorList, hasErrors, showErrorInputClass } = errorToggles;
-    const showError = hasErrors && errorList[name];
-
     return (
         <label className="generic-form-input">
             <span className={labelClass}>{title}</span>
             <div>
                 <input
                     className={`${
-                        showErrorInputClass ? 'input-error-light' : inputStyle
+                        errorMessage ? 'input-error-light' : inputStyle
                     } ${classProps}`}
                     name={name}
                     id={id}
-                    onChange={(event) => setter(event)}
+                    {...setter(name)}
                     value={value}
                     type={type}
                     placeholder={placeholder}
@@ -42,8 +35,8 @@ export default function Input({
                 />
                 {toggleVisibilityButton && <ShowInfoEyeButton />}
             </div>
-            {showError && (
-                <span className={`${errorMessageClass}`}>{errorList[name][0]}</span>
+            {errorMessage && (
+                <span className={`${errorMessageClass}`}>{errorMessage.message}</span>
             )}
         </label>
     );
