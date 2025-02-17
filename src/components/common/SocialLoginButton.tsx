@@ -3,7 +3,7 @@ import React from 'react';
 import DiscordLogo from '@assets/icons/social-midia/discord.svg';
 import GoogleLogo from '@assets/icons/social-midia/google.svg';
 import { useRouter } from 'next/navigation';
-import { SocialLoginButtonProps } from '@/types/modules/components/authentication/SocialLoginButton';
+import { SocialLoginButtonProps } from '@/types/modules/components/register/SocialLoginButton';
 import Link from 'next/link';
 import './styles/SocialLoginButton.css';
 
