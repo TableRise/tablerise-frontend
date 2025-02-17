@@ -1,6 +1,6 @@
 import React from 'react';
 import { errorListTypes } from '@/types/shared/errorHandler';
-import { RegisterPayload } from '@/components/authentication/schema/RegisterSchema';
+import { RegisterPayload } from '@/components/register/schema/RegisterSchema';
 
 export type CheckBoxFieldProps = {
     label: string;
