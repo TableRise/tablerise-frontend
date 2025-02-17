@@ -4,7 +4,7 @@ import React, { useContext } from 'react';
 import CheckBoxField from './CheckBoxField';
 import { postRegister } from '@/server/users/register';
 import { useRouter } from 'next/navigation';
-import '@/components/authentication/styles/RegisterForm.css';
+import '@/components/register/styles/RegisterForm.css';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Input from '../common/forms/Input';

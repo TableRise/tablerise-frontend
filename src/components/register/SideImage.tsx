@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import React from 'react';
 import TableriseLogo from '@assets/icons/logo.svg?url';
-import '@/components/authentication/styles/SideImage.css';
+import '@/components/register/styles/SideImage.css';
 
 export default function SideImage(): JSX.Element {
     return (

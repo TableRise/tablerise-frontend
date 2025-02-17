@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import React from 'react';
-import '@/components/authentication/styles/CheckBoxField.css';
+import '@/components/register/styles/CheckBoxField.css';
 import { CheckBoxFieldProps } from '@/types/modules/components/authentication/CheckBoxField';
 
 export default function CheckBoxField({
