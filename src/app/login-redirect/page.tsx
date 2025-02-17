@@ -1,21 +1,22 @@
+'use client';
 import './styles/page.css';
-import { useRouter } from 'next/router';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function LoginRedirect(): JSX.Element {
+    const searchParams = useSearchParams();
     const router = useRouter();
+    const userData = searchParams.get('userData');
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const { userData } = router.query;
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            if (userData) {
+                localStorage.setItem('userLogged', String(userData));
+            }
 
-      if (userData) {
-        localStorage.setItem("userLogged", String(userData));
-      }
+            router.replace('/');
+        }
+    }, [userData]);
 
-      router.replace("/");
-    }
-  }, [router.query]);
-
-  return <p>...</p>;
+    return <p>...</p>;
 }
