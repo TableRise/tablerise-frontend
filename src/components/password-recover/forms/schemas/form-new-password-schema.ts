@@ -1,8 +1,9 @@
+import regexCollection from '@/utils/regexCollection';
 import { z } from 'zod';
 
 export const newPasswordSchema = z
     .object({
-        newPassword: z.string().regex(/^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*\d).{8,32}$/, {
+        newPassword: z.string().regex(regexCollection.regexForPasswordValidation, {
             message:
                 'Use entre 8 e 32 caracteres, incluindo pelo menos uma letra maiúscula, um número e um dos símbolos: !@#$&*',
         }),

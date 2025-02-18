@@ -15,6 +15,7 @@ export const postLogin = async (payload: LoginPayload): Promise<AxiosResponse | 
 
         return result;
     } catch ({ response }: AxiosError | any) {
+        if (response.status == 404) throw new Error('*Usuario não cadastrado');
         if (response.status == 401)
             throw new Error('*Dados de email ou senha incorretos. Tente novamente.');
         if (response.status !== 200)

@@ -1,5 +1,5 @@
-import RegisterForm from '@/components/authentication/RegisterForm';
-import SideImage from '@/components/authentication/SideImage';
+import RegisterForm from '@/components/register/RegisterForm';
+import SideImage from '@/components/register/SideImage';
 import SocialLoginContainer from '@/components/common/SocialLoginContainer';
 import '@/app/register/styles/Register.css';
 
