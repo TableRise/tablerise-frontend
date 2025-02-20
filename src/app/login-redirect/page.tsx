@@ -1,7 +1,7 @@
 'use client';
 import './styles/page.css';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 
 export default function LoginRedirect(): JSX.Element {
     const searchParams = useSearchParams();
@@ -18,5 +18,9 @@ export default function LoginRedirect(): JSX.Element {
         }
     }, [userData]);
 
-    return <p>...</p>;
+    return (
+        <Suspense>
+            <p>...</p>;
+        </Suspense>
+    );
 }
