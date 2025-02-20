@@ -10,12 +10,12 @@ export default function LoginRedirectParams(): JSX.Element {
     useEffect(() => {
         if (typeof window !== 'undefined') {
             if (userData) {
-                localStorage.setItem('userLogged', String(userData));
+                localStorage.setItem('userLogged', decodeURIComponent(userData || ''));
             }
 
             router.replace('/');
         }
-    }, [userData]);
+    }, [userData, router]);
 
     return <p>...</p>;
 }
