@@ -1,6 +1,5 @@
-import Logo from '@assets/icons/logo.svg';
 import './page.css';
-import SideImage from '@/components/authentication/SideImage';
+import SideImage from '@/components/register/SideImage';
 
 export default function Template({ children }: { children: React.ReactNode }) {
     return (
