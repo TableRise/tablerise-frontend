@@ -18,7 +18,5 @@ export default function LoginRedirectParams(): JSX.Element {
         }
     }, [userData]);
 
-    return (
-        <p>...</p>
-    );
+    return <p>...</p>;
 }
