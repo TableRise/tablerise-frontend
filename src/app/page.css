@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    main {
+        @apply flex flex-col items-center bg-color-greyScale/50;
+    }
+
+    .header-home {
+        @apply w-full pt-4 flex flex-col items-center bg-gradient-to-r from-[#0A358A] to-[#0C255F];
+    }
+
+    .content-home {
+        @apply w-full flex flex-col items-center bg-color-greyScale/100;
+    }
+}

@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    form {
+        @apply flex flex-col w-full mb-6;
+    }
+}

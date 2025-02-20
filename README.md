@@ -1,1 +1,1 @@
-Repositório Frontend do Projeto Tablerise
+Repositório Frontend do Projeto Tablerise.

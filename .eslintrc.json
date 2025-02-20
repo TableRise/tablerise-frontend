@@ -1,10 +1,18 @@
 {
-  "extends": "next/core-web-vitals",
-  "rules": {
-    "quotes": ["error", "single"],
-    "no-console": "warn",
-    "no-return-await": "warn",
-    "eol-last": "warn",
-    "space-before-function-paren": "off"
-  }
+    "extends": ["next/core-web-vitals", "next", "plugin:prettier/recommended"],
+    "plugins": ["prettier"],
+    "rules": {
+        "quotes": ["error", "single"],
+        "no-console": "warn",
+        "no-return-await": "warn",
+        "eol-last": "warn",
+        "space-before-function-paren": "off",
+        "prettier/prettier": [
+            "warn",
+            {
+                "endOfLine": "auto"
+            }
+        ],
+        "linebreak-style": "off"
+    }
 }

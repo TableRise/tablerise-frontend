@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .section-container {
+        @apply flex justify-center items-center px-[7.4rem] w-[38.8rem] right-0 top-0 absolute h-screen bg-color-greyScale/100 rounded-l-xl;
+    }
+
+    .section-container section {
+        @apply w-full;
+    }
+}

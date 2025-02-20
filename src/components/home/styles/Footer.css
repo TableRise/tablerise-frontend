@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.footer {
+    @apply w-full flex flex-col bg-color-primary/default_900 text-white py-0;
+}
+
+.footer-media-links {
+    @apply w-[70.5rem] ml-auto mr-auto mt-24 mb-8 flex flex-row flex-wrap justify-between items-stretch;
+}
+
+.social-media-icons {
+    @apply flex flex-row flex-wrap  space-x-[1.5rem] w-[264px];
+}
+
+.logo {
+    @apply w-[18px] h-[17.7px] mt-[3px] ml-[3px];
+}
+
+.footer-links {
+    @apply font-sans flex flex-col;
+}
+
+.footer-links h5 {
+    @apply font-semibold text-xl/[24px];
+}
+
+.footer-links ul {
+    @apply space-y-3 text-sm/[18px];
+}
+
+.footer-links a {
+    @apply font-normal text-color-greyScale/50;
+}
+
+.footer-bottom {
+    @apply mb-24 w-[70.5rem] ml-auto mr-auto border-t border-gray-500 pt-8 flex flex-col  lg:flex-row justify-between space-y-4 lg:space-y-0;
+}
+
+.footer-bottom p {
+    @apply pt-2 text-sm/[18px] font-sans text-color-greyScale/50;
+}
+
+p.artist {
+    @apply w-[192px] font-bold opacity-50 ml-3;
+}
+.matheus-link {
+    @apply underline  decoration-gray-50;
+}
+p.copy-right {
+    @apply w-[306px] font-normal;
+}
+
+.light-mode-logo {
+    @apply absolute right-0 select-none;
+}
+
+.dark-mode-logo {
+    @apply absolute left-1 select-none;
+}
+
+.theme-toggle {
+    @apply flex items-center space-x-4;
+}
+
+.theme-toggle-label {
+    @apply w-[52px] font-semibold text-xl/[24px];
+}
+
+.theme-switch {
+    @apply relative inline-flex items-center cursor-pointer;
+}
+
+.theme-input {
+    @apply absolute left-0 items-center;
+}
+
+.theme-switch div {
+    @apply w-[60px] h-8 relative bg-gray-200 rounded-full;
+}
+
+.theme-switch div::after {
+    content: '';
+    @apply absolute top-1 left-[2px] bg-white border-gray-300 border rounded-full h-6 w-6;
+}
+
+.label-darkmode-toggle {
+    @apply w-[3.75rem] h-8 bg-color-greyScale/200 relative flex items-center rounded-full cursor-pointer;
+    transition: 0.3s;
+}
+
+.label-darkmode-toggle:after {
+    @apply w-6 h-6 absolute top-1 left-1 bg-color-greyScale/50 rounded-3xl;
+    content: '';
+    transition: 0.3s;
+}
+
+.label-darkmode-toggle:active:after {
+    @apply w-8;
+}
+
+#darkmode-toggle {
+    @apply w-0 h-0 hidden;
+}
+
+#darkmode-toggle:checked + .label-darkmode-toggle {
+    @apply bg-color-greyScale/800;
+}
+
+#darkmode-toggle:checked + .label-darkmode-toggle:after {
+    @apply left-14 -translate-x-full;
+}

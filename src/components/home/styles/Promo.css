@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .promo-section {
+        @apply w-[70.5rem] flex flex-col items-center rounded-lg bg-color-greyScale/50 relative -top-14;
+    }
+
+    .promo-section .promo-text {
+        @apply p-6 self-start;
+    }
+
+    .promo-section .promo-text h2 {
+        @apply mb-2 text-color-primary/default_900;
+    }
+
+    .promo-section .promo-text p {
+        @apply text-color-greyScale/950;
+    }
+
+    .promo-section .promo-image {
+        @apply w-[96.5%] h-[25rem] bg-[url('../../../../assets/images/image_dnd_5e_02.jpeg')] rounded-t-lg bg-cover bg-center;
+    }
+}

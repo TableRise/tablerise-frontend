@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .checkered-background-container {
+        @apply w-[55%];
+    }
+
+    .checkered-background-container .article .logo-container {
+        @apply flex justify-center;
+    }
+
+    .checkered-background-container .article .logo-container .image-logo {
+        @apply w-[28rem];
+    }
+}
