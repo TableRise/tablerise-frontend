@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .guide-menu-banner-section {
+        @apply w-[70.5rem] flex flex-col items-center;
+    }
+
+    .guide-menu-banner-section .guide-menu-banner-text {
+        @apply p-6 self-start;
+    }
+
+    .guide-menu-banner-section .guide-menu-banner-text h2 {
+        @apply mb-2 text-color-primary/default_900;
+    }
+
+    .guide-menu-banner-section .guide-menu-banner-text p {
+        @apply text-color-greyScale/950;
+    }
+    
+    .guide-menu-banner-section .guide-menu-banner-image {
+        @apply relative h-[25rem] rounded-t-lg overflow-hidden;
+    }
+
+}
