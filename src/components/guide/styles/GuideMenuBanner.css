@@ -18,9 +18,8 @@
     .guide-menu-banner-section .guide-menu-banner-text p {
         @apply text-color-greyScale/950;
     }
-    
+
     .guide-menu-banner-section .guide-menu-banner-image {
         @apply relative h-[25rem] rounded-t-lg overflow-hidden;
     }
-
 }
