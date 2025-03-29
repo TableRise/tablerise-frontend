@@ -303,6 +303,15 @@ path {
         line-height: 1.2rem;
     }
 
+    .button-M-fill {
+        @apply flex justify-center items-center px-4 py-2 w-auto h-10 bg-color-primary/default_900 rounded-lg;
+        font-family: var('--dm-sans-base');
+        font-weight: 700;
+        font-style: normal;
+        font-size: 1rem;
+        line-height: 1.2rem;
+    }
+
     /* ----------- Media queries ----------- */
     @media (min-width: 1920px) {
         .font-XXL-bold {
