@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+   .banner-card-image {
+        @apply relative h-[25rem] rounded-2xl overflow-hidden drop-shadow-md;
+    }
+
+}
