@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .login-form-header {
+        @apply flex flex-col w-full;
+    }
+
+    .login-form-header h1 {
+        @apply mb-1;
+    }
+}

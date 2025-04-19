@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    section {
+        @apply flex w-screen h-screen;
+    }
+
+    section .login-form-container {
+        @apply absolute;
+    }
+}

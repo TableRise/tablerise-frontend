@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    section .login-form-container {
+        @apply flex flex-col justify-center items-center py-0 px-28 w-[38.8rem] h-full right-0 top-0 bg-color-greyScale/100 rounded-s-xl;
+    }
+
+    section .login-form-container .login-form-content {
+        @apply flex flex-col justify-center items-center w-full;
+    }
+
+    section a:nth-child(2) {
+        @apply text-color-primary/800 ml-1 underline;
+    }
+
+    section .login-form-container .social-container {
+        @apply self-start w-[24rem];
+    }
+
+    section .login-form-container .buttons-container {
+        @apply w-[24rem];
+    }
+
+    section .login-form-container .social-button {
+        @apply w-[11.6rem];
+    }
+}
