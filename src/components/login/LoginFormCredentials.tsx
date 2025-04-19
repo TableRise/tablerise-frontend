@@ -30,7 +30,7 @@ export default function LoginFormCredentials(): JSX.Element {
             if (!loginResult) return;
 
             localStorage.setItem('userLogged', JSON.stringify(loginResult.data));
-            router.push('/');
+            router.push('/guide');
 
             return;
         } catch (error: Error | any) {

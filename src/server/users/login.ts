@@ -3,9 +3,11 @@ import { apiCall } from '../wrapper';
 import { LoginPayload } from '@/components/login/schemas/LoginSchema';
 
 const usersBaseUrl = process.env.API_USERS;
+// const usersBaseUrl = 'http://localhost:3001/users/login';
 
 export const postLogin = async (payload: LoginPayload): Promise<AxiosResponse | any> => {
     try {
+        console.log('usersBaseUrl no login ---------', `${usersBaseUrl}`);
         const result = await apiCall({
             baseUrl: usersBaseUrl,
             endpoint: 'login',
