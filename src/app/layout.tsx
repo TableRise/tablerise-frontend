@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { DM_Sans } from 'next/font/google';
 import TableriseProvider from '@/context/TableriseProvider';
 import '@/app/globals.css';
+import { cookies } from 'next/headers';
 
 const dm_sans = DM_Sans({ variable: '--dm-sans-base', subsets: ['latin'] });
 
@@ -29,10 +30,14 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const recoverUserInfo = cookies().get('token') ? 1 : 0;
+
     return (
         <html lang="en">
             <body className={dm_sans.className}>
-                <TableriseProvider>{children}</TableriseProvider>
+                <TableriseProvider userLogged={recoverUserInfo}>
+                    {children}
+                </TableriseProvider>
             </body>
         </html>
     );
