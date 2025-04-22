@@ -11,7 +11,7 @@
         @apply w-fit flex cursor-pointer;
     }
 
-    header .menu-and-buttons-logged img:first-of-type{
+    header .menu-and-buttons-logged img:first-of-type {
         @apply mr-2;
     }
 }
