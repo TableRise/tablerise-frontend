@@ -3,15 +3,15 @@
 @tailwind utilities;
 
 @layer base {
-    header {
+    .logged-header {
         @apply w-[70.5rem] h-[4.5rem] px-6 py-3 flex items-center justify-between bg-color-primary/default_900 rounded-xl;
     }
 
-    header .menu-and-buttons-logged {
+    .logged-header .menu-and-buttons-logged {
         @apply w-fit flex cursor-pointer;
     }
 
-    header .menu-and-buttons-logged img:first-of-type {
+    .logged-header .menu-and-buttons-logged img:first-of-type {
         @apply mr-2;
     }
 }

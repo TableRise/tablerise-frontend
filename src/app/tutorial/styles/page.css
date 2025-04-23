@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .tutorial-page {
+        @apply flex justify-center;
+    }
+
+    .tutorial-inside-container {
+        @apply w-[70.5rem];
+    }
+
+    .tutorial-inside-container header h2 {
+        @apply text-color-primary/default_900 mb-2;
+    }
+
+    .tutorial-inside-container .tutorial-cards {
+        @apply flex flex-wrap justify-between mt-6;
+    }
+
+    .tutorial-inside-container .tutorial-cards .main-card {
+        @apply mt-6;
+    }
+}

@@ -8,7 +8,7 @@ const alts = require('@assets/alts');
 
 export default function LoggedHeader(): JSX.Element {
     return (
-        <header>
+        <header className="logged-header">
             <Image
                 src={TableRiseLightMark}
                 alt={alts.tablerise_logo_alt_txt}
