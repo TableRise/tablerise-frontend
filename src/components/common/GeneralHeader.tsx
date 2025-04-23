@@ -7,7 +7,7 @@ const alts = require('@assets/alts');
 
 export default function GeneralHeader(): JSX.Element {
     return (
-        <header>
+        <header className="general-header">
             <Image
                 src={TableRiseLightMark}
                 alt={alts.tablerise_logo_alt_txt}
@@ -20,7 +20,7 @@ export default function GeneralHeader(): JSX.Element {
                             <Link href="/">Inicio</Link>
                         </li>
                         <li>
-                            <Link href="/guide">Tutorial</Link>
+                            <Link href="/tutorial">Tutorial</Link>
                         </li>
                         <li>
                             <Link href="/about">Sobre</Link>

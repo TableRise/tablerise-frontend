@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .main-card {
+        @apply flex flex-col items-start justify-end bg-cover rounded-xl;
+    }
+
+    .main-card .card-fog {
+        @apply relative w-full h-44 top-[5rem] rounded-xl;
+    }
+
+    .main-card .card-infos {
+        @apply relative h-[5rem] left-4 -top-8 flex flex-col justify-evenly;
+    }
+
+    .main-card .card-infos button {
+        @apply w-full h-10;
+        font-family: var('--dm-sans-base');
+        font-weight: 700;
+        font-style: normal;
+        font-size: 1rem;
+        line-height: 1.2rem;
+    }
+}
