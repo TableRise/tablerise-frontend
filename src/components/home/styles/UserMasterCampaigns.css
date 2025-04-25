@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .user-master-campaigns {
+        @apply w-[70.5rem] p-6 flex flex-col items-start justify-center bg-color-greyScale/50 rounded-xl;
+    }
+
+    .user-master-campaigns .user-master-campaigns-header {
+        @apply flex justify-between items-center w-full;
+    }
+
+    .user-master-campaigns .user-master-campaigns-header .user-master-campaigns-created-label {
+        @apply flex justify-center items-center;
+    }
+
+    .user-master-campaigns .user-master-campaigns-header .user-master-campaigns-created-label .label-title {
+        @apply mr-6 text-color-primary/default_900;
+    }
+
+    .user-master-campaigns .user-master-campaigns-header .user-master-campaigns-created-label .creation-limits {
+        @apply px-3 py-2 bg-color-greyScale/100 rounded-lg;
+    }
+
+    .user-master-campaigns .user-master-campaigns-header .user-master-campaigns-buttons {
+        @apply flex text-color-greyScale/50;
+    }
+
+    .user-master-campaigns .user-master-campaigns-header .user-master-campaigns-buttons button {
+        @apply h-10;
+    }
+
+    .user-master-campaigns .user-master-campaigns-header .user-master-campaigns-buttons img {
+        @apply ml-4 cursor-pointer;
+    }
+
+    .user-master-campaigns .user-master-campaigns-header .user-master-campaigns-created-label .creation-limits span:nth-child(2) {
+        @apply ml-1;
+    }
+
+    .user-master-campaigns .user-master-campaigns-cards {
+        @apply w-[67.5rem] flex flex-wrap justify-between mt-6;
+    }
+}

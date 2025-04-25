@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .user-player-campaigns {
+        @apply w-[70.5rem] mt-6 p-6 flex flex-col items-start justify-center bg-color-greyScale/50 rounded-xl;
+    }
+
+    .user-player-campaigns .user-player-campaigns-header {
+        @apply flex justify-between items-center w-full;
+    }
+
+    .user-player-campaigns .user-player-campaigns-header .user-player-campaigns-created-label {
+        @apply flex justify-center items-center;
+    }
+
+    .user-player-campaigns .user-player-campaigns-header .user-player-campaigns-created-label .label-title {
+        @apply mr-6 text-color-primary/default_900;
+    }
+
+    .user-player-campaigns .user-player-campaigns-header .user-player-campaigns-created-label .creation-limits {
+        @apply px-3 py-2 bg-color-greyScale/100 rounded-lg;
+    }
+
+    .user-player-campaigns .user-player-campaigns-header .user-player-campaigns-buttons {
+        @apply flex text-color-greyScale/50;
+    }
+
+    .user-player-campaigns .user-player-campaigns-header .user-player-campaigns-buttons button {
+        @apply h-10;
+    }
+
+    .user-player-campaigns .user-player-campaigns-header .user-player-campaigns-buttons img {
+        @apply ml-4 cursor-pointer;
+    }
+
+    .user-player-campaigns .user-player-campaigns-header .user-player-campaigns-created-label .creation-limits span:nth-child(2) {
+        @apply ml-1;
+    }
+
+    .user-player-campaigns .user-player-campaigns-cards {
+        @apply w-[67.5rem] flex flex-wrap justify-between mt-6 select-none;
+    }
+
+    .user-player-campaigns .user-player-campaigns-cards .carousel-arrow {
+        @apply w-14 h-14 relative -top-52 left-[65rem] flex justify-center items-center bg-color-greyScale/50 rounded-xl cursor-pointer;
+    }
+
+    .user-player-campaigns .embla__viewport {
+        @apply overflow-hidden h-[23rem];
+    }
+
+    .user-player-campaigns .embla__container {
+        @apply flex w-auto;
+    }
+
+    .user-player-campaigns .embla__slide {
+        flex: 0 0 auto;
+        margin-right: 1rem;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .embla__viewport {
+        border: 2px solid transparent;
+    }
+      
+    .embla__container {
+        border: 2px solid transparent;
+    }
+}

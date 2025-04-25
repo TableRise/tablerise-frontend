@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .embla__viewport {
+        @apply overflow-hidden h-[23rem];
+    }
+
+    .embla__container {
+        @apply flex w-auto;
+    }
+
+    .user-player-campaigns .embla__slide {
+        flex: 0 0 auto;
+        margin-right: 1rem;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .embla__viewport {
+        border: 2px solid transparent;
+    }
+      
+    .embla__container {
+        border: 2px solid transparent;
+    }
+
+    .carousel-arrow {
+        @apply w-14 h-14 relative -top-52 left-[65rem] flex justify-center items-center bg-color-greyScale/50 rounded-xl cursor-pointer;
+    }
+}

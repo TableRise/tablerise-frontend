@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid';
 import { MainCardProps } from '@/types/modules/components/common/MainCard';
 import SideImageBackground from '../../../public/images/SideImageBackground.svg?url';
 import '@/components/common/styles/MainCard.css';
@@ -28,7 +27,6 @@ export default function MainCard(cardProps: MainCardProps): JSX.Element {
     return (
         <div
             className="main-card"
-            key={uuid()}
             style={{
                 backgroundImage: `url(${image})`,
                 width: cardSize.w,

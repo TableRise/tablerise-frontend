@@ -1,0 +1,43 @@
+'use client';
+import { useCallback } from 'react';
+import { CarouselProps } from '@/types/modules/components/common/Carousel';
+import useEmblaCarousel from 'embla-carousel-react';
+import ArrowRightGraySVG from '../../../assets/icons/nav/arrow-right-gray.svg?url';
+import Image from 'next/image';
+import '@/components/common/styles/Carousel.css';
+
+export default function Carousel({ elements }: CarouselProps): JSX.Element {
+    const [emblaRef, emblaApi] = useEmblaCarousel({
+        loop: true,
+        align: 'start',
+        dragFree: false,
+    });
+
+    const handleNext = useCallback(() => {
+        if (!emblaApi) return;
+        emblaApi.scrollNext();
+    }, [emblaApi]);
+
+    return (
+        <>
+            <div className="embla__viewport" ref={emblaRef}>
+                <div className="embla__container">{...elements}</div>
+            </div>
+            <div className="embla__controls">
+                <div className="embla__buttons">
+                    <button
+                        className="carousel-arrow embla__button embla__button--next"
+                        onClick={handleNext}
+                    >
+                        <Image
+                            src={ArrowRightGraySVG.src}
+                            alt="arrrow right"
+                            width={ArrowRightGraySVG.width}
+                            height={ArrowRightGraySVG.height}
+                        />
+                    </button>
+                </div>
+            </div>
+        </>
+    );
+}
