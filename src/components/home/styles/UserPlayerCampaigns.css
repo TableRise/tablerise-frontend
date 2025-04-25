@@ -11,15 +11,23 @@
         @apply flex justify-between items-center w-full;
     }
 
-    .user-player-campaigns .user-player-campaigns-header .user-player-campaigns-created-label {
+    .user-player-campaigns
+        .user-player-campaigns-header
+        .user-player-campaigns-created-label {
         @apply flex justify-center items-center;
     }
 
-    .user-player-campaigns .user-player-campaigns-header .user-player-campaigns-created-label .label-title {
+    .user-player-campaigns
+        .user-player-campaigns-header
+        .user-player-campaigns-created-label
+        .label-title {
         @apply mr-6 text-color-primary/default_900;
     }
 
-    .user-player-campaigns .user-player-campaigns-header .user-player-campaigns-created-label .creation-limits {
+    .user-player-campaigns
+        .user-player-campaigns-header
+        .user-player-campaigns-created-label
+        .creation-limits {
         @apply px-3 py-2 bg-color-greyScale/100 rounded-lg;
     }
 
@@ -27,15 +35,25 @@
         @apply flex text-color-greyScale/50;
     }
 
-    .user-player-campaigns .user-player-campaigns-header .user-player-campaigns-buttons button {
+    .user-player-campaigns
+        .user-player-campaigns-header
+        .user-player-campaigns-buttons
+        button {
         @apply h-10;
     }
 
-    .user-player-campaigns .user-player-campaigns-header .user-player-campaigns-buttons img {
+    .user-player-campaigns
+        .user-player-campaigns-header
+        .user-player-campaigns-buttons
+        img {
         @apply ml-4 cursor-pointer;
     }
 
-    .user-player-campaigns .user-player-campaigns-header .user-player-campaigns-created-label .creation-limits span:nth-child(2) {
+    .user-player-campaigns
+        .user-player-campaigns-header
+        .user-player-campaigns-created-label
+        .creation-limits
+        span:nth-child(2) {
         @apply ml-1;
     }
 
@@ -65,7 +83,7 @@
     .embla__viewport {
         border: 2px solid transparent;
     }
-      
+
     .embla__container {
         border: 2px solid transparent;
     }
