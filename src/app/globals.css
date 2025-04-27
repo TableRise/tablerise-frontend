@@ -312,6 +312,10 @@ a {
         line-height: 1.2rem;
     }
 
+    .button-L-fill:disabled {
+        @apply bg-color-greyScale/200 text-color-greyScale/500;
+    }
+
     /* ----------- Media queries ----------- */
     @media (min-width: 1920px) {
         .font-XXL-bold {

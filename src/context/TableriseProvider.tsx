@@ -1,6 +1,8 @@
 'use client';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import TableriseContext from '@/context/TableriseContext';
+import { UserCampaignsContract } from '@/types/modules/context/TableriseContext';
+import { getCampaignsByUserId } from '@/server/campaigns/get-campaigns';
 
 export default function TableriseProvider({
     children,
@@ -12,7 +14,59 @@ export default function TableriseProvider({
     const [loading, setLoading] = useState(false);
     const [newPassVisible, setNewPassVisible] = useState(false);
     const [darkModeOn, setDarkModeOn] = useState(false);
+    const [userCampaigns, setUserCampaigns] = useState<UserCampaignsContract>({
+        master: [],
+        player: [],
+    } as UserCampaignsContract);
     const [userLoggedToggle] = useState(userLogged);
+
+    const recoverUserCampaigns = useCallback(async () => {
+        const userInfos = JSON.parse(localStorage.getItem('userLogged') as string);
+
+        if (userInfos) {
+            const userCampaigns = await getCampaignsByUserId(userInfos.userId);
+            const userCampaignsHomeData = {
+                master: [],
+                player: [],
+            } as UserCampaignsContract;
+
+            userCampaigns.master.forEach((campaign: any) => {
+                userCampaignsHomeData.master.push({
+                    campaignId: campaign.campaignId,
+                    title: campaign.title,
+                    cover: campaign.cover,
+                    description: campaign.description,
+                    infos: {
+                        nextMatchDate: campaign.infos.nextMatchDate,
+                    },
+                });
+            });
+
+            userCampaigns.player.forEach((campaign: any) => {
+                userCampaignsHomeData.player.push({
+                    campaignId: campaign.campaignId,
+                    title: campaign.title,
+                    cover: campaign.cover,
+                    description: campaign.description,
+                    infos: {
+                        nextMatchDate: campaign.infos.nextMatchDate,
+                    },
+                });
+            });
+
+            setUserCampaigns(userCampaignsHomeData);
+        }
+    }, [setUserCampaigns]);
+
+    useEffect(() => {
+        async function handleUserCampaigns() {
+            if (userLoggedToggle === 1) {
+                await recoverUserCampaigns();
+            }
+        }
+
+        handleUserCampaigns();
+    }, [recoverUserCampaigns, userLoggedToggle]);
 
     const value = useMemo(
         () => ({
@@ -20,11 +74,12 @@ export default function TableriseProvider({
             newPassVisible,
             darkModeOn,
             userLoggedToggle,
+            userCampaigns,
             setLoading,
             setNewPassVisible,
             setDarkModeOn,
         }),
-        [loading, newPassVisible, darkModeOn, userLoggedToggle]
+        [loading, newPassVisible, darkModeOn, userLoggedToggle, userCampaigns]
     );
 
     return (

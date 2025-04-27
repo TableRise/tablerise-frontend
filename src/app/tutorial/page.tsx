@@ -1,4 +1,6 @@
+import { v4 as uuid } from 'uuid';
 import MainCard from '@/components/common/MainCard';
+import { cards } from '@/app/tutorial/data';
 import '@/app/tutorial/styles/page.css';
 
 export default function Tutorial(): JSX.Element {
@@ -13,17 +15,16 @@ export default function Tutorial(): JSX.Element {
                     </span>
                 </header>
                 <div className="tutorial-cards">
-                    <MainCard
-                        title="Campanha"
-                        textColor="white"
-                        buttonColor="white"
-                        fogColor="#0A358A"
-                        size="large"
-                    />
-                    <MainCard title="Ficha" />
-                    <MainCard title="Mesa" />
-                    <MainCard title="Jogadores" />
-                    <MainCard title="Partidas" />
+                    {cards.map((card) => (
+                        <MainCard
+                            key={uuid()}
+                            title={card.title}
+                            textColor={card.textColor}
+                            buttonColor={card.buttonColor}
+                            fogColor={card.fogColor}
+                            size={card.size}
+                        />
+                    ))}
                 </div>
             </section>
         </section>

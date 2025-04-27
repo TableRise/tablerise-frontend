@@ -4,7 +4,7 @@
 
 @layer base {
     main {
-        @apply flex flex-col items-center bg-color-greyScale/50;
+        @apply flex flex-col items-center;
     }
 
     .header-home {
@@ -13,5 +13,13 @@
 
     .content-home {
         @apply w-full flex flex-col items-center bg-color-greyScale/100;
+    }
+
+    .main-logged-page {
+        @apply mt-[8.6rem];
+    }
+
+    .main-logged-page h2 {
+        @apply text-color-primary/default_900 mb-6;
     }
 }

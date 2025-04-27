@@ -4,7 +4,7 @@
 
 @layer base {
     .logged-header {
-        @apply w-[70.5rem] h-[4.5rem] px-6 py-3 flex items-center justify-between bg-color-primary/default_900 rounded-xl;
+        @apply w-[70.5rem] h-[4.5rem] absolute left-[50%] top-5 -translate-x-1/2 px-6 py-3 flex items-center justify-between bg-color-primary/default_900 rounded-xl;
     }
 
     .logged-header .menu-and-buttons-logged {

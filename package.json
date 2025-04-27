@@ -17,12 +17,13 @@
         "@hookform/resolvers": "3.9.1",
         "@sentry/nextjs": "8.48.0",
         "axios": "1.7.4",
+        "embla-carousel-react": "8.6.0",
         "next": "14.2.4",
         "react": "18",
         "react-dom": "18",
-        "sharp": "0.33.5",
-        "uuidv4": "6.2.13",
         "react-hook-form": "7.54.0",
+        "sharp": "0.33.5",
+        "uuid": "11.1.0",
         "zod": "3.24.0"
     },
     "devDependencies": {
