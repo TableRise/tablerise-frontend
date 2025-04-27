@@ -22,7 +22,10 @@ export default function UserMasterCampaigns({
                 </div>
                 <div className="user-master-campaigns-buttons">
                     <Link href="/home/campaigns">
-                        <button className="button-L-fill font-XS-bold">
+                        <button
+                            className="button-L-fill font-XS-bold"
+                            disabled={campaigns.length >= 2}
+                        >
                             Criar uma campanha
                         </button>
                     </Link>
@@ -36,17 +39,19 @@ export default function UserMasterCampaigns({
             </div>
 
             <div className="user-master-campaigns-cards">
-                <CampaignCard
-                    className={'embla__slide'}
-                    key={uuid()}
-                    title={campaigns[0].title}
-                    nextMatchDate={campaigns[0].infos.nextMatchDate}
-                    fogColor="#0A358A"
-                    textColor="white"
-                    size="large"
-                    buttonColor="white"
-                    buttonTitle="Entrar no Jogo"
-                />
+                {campaigns.length > 0 && (
+                    <CampaignCard
+                        className={'embla__slide'}
+                        key={uuid()}
+                        title={campaigns[0].title}
+                        nextMatchDate={campaigns[0].infos.nextMatchDate}
+                        fogColor="#0A358A"
+                        textColor="white"
+                        size="large"
+                        buttonColor="white"
+                        buttonTitle="Entrar no Jogo"
+                    />
+                )}
                 {campaigns.length > 1 ? (
                     <CampaignCard
                         className={'embla__slide'}

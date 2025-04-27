@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import { AxiosResponse } from 'axios';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 import TableriseContext from '@/context/TableriseContext';
 import Input from '@/components/common/forms/Input';
@@ -30,7 +29,8 @@ export default function LoginFormCredentials(): JSX.Element {
             if (!loginResult) return;
 
             localStorage.setItem('userLogged', JSON.stringify(loginResult.data));
-            router.push('/');
+
+            window.location.replace('/');
 
             return;
         } catch (error: Error | any) {
@@ -42,7 +42,6 @@ export default function LoginFormCredentials(): JSX.Element {
     };
 
     const { newPassVisible } = useContext(TableriseContext);
-    const router = useRouter();
 
     return (
         <form className="login-form-credentials" onSubmit={handleSubmit(login)}>

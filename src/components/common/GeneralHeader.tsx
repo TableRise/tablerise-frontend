@@ -8,11 +8,14 @@ const alts = require('@assets/alts');
 export default function GeneralHeader(): JSX.Element {
     return (
         <header className="general-header">
-            <Image
-                src={TableRiseLightMark}
-                alt={alts.tablerise_logo_alt_txt}
-                className="logo-header"
-            />
+            <Link href="/">
+                <Image
+                    src={TableRiseLightMark}
+                    alt={alts.tablerise_logo_alt_txt}
+                    className="logo-header"
+                />
+            </Link>
+
             <div className="menu-and-buttons">
                 <nav className="menu">
                     <ul className="menu-list font-XS-bold">

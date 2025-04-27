@@ -37,7 +37,10 @@ export default function UserPlayerCampaigns({
                 </div>
                 <div className="user-player-campaigns-buttons">
                     <Link href="/home/campaigns">
-                        <button className="button-L-fill font-XS-bold">
+                        <button
+                            className="button-L-fill font-XS-bold"
+                            disabled={campaigns.length >= 8}
+                        >
                             Entrar em uma nova campanha
                         </button>
                     </Link>
