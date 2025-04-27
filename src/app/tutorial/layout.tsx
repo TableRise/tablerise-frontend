@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { DM_Sans } from 'next/font/google';
 import { cookies } from 'next/headers';
 import HeaderToggle from '@/components/common/HeaderToggle';
-import TutorialProvider from '@/context/TutorialProvider';
+import TableriseProvider from '@/context/TableriseProvider';
 import Footer from '@/components/common/Footer';
 
 const dm_sans = DM_Sans({ variable: '--dm-sans-base', subsets: ['latin'] });
@@ -37,9 +37,9 @@ export default function RootLayout({
         <html lang="en">
             <body className={dm_sans.className} style={{ marginTop: '8.6rem' }}>
                 <HeaderToggle userLogged={recoverUserInfo} />
-                <TutorialProvider userLogged={recoverUserInfo}>
+                <TableriseProvider userLogged={recoverUserInfo}>
                     {children}
-                </TutorialProvider>
+                </TableriseProvider>
                 <Footer />
             </body>
         </html>

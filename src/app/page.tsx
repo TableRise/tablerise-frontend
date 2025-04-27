@@ -14,7 +14,7 @@ import UserMasterCampaigns from '@/components/home/UserMasterCampaigns';
 import UserPlayerCampaigns from '@/components/home/UserPlayerCampaigns';
 
 export default function Home(): JSX.Element {
-    const { userLoggedToggle } = useContext(TableriseContext);
+    const { userLoggedToggle, userCampaigns } = useContext(TableriseContext);
 
     const userNotLoggedPage = (
         <>
@@ -37,9 +37,8 @@ export default function Home(): JSX.Element {
             <section className="main-logged-page">
                 <LoggedHeader />
                 <h2 className="font-XL-bold">Campanhas</h2>
-
-                <UserMasterCampaigns />
-                <UserPlayerCampaigns />
+                <UserMasterCampaigns campaigns={userCampaigns.master} />
+                <UserPlayerCampaigns campaigns={userCampaigns.player} />
             </section>
             <Footer />
         </>

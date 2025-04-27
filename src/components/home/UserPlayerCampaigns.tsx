@@ -3,35 +3,25 @@ import Image from 'next/image';
 import CampaignCard from '@/components/common/CampaignCard';
 import MoreVertBlueSVG from '../../../assets/icons/nav/more-vert-blue.svg?url';
 import SearchBlueSVG from '../../../assets/icons/nav/search-blue.svg?url';
-import { data } from './data/UserPlayerCampaignsData';
+import { CampaignsToRender } from '@/types/modules/components/home/UserMasterCampaigns';
 import Link from 'next/link';
 import Carousel from '../common/Carousel';
 import '@/components/home/styles/UserPlayerCampaigns.css';
 
-export default function UserPlayerCampaigns(): JSX.Element {
-    const cards = data.map((item) => (
+export default function UserPlayerCampaigns({
+    campaigns,
+}: CampaignsToRender): JSX.Element {
+    const cards = campaigns.map((campaign) => (
         <CampaignCard
             className={'embla__slide'}
             key={uuid()}
-            title={item.title}
-            fogColor={item.fogColor}
-            textColor={item.textColor}
-            size={item.size}
-            buttonColor={item.buttonColor}
-            buttonTitle={item.buttonTitle}
-        />
-    ));
-
-    const cardsTwo = data.map((item) => (
-        <CampaignCard
-            className={'embla__slide'}
-            key={uuid()}
-            title={item.title}
-            fogColor={item.fogColor}
-            textColor={item.textColor}
-            size="large"
-            buttonColor={item.buttonColor}
-            buttonTitle={item.buttonTitle}
+            title={campaign.title}
+            nextMatchDate={campaign.infos.nextMatchDate}
+            fogColor="#0A358A"
+            textColor="white"
+            size="straight"
+            buttonColor="white"
+            buttonTitle="Entrar no Jogo"
         />
     ));
 
@@ -42,7 +32,7 @@ export default function UserPlayerCampaigns(): JSX.Element {
                     <span className="label-title font-L-semibold">Participando</span>
                     <div className="creation-limits font-XS-regular">
                         <span>Limite de participação</span>
-                        <span>3/8</span>
+                        <span>{campaigns.length}/8</span>
                     </div>
                 </div>
                 <div className="user-player-campaigns-buttons">

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import MoreVertSVG from '../../../assets/icons/nav/more-vert.svg?url';
 import CalendarSVG from '../../../assets/icons/sys/calendar.svg?url';
 import '@/components/common/styles/CampaignCard.css';
+import formatDate from '@/utils/formatDate';
 
 export default function CampaignCard(cardProps: CampaignCardProps): JSX.Element {
     const {
@@ -16,6 +17,7 @@ export default function CampaignCard(cardProps: CampaignCardProps): JSX.Element 
         size = 'medium',
         textColor = 'blue',
         buttonColor = 'blue',
+        nextMatchDate = 'Em aberto',
     } = cardProps || {};
 
     const cardSize = { w: '22.5rem', h: '22.5rem' };
@@ -23,11 +25,15 @@ export default function CampaignCard(cardProps: CampaignCardProps): JSX.Element 
     let buttonColorCSS = 'button-L-fill';
     let buttonTextColorCSS = 'text-color-greyScale/50';
 
+    let nextMatchDateRender = nextMatchDate;
+
     if (size === 'straight') cardSize.w = '21.8rem';
     if (size === 'large') cardSize.w = '44rem';
     if (textColor === 'white') textColorCSS = 'text-color-greyScale/50';
     if (buttonColor === 'white') buttonColorCSS = 'button-white-default';
     if (buttonColor === 'white') buttonTextColorCSS = 'text-color-primary/default_900';
+    if (nextMatchDate === 'no-date') nextMatchDateRender = 'Em aberto';
+    if (nextMatchDate !== 'no-date') nextMatchDateRender = formatDate(nextMatchDate);
 
     return (
         <div
@@ -54,7 +60,7 @@ export default function CampaignCard(cardProps: CampaignCardProps): JSX.Element 
                         width={CalendarSVG.width}
                         height={CalendarSVG.height}
                     />
-                    <span className="font-XS-bold">Em aberto</span>
+                    <span className="font-XS-bold">{nextMatchDateRender}</span>
                 </div>
 
                 <div className="card-buttons">

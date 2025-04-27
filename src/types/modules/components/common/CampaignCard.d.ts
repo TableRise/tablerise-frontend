@@ -9,4 +9,5 @@ export interface CampaignCardProps {
     buttonTitle?: string;
     textColor?: string;
     buttonColor?: string;
+    nextMatchDate?: string;
 }
