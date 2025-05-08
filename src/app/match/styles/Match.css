@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .match-page {
+        @apply w-full h-screen flex;
+    }
+
+    .match-items {
+        @apply mt-2;
+    }
+
+    .match-items button {
+        @apply mx-2 p-2 bg-slate-900 text-white;
+    }
+
+    .match-map {
+        @apply w-[70%] h-[70%] border border-black self-center;
+    }
+
+    .match-squares {
+        @apply w-[10%] h-[10%] bg-red-800;
+    }
+
+    .react-draggable .avatar button {
+        @apply p-1 bg-white;
+    }
+}
+
+.react-draggable {
+    background-color: blue;
+}

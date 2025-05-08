@@ -24,3 +24,39 @@ export const postLogin = async (payload: LoginPayload): Promise<AxiosResponse | 
             throw new Error('*Algo deu errado. Tente novamente.');
     }
 };
+
+export const getUser = async (userId: string): Promise<AxiosResponse | any> => {
+    try {
+        console.log('usersBaseUrl no getUser ---------', `${usersBaseUrl}`);
+        const result = await apiCall({
+            baseUrl: usersBaseUrl,
+            endpoint: `${userId}`,
+            method: 'GET'
+        });
+
+        return result;
+    } catch ({ response }: AxiosError | any) {
+        if (response.status === 404) throw new Error('*Usuário não encontrado');
+        if (response.status === 401) throw new Error('*Acesso não autorizado');
+        if (response.status !== 200) throw new Error('*Algo deu errado. Tente novamente.');
+    }
+};
+
+export const putUser = async (userId: string, payload: any): Promise<AxiosResponse | any> => {
+    try {
+        console.log('usersBaseUrl no putUser ---------', `${usersBaseUrl}`);
+        const result = await apiCall({
+            baseUrl: usersBaseUrl,
+            endpoint: `${userId}/update`,
+            data: payload,
+            method: 'PUT'
+        });
+        console.log(result)
+        return result;
+    } catch ({ response }: AxiosError | any) {
+        if (response.status === 404) throw new Error('*Usuário não encontrado');
+        if (response.status === 401) throw new Error('*Acesso não autorizado');
+        if (response.status !== 200) throw new Error('*Algo deu errado. Tente novamente.');
+    }
+};
+

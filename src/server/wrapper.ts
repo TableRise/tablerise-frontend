@@ -10,16 +10,7 @@ export const apiCall = async (data: WrapperPayload) => {
     const { method, baseUrl, endpoint, data: requestData, params } = data;
 
     try {
-        // console.log('baseUrl---------', `${baseUrl}`);
-        // console.log('endpoint---------', `${endpoint}`);
-        // console.log('process.env.TYPE_KEY---------', `${process.env.TYPE_KEY}`);
-        // console.log(
-        //     'process.env.API_ACCESS_KEY---------',
-        //     `${process.env.API_ACCESS_KEY}`
-        // );
-        // console.log('requestData---------', requestData);
-        // console.log('`${baseUrl}/${endpoint}`---------', `${baseUrl}/${endpoint}`);
-
+        console.log(`${baseUrl}/${endpoint}---------`, baseUrl, endpoint);
         const response = await axios({
             method,
             url: `${baseUrl}/${endpoint}`,
