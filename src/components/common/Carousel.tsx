@@ -18,6 +18,11 @@ export default function Carousel({ elements }: CarouselProps): JSX.Element {
         emblaApi.scrollNext();
     }, [emblaApi]);
 
+    const handlePrev = useCallback(() => {
+        if (!emblaApi) return;
+        emblaApi.scrollPrev();
+    }, [emblaApi]);
+
     return (
         <>
             <div className="embla__viewport" ref={emblaRef}>
@@ -26,7 +31,21 @@ export default function Carousel({ elements }: CarouselProps): JSX.Element {
             <div className="embla__controls">
                 <div className="embla__buttons">
                     <button
-                        className="carousel-arrow embla__button embla__button--next"
+                        className="carousel-arrow-prev embla__button embla__button--next"
+                        onClick={handlePrev}
+                    >
+                        <Image
+                            src={ArrowRightGraySVG.src}
+                            alt="arrrow right"
+                            width={ArrowRightGraySVG.width}
+                            height={ArrowRightGraySVG.height}
+                        />
+                    </button>
+                </div>
+
+                <div className="embla__buttons">
+                    <button
+                        className="carousel-arrow-next embla__button embla__button--next"
                         onClick={handleNext}
                     >
                         <Image

@@ -105,7 +105,7 @@ export default function FormTwoFactor() {
         <form onSubmit={handleSubmit(sendCode)}>
             <Form.Label>
                 Insira o código de verificação, indicado em seu e-mail.
-                <div className="flex justify-center gap-2">
+                <div className="form-opts-inputs">
                     {num6.map((_, index) => (
                         <input
                             {...register(

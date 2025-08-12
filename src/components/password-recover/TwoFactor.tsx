@@ -3,7 +3,7 @@ import FormTwoFactor from './forms/form-two-factor';
 
 export default function TwoFactor() {
     return (
-        <div>
+        <div className="inside-div">
             <Form.Title>Verificação de duas etapas</Form.Title>
             <Form.Description>
                 Enviamos um e-mail com código de verificação para user@email.com.

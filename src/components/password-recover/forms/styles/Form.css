@@ -16,7 +16,11 @@
     }
 
     .form-opt-input {
-        @apply flex text-center w-[15%] h-12 mb-6 items-center justify-center bg-white text-color-greyScale/500 uppercase;
+        @apply flex text-center w-[15%] h-12 items-center justify-center bg-white text-color-greyScale/500 uppercase;
+    }
+
+    .form-opts-inputs {
+        @apply flex gap-2 mb-6 mt-2;
     }
 
     .container-button {

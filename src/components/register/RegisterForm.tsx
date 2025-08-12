@@ -102,7 +102,7 @@ export default function RegisterForm(): JSX.Element {
             />
 
             <Button
-                title="Entrar"
+                title="Cadastrar-se"
                 name="login-btn"
                 buttonStyle="button-L-fill"
                 props="font-S-bold text-color-greyScale/50"
