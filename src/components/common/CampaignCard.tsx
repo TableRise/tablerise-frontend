@@ -60,7 +60,11 @@ export default function CampaignCard(cardProps: CampaignCardProps): JSX.Element 
                         width={CalendarSVG.width}
                         height={CalendarSVG.height}
                     />
-                    <span className="font-XS-bold">{nextMatchDateRender}</span>
+                    <span className="font-XS-bold">
+                        {nextMatchDateRender === 'Em aberto'
+                            ? nextMatchDateRender
+                            : `Agendado: ${nextMatchDateRender}`}
+                    </span>
                 </div>
 
                 <div className="card-buttons">

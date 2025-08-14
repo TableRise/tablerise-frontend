@@ -26,7 +26,23 @@
         border: 2px solid transparent;
     }
 
-    .carousel-arrow {
-        @apply w-14 h-14 relative -top-52 left-[65rem] flex justify-center items-center bg-color-greyScale/50 rounded-xl cursor-pointer;
+    .embla__controls {
+        @apply flex;
+    }
+
+    .carousel-arrow-prev {
+        @apply w-14 h-14 relative -top-52 left-[-1rem] flex justify-center items-center bg-color-greyScale/50 rounded-xl cursor-pointer;
+        box-shadow: 0px 0px 1px 0px rgba(12, 37, 95, 0.1);
+        box-shadow: 4px 6px 12px -6px rgba(12, 37, 95, 0.08);
+    }
+
+    .user-player-campaigns .user-player-campaigns-cards .carousel-arrow-prev img {
+        @apply -scale-x-100;
+    }
+
+    .carousel-arrow-next {
+        @apply w-14 h-14 relative -top-52 left-[61.5rem] flex justify-center items-center bg-color-greyScale/50 rounded-xl cursor-pointer;
+        box-shadow: 0px 0px 1px 0px rgba(12, 37, 95, 0.1);
+        box-shadow: 4px 6px 12px -6px rgba(12, 37, 95, 0.08);
     }
 }

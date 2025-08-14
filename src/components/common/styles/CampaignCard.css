@@ -16,11 +16,11 @@
     }
 
     .campaign-card .card-infos .date-schedule {
-        @apply p-1 w-[15rem] my-4 bg-color-primary/default_900 flex items-center text-color-greyScale/50 rounded-lg;
+        @apply p-1 pr-2 w-fit my-4 bg-color-primary/default_900 flex items-center text-color-greyScale/50 rounded-lg;
     }
 
     .campaign-card .card-infos .date-schedule span {
-        @apply ml-2;
+        @apply ml-1;
     }
 
     .campaign-card .card-infos .card-buttons {

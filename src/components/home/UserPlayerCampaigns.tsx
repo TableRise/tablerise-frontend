@@ -7,11 +7,12 @@ import { CampaignsToRender } from '@/types/modules/components/home/UserMasterCam
 import Link from 'next/link';
 import Carousel from '../common/Carousel';
 import '@/components/home/styles/UserPlayerCampaigns.css';
+import BasicParticipationCard from '../common/BasicParticipationCard';
 
 export default function UserPlayerCampaigns({
     campaigns,
 }: CampaignsToRender): JSX.Element {
-    const cards = campaigns.map((campaign) => (
+    const cardMap = campaigns.map((campaign) => (
         <CampaignCard
             className={'embla__slide'}
             key={uuid()}
@@ -24,6 +25,9 @@ export default function UserPlayerCampaigns({
             buttonTitle="Entrar no Jogo"
         />
     ));
+
+    const cards =
+        cardMap.length > 0 ? cardMap : [<BasicParticipationCard key="no-campaigns" />];
 
     return (
         <section className="user-player-campaigns">

@@ -61,10 +61,6 @@
         @apply w-[67.5rem] flex flex-wrap justify-between mt-6 select-none;
     }
 
-    .user-player-campaigns .user-player-campaigns-cards .carousel-arrow {
-        @apply w-14 h-14 relative -top-52 left-[65rem] flex justify-center items-center bg-color-greyScale/50 rounded-xl cursor-pointer;
-    }
-
     .user-player-campaigns .embla__viewport {
         @apply overflow-hidden h-[23rem];
     }
