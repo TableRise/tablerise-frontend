@@ -3,7 +3,10 @@ import { apiCall } from '../wrapper';
 
 const usersBaseUrl = process.env.API_USERS;
 
-export const postAuthenticateEmail = async (email: string, code: string): Promise<void> => {
+export const postAuthenticateEmail = async (
+    email: string,
+    code: string
+): Promise<void> => {
     try {
         await apiCall({
             baseUrl: usersBaseUrl,
