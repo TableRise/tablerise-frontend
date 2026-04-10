@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .activation-modal-overlay {
+        @apply fixed inset-0 z-50 flex items-center justify-center bg-black/60;
+    }
+
+    .activation-modal-card {
+        @apply w-[30rem] bg-white rounded-2xl p-8 flex flex-col items-center gap-4 shadow-xl;
+    }
+
+    .activation-modal-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .activation-modal-description {
+        @apply text-color-greyScale/950 text-center;
+    }
+
+    .activation-modal-inputs {
+        @apply flex gap-2 mt-2;
+    }
+
+    .activation-modal-digit {
+        @apply w-11 h-12 text-center rounded-lg border text-color-greyScale/500 uppercase bg-white focus:outline-none;
+    }
+
+    .activation-modal-buttons {
+        @apply flex flex-col gap-2 w-full mt-2;
+    }
+}
