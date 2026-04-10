@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { AxiosResponse } from 'axios';
 import Link from 'next/link';
 
@@ -6,6 +6,7 @@ import TableriseContext from '@/context/TableriseContext';
 import Input from '@/components/common/forms/Input';
 import Button from '@/components/common/forms/Button';
 import { postLogin } from '@/server/users/login';
+import ActivationCodeModal from './ActivationCodeModal';
 
 import loginZodSchema, { LoginPayload } from './schemas/LoginSchema';
 import './styles/LoginFormCredentials.css';
@@ -13,6 +14,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 export default function LoginFormCredentials(): JSX.Element {
+    const [activationModalOpen, setActivationModalOpen] = useState(false);
+    const [pendingEmail, setPendingEmail] = useState('');
+
     const {
         register,
         formState: { errors, isSubmitting },
@@ -34,6 +38,11 @@ export default function LoginFormCredentials(): JSX.Element {
 
             return;
         } catch (error: Error | any) {
+            if (error.message?.includes('Usuário com status incorreto para login')) {
+                setPendingEmail(value.email);
+                setActivationModalOpen(true);
+                return;
+            }
             setError('root', {
                 type: 'manual',
                 message: `${error.message}`,
@@ -44,52 +53,62 @@ export default function LoginFormCredentials(): JSX.Element {
     const { newPassVisible } = useContext(TableriseContext);
 
     return (
-        <form className="login-form-credentials" onSubmit={handleSubmit(login)}>
-            <Input
-                title="Email"
-                inputStyle="input-default-light"
-                classProps="email-input-login"
-                setter={register}
-                name="email"
-                type="email"
-                placeholder="Insira o seu e-mail"
-                errorMessage={errors.email}
-            />
-            <Input
-                title="Senha"
-                inputStyle="input-default-light"
-                setter={register}
-                name="password"
-                type={newPassVisible ? 'text' : 'password'}
-                placeholder="Insira a sua senha"
-                errorMessage={errors.password}
-                toggleVisibilityButton={true}
-            />
-            <Link
-                href="/password-recover"
-                className="font-XS-regular text-color-primary/800"
-            >
-                Esqueceu a senha?
-            </Link>
-            <div className="login-form-credentials-buttons">
-                <Button
-                    title="Entrar"
-                    name="login-btn"
-                    buttonStyle="button-L-fill"
-                    props="font-S-bold text-color-greyScale/50"
-                    disabled={isSubmitting}
+        <>
+            {activationModalOpen && (
+                <ActivationCodeModal
+                    email={pendingEmail}
+                    onClose={() => setActivationModalOpen(false)}
                 />
-                {errors.root && (
-                    <span className="font-XXS-regular text-color-support/alert">
-                        {errors.root.message}
-                    </span>
-                )}
-                <div className="divider-container">
-                    <div className="divider-line"></div>
-                    <span className="dividee-content font-S-bold">ou continue com</span>
-                    <div className="divider-line"></div>
+            )}
+            <form className="login-form-credentials" onSubmit={handleSubmit(login)}>
+                <Input
+                    title="Email"
+                    inputStyle="input-default-light"
+                    classProps="email-input-login"
+                    setter={register}
+                    name="email"
+                    type="email"
+                    placeholder="Insira o seu e-mail"
+                    errorMessage={errors.email}
+                />
+                <Input
+                    title="Senha"
+                    inputStyle="input-default-light"
+                    setter={register}
+                    name="password"
+                    type={newPassVisible ? 'text' : 'password'}
+                    placeholder="Insira a sua senha"
+                    errorMessage={errors.password}
+                    toggleVisibilityButton={true}
+                />
+                <Link
+                    href="/password-recover"
+                    className="font-XS-regular text-color-primary/800"
+                >
+                    Esqueceu a senha?
+                </Link>
+                <div className="login-form-credentials-buttons">
+                    <Button
+                        title="Entrar"
+                        name="login-btn"
+                        buttonStyle="button-L-fill"
+                        props="font-S-bold text-color-greyScale/50"
+                        disabled={isSubmitting}
+                    />
+                    {errors.root && (
+                        <span className="font-XXS-regular text-color-support/alert">
+                            {errors.root.message}
+                        </span>
+                    )}
+                    <div className="divider-container">
+                        <div className="divider-line"></div>
+                        <span className="dividee-content font-S-bold">
+                            ou continue com
+                        </span>
+                        <div className="divider-line"></div>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </>
     );
 }
