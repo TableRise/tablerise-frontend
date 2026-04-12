@@ -23,6 +23,7 @@ export default function Tutorial(): JSX.Element {
                             buttonColor={card.buttonColor}
                             fogColor={card.fogColor}
                             size={card.size}
+                            image={card.image}
                         />
                     ))}
                 </div>

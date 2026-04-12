@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .tutorial-detail-page {
+        @apply flex justify-center;
+    }
+
+    .tutorial-detail-container {
+        @apply w-[70.5rem] flex gap-8 items-start;
+    }
+
+    /* ----------- Sidebar ----------- */
+    .tutorial-detail-sidebar {
+        @apply flex-shrink-0 w-44;
+    }
+
+    .tutorial-detail-sidebar-title {
+        @apply text-color-greyScale/700 uppercase tracking-wide mb-3;
+    }
+
+    .tutorial-detail-sidebar-list {
+        @apply flex flex-col list-none;
+    }
+
+    .tutorial-detail-sidebar-item {
+        @apply block py-2 px-3 rounded-lg text-color-greyScale/700 transition-colors;
+    }
+
+    .tutorial-detail-sidebar-item:hover {
+        @apply bg-color-greyScale/200 text-color-primary/default_900;
+    }
+
+    .tutorial-detail-sidebar-item--active {
+        @apply bg-color-primary/default_900 text-color-greyScale/50;
+    }
+
+    .tutorial-detail-sidebar-item--active:hover {
+        @apply bg-color-primary/default_900 text-color-greyScale/50;
+    }
+
+    /* ----------- Content ----------- */
+    .tutorial-detail-content {
+        @apply flex-1 flex flex-col gap-6 pb-12;
+    }
+
+    /* ----------- Hero ----------- */
+    .tutorial-detail-hero {
+        @apply relative w-full h-72 rounded-xl bg-cover bg-center flex flex-col justify-end overflow-hidden;
+    }
+
+    .tutorial-detail-hero--placeholder {
+        background-image: repeating-conic-gradient(
+            #dcdcdc 0% 25%,
+            #ffffff 0% 50%
+        );
+        background-size: 24px 24px;
+    }
+
+    .tutorial-detail-hero-fog {
+        @apply absolute inset-0 rounded-xl;
+        background: linear-gradient(to top, #0a358a 10%, rgba(255, 255, 255, 0) 70%);
+    }
+
+    .tutorial-detail-hero-title {
+        @apply relative z-10 px-6 pb-4;
+    }
+
+    /* ----------- Body ----------- */
+    .tutorial-detail-body {
+        @apply flex flex-col gap-6;
+    }
+
+    .tutorial-detail-topic {
+        @apply flex flex-col gap-3;
+    }
+}

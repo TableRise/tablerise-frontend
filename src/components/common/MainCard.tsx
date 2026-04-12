@@ -7,12 +7,13 @@ export default function MainCard(cardProps: MainCardProps): JSX.Element {
     const {
         title = 'default',
         buttonTitle = 'Ler mais',
-        image = SideImageBackground.src,
         fogColor = '#FFFFFF',
         size = 'medium',
         textColor = 'blue',
         buttonColor = 'blue',
     } = cardProps || {};
+
+    let { image } = cardProps;
 
     const cardSize = { w: '22.5rem', h: '22.5rem' };
     let textColorCSS = 'text-color-primary/default_900';
@@ -23,6 +24,7 @@ export default function MainCard(cardProps: MainCardProps): JSX.Element {
     if (textColor === 'white') textColorCSS = 'text-color-greyScale/50';
     if (buttonColor === 'white') buttonColorCSS = 'button-white-default';
     if (buttonColor === 'white') buttonTextColorCSS = 'text-color-primary/default_900';
+    if (!image) image = SideImageBackground.src;
 
     return (
         <div
