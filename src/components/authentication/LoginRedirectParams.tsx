@@ -1,21 +1,40 @@
 'use client';
+import { getUser } from '@/server/users/get-user';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function LoginRedirectParams(): JSX.Element {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const userData = searchParams.get('userData');
+    const userId = searchParams.get('userId');
+    const [data, setData] = useState<any & { userId: string }>();
+
+    const getUserCallback = useCallback(async () => {
+        const userData = await getUser(userId as string);
+        setData(userData);
+    }, [userId, setData])
 
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            if (userData) {
-                localStorage.setItem('userLogged', decodeURIComponent(userData || ''));
-            }
+        async function getUserData() {
+            if (typeof window !== 'undefined') {
+                await getUserCallback();
 
-            router.replace('/');
+                console.log(data);
+
+                const userToStorage = {
+                    userId: data.userId,
+                    providerId: data.providerId,
+                    username: `${data.nickname}${data.tag}`,
+                    picture: data.picture.link
+                };
+
+                localStorage.setItem('userLogged', JSON.stringify(userToStorage));
+                router.replace('/');
+            }
         }
-    }, [userData, router]);
+
+        getUserData();
+    }, [data, router]);
 
     return <p>...</p>;
 }

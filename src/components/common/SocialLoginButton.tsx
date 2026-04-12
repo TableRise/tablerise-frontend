@@ -2,7 +2,6 @@
 import React from 'react';
 import DiscordLogo from '@assets/icons/social-midia/discord.svg';
 import GoogleLogo from '@assets/icons/social-midia/google.svg';
-import { useRouter } from 'next/navigation';
 import { SocialLoginButtonProps } from '@/types/modules/components/register/SocialLoginButton';
 import Link from 'next/link';
 import './styles/SocialLoginButton.css';
@@ -11,8 +10,6 @@ export default function SocialLoginButton({
     title,
     socialType,
 }: SocialLoginButtonProps): JSX.Element {
-    const router = useRouter();
-
     return (
         <div className="button-container">
             <Link href={`${process.env.API_OAUTH}/${socialType}`}>

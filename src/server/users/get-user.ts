@@ -5,7 +5,7 @@ export const getUser = async (userId: string) => {
     try {
         const { data }: AxiosResponse = await apiCall({
             baseUrl: usersBaseUrl,
-            endpoint: `/${userId}`,
+            endpoint: `${userId}`,
             method: 'GET',
         });
 
