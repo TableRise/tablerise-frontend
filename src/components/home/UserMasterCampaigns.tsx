@@ -61,8 +61,8 @@ export default function UserMasterCampaigns({
                     <CampaignCard
                         className={'embla__slide'}
                         key={uuid()}
-                        title={campaigns[0].title}
-                        nextMatchDate={campaigns[0].infos.nextMatchDate}
+                        title={campaigns[1].title}
+                        nextMatchDate={campaigns[1].infos.nextMatchDate}
                         fogColor="#0A358A"
                         textColor="white"
                         buttonColor="white"
