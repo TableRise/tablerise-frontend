@@ -1,15 +1,21 @@
+'use client';
+import { useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import CampaignCard from '@/components/common/CampaignCard';
 import BasicCreationCard from '@/components/common/BasicCreationCard';
+import CreateCampaignModal from '@/components/home/CreateCampaignModal';
 import MoreVertBlueSVG from '../../../assets/icons/nav/more-vert-blue.svg?url';
 import { CampaignsToRender } from '@/types/modules/components/home/UserMasterCampaigns';
-import Link from 'next/link';
 import Image from 'next/image';
 import '@/components/home/styles/UserMasterCampaigns.css';
 
 export default function UserMasterCampaigns({
     campaigns,
 }: CampaignsToRender): JSX.Element {
+    const [modalOpen, setModalOpen] = useState(false);
+    const openModal = () => setModalOpen(true);
+    const closeModal = () => setModalOpen(false);
+
     return (
         <section className="user-master-campaigns">
             <div className="user-master-campaigns-header">
@@ -21,14 +27,13 @@ export default function UserMasterCampaigns({
                     </div>
                 </div>
                 <div className="user-master-campaigns-buttons">
-                    <Link href="/home/campaigns">
-                        <button
-                            className="button-L-fill font-XS-bold"
-                            disabled={campaigns.length >= 2}
-                        >
-                            Criar uma campanha
-                        </button>
-                    </Link>
+                    <button
+                        className="button-L-fill font-XS-bold"
+                        disabled={campaigns.length >= 2}
+                        onClick={openModal}
+                    >
+                        Criar uma campanha
+                    </button>
                     <Image
                         src={MoreVertBlueSVG.src}
                         alt="more-vert"
@@ -64,9 +69,16 @@ export default function UserMasterCampaigns({
                         buttonTitle="Entrar no Jogo"
                     />
                 ) : (
-                    <BasicCreationCard />
+                    <BasicCreationCard onClick={openModal} />
                 )}
             </div>
+
+            {modalOpen && (
+                <CreateCampaignModal
+                    onClose={closeModal}
+                    onSuccess={closeModal}
+                />
+            )}
         </section>
     );
 }

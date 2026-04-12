@@ -8,4 +8,5 @@ export interface MainCardProps {
     buttonTitle?: string;
     textColor?: string;
     buttonColor?: string;
+    onClick?: () => void;
 }

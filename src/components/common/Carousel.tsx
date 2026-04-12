@@ -1,5 +1,5 @@
 'use client';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { CarouselProps } from '@/types/modules/components/common/Carousel';
 import useEmblaCarousel from 'embla-carousel-react';
 import ArrowRightGraySVG from '../../../assets/icons/nav/arrow-right-gray.svg?url';
@@ -8,10 +8,22 @@ import '@/components/common/styles/Carousel.css';
 
 export default function Carousel({ elements }: CarouselProps): JSX.Element {
     const [emblaRef, emblaApi] = useEmblaCarousel({
-        loop: true,
+        loop: false,
         align: 'start',
         dragFree: false,
     });
+    const [canPrev, setCanPrev] = useState(false);
+
+    useEffect(() => {
+        if (!emblaApi) return;
+        const update = () => setCanPrev(emblaApi.canScrollPrev());
+        emblaApi.on('select', update);
+        emblaApi.on('reInit', update);
+        return () => {
+            emblaApi.off('select', update);
+            emblaApi.off('reInit', update);
+        };
+    }, [emblaApi]);
 
     const handleNext = useCallback(() => {
         if (!emblaApi) return;
@@ -24,23 +36,25 @@ export default function Carousel({ elements }: CarouselProps): JSX.Element {
     }, [emblaApi]);
 
     return (
-        <>
+        <div className="embla-wrapper">
             <div className="embla__viewport" ref={emblaRef}>
                 <div className="embla__container">{...elements}</div>
             </div>
             <div className="embla__controls">
                 <div className="embla__buttons">
-                    <button
-                        className="carousel-arrow-prev embla__button embla__button--next"
-                        onClick={handlePrev}
-                    >
-                        <Image
-                            src={ArrowRightGraySVG.src}
-                            alt="arrrow right"
-                            width={ArrowRightGraySVG.width}
-                            height={ArrowRightGraySVG.height}
-                        />
-                    </button>
+                    {canPrev && (
+                        <button
+                            className="carousel-arrow-prev embla__button embla__button--next"
+                            onClick={handlePrev}
+                        >
+                            <Image
+                                src={ArrowRightGraySVG.src}
+                                alt="arrrow right"
+                                width={ArrowRightGraySVG.width}
+                                height={ArrowRightGraySVG.height}
+                            />
+                        </button>
+                    )}
                 </div>
 
                 <div className="embla__buttons">
@@ -57,6 +71,6 @@ export default function Carousel({ elements }: CarouselProps): JSX.Element {
                     </button>
                 </div>
             </div>
-        </>
+        </div>
     );
 }
