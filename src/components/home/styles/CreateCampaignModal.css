@@ -1,0 +1,380 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    /* ── Backdrop ─────────────────────────────────────────── */
+    .ccm-backdrop {
+        @apply fixed inset-0 z-50 flex items-center justify-center;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    /* ── Modal container ──────────────────────────────────── */
+    .ccm-modal {
+        @apply relative bg-white rounded-2xl flex flex-col;
+        width: 45rem;
+        max-height: 90vh;
+        overflow: hidden;
+    }
+
+    /* ── Header ───────────────────────────────────────────── */
+    .ccm-modal-header {
+        @apply flex items-center justify-between px-8 pt-6 pb-4 flex-shrink-0;
+    }
+
+    .ccm-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .ccm-close-btn {
+        @apply w-8 h-8 flex items-center justify-center rounded-lg;
+        @apply text-color-greyScale/500 transition-colors;
+    }
+
+    .ccm-close-btn:hover {
+        @apply bg-color-greyScale/100;
+    }
+
+    /* ── Stepper ──────────────────────────────────────────── */
+    .ccm-stepper {
+        @apply flex items-start pb-4 flex-shrink-0;
+        padding-left: 10%;
+        padding-right: 10%;
+    }
+
+    .ccm-step-group {
+        @apply flex flex-col items-center gap-1.5 flex-shrink-0;
+        /* fixed to circle diameter so the connector meets the circle edge,
+           label overflows visually without widening the box */
+        width: 2.25rem;
+        overflow: visible;
+        position: relative;
+        z-index: 1;
+    }
+
+    .ccm-step-connector {
+        @apply flex-1 h-[2px] bg-color-greyScale/200;
+        /* align to vertical center of the w-9 (2.25rem) circle */
+        margin-top: calc(2.25rem / 2 - 1px);
+        /* extend half a circle width into each neighbor so the line
+           passes fully behind both circles */
+        margin-left: -1.125rem;
+        margin-right: -1.125rem;
+        min-width: 1.5rem;
+        position: relative;
+        z-index: 0;
+    }
+
+    .ccm-step-connector--done {
+        @apply bg-color-primary/default_900;
+    }
+
+    .ccm-step-circle {
+        @apply w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0;
+        background-color: #9ca3af; /* gray-400 */
+    }
+
+    .ccm-step-circle--active,
+    .ccm-step-circle--done {
+        background-color: #0a358a;
+    }
+
+    .ccm-step-circle img {
+        filter: brightness(0) invert(1);
+    }
+
+    .ccm-step-label {
+        @apply text-color-greyScale/500 whitespace-nowrap;
+    }
+
+    .ccm-step-label--active {
+        @apply text-color-primary/default_900;
+    }
+
+    /* ── Scrollable body ──────────────────────────────────── */
+    .ccm-body {
+        @apply flex-1 overflow-y-auto px-8 py-2;
+    }
+
+    /* ── Step content ─────────────────────────────────────── */
+    .ccm-step-content {
+        @apply flex flex-col gap-5;
+    }
+
+    /* ── Field ────────────────────────────────────────────── */
+    .ccm-field {
+        @apply flex flex-col gap-1;
+    }
+
+    .ccm-field-label {
+        @apply text-color-greyScale/950;
+    }
+
+    .ccm-field-hint {
+        @apply text-color-greyScale/500;
+    }
+
+    .ccm-field-error {
+        @apply text-color-support/alert;
+    }
+
+    /* ── Inputs ───────────────────────────────────────────── */
+    .ccm-input {
+        @apply w-full;
+    }
+
+    .ccm-input--password {
+        @apply w-28 tracking-widest font-bold;
+    }
+
+    .ccm-select {
+        @apply w-full appearance-none cursor-pointer;
+    }
+
+    /* ── Textarea ─────────────────────────────────────────── */
+    .ccm-textarea-wrapper {
+        @apply relative;
+    }
+
+    .ccm-textarea {
+        @apply w-full bg-color-greyScale/50 border border-color-greyScale/300 rounded-lg
+               p-3 resize-none text-color-greyScale/950 outline-none;
+        font-size: 0.8rem;
+        line-height: 1.4;
+    }
+
+    .ccm-textarea:focus {
+        border-color: #0a358a;
+    }
+
+    .ccm-textarea--error {
+        @apply !border-color-support/alert;
+    }
+
+    .ccm-char-count {
+        @apply absolute bottom-2 right-3 text-color-greyScale/500;
+    }
+
+    .ccm-char-count--richtext {
+        position: static;
+        @apply text-right mt-1 text-color-greyScale/500;
+    }
+
+    /* ── Cover upload ─────────────────────────────────────── */
+    .ccm-cover-upload {
+        @apply bg-color-greyScale/100 rounded-xl flex flex-col items-center justify-center gap-3;
+        min-height: 11rem;
+        padding: 1.5rem;
+    }
+
+    .ccm-cover-upload--small {
+        min-height: 7rem;
+        padding: 1rem;
+    }
+
+    .ccm-upload-btn {
+        @apply flex items-center gap-2 px-4 py-2 bg-white border border-color-greyScale/300
+               rounded-lg text-color-greyScale/700 transition-colors;
+    }
+
+    .ccm-upload-btn:hover {
+        @apply bg-color-greyScale/50;
+    }
+
+    .ccm-or-divider {
+        @apply flex items-center gap-2 w-full max-w-[12rem];
+    }
+
+    .ccm-or-divider hr {
+        @apply flex-1 border-color-greyScale/300;
+    }
+
+    .ccm-or-divider span {
+        @apply text-color-greyScale/500;
+    }
+
+    .ccm-template-link {
+        @apply text-color-primary/default_900 cursor-pointer;
+    }
+
+    .ccm-template-link:hover {
+        @apply underline;
+    }
+
+    /* ── Agenda ───────────────────────────────────────────── */
+    .ccm-agenda {
+        @apply flex flex-col gap-2;
+    }
+
+    .ccm-agenda-header {
+        @apply grid gap-3;
+        grid-template-columns: 11rem 1fr;
+    }
+
+    .ccm-agenda-row {
+        @apply flex items-center gap-3;
+    }
+
+    .ccm-agenda-row--filled .ccm-agenda-input,
+    .ccm-agenda-row--filled .ccm-agenda-time {
+        @apply bg-color-greyScale/100;
+    }
+
+    .ccm-agenda-date-cell {
+        @apply flex items-center;
+        position: relative;
+    }
+
+    .ccm-agenda-calendar-icon {
+        position: absolute;
+        right: 0.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .ccm-agenda-date-hidden {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        height: 0;
+    }
+
+    .ccm-agenda-input {
+        @apply w-36;
+        padding-right: 2rem;
+    }
+
+    .ccm-agenda-time-cells {
+        @apply flex items-center gap-2;
+    }
+
+    .ccm-agenda-time {
+        @apply w-20;
+    }
+
+    .ccm-agenda-add {
+        @apply w-8 h-8 flex items-center justify-center border border-color-greyScale/300
+               rounded-lg text-color-greyScale/700 transition-colors;
+    }
+
+    .ccm-agenda-add:hover:not(:disabled) {
+        @apply bg-color-greyScale/100;
+    }
+
+    .ccm-agenda-add:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    .ccm-agenda-remove {
+        @apply w-8 h-8 flex items-center justify-center border border-color-support/alert
+               rounded-lg text-color-support/alert transition-colors text-base font-bold;
+    }
+
+    .ccm-agenda-remove:hover {
+        @apply bg-color-support/alert text-white;
+    }
+
+    /* ── Age ratings ──────────────────────────────────────── */
+    .ccm-age-ratings {
+        @apply flex gap-3 flex-wrap;
+    }
+
+    .ccm-age-square {
+        @apply w-12 h-12 rounded-lg text-white transition-all;
+        opacity: 0.55;
+    }
+
+    .ccm-age-square:hover {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+
+    .ccm-age-square--selected {
+        opacity: 1;
+        transform: scale(1.1);
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+    }
+
+    /* ── Playlist ─────────────────────────────────────────── */
+    .ccm-playlist-empty {
+        @apply bg-color-greyScale/100 rounded-xl flex flex-col items-center justify-center gap-3;
+        min-height: 8rem;
+        padding: 1.5rem;
+    }
+
+    .ccm-playlist-empty-label {
+        @apply text-color-greyScale/500;
+    }
+
+    .ccm-playlist-add-btn {
+        @apply flex items-center gap-1 px-4 py-2 bg-white border border-color-primary/default_900
+               text-color-primary/default_900 rounded-lg transition-colors;
+    }
+
+    .ccm-playlist-add-btn:hover {
+        @apply bg-color-primary/default_900 text-white;
+    }
+
+    /* ── Richtext ─────────────────────────────────────────── */
+    .ccm-richtext-wrapper {
+        @apply border border-color-greyScale/300 rounded-lg overflow-hidden;
+    }
+
+    .ccm-richtext-toolbar {
+        @apply flex items-center gap-1 px-3 py-2 border-b border-color-greyScale/300 bg-white;
+    }
+
+    .ccm-richtext-tool {
+        @apply w-7 h-7 flex items-center justify-center rounded
+               text-color-greyScale/700 transition-colors;
+    }
+
+    .ccm-richtext-tool:hover {
+        @apply bg-color-greyScale/100;
+    }
+
+    .ccm-richtext-tool--italic {
+        font-style: italic;
+    }
+
+    .ccm-richtext-tool--underline {
+        text-decoration: underline;
+    }
+
+    .ccm-richtext-divider {
+        @apply w-px h-5 bg-color-greyScale/300 mx-1;
+    }
+
+    .ccm-richtext-area {
+        @apply w-full p-3 bg-color-greyScale/50 resize-none outline-none text-color-greyScale/950;
+        font-size: 0.8rem;
+        line-height: 1.6;
+    }
+
+    /* ── Error ────────────────────────────────────────────── */
+    .ccm-error {
+        @apply text-color-support/alert px-8 pb-2 flex-shrink-0;
+    }
+
+    /* ── Footer ───────────────────────────────────────────── */
+    .ccm-footer {
+        @apply flex items-center justify-between px-8 py-5 border-t border-color-greyScale/200 flex-shrink-0;
+    }
+
+    .ccm-btn-ghost {
+        @apply text-color-greyScale/700 transition-colors;
+    }
+
+    .ccm-btn-ghost:hover {
+        @apply text-color-greyScale/950;
+    }
+
+    .ccm-btn-primary {
+        @apply w-[50%];
+    }
+}
