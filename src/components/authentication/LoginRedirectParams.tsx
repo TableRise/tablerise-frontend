@@ -25,7 +25,7 @@ export default function LoginRedirectParams(): JSX.Element {
                     userId: data.userId,
                     providerId: data.providerId,
                     username: `${data.nickname}${data.tag}`,
-                    picture: data.picture.link
+                    picture: data.picture?.link
                 };
 
                 localStorage.setItem('userLogged', JSON.stringify(userToStorage));

@@ -74,10 +74,7 @@ export default function UserMasterCampaigns({
             </div>
 
             {modalOpen && (
-                <CreateCampaignModal
-                    onClose={closeModal}
-                    onSuccess={closeModal}
-                />
+                <CreateCampaignModal onClose={closeModal} onSuccess={closeModal} />
             )}
         </section>
     );

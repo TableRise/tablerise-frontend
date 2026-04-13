@@ -2,6 +2,7 @@ import { MainCardProps } from '@/types/modules/components/common/MainCard';
 import SideImageBackground from '../../../public/images/SideImageBackground.svg?url';
 import '@/components/common/styles/MainCard.css';
 import Link from 'next/link';
+import { resolveCardStyles } from '@/utils/cardStyles';
 
 export default function MainCard(cardProps: MainCardProps): JSX.Element {
     const {
@@ -15,15 +16,9 @@ export default function MainCard(cardProps: MainCardProps): JSX.Element {
 
     let { image } = cardProps;
 
-    const cardSize = { w: '22.5rem', h: '22.5rem' };
-    let textColorCSS = 'text-color-primary/default_900';
-    let buttonColorCSS = 'button-L-fill';
-    let buttonTextColorCSS = 'text-color-greyScale/50';
+    const { cardSize, textColorCSS, buttonColorCSS, buttonTextColorCSS } =
+        resolveCardStyles({ size, textColor, buttonColor });
 
-    if (size === 'large') cardSize.w = '46.5rem';
-    if (textColor === 'white') textColorCSS = 'text-color-greyScale/50';
-    if (buttonColor === 'white') buttonColorCSS = 'button-white-default';
-    if (buttonColor === 'white') buttonTextColorCSS = 'text-color-primary/default_900';
     if (!image) image = SideImageBackground.src;
 
     return (

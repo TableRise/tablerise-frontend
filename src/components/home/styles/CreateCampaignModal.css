@@ -201,6 +201,44 @@
         @apply underline;
     }
 
+    /* ── Cover preview ────────────────────────────────────── */
+    .ccm-cover-preview {
+        @apply flex flex-col items-center gap-3 w-full;
+    }
+
+    .ccm-cover-preview-img {
+        @apply w-full rounded-lg object-cover;
+        max-height: 10rem;
+    }
+
+    /* ── Map images grid ──────────────────────────────────── */
+    .ccm-map-images {
+        @apply flex flex-col items-center gap-3 w-full;
+    }
+
+    .ccm-map-images-grid {
+        @apply flex gap-3 w-full;
+    }
+
+    .ccm-map-images-item {
+        @apply relative flex-1;
+    }
+
+    .ccm-map-images-thumb {
+        @apply w-full rounded-lg object-cover;
+        height: 5rem;
+    }
+
+    .ccm-map-images-remove {
+        @apply absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center
+               rounded-full bg-color-support/alert text-white text-xs font-bold
+               leading-none transition-colors;
+    }
+
+    .ccm-map-images-remove:hover {
+        @apply opacity-80;
+    }
+
     /* ── Agenda ───────────────────────────────────────────── */
     .ccm-agenda {
         @apply flex flex-col gap-2;
@@ -301,18 +339,103 @@
     }
 
     /* ── Playlist ─────────────────────────────────────────── */
-    .ccm-playlist-empty {
-        @apply bg-color-greyScale/100 rounded-xl flex flex-col items-center justify-center gap-3;
+    .ccm-playlist {
+        @apply bg-color-greyScale/100 rounded-xl flex flex-col gap-3;
         min-height: 8rem;
         padding: 1.5rem;
+    }
+
+    .ccm-playlist-list {
+        @apply flex flex-col items-center gap-2;
     }
 
     .ccm-playlist-empty-label {
         @apply text-color-greyScale/500;
     }
 
+    .ccm-playlist-item {
+        @apply w-full flex items-center gap-3 bg-white rounded-lg p-2;
+    }
+
+    .ccm-playlist-thumb-btn {
+        @apply relative flex-shrink-0 rounded overflow-hidden cursor-pointer;
+        width: 60px;
+        height: 45px;
+        border: none;
+        padding: 0;
+        background: none;
+    }
+
+    .ccm-playlist-thumb {
+        @apply rounded flex-shrink-0 object-cover;
+        width: 60px;
+        height: 45px;
+    }
+
+    .ccm-playlist-thumb-overlay {
+        @apply absolute inset-0 flex items-center justify-center rounded;
+        background-color: rgba(0, 0, 0, 0.45);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .ccm-playlist-thumb-btn:hover .ccm-playlist-thumb-overlay,
+    .ccm-playlist-thumb-overlay--playing {
+        opacity: 1;
+    }
+
+    .ccm-playlist-item-title {
+        @apply flex-1 text-color-greyScale/950 truncate;
+    }
+
+    .ccm-playlist-remove-btn {
+        @apply flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg
+               text-color-greyScale/500 transition-colors;
+    }
+
+    .ccm-playlist-remove-btn:hover {
+        @apply bg-color-greyScale/100 text-color-support/alert;
+    }
+
+    .ccm-playlist-input-row {
+        @apply flex items-center gap-2 flex-wrap;
+    }
+
+    .ccm-playlist-url-input {
+        @apply flex-1 min-w-0;
+    }
+
+    .ccm-playlist-confirm-btn {
+        @apply flex items-center gap-1 px-4 py-2
+               text-white rounded-lg transition-colors flex-shrink-0;
+    }
+
+    .ccm-playlist-confirm-btn:hover:not(:disabled) {
+        @apply opacity-90;
+    }
+
+    .ccm-playlist-confirm-btn:disabled {
+        @apply cursor-not-allowed;
+    }
+
+    .ccm-playlist-confirm-btn img {
+        filter: brightness(0) invert(1);
+    }
+
+    .ccm-playlist-close-input {
+        @apply w-8 h-8 flex items-center justify-center rounded-lg;
+    }
+
+    .ccm-playlist-close-input:hover {
+        @apply bg-color-greyScale/300;
+    }
+
+    .ccm-playlist-input-error {
+        @apply w-full text-color-support/alert;
+    }
+
     .ccm-playlist-add-btn {
-        @apply flex items-center gap-1 px-4 py-2 bg-white border border-color-primary/default_900
+        @apply flex items-center justify-center gap-1 px-4 py-2 bg-white border border-color-primary/default_900
                text-color-primary/default_900 rounded-lg transition-colors;
     }
 

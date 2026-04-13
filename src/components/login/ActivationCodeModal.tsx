@@ -1,6 +1,7 @@
 'use client';
 import React, { useRef, useState } from 'react';
 import { postAuthenticateEmail } from '@/server/users/authenticate-email';
+import { handleOtpKeyDown, handleOtpPaste } from '@/utils/otpInputHelpers';
 import './styles/ActivationCodeModal.css';
 
 interface ActivationCodeModalProps {
@@ -33,6 +34,7 @@ export default function ActivationCodeModal({
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+        handleOtpKeyDown(e, index, '', 'alphanumeric');
         if (
             (e.key === 'Backspace' || e.key === 'Delete') &&
             digits[index] === '' &&
@@ -42,18 +44,9 @@ export default function ActivationCodeModal({
         }
     };
 
-    const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-        e.preventDefault();
-        const pasted = e.clipboardData
-            .getData('Text')
-            .replace(/\s/g, '')
-            .slice(0, LENGTH);
-        const updated = new Array(LENGTH).fill('');
-        pasted.split('').forEach((char, i) => {
-            updated[i] = char.toUpperCase();
-        });
-        setDigits(updated);
-        const nextEmpty = updated.findIndex((d) => d === '');
+    const onPasteFilled = (chars: string[]) => {
+        setDigits(chars);
+        const nextEmpty = chars.findIndex((d) => d === '');
         const focusIndex = nextEmpty === -1 ? LENGTH - 1 : nextEmpty;
         inputRefs.current[focusIndex]?.focus();
     };
@@ -94,7 +87,7 @@ export default function ActivationCodeModal({
                             className="activation-modal-digit input-default-light font-XS-regular"
                             onChange={(e) => handleChange(e.target.value, index)}
                             onKeyDown={(e) => handleKeyDown(e, index)}
-                            onPaste={handlePaste}
+                            onPaste={(e) => handleOtpPaste(e, LENGTH, onPasteFilled)}
                         />
                     ))}
                 </div>

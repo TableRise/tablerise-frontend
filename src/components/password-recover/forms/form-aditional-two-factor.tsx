@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useContext } from 'react';
 import RecoverPasswordContext from '@/context/RecoverPasswordContext';
 import { useRouter } from 'next/navigation';
+import { handleOtpKeyDown, handleOtpAutoAdvance } from '@/utils/otpInputHelpers';
 
 export default function FormAditionalTwoFactor() {
     const router = useRouter();
@@ -21,54 +22,6 @@ export default function FormAditionalTwoFactor() {
     } = useForm<TwoFactorSchema>({
         resolver: zodResolver(twoFactorSchema),
     });
-
-    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
-        const inputElement = e.currentTarget;
-
-        if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
-            e.preventDefault(); // Impede qualquer caractere que não seja número
-            return;
-        }
-
-        // Se a tecla pressionada for Backspace ou Delete e o campo estiver vazio, move para o campo anterior
-        if ((e.key === 'Backspace' || e.key === 'Delete') && inputElement.value === '') {
-            const previousField = document.getElementById(
-                `fild${index - 1}`
-            ) as HTMLInputElement | null;
-            if (previousField) {
-                previousField.focus();
-            }
-        } else if (
-            inputElement.value.length === 1 &&
-            e.key !== 'Backspace' &&
-            e.key !== 'Delete'
-        ) {
-            // Limpa o campo antes de adicionar o novo valor
-            inputElement.value = '';
-        }
-    };
-
-    const nextInput = (e: React.FormEvent<HTMLInputElement>, index: number) => {
-        const { value } = e.currentTarget;
-
-        if (value.length === 1) {
-            const nextField = document.getElementById(
-                `fild${index + 1}`
-            ) as HTMLInputElement | null;
-
-            if (nextField) {
-                nextField.focus();
-            }
-        } else if (value.length === 0 && index > 0) {
-            const previousField = document.getElementById(
-                `fild${index - 1}`
-            ) as HTMLInputElement | null;
-
-            if (previousField) {
-                previousField.focus();
-            }
-        }
-    };
 
     const consoleFormTwoFactor = async (data: TwoFactorSchema) => {
         const code = Object.values(data).join('');
@@ -102,8 +55,10 @@ export default function FormAditionalTwoFactor() {
                             inputMode="numeric"
                             pattern="[0-9]*"
                             maxLength={1}
-                            onKeyDown={(e) => handleKeyPress(e, index)}
-                            onInput={(e) => nextInput(e, index)}
+                            onKeyDown={(e) =>
+                                handleOtpKeyDown(e, index, 'fild', 'numeric')
+                            }
+                            onInput={(e) => handleOtpAutoAdvance(e, index, 'fild')}
                             className={`form-opt-input ${
                                 errors.fild0
                                     ? 'input-error-light mb-0'

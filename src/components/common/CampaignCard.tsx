@@ -6,6 +6,7 @@ import MoreVertSVG from '../../../assets/icons/nav/more-vert.svg?url';
 import CalendarSVG from '../../../assets/icons/sys/calendar.svg?url';
 import '@/components/common/styles/CampaignCard.css';
 import formatDate from '@/utils/formatDate';
+import { resolveCardStyles } from '@/utils/cardStyles';
 
 export default function CampaignCard(cardProps: CampaignCardProps): JSX.Element {
     const {
@@ -20,18 +21,12 @@ export default function CampaignCard(cardProps: CampaignCardProps): JSX.Element 
         nextMatchDate = 'Em aberto',
     } = cardProps || {};
 
-    const cardSize = { w: '22.5rem', h: '22.5rem' };
-    let textColorCSS = 'text-color-primary/default_900';
-    let buttonColorCSS = 'button-L-fill';
-    let buttonTextColorCSS = 'text-color-greyScale/50';
-
-    let nextMatchDateRender = nextMatchDate;
+    const { cardSize, textColorCSS, buttonColorCSS, buttonTextColorCSS } =
+        resolveCardStyles({ size, textColor, buttonColor });
 
     if (size === 'straight') cardSize.w = '21.8rem';
-    if (size === 'large') cardSize.w = '44rem';
-    if (textColor === 'white') textColorCSS = 'text-color-greyScale/50';
-    if (buttonColor === 'white') buttonColorCSS = 'button-white-default';
-    if (buttonColor === 'white') buttonTextColorCSS = 'text-color-primary/default_900';
+
+    let nextMatchDateRender = nextMatchDate;
     if (nextMatchDate === 'no-date') nextMatchDateRender = 'Em aberto';
     if (nextMatchDate !== 'no-date') nextMatchDateRender = formatDate(nextMatchDate);
 
@@ -73,14 +68,6 @@ export default function CampaignCard(cardProps: CampaignCardProps): JSX.Element 
                             {buttonTitle}
                         </button>
                     </Link>
-                    <div className="card-menu">
-                        <Image
-                            src={MoreVertSVG.src}
-                            alt="menu"
-                            width={MoreVertSVG.width}
-                            height={MoreVertSVG.height}
-                        />
-                    </div>
                 </div>
             </div>
         </div>

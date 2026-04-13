@@ -1,6 +1,14 @@
 import { withSentryConfig } from '@sentry/nextjs';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'i.ytimg.com',
+            },
+        ],
+    },
     webpack(config) {
         // Grab the existing rule that handles SVG imports
         const fileLoaderRule = config.module.rules.find((rule) =>
@@ -34,6 +42,8 @@ const nextConfig = {
         API_OAUTH: process.env.API_OAUTH,
         API_CAMPAIGNS: process.env.API_CAMPAIGNS,
         API_DD5E: process.env.API_DD5E,
+        API_GOOGLE_YOUTUBE: process.env.API_GOOGLE_YOUTUBE,
+        API_GOOGLE_KEY: process.env.API_GOOGLE_KEY,
     },
 };
 

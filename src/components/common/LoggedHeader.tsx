@@ -1,5 +1,6 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import TableRiseLightMark from '@assets/icons/logo.svg?url';
 import AccountBox from '@assets/icons/social/account-box.svg?url';
@@ -8,6 +9,7 @@ import ExpandMore from '@assets/icons/nav/expand-more.svg?url';
 import SettingsIcon from '@assets/icons/sys/settings-blue.svg?url';
 import HelpIcon from '@assets/icons/sys/help-blue.svg?url';
 import ExitIcon from '@assets/icons/sys/exit-red.svg?url';
+import { postLogout } from '@/server/users/logout';
 import Link from 'next/link';
 import '@/components/common/styles/LoggedHeader.css';
 
@@ -16,6 +18,14 @@ const alts = require('@assets/alts');
 export default function LoggedHeader(): JSX.Element {
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
+    const router = useRouter();
+
+    async function handleLogout() {
+        setOpen(false);
+        await postLogout();
+        localStorage.removeItem('userLogged');
+        router.push('/login');
+    }
 
     useEffect(() => {
         function handleClickOutside(e: MouseEvent) {
@@ -74,7 +84,7 @@ export default function LoggedHeader(): JSX.Element {
                         <button
                             type="button"
                             className="logged-header-dropdown-item logged-header-dropdown-item--danger"
-                            onClick={() => setOpen(false)}
+                            onClick={handleLogout}
                         >
                             <Image src={ExitIcon} alt="deslogar" width={20} height={20} />
                             <span className="font-S-bold">Deslogar</span>
