@@ -15,7 +15,11 @@ export default function BasicCreationCard(cardProps: MainCardProps): JSX.Element
             className="basic-creation-card"
             style={{ width: cardSize.w, height: cardSize.h }}
         >
-            <button type="button" className="basic-add-button" onClick={cardProps.onClick}>
+            <button
+                type="button"
+                className="basic-add-button"
+                onClick={cardProps.onClick}
+            >
                 <Image src={Add.src} alt="add" width={Add.width} height={Add.height} />
             </button>
         </div>

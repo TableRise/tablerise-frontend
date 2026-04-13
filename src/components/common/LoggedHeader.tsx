@@ -50,8 +50,12 @@ export default function LoggedHeader(): JSX.Element {
             <div className="menu-and-buttons-logged" ref={ref}>
                 <nav className="logged-header-nav">
                     <ul className="font-XS-bold">
-                        <li><Link href="/campaigns">Campanhas</Link></li>
-                        <li><Link href="/tutorial">Tutorial</Link></li>
+                        <li>
+                            <Link href="/campaigns">Campanhas</Link>
+                        </li>
+                        <li>
+                            <Link href="/tutorial">Tutorial</Link>
+                        </li>
                     </ul>
                 </nav>
                 <button
@@ -63,21 +67,45 @@ export default function LoggedHeader(): JSX.Element {
                     <Image
                         src={ExpandMore}
                         alt="down arrow to show menu"
-                        className={`logged-header-chevron${open ? ' logged-header-chevron--open' : ''}`}
+                        className={`logged-header-chevron${
+                            open ? ' logged-header-chevron--open' : ''
+                        }`}
                     />
                 </button>
 
                 {open && (
                     <div className="logged-header-dropdown">
-                        <Link href="/profile" className="logged-header-dropdown-item" onClick={() => setOpen(false)}>
-                            <Image src={AccountBoxBlue} alt="perfil" width={20} height={20} />
+                        <Link
+                            href="/profile"
+                            className="logged-header-dropdown-item"
+                            onClick={() => setOpen(false)}
+                        >
+                            <Image
+                                src={AccountBoxBlue}
+                                alt="perfil"
+                                width={20}
+                                height={20}
+                            />
                             <span className="font-S-regular">Perfil</span>
                         </Link>
-                        <Link href="/settings" className="logged-header-dropdown-item" onClick={() => setOpen(false)}>
-                            <Image src={SettingsIcon} alt="configurações" width={20} height={20} />
+                        <Link
+                            href="/settings"
+                            className="logged-header-dropdown-item"
+                            onClick={() => setOpen(false)}
+                        >
+                            <Image
+                                src={SettingsIcon}
+                                alt="configurações"
+                                width={20}
+                                height={20}
+                            />
                             <span className="font-S-regular">Configurações</span>
                         </Link>
-                        <Link href="/support" className="logged-header-dropdown-item" onClick={() => setOpen(false)}>
+                        <Link
+                            href="/support"
+                            className="logged-header-dropdown-item"
+                            onClick={() => setOpen(false)}
+                        >
                             <Image src={HelpIcon} alt="suporte" width={20} height={20} />
                             <span className="font-S-regular">Suporte</span>
                         </Link>

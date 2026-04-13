@@ -12,7 +12,7 @@ export default function LoginRedirectParams(): JSX.Element {
     const getUserCallback = useCallback(async () => {
         const userData = await getUser(userId as string);
         setData(userData);
-    }, [userId, setData])
+    }, [userId, setData]);
 
     useEffect(() => {
         async function getUserData() {
@@ -25,7 +25,7 @@ export default function LoginRedirectParams(): JSX.Element {
                     userId: data.userId,
                     providerId: data.providerId,
                     username: `${data.nickname}${data.tag}`,
-                    picture: data.picture?.link
+                    picture: data.picture?.link,
                 };
 
                 localStorage.setItem('userLogged', JSON.stringify(userToStorage));

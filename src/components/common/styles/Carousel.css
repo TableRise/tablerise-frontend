@@ -32,7 +32,9 @@
 
     .carousel-arrow-prev {
         @apply w-14 h-14 flex justify-center items-center bg-color-greyScale/50 rounded-xl cursor-pointer;
-        box-shadow: 0px 0px 1px 0px rgba(12, 37, 95, 0.1), 4px 6px 12px -6px rgba(12, 37, 95, 0.08);
+        box-shadow:
+            0px 0px 1px 0px rgba(12, 37, 95, 0.1),
+            4px 6px 12px -6px rgba(12, 37, 95, 0.08);
     }
 
     .user-player-campaigns .user-player-campaigns-cards .carousel-arrow-prev img {
@@ -41,6 +43,8 @@
 
     .carousel-arrow-next {
         @apply w-14 h-14 flex justify-center items-center bg-color-greyScale/50 rounded-xl cursor-pointer;
-        box-shadow: 0px 0px 1px 0px rgba(12, 37, 95, 0.1), 4px 6px 12px -6px rgba(12, 37, 95, 0.08);
+        box-shadow:
+            0px 0px 1px 0px rgba(12, 37, 95, 0.1),
+            4px 6px 12px -6px rgba(12, 37, 95, 0.08);
     }
 }

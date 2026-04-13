@@ -11,6 +11,7 @@ export const postLogout = async (): Promise<void> => {
             method: 'GET',
         });
     } catch ({ response }: AxiosError | any) {
-        if (response?.status !== 200) throw new Error('Erro ao deslogar. Tente novamente.');
+        if (response?.status !== 200)
+            throw new Error('Erro ao deslogar. Tente novamente.');
     }
 };
