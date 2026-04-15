@@ -32,6 +32,9 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
     const [description, setDescription] = useState('');
     const [password, setPassword] = useState('');
     const [coverImage, setCoverImage] = useState<File | null>(null);
+    const [agendaRows, setAgendaRows] = useState<{ date: string; start: string }[]>([
+        { date: '', start: '' },
+    ]);
 
     /* ── step 2 fields ── */
     const [system, setSystem] = useState('');
@@ -102,6 +105,9 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
                 coverImage,
                 mapImages,
                 lore,
+                nextMatchDate: agendaRows
+                    .filter((r) => r.date && r.start)
+                    .map((r) => `${r.date}T${r.start}:00`),
             });
             onSuccess();
             onClose();
@@ -182,6 +188,8 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
                             passwordError={passwordError}
                             coverImage={coverImage}
                             setCoverImage={setCoverImage}
+                            agendaRows={agendaRows}
+                            setAgendaRows={setAgendaRows}
                         />
                     )}
                     {step === 1 && (

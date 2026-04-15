@@ -19,6 +19,7 @@ export interface CreateCampaignPayload {
     coverImage?: File | null;
     mapImages: File[];
     lore: string;
+    nextMatchDate: string[];
 }
 
 export const createCampaign = async (payload: CreateCampaignPayload) => {
@@ -32,12 +33,13 @@ export const createCampaign = async (payload: CreateCampaignPayload) => {
         formData.append('password', payload.password);
         formData.append('musics', JSON.stringify(payload.musics));
         if (payload.coverImage) {
-            formData.append('coverImage', payload.coverImage);
+            formData.append('cover', payload.coverImage);
         }
         payload.mapImages.forEach((file) => {
             formData.append('mapImages', file);
         });
         formData.append('lore', payload.lore);
+        formData.append('nextMatchDate', JSON.stringify(payload.nextMatchDate[0]));
 
         const { data }: AxiosResponse = await axios({
             method: 'POST',

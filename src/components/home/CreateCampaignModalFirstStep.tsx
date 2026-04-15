@@ -17,6 +17,8 @@ export default function CreateCampaignModalFirstStep({
     passwordError,
     coverImage,
     setCoverImage,
+    agendaRows,
+    setAgendaRows,
 }: any) {
     const coverInputRef = useRef<HTMLInputElement>(null);
 
@@ -151,19 +153,17 @@ export default function CreateCampaignModalFirstStep({
                 </div>
             </div>
 
-            {/* Agenda (UI only) */}
             <div className="ccm-field">
                 <span className="font-S-bold ccm-field-label">Agenda</span>
-                <AgendaUI />
+                <AgendaUI rows={agendaRows} setRows={setAgendaRows} />
             </div>
         </div>
     );
 }
 
-function AgendaUI() {
-    const [rows, setRows] = useState([{ date: '', start: '', end: '' }]);
-    const [timeErrors, setTimeErrors] = useState<{ start: boolean; end: boolean }[]>([
-        { start: false, end: false },
+function AgendaUI({ rows, setRows }: { rows: { date: string; start: string }[]; setRows: (rows: { date: string; start: string }[]) => void }) {
+    const [timeErrors, setTimeErrors] = useState<{ start: boolean }[]>([
+        { start: false },
     ]);
     const datePickerRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -175,18 +175,16 @@ function AgendaUI() {
     const lastErrors = timeErrors[lastIdx];
     const hasError =
         lastErrors?.start ||
-        lastErrors?.end ||
         !lastRow?.date ||
-        !lastRow?.start ||
-        !lastRow?.end;
+        !lastRow?.start;
 
     function addRow() {
-        setRows((r) => [...r, { date: '', start: '', end: '' }]);
-        setTimeErrors((e) => [...e, { start: false, end: false }]);
+        setRows([...rows, { date: '', start: '' }]);
+        setTimeErrors((e) => [...e, { start: false }]);
     }
 
     function removeRow(idx: number) {
-        setRows((r) => r.filter((_, i) => i !== idx));
+        setRows(rows.filter((_, i) => i !== idx));
         setTimeErrors((e) => e.filter((_, i) => i !== idx));
         datePickerRefs.current = datePickerRefs.current.filter((_, i) => i !== idx);
     }
@@ -196,21 +194,20 @@ function AgendaUI() {
         if (el) el.showPicker();
     }
 
-    function handleTimeChange(idx: number, field: 'start' | 'end', value: string) {
+    function handleTimeChange(idx: number, value: string) {
         const copy = [...rows];
-        copy[idx][field] = value;
+        copy[idx].start = value;
         setRows(copy);
 
         const errCopy = [...timeErrors];
         errCopy[idx] = {
-            ...errCopy[idx],
-            [field]: value.length > 0 && !TIME_RE.test(value),
+            start: value.length > 0 && !TIME_RE.test(value),
         };
         setTimeErrors(errCopy);
     }
 
-    function timeClass(idx: number, field: 'start' | 'end') {
-        const hasError = timeErrors[idx]?.[field];
+    function timeClass(idx: number) {
+        const hasError = timeErrors[idx]?.start;
         return `${
             hasError ? 'input-error-light' : 'input-default-light'
         } ccm-agenda-time`;
@@ -267,25 +264,14 @@ function AgendaUI() {
                         </div>
                         <div className="ccm-agenda-time-cells">
                             <input
-                                className={timeClass(idx, 'start')}
+                                className={timeClass(idx)}
                                 type="text"
                                 placeholder="00:00"
                                 value={row.start}
                                 maxLength={5}
                                 readOnly={filled}
                                 onChange={(e) =>
-                                    handleTimeChange(idx, 'start', e.target.value)
-                                }
-                            />
-                            <input
-                                className={timeClass(idx, 'end')}
-                                type="text"
-                                placeholder="00:00"
-                                value={row.end}
-                                maxLength={5}
-                                readOnly={filled}
-                                onChange={(e) =>
-                                    handleTimeChange(idx, 'end', e.target.value)
+                                    handleTimeChange(idx, e.target.value)
                                 }
                             />
                             {filled && (

@@ -245,8 +245,11 @@
     }
 
     .ccm-agenda-header {
-        @apply grid gap-3;
-        grid-template-columns: 11rem 1fr;
+        @apply flex gap-3;
+    }
+
+    .ccm-agenda-header span:first-child {
+        @apply w-36;
     }
 
     .ccm-agenda-row {

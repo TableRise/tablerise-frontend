@@ -51,6 +51,7 @@ export default function UserMasterCampaigns({
                         title={campaigns[0].title}
                         nextMatchDate={campaigns[0].infos.nextMatchDate}
                         fogColor="#0A358A"
+                        image={campaigns[0].cover.link}
                         textColor="white"
                         size="large"
                         buttonColor="white"
