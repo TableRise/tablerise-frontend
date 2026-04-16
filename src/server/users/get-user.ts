@@ -9,6 +9,8 @@ export const getUser = async (userId: string) => {
             method: 'GET',
         });
 
+        console.log(data);
+
         return data;
     } catch ({ response }: AxiosError | any) {
         if (response.status == 404) throw new Error('Usuário não encontrado');

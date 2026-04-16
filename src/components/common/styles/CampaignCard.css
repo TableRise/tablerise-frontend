@@ -4,7 +4,15 @@
 
 @layer base {
     .campaign-card {
-        @apply flex flex-col items-start justify-end bg-cover rounded-xl;
+        @apply flex flex-col items-start justify-end bg-cover rounded-xl relative;
+    }
+
+    .campaign-card .card-system-logo {
+        @apply absolute top-4 left-4 z-20;
+    }
+
+    .campaign-card .card-age-badge {
+        @apply absolute top-4 right-4 z-20 flex items-center justify-center rounded-md text-white px-2 py-1 min-w-[2rem] h-[2rem] text-center;
     }
 
     .campaign-card .card-fog {

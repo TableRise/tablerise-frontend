@@ -1,40 +1,35 @@
 'use client';
+import TableriseContext from '@/context/TableriseContext';
 import { getUser } from '@/server/users/get-user';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 
 export default function LoginRedirectParams(): JSX.Element {
     const searchParams = useSearchParams();
     const router = useRouter();
+    const { recoverUserCampaigns } = useContext(TableriseContext);
     const userId = searchParams.get('userId');
-    const [data, setData] = useState<any & { userId: string }>();
 
-    const getUserCallback = useCallback(async () => {
-        const userData = await getUser(userId as string);
-        setData(userData);
-    }, [userId, setData]);
+    const getUserAndRedirect = useCallback(async () => {
+        const data = await getUser(userId as string);
+
+        const userToStorage = {
+            userId: data.userId,
+            providerId: data.providerId,
+            username: `${data.nickname}${data.tag}`,
+            picture: data.picture?.link,
+        };
+
+        localStorage.setItem('userLogged', JSON.stringify(userToStorage));
+        await recoverUserCampaigns();
+        router.replace('/');
+    }, [userId, recoverUserCampaigns, router]);
 
     useEffect(() => {
-        async function getUserData() {
-            if (typeof window !== 'undefined') {
-                await getUserCallback();
-
-                console.log(data);
-
-                const userToStorage = {
-                    userId: data.userId,
-                    providerId: data.providerId,
-                    username: `${data.nickname}${data.tag}`,
-                    picture: data.picture?.link,
-                };
-
-                localStorage.setItem('userLogged', JSON.stringify(userToStorage));
-                router.replace('/');
-            }
+        if (typeof window !== 'undefined') {
+            getUserAndRedirect();
         }
-
-        getUserData();
-    }, [data, router]);
+    }, [getUserAndRedirect]);
 
     return <p>...</p>;
 }

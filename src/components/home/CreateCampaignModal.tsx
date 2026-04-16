@@ -40,6 +40,7 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
     const [system, setSystem] = useState('');
     const [ageRestriction, setAgeRestriction] = useState('');
     const [visibility, setVisibility] = useState('');
+    const [playerAmountLimit, setPlayerAmountLimit] = useState(1);
     const [musics, setMusics] = useState<CampaignMusic[]>([]);
     const [mapImages, setMapImages] = useState<File[]>([]);
 
@@ -94,6 +95,10 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
         }
         setSubmitting(true);
         try {
+            const filledDates = agendaRows
+                    .filter((r) => r.date && r.start)
+                    .map((r) => `${r.date}T${r.start}:00`);
+
             await createCampaign({
                 title,
                 description,
@@ -105,12 +110,12 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
                 coverImage,
                 mapImages,
                 lore,
-                nextMatchDate: agendaRows
-                    .filter((r) => r.date && r.start)
-                    .map((r) => `${r.date}T${r.start}:00`),
+                playerAmountLimit,
+                nextMatchDate: filledDates.length > 0 ? filledDates : [],
             });
             onSuccess();
             onClose();
+            window.location.reload();
         } catch (err: any) {
             setError(err.message ?? 'Erro ao criar campanha');
         } finally {
@@ -203,6 +208,8 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
                             visibility={visibility}
                             setVisibility={setVisibility}
                             visibilityError={visibilityError}
+                            playerAmountLimit={playerAmountLimit}
+                            setPlayerAmountLimit={setPlayerAmountLimit}
                             musics={musics}
                             setMusics={setMusics}
                             mapImages={mapImages}

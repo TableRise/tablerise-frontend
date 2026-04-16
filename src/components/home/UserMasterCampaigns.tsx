@@ -51,11 +51,13 @@ export default function UserMasterCampaigns({
                         title={campaigns[0].title}
                         nextMatchDate={campaigns[0].infos.nextMatchDate}
                         fogColor="#0A358A"
-                        image={campaigns[0].cover.link}
+                        image={campaigns[0].cover?.link}
                         textColor="white"
                         size="large"
                         buttonColor="white"
                         buttonTitle="Entrar no Jogo"
+                        system={campaigns[0].system}
+                        ageRestriction={campaigns[0].ageRestriction}
                     />
                 )}
                 {campaigns.length > 1 ? (
@@ -65,9 +67,12 @@ export default function UserMasterCampaigns({
                         title={campaigns[1].title}
                         nextMatchDate={campaigns[1].infos.nextMatchDate}
                         fogColor="#0A358A"
+                        image={campaigns[0].cover?.link}
                         textColor="white"
                         buttonColor="white"
                         buttonTitle="Entrar no Jogo"
+                        system={campaigns[1].system}
+                        ageRestriction={campaigns[1].ageRestriction}
                     />
                 ) : (
                     <BasicCreationCard onClick={openModal} />

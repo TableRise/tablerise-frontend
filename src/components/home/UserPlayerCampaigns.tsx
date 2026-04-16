@@ -23,6 +23,8 @@ export default function UserPlayerCampaigns({
             size="straight"
             buttonColor="white"
             buttonTitle="Entrar no Jogo"
+            system={campaign.system}
+            ageRestriction={campaign.ageRestriction}
         />
     ));
 

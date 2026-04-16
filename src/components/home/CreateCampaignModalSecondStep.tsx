@@ -26,6 +26,8 @@ export default function CreateCampaignModalSecondStep({
     visibility,
     setVisibility,
     visibilityError,
+    playerAmountLimit,
+    setPlayerAmountLimit,
     musics,
     setMusics,
     mapImages,
@@ -105,6 +107,18 @@ export default function CreateCampaignModalSecondStep({
                         {visibilityError}
                     </span>
                 )}
+            </label>
+
+            {/* Limite de Players */}
+            <label className="ccm-field">
+                <span className="font-S-bold ccm-field-label">Limite de Players</span>
+                <input
+                    type="number"
+                    className="input-default-light"
+                    min={1}
+                    value={playerAmountLimit}
+                    onChange={(e) => setPlayerAmountLimit(Number(e.target.value))}
+                />
             </label>
 
             <div className="ccm-field">

@@ -20,6 +20,7 @@ export interface CreateCampaignPayload {
     mapImages: File[];
     lore: string;
     nextMatchDate: string[];
+    playerAmountLimit: number;
 }
 
 export const createCampaign = async (payload: CreateCampaignPayload) => {
@@ -39,7 +40,10 @@ export const createCampaign = async (payload: CreateCampaignPayload) => {
             formData.append('mapImages', file);
         });
         formData.append('lore', payload.lore);
-        formData.append('nextMatchDate', JSON.stringify(payload.nextMatchDate[0]));
+        formData.append('playerAmountLimit', String(payload.playerAmountLimit));
+        if (payload.nextMatchDate.length > 0) {
+            formData.append('nextMatchDate', JSON.stringify(payload.nextMatchDate[0]));
+        }
 
         const { data }: AxiosResponse = await axios({
             method: 'POST',

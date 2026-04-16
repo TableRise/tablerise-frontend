@@ -5,6 +5,8 @@ interface UserCampaign {
     title: string;
     cover: ImageObject;
     description: string;
+    system: string;
+    ageRestriction: string;
     infos: {
         nextMatchDate: string;
     };
@@ -23,4 +25,6 @@ export interface TableriseContextContract {
     setLoading: (boolean: boolean) => void;
     setNewPassVisible: (boolean: boolean) => void;
     setDarkModeOn: (boolean: boolean) => void;
+    setUserCampaigns: (data: UserCampaignsContract) => void;
+    recoverUserCampaigns: () => Promise<void>;
 }

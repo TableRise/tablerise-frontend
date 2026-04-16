@@ -10,4 +10,6 @@ export interface CampaignCardProps {
     textColor?: string;
     buttonColor?: string;
     nextMatchDate?: string;
+    system?: string;
+    ageRestriction?: string;
 }

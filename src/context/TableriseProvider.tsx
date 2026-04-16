@@ -36,6 +36,8 @@ export default function TableriseProvider({
                     title: campaign.title,
                     cover: campaign.cover,
                     description: campaign.description,
+                    system: campaign.system,
+                    ageRestriction: campaign.ageRestriction,
                     infos: {
                         nextMatchDate: campaign.infos.nextMatchDate,
                     },
@@ -48,6 +50,8 @@ export default function TableriseProvider({
                     title: campaign.title,
                     cover: campaign.cover,
                     description: campaign.description,
+                    system: campaign.system,
+                    ageRestriction: campaign.ageRestriction,
                     infos: {
                         nextMatchDate: campaign.infos.nextMatchDate,
                     },
@@ -78,8 +82,17 @@ export default function TableriseProvider({
             setLoading,
             setNewPassVisible,
             setDarkModeOn,
+            setUserCampaigns,
+            recoverUserCampaigns,
         }),
-        [loading, newPassVisible, darkModeOn, userLoggedToggle, userCampaigns]
+        [
+            loading,
+            newPassVisible,
+            darkModeOn,
+            userLoggedToggle,
+            userCampaigns,
+            recoverUserCampaigns,
+        ]
     );
 
     return (
