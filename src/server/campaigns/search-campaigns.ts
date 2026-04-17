@@ -1,19 +1,20 @@
 import { AxiosResponse, AxiosError } from 'axios';
 import { apiCall, campaignsBaseUrl } from '../wrapper';
 
-export const getCampaignsByUserId = async (userId: string) => {
+export const searchCampaigns = async (params: { title?: string; code?: string }) => {
     try {
         const { data }: AxiosResponse = await apiCall({
             baseUrl: campaignsBaseUrl,
-            endpoint: `user/${userId}`,
+            endpoint: '',
             method: 'GET',
+            params,
         });
 
         return data;
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
-        if (status === 400) throw new Error('Erro no preenchimento de dados');
-        if (status === 404) return { master: [], player: [] };
+        if (status === 404) return [];
         if (status === 500) throw new Error('Erro no servidor');
+        return [];
     }
 };

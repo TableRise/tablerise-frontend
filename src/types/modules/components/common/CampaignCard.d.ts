@@ -12,4 +12,8 @@ export interface CampaignCardProps {
     nextMatchDate?: string;
     system?: string;
     ageRestriction?: string;
+    campaignPlayers?: { role: string }[];
+    playerAmountLimit?: number;
+    campaignId?: string;
+    onButtonClick?: () => void;
 }

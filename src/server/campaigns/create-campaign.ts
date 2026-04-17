@@ -31,19 +31,17 @@ export const createCampaign = async (payload: CreateCampaignPayload) => {
         formData.append('system', payload.system);
         formData.append('ageRestriction', payload.ageRestriction);
         formData.append('visibility', payload.visibility);
-        formData.append('password', payload.password);
         formData.append('musics', JSON.stringify(payload.musics));
-        if (payload.coverImage) {
-            formData.append('cover', payload.coverImage);
+        formData.append('lore', payload.lore);
+        formData.append('playerAmountLimit', String(payload.playerAmountLimit));
+        if (payload.password) formData.append('password', payload.password);
+        if (payload.coverImage) formData.append('cover', payload.coverImage);
+        if (payload.nextMatchDate.length > 0) {
+            formData.append('nextMatchDate', JSON.stringify(payload.nextMatchDate[0]));
         }
         payload.mapImages.forEach((file) => {
             formData.append('mapImages', file);
         });
-        formData.append('lore', payload.lore);
-        formData.append('playerAmountLimit', String(payload.playerAmountLimit));
-        if (payload.nextMatchDate.length > 0) {
-            formData.append('nextMatchDate', JSON.stringify(payload.nextMatchDate[0]));
-        }
 
         const { data }: AxiosResponse = await axios({
             method: 'POST',

@@ -35,8 +35,12 @@
         @apply flex justify-between items-center;
     }
 
+    .campaign-card .card-infos .card-buttons .card-player-limit {
+        @apply flex items-center gap-1 ml-2 px-2 py-1 h-10 bg-white rounded-lg font-semibold text-color-primary/default_900;
+    }
+
     .campaign-card .card-infos .card-buttons button {
-        @apply w-full h-10 px-4;
+        @apply w-[9.5rem] h-10 px-4;
         font-family: var('--dm-sans-base');
         font-weight: 700;
         font-style: normal;

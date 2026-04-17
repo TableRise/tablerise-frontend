@@ -4,10 +4,11 @@ import { v4 as uuid } from 'uuid';
 import CampaignCard from '@/components/common/CampaignCard';
 import BasicCreationCard from '@/components/common/BasicCreationCard';
 import CreateCampaignModal from '@/components/home/CreateCampaignModal';
-import MoreVertBlueSVG from '../../../assets/icons/nav/more-vert-blue.svg?url';
+import CampaignPasswordModal from '@/components/home/CampaignPasswordModal';
+import ErrorModal from '@/components/home/ErrorModal';
 import { CampaignsToRender } from '@/types/modules/components/home/UserMasterCampaigns';
-import Image from 'next/image';
 import '@/components/home/styles/UserMasterCampaigns.css';
+import { useJoinCampaign } from '@/components/home/helpers/useJoinCampaign';
 
 export default function UserMasterCampaigns({
     campaigns,
@@ -15,6 +16,15 @@ export default function UserMasterCampaigns({
     const [modalOpen, setModalOpen] = useState(false);
     const openModal = () => setModalOpen(true);
     const closeModal = () => setModalOpen(false);
+    const {
+        handleJoinClick,
+        passwordModalOpen,
+        passwordError,
+        handlePasswordConfirm,
+        closePasswordModal,
+        joinError,
+        closeJoinError,
+    } = useJoinCampaign();
 
     return (
         <section className="user-master-campaigns">
@@ -34,12 +44,6 @@ export default function UserMasterCampaigns({
                     >
                         Criar uma campanha
                     </button>
-                    <Image
-                        src={MoreVertBlueSVG.src}
-                        alt="more-vert"
-                        width={MoreVertBlueSVG.width}
-                        height={MoreVertBlueSVG.height}
-                    />
                 </div>
             </div>
 
@@ -58,6 +62,15 @@ export default function UserMasterCampaigns({
                         buttonTitle="Entrar no Jogo"
                         system={campaigns[0].system}
                         ageRestriction={campaigns[0].ageRestriction}
+                        campaignPlayers={campaigns[0].campaignPlayers}
+                        playerAmountLimit={campaigns[0].infos.playerAmountLimit}
+                        campaignId={campaigns[0].campaignId}
+                        onButtonClick={() =>
+                            handleJoinClick(
+                                campaigns[0].campaignId,
+                                campaigns[0].campaignPlayers
+                            )
+                        }
                     />
                 )}
                 {campaigns.length > 1 ? (
@@ -73,6 +86,15 @@ export default function UserMasterCampaigns({
                         buttonTitle="Entrar no Jogo"
                         system={campaigns[1].system}
                         ageRestriction={campaigns[1].ageRestriction}
+                        campaignPlayers={campaigns[1].campaignPlayers}
+                        playerAmountLimit={campaigns[1].infos.playerAmountLimit}
+                        campaignId={campaigns[1].campaignId}
+                        onButtonClick={() =>
+                            handleJoinClick(
+                                campaigns[1].campaignId,
+                                campaigns[1].campaignPlayers
+                            )
+                        }
                     />
                 ) : (
                     <BasicCreationCard onClick={openModal} />
@@ -82,6 +104,16 @@ export default function UserMasterCampaigns({
             {modalOpen && (
                 <CreateCampaignModal onClose={closeModal} onSuccess={closeModal} />
             )}
+
+            {passwordModalOpen && (
+                <CampaignPasswordModal
+                    onConfirm={handlePasswordConfirm}
+                    onClose={closePasswordModal}
+                    error={passwordError}
+                />
+            )}
+
+            {joinError && <ErrorModal message={joinError} onClose={closeJoinError} />}
         </section>
     );
 }

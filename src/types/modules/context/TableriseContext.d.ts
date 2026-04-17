@@ -1,5 +1,12 @@
 import { ImageObject } from '@/types/shared/general';
 
+interface CampaignPlayer {
+    vispierId: string;
+    vispierId_sk: string;
+    vispierId_pk: string;
+    role: string;
+}
+
 interface UserCampaign {
     campaignId: string;
     title: string;
@@ -7,8 +14,10 @@ interface UserCampaign {
     description: string;
     system: string;
     ageRestriction: string;
+    campaignPlayers: CampaignPlayer[];
     infos: {
         nextMatchDate: string;
+        playerAmountLimit?: number;
     };
 }
 

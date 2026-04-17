@@ -1,8 +1,7 @@
 import { CampaignCardProps } from '@/types/modules/components/common/CampaignCard';
 import SideImageBackground from '../../../public/images/SideImageBackground.svg?url';
-import Link from 'next/link';
 import Image from 'next/image';
-import MoreVertSVG from '../../../assets/icons/nav/more-vert.svg?url';
+import UserSVG from '../../../assets/icons/social/user.svg?url';
 import CalendarSVG from '../../../assets/icons/sys/calendar.svg?url';
 import DndLogoSVG from '../../../assets/icons/systems-rpg/dnd-logo.svg?url';
 import '@/components/common/styles/CampaignCard.css';
@@ -34,6 +33,9 @@ export default function CampaignCard(cardProps: CampaignCardProps): JSX.Element 
         nextMatchDate = 'Em aberto',
         system,
         ageRestriction,
+        campaignPlayers = [],
+        playerAmountLimit,
+        onButtonClick,
     } = cardProps || {};
 
     const { cardSize, textColorCSS, buttonColorCSS, buttonTextColorCSS } =
@@ -47,6 +49,9 @@ export default function CampaignCard(cardProps: CampaignCardProps): JSX.Element 
 
     const systemLogo = system ? systemLogos[system] : null;
     const ageBadgeColor = ageRestriction ? ageRestrictionColors[ageRestriction] : null;
+    const playerCount = campaignPlayers.filter(
+        (p) => p.role === 'player' || p.role === 'admin_player'
+    ).length;
 
     return (
         <div
@@ -99,11 +104,23 @@ export default function CampaignCard(cardProps: CampaignCardProps): JSX.Element 
                 </div>
 
                 <div className="card-buttons">
-                    <Link href={`/tutorial/${title.toLowerCase()}`}>
-                        <button className={`${buttonColorCSS} ${buttonTextColorCSS}`}>
-                            {buttonTitle}
-                        </button>
-                    </Link>
+                    <button
+                        className={`${buttonColorCSS} ${buttonTextColorCSS}`}
+                        onClick={onButtonClick}
+                    >
+                        {buttonTitle}
+                    </button>
+                    <div className="card-player-limit font-XS-regular">
+                        <Image
+                            src={UserSVG.src}
+                            alt="Player icon"
+                            width={25}
+                            height={25}
+                        />
+                        <span>
+                            {playerCount}/{playerAmountLimit ?? 0}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>

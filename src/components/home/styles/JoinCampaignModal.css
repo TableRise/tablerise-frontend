@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    /* ── Backdrop ─────────────────────────────────────────── */
+    .jcm-backdrop {
+        @apply fixed inset-0 z-50 flex items-center justify-center;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    /* ── Modal container ──────────────────────────────────── */
+    .jcm-modal {
+        @apply relative bg-color-greyScale/100 rounded-2xl flex flex-col p-8;
+        width: 45rem;
+        max-height: 90vh;
+        overflow: hidden;
+    }
+
+    /* ── Title ─────────────────────────────────────────────── */
+    .jcm-title {
+        @apply mb-6 flex-shrink-0;
+    }
+
+    /* ── Search row ───────────────────────────────────────── */
+    .jcm-search-row {
+        @apply flex items-center gap-3 mb-6 flex-shrink-0;
+    }
+
+    .jcm-input-title {
+        @apply flex-1 h-10 px-4 rounded-lg border border-color-greyScale/300 bg-white;
+    }
+
+    .jcm-input-code {
+        @apply w-32 h-10 px-4 rounded-lg border border-color-greyScale/300 bg-white;
+    }
+
+    .jcm-search-btn {
+        @apply h-10 px-6 flex-shrink-0 text-color-greyScale/50;
+    }
+
+    /* ── Results ──────────────────────────────────────────── */
+    .jcm-results {
+        @apply flex flex-col gap-4 mb-6 overflow-y-auto;
+        min-height: 0;
+        max-height: 27rem;
+    }
+
+    .jcm-results-label {
+        @apply mb-2;
+    }
+
+    .jcm-results-cards {
+        @apply flex flex-col gap-4;
+    }
+
+    .jcm-no-results {
+        @apply text-color-greyScale/500 text-center py-8;
+    }
+
+    /* ── Cancel button ────────────────────────────────────── */
+    .jcm-cancel-btn {
+        @apply w-full text-center text-color-primary/default_900 py-3 cursor-pointer;
+    }
+
+    .jcm-cancel-btn:hover {
+        @apply underline;
+    }
+}

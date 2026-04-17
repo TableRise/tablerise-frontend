@@ -161,7 +161,13 @@ export default function CreateCampaignModalFirstStep({
     );
 }
 
-function AgendaUI({ rows, setRows }: { rows: { date: string; start: string }[]; setRows: (rows: { date: string; start: string }[]) => void }) {
+function AgendaUI({
+    rows,
+    setRows,
+}: {
+    rows: { date: string; start: string }[];
+    setRows: (rows: { date: string; start: string }[]) => void;
+}) {
     const [timeErrors, setTimeErrors] = useState<{ start: boolean }[]>([
         { start: false },
     ]);
@@ -173,10 +179,7 @@ function AgendaUI({ rows, setRows }: { rows: { date: string; start: string }[]; 
     const hasFilled = rows.length > 1;
     const lastRow = rows[lastIdx];
     const lastErrors = timeErrors[lastIdx];
-    const hasError =
-        lastErrors?.start ||
-        !lastRow?.date ||
-        !lastRow?.start;
+    const hasError = lastErrors?.start || !lastRow?.date || !lastRow?.start;
 
     function addRow() {
         setRows([...rows, { date: '', start: '' }]);
@@ -270,9 +273,7 @@ function AgendaUI({ rows, setRows }: { rows: { date: string; start: string }[]; 
                                 value={row.start}
                                 maxLength={5}
                                 readOnly={filled}
-                                onChange={(e) =>
-                                    handleTimeChange(idx, e.target.value)
-                                }
+                                onChange={(e) => handleTimeChange(idx, e.target.value)}
                             />
                             {filled && (
                                 <button

@@ -1,5 +1,5 @@
 'use client';
-import { Fragment, useState } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 import Image from 'next/image';
 import EditSVG from '../../../assets/icons/sys/edit.svg?url';
 import SettingsSVG from '../../../assets/icons/sys/settings.svg?url';
@@ -26,6 +26,13 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
     const [step, setStep] = useState<Step>(0);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, []);
 
     /* ── step 1 fields ── */
     const [title, setTitle] = useState('');
@@ -96,8 +103,8 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
         setSubmitting(true);
         try {
             const filledDates = agendaRows
-                    .filter((r) => r.date && r.start)
-                    .map((r) => `${r.date}T${r.start}:00`);
+                .filter((r) => r.date && r.start)
+                .map((r) => `${r.date}T${r.start}:00`);
 
             await createCampaign({
                 title,

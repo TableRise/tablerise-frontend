@@ -25,6 +25,9 @@ export default function TableriseProvider({
 
         if (userInfos) {
             const userCampaigns = await getCampaignsByUserId(userInfos.userId);
+
+            if (!userCampaigns) return;
+
             const userCampaignsHomeData = {
                 master: [],
                 player: [],
@@ -38,8 +41,10 @@ export default function TableriseProvider({
                     description: campaign.description,
                     system: campaign.system,
                     ageRestriction: campaign.ageRestriction,
+                    campaignPlayers: campaign.campaignPlayers ?? [],
                     infos: {
                         nextMatchDate: campaign.infos.nextMatchDate,
+                        playerAmountLimit: campaign.infos.playerAmountLimit,
                     },
                 });
             });
@@ -52,8 +57,10 @@ export default function TableriseProvider({
                     description: campaign.description,
                     system: campaign.system,
                     ageRestriction: campaign.ageRestriction,
+                    campaignPlayers: campaign.campaignPlayers ?? [],
                     infos: {
                         nextMatchDate: campaign.infos.nextMatchDate,
+                        playerAmountLimit: campaign.infos.playerAmountLimit,
                     },
                 });
             });
