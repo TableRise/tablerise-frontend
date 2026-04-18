@@ -50,6 +50,9 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
     const [playerAmountLimit, setPlayerAmountLimit] = useState(1);
     const [musics, setMusics] = useState<CampaignMusic[]>([]);
     const [mapImages, setMapImages] = useState<File[]>([]);
+    const [discordLink, setDiscordLink] = useState('');
+    const [twitterLink, setTwitterLink] = useState('');
+    const [youtubeLink, setYoutubeLink] = useState('');
 
     /* ── step 3 fields ── */
     const [lore, setLore] = useState('');
@@ -119,6 +122,11 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
                 lore,
                 playerAmountLimit,
                 nextMatchDate: filledDates.length > 0 ? filledDates : [],
+                socialMedia: {
+                    ...(discordLink ? { discord: discordLink } : {}),
+                    ...(twitterLink ? { twitter: twitterLink } : {}),
+                    ...(youtubeLink ? { youtube: youtubeLink } : {}),
+                },
             });
             onSuccess();
             onClose();
@@ -221,6 +229,12 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
                             setMusics={setMusics}
                             mapImages={mapImages}
                             setMapImages={setMapImages}
+                            discordLink={discordLink}
+                            setDiscordLink={setDiscordLink}
+                            twitterLink={twitterLink}
+                            setTwitterLink={setTwitterLink}
+                            youtubeLink={youtubeLink}
+                            setYoutubeLink={setYoutubeLink}
                         />
                     )}
                     {step === 2 && <Step3 lore={lore} setLore={setLore} />}

@@ -6,7 +6,7 @@ import TableriseContext from '@/context/TableriseContext';
 interface UseJoinCampaignReturn {
     handleJoinClick: (
         campaignId: string,
-        campaignPlayers: { role?: string; vispierId?: string }[]
+        campaignPlayers: { role?: string; userId?: string }[]
     ) => Promise<void>;
     passwordModalOpen: boolean;
     passwordError: string;
@@ -30,7 +30,7 @@ export function useJoinCampaign(): UseJoinCampaignReturn {
             userCampaigns.master.some((c) => c.campaignId === campaignId);
 
         if (alreadyJoined) {
-            router.push('/campaigns/lobby');
+            router.push(`/campaigns/lobby?campaignId=${campaignId}`);
             return;
         }
 
@@ -42,7 +42,7 @@ export function useJoinCampaign(): UseJoinCampaignReturn {
 
             if (!hasPassword) {
                 await addPlayerToCampaign(campaignId);
-                router.push('/campaigns/lobby');
+                router.push(`/campaigns/lobby?campaignId=${campaignId}`);
             } else {
                 setPendingCampaignId(campaignId);
                 setPasswordError('');
@@ -57,7 +57,7 @@ export function useJoinCampaign(): UseJoinCampaignReturn {
         try {
             await addPlayerToCampaign(pendingCampaignId, password);
             setPasswordModalOpen(false);
-            router.push('/campaigns/lobby');
+            router.push(`/campaigns/lobby?campaignId=${pendingCampaignId}`);
         } catch (err: any) {
             setPasswordError(err.message || 'Erro ao entrar na campanha');
         }

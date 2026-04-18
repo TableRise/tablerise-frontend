@@ -503,4 +503,17 @@
     .ccm-btn-primary {
         @apply w-[50%];
     }
+
+    /* ── Social media fields ─────────────────────────────── */
+    .ccm-social-fields {
+        @apply flex flex-col gap-3 mt-2;
+    }
+
+    .ccm-social-field {
+        @apply flex flex-col gap-1;
+    }
+
+    .ccm-social-field span {
+        @apply text-color-primary/default_900;
+    }
 }

@@ -45,6 +45,7 @@ export default function TableriseProvider({
                     infos: {
                         nextMatchDate: campaign.infos.nextMatchDate,
                         playerAmountLimit: campaign.infos.playerAmountLimit,
+                        socialMedia: campaign.infos.socialMedia ?? [],
                     },
                 });
             });
@@ -61,6 +62,7 @@ export default function TableriseProvider({
                     infos: {
                         nextMatchDate: campaign.infos.nextMatchDate,
                         playerAmountLimit: campaign.infos.playerAmountLimit,
+                        socialMedia: campaign.infos.socialMedia ?? [],
                     },
                 });
             });

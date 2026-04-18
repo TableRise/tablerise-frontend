@@ -32,6 +32,12 @@ export default function CreateCampaignModalSecondStep({
     setMusics,
     mapImages,
     setMapImages,
+    discordLink,
+    setDiscordLink,
+    twitterLink,
+    setTwitterLink,
+    youtubeLink,
+    setYoutubeLink,
 }: any) {
     const mapInputRef = useRef<HTMLInputElement>(null);
 
@@ -216,6 +222,46 @@ export default function CreateCampaignModalSecondStep({
                             </span>
                         </>
                     )}
+                </div>
+            </div>
+
+            {/* Redes sociais */}
+            <div className="ccm-field">
+                <span className="font-S-bold ccm-field-label">Redes sociais</span>
+                <span className="font-XXS-regular ccm-field-hint">
+                    Adicione links para as redes sociais da campanha (opcional)
+                </span>
+                <div className="ccm-social-fields">
+                    <label className="ccm-social-field">
+                        <span className="font-XS-bold">Discord</span>
+                        <input
+                            type="url"
+                            className="input-default-light"
+                            placeholder="https://discord.gg/..."
+                            value={discordLink}
+                            onChange={(e) => setDiscordLink(e.target.value)}
+                        />
+                    </label>
+                    <label className="ccm-social-field">
+                        <span className="font-XS-bold">Twitter</span>
+                        <input
+                            type="url"
+                            className="input-default-light"
+                            placeholder="https://twitter.com/..."
+                            value={twitterLink}
+                            onChange={(e) => setTwitterLink(e.target.value)}
+                        />
+                    </label>
+                    <label className="ccm-social-field">
+                        <span className="font-XS-bold">YouTube</span>
+                        <input
+                            type="url"
+                            className="input-default-light"
+                            placeholder="https://youtube.com/..."
+                            value={youtubeLink}
+                            onChange={(e) => setYoutubeLink(e.target.value)}
+                        />
+                    </label>
                 </div>
             </div>
         </div>

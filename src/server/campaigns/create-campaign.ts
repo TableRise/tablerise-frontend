@@ -21,6 +21,7 @@ export interface CreateCampaignPayload {
     lore: string;
     nextMatchDate: string[];
     playerAmountLimit: number;
+    socialMedia: { discord?: string; twitter?: string; youtube?: string };
 }
 
 export const createCampaign = async (payload: CreateCampaignPayload) => {
@@ -42,6 +43,9 @@ export const createCampaign = async (payload: CreateCampaignPayload) => {
         payload.mapImages.forEach((file) => {
             formData.append('mapImages', file);
         });
+        if (Object.values(payload.socialMedia).some((v) => v)) {
+            formData.append('socialMedia', JSON.stringify(payload.socialMedia));
+        }
 
         const { data }: AxiosResponse = await axios({
             method: 'POST',

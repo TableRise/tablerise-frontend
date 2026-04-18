@@ -1,9 +1,9 @@
 import { ImageObject } from '@/types/shared/general';
 
 interface CampaignPlayer {
-    vispierId: string;
-    vispierId_sk: string;
-    vispierId_pk: string;
+    userId: string;
+    userId_sk: string;
+    userId_pk: string;
     role: string;
 }
 
@@ -18,6 +18,7 @@ interface UserCampaign {
     infos: {
         nextMatchDate: string;
         playerAmountLimit?: number;
+        socialMedia?: { discord?: string; twitter?: string; youtube?: string };
     };
 }
 

@@ -7,6 +7,10 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'i.ytimg.com',
             },
+            {
+                protocol: 'https',
+                hostname: 'i.ibb.co',
+            },
         ],
     },
     webpack(config) {

@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .lobby-side-menu {
+        @apply w-[fit] flex flex-col items-center bg-color-greyScale/50 rounded-xl p-4 h-fit sticky top-[10rem];
+    }
+
+    .lobby-side-menu-nav {
+        @apply flex flex-col gap-2;
+    }
+
+    .lobby-menu-item-wrapper {
+        @apply relative flex items-center justify-end;
+    }
+
+    .lobby-menu-label {
+        @apply absolute right-full mr-0 px-4 bg-color-greyScale/50 rounded-l-lg whitespace-nowrap
+               text-color-primary/default_900 opacity-0 pointer-events-none
+               transition-all duration-500 ease-in-out translate-x-2
+               top-0 bottom-0 flex items-center;
+    }
+
+    .lobby-menu-label-danger {
+        @apply text-color-support/alert;
+    }
+
+    .lobby-menu-item-wrapper:hover .lobby-menu-label {
+        @apply opacity-100 translate-x-0 pointer-events-auto;
+    }
+
+    .lobby-menu-item {
+        @apply p-3 rounded-lg text-color-primary/default_900 cursor-pointer transition-all duration-300 flex items-center justify-center relative z-10;
+    }
+
+    .lobby-menu-item:hover {
+        @apply shadow-lg;
+    }
+
+    .lobby-menu-item-danger {
+        @apply text-color-support/alert;
+    }
+
+    .lobby-menu-item-danger:hover {
+        @apply bg-red-50;
+    }
+}
