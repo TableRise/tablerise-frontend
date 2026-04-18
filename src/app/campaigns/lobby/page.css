@@ -52,11 +52,11 @@
     }
 
     .lobby-confirm-presence--confirmed {
-        @apply bg-color-greyScale/300 text-color-greyScale/50 cursor-default;
+        @apply bg-color-greyScale/300 text-color-greyScale/50 cursor-pointer;
     }
 
     .lobby-confirm-presence--confirmed:hover {
-        @apply opacity-100;
+        @apply opacity-80;
     }
 
     .lobby-session-preview-btn {

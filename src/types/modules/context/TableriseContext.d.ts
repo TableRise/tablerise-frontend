@@ -20,6 +20,9 @@ interface UserCampaign {
         playerAmountLimit?: number;
         socialMedia?: { discord?: string; twitter?: string; youtube?: string };
     };
+    matchData?: {
+        confirmedPlayers?: string[];
+    };
 }
 
 export interface UserCampaignsContract {

@@ -1,11 +1,12 @@
 'use client';
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import TableriseContext from '@/context/TableriseContext';
 import LoggedHeader from '@/components/common/LoggedHeader';
 import LobbySideMenu from '@/components/lobby/LobbySideMenu';
-import { getCampaignById } from '@/server/campaigns/join-campaign';
+import { getCampaignById, confirmPlayerPresence } from '@/server/campaigns/join-campaign';
+import { getUser } from '@/server/users/get-user';
 import formatDate from '@/utils/formatDate';
 import '@/app/campaigns/lobby/page.css';
 
@@ -18,6 +19,13 @@ interface CampaignData {
     campaignPlayers: { userId: string; role: string }[];
     nextMatchDate: string;
     socialMedia: { discord?: string; twitter?: string; youtube?: string };
+    confirmedPlayers: (string | { userId: string })[];
+}
+
+interface ConfirmedPlayerInfo {
+    userId: string;
+    name: string;
+    picture: string;
 }
 
 export default function CampaignLobby(): JSX.Element {
@@ -27,6 +35,9 @@ export default function CampaignLobby(): JSX.Element {
     const [campaign, setCampaign] = useState<CampaignData | null>(null);
     const [presenceConfirmed, setPresenceConfirmed] = useState(false);
     const [sessionPreviewOpen, setSessionPreviewOpen] = useState(false);
+    const [confirmedPlayersInfo, setConfirmedPlayersInfo] = useState<
+        ConfirmedPlayerInfo[]
+    >([]);
 
     useEffect(() => {
         if (!campaignId) return;
@@ -45,18 +56,87 @@ export default function CampaignLobby(): JSX.Element {
                 campaignPlayers: cached.campaignPlayers,
                 nextMatchDate: cached.infos?.nextMatchDate ?? '',
                 socialMedia: cached.infos?.socialMedia ?? {},
+                confirmedPlayers: cached.matchData?.confirmedPlayers ?? [],
             });
         } else {
             getCampaignById(campaignId).then((data) => {
-                if (data) setCampaign(data);
+                if (data)
+                    setCampaign({
+                        campaignId: data.campaignId,
+                        title: data.title,
+                        cover: { link: data.cover?.link },
+                        description: data.description,
+                        system: data.system,
+                        campaignPlayers: data.campaignPlayers,
+                        nextMatchDate: data.infos?.nextMatchDate ?? '',
+                        socialMedia: data.infos?.socialMedia ?? {},
+                        confirmedPlayers: data.matchData?.confirmedPlayers ?? [],
+                    });
             });
         }
     }, [campaignId, userCampaigns]);
+
+    const refreshCampaign = useCallback(() => {
+        if (!campaignId) return;
+        getCampaignById(campaignId).then((data) => {
+            if (data)
+                setCampaign({
+                    campaignId: data.campaignId,
+                    title: data.title,
+                    cover: { link: data.cover?.link },
+                    description: data.description,
+                    system: data.system,
+                    campaignPlayers: data.campaignPlayers,
+                    nextMatchDate: data.infos?.nextMatchDate ?? '',
+                    socialMedia: data.infos?.socialMedia ?? {},
+                    confirmedPlayers: data.matchData?.confirmedPlayers ?? [],
+                });
+        });
+    }, [campaignId]);
+
+    useEffect(() => {
+        if (!campaign?.confirmedPlayers?.length) {
+            setConfirmedPlayersInfo([]);
+            return;
+        }
+
+        Promise.all(
+            campaign.confirmedPlayers.map(async (entry) => {
+                const userId = typeof entry === 'string' ? entry : (entry as any).userId;
+                try {
+                    const user = await getUser(userId);
+                    return {
+                        userId,
+                        name: user?.nickname ?? user?.username ?? userId,
+                        picture: user?.picture?.link ?? '/images/SideImageBackground.svg',
+                    };
+                } catch {
+                    return {
+                        userId,
+                        name: userId,
+                        picture: '/images/SideImageBackground.svg',
+                    };
+                }
+            })
+        ).then(setConfirmedPlayersInfo);
+    }, [campaign?.confirmedPlayers]);
 
     const userInfo =
         typeof window !== 'undefined'
             ? JSON.parse(localStorage.getItem('userLogged') as string)
             : null;
+
+    useEffect(() => {
+        if (!campaign?.confirmedPlayers?.length || !userInfo?.userId) {
+            setPresenceConfirmed(false);
+            return;
+        }
+        const isConfirmed = campaign.confirmedPlayers.some((entry) => {
+            const id = typeof entry === 'string' ? entry : (entry as any).userId;
+            return id === userInfo.userId;
+        });
+        setPresenceConfirmed(isConfirmed);
+    }, [campaign?.confirmedPlayers, userInfo?.userId]);
 
     const userRole = campaign?.campaignPlayers.find((p) => p.userId === userInfo?.userId)
         ?.role;
@@ -103,28 +183,28 @@ export default function CampaignLobby(): JSX.Element {
             thumbnail: '/images/SideImageBackground.svg',
         },
         {
-            id: '3',
+            id: '4',
             title: 'Sessão 3 - O Covil do Dragão',
             resume: 'Finalmente chegaram ao covil, onde o ar estava quente...',
             date: '16/04/2026',
             thumbnail: '/images/SideImageBackground.svg',
         },
         {
-            id: '3',
+            id: '5',
             title: 'Sessão 3 - O Covil do Dragão',
             resume: 'Finalmente chegaram ao covil, onde o ar estava quente...',
             date: '16/04/2026',
             thumbnail: '/images/SideImageBackground.svg',
         },
         {
-            id: '3',
+            id: '6',
             title: 'Sessão 3 - O Covil do Dragão',
             resume: 'Finalmente chegaram ao covil, onde o ar estava quente...',
             date: '16/04/2026',
             thumbnail: '/images/SideImageBackground.svg',
         },
         {
-            id: '3',
+            id: '7',
             title: 'Sessão 3 - O Covil do Dragão',
             resume: 'Finalmente chegaram ao covil, onde o ar estava quente...',
             date: '16/04/2026',
@@ -202,7 +282,17 @@ export default function CampaignLobby(): JSX.Element {
                                     ? 'lobby-confirm-presence--confirmed'
                                     : ''
                             }`}
-                            onClick={() => setPresenceConfirmed((prev) => !prev)}
+                            onClick={async () => {
+                                try {
+                                    await confirmPlayerPresence(
+                                        campaignId,
+                                        presenceConfirmed
+                                    );
+                                    refreshCampaign();
+                                } catch {
+                                    // silently ignore
+                                }
+                            }}
                         >
                             {presenceConfirmed
                                 ? '✔ Presença confirmada'
@@ -245,6 +335,32 @@ export default function CampaignLobby(): JSX.Element {
                             </div>
                         </div>
                     )}
+                    <div className="lobby-characters">
+                        <h2 className="font-L-semibold">Confirmados Próxima Sessão</h2>
+                        <div className="lobby-characters-slider">
+                            {confirmedPlayersInfo.length > 0 ? (
+                                confirmedPlayersInfo.map((player) => (
+                                    <div key={player.userId} className="lobby-character">
+                                        <div className="lobby-character-avatar">
+                                            <Image
+                                                src={player.picture}
+                                                alt={player.name}
+                                                fill
+                                                style={{ objectFit: 'cover' }}
+                                            />
+                                        </div>
+                                        <span className="font-XXS-regular">
+                                            {player.name}
+                                        </span>
+                                    </div>
+                                ))
+                            ) : (
+                                <span className="font-XS-regular">
+                                    Nenhum jogador confirmado
+                                </span>
+                            )}
+                        </div>
+                    </div>
                     <div className="lobby-characters">
                         <h2 className="font-L-semibold">Personagens</h2>
                         <div className="lobby-characters-slider">

@@ -47,6 +47,9 @@ export default function TableriseProvider({
                         playerAmountLimit: campaign.infos.playerAmountLimit,
                         socialMedia: campaign.infos.socialMedia ?? [],
                     },
+                    matchData: {
+                        confirmedPlayers: campaign.matchData?.confirmedPlayers ?? [],
+                    },
                 });
             });
 
@@ -63,6 +66,9 @@ export default function TableriseProvider({
                         nextMatchDate: campaign.infos.nextMatchDate,
                         playerAmountLimit: campaign.infos.playerAmountLimit,
                         socialMedia: campaign.infos.socialMedia ?? [],
+                    },
+                    matchData: {
+                        confirmedPlayers: campaign.matchData?.confirmedPlayers ?? [],
                     },
                 });
             });

@@ -40,3 +40,21 @@ export const addPlayerToCampaign = async (campaignId: string, password?: string)
         throw new Error('Erro ao entrar na campanha');
     }
 };
+
+export const confirmPlayerPresence = async (campaignId: string, cancel?: boolean) => {
+    try {
+        const { data }: AxiosResponse = await apiCall({
+            baseUrl: campaignsBaseUrl,
+            endpoint: `${campaignId}/update/match/player-presence`,
+            method: 'POST',
+            ...(cancel ? { params: { cancel: true } } : {}),
+        });
+
+        return data;
+    } catch (error: AxiosError | any) {
+        const status = error?.response?.status;
+        if (status === 404) throw new Error('Campanha não encontrada');
+        if (status === 500) throw new Error('Erro no servidor');
+        throw new Error('Erro ao confirmar presença');
+    }
+};
