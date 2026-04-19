@@ -13,6 +13,7 @@ import '@/components/lobby/styles/LobbySideMenu.css';
 interface LobbySideMenuProps {
     isPlayer: boolean;
     isMaster: boolean;
+    onMenuAction?: (key: string) => void;
 }
 
 const playerMenuItems = [
@@ -32,6 +33,7 @@ const masterExtraItems = [
 export default function LobbySideMenu({
     isPlayer,
     isMaster,
+    onMenuAction,
 }: LobbySideMenuProps): JSX.Element {
     const baseItems = playerMenuItems.filter((item) => item.key !== 'leave');
     const leaveItem = playerMenuItems.find((item) => item.key === 'leave')!;
@@ -59,6 +61,7 @@ export default function LobbySideMenu({
                             className={`lobby-menu-item ${
                                 item.danger ? 'lobby-menu-item-danger' : ''
                             }`}
+                            onClick={() => onMenuAction?.(item.key)}
                         >
                             <Image
                                 src={item.icon}

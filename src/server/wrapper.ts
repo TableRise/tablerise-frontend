@@ -5,6 +5,7 @@ export const usersBaseUrl = process.env.API_USERS;
 export const dndBaseUrl = process.env.API_DD5E;
 export const campaignsBaseUrl = process.env.API_CAMPAIGNS;
 export const oAuthBaseUrl = process.env.API_OAUTH;
+export const charactersBaseUrl = process.env.API_CHARACTERS;
 
 export const apiCall = async (data: WrapperPayload) => {
     const { method, baseUrl, endpoint, data: requestData, params } = data;

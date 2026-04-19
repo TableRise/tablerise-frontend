@@ -1,0 +1,379 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    /* ── Page wrapper & tabs ──────────────────── */
+
+    .cs-wrapper {
+        @apply mt-[8.6rem] flex flex-col items-center px-6 pt-6 pb-12 gap-6;
+    }
+
+    .cs-tabs {
+        @apply flex gap-1 bg-color-greyScale/50 rounded-2xl p-1.5 shadow-md border border-color-greyScale/200;
+    }
+
+    .cs-tab {
+        @apply px-7 py-2.5 rounded-xl cursor-pointer transition-all text-color-greyScale/500 bg-transparent border-none;
+    }
+
+    .cs-tab:hover:not(.cs-tab--active) {
+        @apply bg-color-greyScale/100 text-color-greyScale/700;
+    }
+
+    .cs-tab--active {
+        @apply bg-color-primary/default_900 text-color-greyScale/50 shadow-sm;
+    }
+
+    .cs-sheet {
+        @apply w-full max-w-[64rem] bg-color-greyScale/50 rounded-2xl p-8 shadow-lg border border-color-greyScale/200;
+    }
+
+    /* ── Shared sheet styles ──────────────────── */
+
+    .cs-section-title {
+        @apply text-[0.65rem] font-bold uppercase tracking-widest text-center text-color-primary/default_900 mt-2 pb-1 border-b border-color-primary/default_900;
+    }
+
+    .cs-field {
+        @apply flex flex-col gap-0.5;
+    }
+
+    .cs-field-label {
+        @apply text-[0.6rem] uppercase tracking-widest text-color-greyScale/500 mt-0.5;
+    }
+
+    .cs-field-input {
+        @apply border-b-2 border-color-greyScale/200 bg-transparent px-1.5 py-1 text-sm outline-none text-color-greyScale/900
+            focus:border-color-primary/default_900 transition-colors;
+    }
+
+    .cs-field-input::placeholder {
+        @apply text-color-greyScale/300;
+    }
+
+    .cs-field-input-box {
+        @apply border border-color-greyScale/200 rounded-lg bg-color-greyScale/50 px-2 py-1.5 text-sm outline-none
+            text-color-greyScale/900 shadow-inner
+            focus:border-color-primary/default_900 focus:ring-1 focus:ring-color-primary/500 transition-all;
+    }
+
+    .cs-field-input-box::placeholder {
+        @apply text-color-greyScale/300;
+    }
+
+    .cs-field-textarea {
+        @apply border border-color-greyScale/200 rounded-lg bg-color-greyScale/50 px-3 py-2 text-sm outline-none resize-none
+            text-color-greyScale/900
+            focus:border-color-primary/default_900 focus:ring-1 focus:ring-color-primary/500 transition-all;
+    }
+
+    .cs-field-textarea::placeholder {
+        @apply text-color-greyScale/300;
+    }
+
+    /* ── Principal tab ────────────────────────── */
+
+    .cs-header {
+        @apply grid grid-cols-[1fr_1fr_1fr] gap-x-4 gap-y-2 mb-6 pb-4 border-b-2 border-color-greyScale/200;
+    }
+
+    .cs-header-name {
+        @apply col-span-1 row-span-2;
+    }
+
+    .cs-body {
+        @apply grid grid-cols-[9rem_1fr_15rem] gap-5;
+    }
+
+    .cs-ability-col {
+        @apply flex flex-col gap-2.5;
+    }
+
+    .cs-ability-block {
+        @apply flex flex-col items-center border-2 border-color-greyScale/200 rounded-2xl py-2 px-3
+            bg-gradient-to-b from-color-greyScale/50 to-color-greyScale/100 shadow-sm
+            hover:border-color-primary/500 transition-colors;
+    }
+
+    .cs-ability-name {
+        @apply text-[0.6rem] font-bold uppercase tracking-widest text-color-primary/default_900;
+    }
+
+    .cs-ability-mod {
+        @apply text-2xl font-bold text-color-greyScale/900;
+    }
+
+    .cs-ability-score {
+        @apply w-9 h-6 text-center text-xs border-2 border-color-greyScale/300 rounded-full bg-color-greyScale/50
+            font-semibold text-color-greyScale/700 mt-0.5 outline-none
+            focus:border-color-primary/default_900 transition-colors;
+    }
+
+    .cs-middle-col {
+        @apply flex flex-col gap-4;
+    }
+
+    .cs-combat-row {
+        @apply flex gap-3 justify-center;
+    }
+
+    .cs-combat-box {
+        @apply flex flex-col items-center border-2 border-color-greyScale/200 rounded-2xl p-3
+            bg-gradient-to-b from-color-greyScale/50 to-color-greyScale/100 min-w-[5.5rem] shadow-sm
+            hover:border-color-primary/500 transition-colors;
+    }
+
+    .cs-combat-value {
+        @apply text-xl font-bold text-color-greyScale/900;
+    }
+
+    .cs-combat-label {
+        @apply text-[0.55rem] font-semibold uppercase tracking-wider text-color-primary/default_900 text-center mt-1;
+    }
+
+    .cs-inspiration-row {
+        @apply flex items-center gap-3 mb-2 px-1;
+    }
+
+    .cs-proficiency-row {
+        @apply flex items-center gap-3 mb-3 px-1;
+    }
+
+    .cs-saves-box {
+        @apply border-2 border-color-greyScale/200 rounded-xl p-3 bg-color-greyScale/50 mb-3 shadow-sm;
+    }
+
+    .cs-save-row {
+        @apply flex items-center gap-2 py-[3px];
+    }
+
+    .cs-save-check {
+        @apply w-3.5 h-3.5 rounded-full border-2 border-color-greyScale/300 cursor-pointer accent-color-primary/default_900
+            checked:bg-color-primary/default_900;
+    }
+
+    .cs-save-mod {
+        @apply w-8 text-center text-xs font-semibold border-b-2 border-color-greyScale/200 bg-transparent outline-none
+            text-color-greyScale/900
+            focus:border-color-primary/default_900 transition-colors;
+    }
+
+    .cs-save-mod::placeholder {
+        @apply text-color-greyScale/300 font-normal;
+    }
+
+    .cs-save-name {
+        @apply text-xs text-color-greyScale/700;
+    }
+
+    .cs-skills-box {
+        @apply border-2 border-color-greyScale/200 rounded-xl p-3 bg-color-greyScale/50 shadow-sm;
+    }
+
+    .cs-skill-row {
+        @apply flex items-center gap-2 py-[3px];
+    }
+
+    .cs-hp-section {
+        @apply border-2 border-color-greyScale/200 rounded-xl p-4 bg-color-greyScale/50 mb-3 shadow-sm;
+    }
+
+    .cs-hp-total {
+        @apply flex items-center gap-3 mb-2;
+    }
+
+    .cs-hp-current {
+        @apply flex items-center justify-center h-16 text-3xl font-bold text-color-primary/default_900;
+    }
+
+    .cs-hp-temp {
+        @apply border-2 border-color-greyScale/200 rounded-xl p-4 bg-color-greyScale/50 mb-3 shadow-sm;
+    }
+
+    .cs-death-saves {
+        @apply flex gap-5 justify-center mb-2;
+    }
+
+    .cs-death-save-group {
+        @apply flex flex-col items-center gap-1.5;
+    }
+
+    .cs-death-save-dots {
+        @apply flex gap-1.5;
+    }
+
+    .cs-death-dot {
+        @apply w-3.5 h-3.5 rounded-full border-2 border-color-greyScale/300 cursor-pointer
+            hover:border-color-primary/500 transition-colors;
+    }
+
+    .cs-death-dot--filled {
+        @apply bg-color-primary/default_900 border-color-primary/default_900;
+    }
+
+    .cs-hit-dice {
+        @apply border-2 border-color-greyScale/200 rounded-xl p-3 bg-color-greyScale/50 mb-3 flex flex-col items-center gap-1.5 shadow-sm;
+    }
+
+    .cs-attacks-box {
+        @apply border-2 border-color-greyScale/200 rounded-xl p-4 bg-color-greyScale/50 mb-3 shadow-sm;
+    }
+
+    .cs-attack-header {
+        @apply grid grid-cols-3 gap-2 text-[0.6rem] font-semibold uppercase tracking-wider text-color-primary/default_900 mb-2 pb-1 border-b border-color-greyScale/200;
+    }
+
+    .cs-attack-row {
+        @apply grid grid-cols-3 gap-2 mb-1.5;
+    }
+
+    .cs-equipment-box {
+        @apply border-2 border-color-greyScale/200 rounded-xl p-4 bg-color-greyScale/50 shadow-sm;
+    }
+
+    .cs-right-col {
+        @apply flex flex-col gap-3;
+    }
+
+    .cs-trait-box {
+        @apply border-2 border-color-greyScale/200 rounded-xl p-4 bg-color-greyScale/50 shadow-sm
+            hover:border-color-primary/500 transition-colors;
+    }
+
+    .cs-passive-row {
+        @apply flex items-center gap-3 mt-3;
+    }
+
+    .cs-passive-circle {
+        @apply w-11 h-11 rounded-full border-2 border-color-primary/default_900 bg-color-greyScale/50 flex items-center justify-center text-sm font-bold shadow-sm;
+    }
+
+    .cs-bottom-row {
+        @apply grid grid-cols-3 gap-4 mt-6;
+    }
+
+    .cs-bottom-box {
+        @apply border-2 border-color-greyScale/200 rounded-xl p-4 bg-color-greyScale/50 min-h-[8rem] shadow-sm
+            hover:border-color-primary/500 transition-colors;
+    }
+
+    /* ── Características tab ───────────────────── */
+
+    .cs-char-header {
+        @apply grid grid-cols-[1fr_1fr_1fr] gap-4 mb-4 pb-4 border-b-2 border-color-greyScale/200;
+    }
+
+    .cs-char-header-row2 {
+        @apply grid grid-cols-4 gap-4 mb-6;
+    }
+
+    .cs-char-body {
+        @apply grid grid-cols-[1fr_2fr] gap-6 mb-6;
+    }
+
+    .cs-char-appearance {
+        @apply border-2 border-color-greyScale/200 rounded-xl p-5 bg-color-greyScale/50 min-h-[16rem] shadow-sm
+            hover:border-color-primary/500 transition-colors;
+    }
+
+    .cs-char-allies {
+        @apply border-2 border-color-greyScale/200 rounded-xl p-5 bg-color-greyScale/50 min-h-[16rem] shadow-sm
+            hover:border-color-primary/500 transition-colors;
+    }
+
+    .cs-char-allies-picture {
+        @apply border-2 border-dashed border-color-greyScale/300 rounded-lg p-2 bg-color-greyScale/100 w-32 h-32 float-right ml-4 mb-2
+            flex items-center justify-center;
+    }
+
+    .cs-char-bottom {
+        @apply grid grid-cols-2 gap-6;
+    }
+
+    .cs-char-backstory {
+        @apply border-2 border-color-greyScale/200 rounded-xl p-5 bg-color-greyScale/50 min-h-[20rem] shadow-sm
+            hover:border-color-primary/500 transition-colors;
+    }
+
+    .cs-char-right-bottom {
+        @apply flex flex-col gap-6;
+    }
+
+    .cs-char-treasure {
+        @apply border-2 border-color-greyScale/200 rounded-xl p-5 bg-color-greyScale/50 min-h-[8rem] shadow-sm
+            hover:border-color-primary/500 transition-colors;
+    }
+
+    .cs-char-other {
+        @apply border-2 border-color-greyScale/200 rounded-xl p-5 bg-color-greyScale/50 min-h-[8rem] shadow-sm
+            hover:border-color-primary/500 transition-colors;
+    }
+
+    /* ── Magias tab ────────────────────────────── */
+
+    .cs-spell-header {
+        @apply flex gap-4 justify-center mb-6;
+    }
+
+    .cs-spell-header-box {
+        @apply border-2 border-color-greyScale/200 rounded-2xl p-4 bg-gradient-to-b from-color-greyScale/50 to-color-greyScale/100
+            flex flex-col items-center min-w-[11rem] shadow-sm gap-1
+            hover:border-color-primary/500 transition-colors;
+    }
+
+    .cs-spell-grid {
+        @apply grid grid-cols-3 gap-4;
+    }
+
+    .cs-spell-level-box {
+        @apply border-2 border-color-greyScale/200 rounded-xl p-4 bg-color-greyScale/50 shadow-sm
+            hover:border-color-primary/500 transition-colors;
+    }
+
+    .cs-spell-level-header {
+        @apply flex items-center justify-between mb-3 pb-2 border-b border-color-greyScale/200;
+    }
+
+    .cs-spell-level-badge {
+        @apply w-8 h-8 rounded-full border-2 border-color-primary/default_900 bg-color-greyScale/50
+            flex items-center justify-center text-xs font-bold text-color-primary/default_900 shadow-sm;
+    }
+
+    .cs-spell-slots {
+        @apply flex items-center gap-2 text-[0.65rem] font-semibold text-color-greyScale/500;
+    }
+
+    .cs-spell-slot-input {
+        @apply w-10 text-center border-b-2 border-color-greyScale/200 text-xs font-semibold bg-transparent outline-none
+            text-color-greyScale/900
+            focus:border-color-primary/default_900 transition-colors;
+    }
+
+    .cs-spell-slot-input::placeholder {
+        @apply text-color-greyScale/300 font-normal;
+    }
+
+    .cs-spell-list {
+        @apply flex flex-col gap-1;
+    }
+
+    .cs-spell-row {
+        @apply flex items-center gap-2 py-0.5;
+    }
+
+    .cs-spell-check {
+        @apply w-3.5 h-3.5 rounded border-2 border-color-greyScale/300 cursor-pointer
+            hover:border-color-primary/500 transition-colors;
+    }
+
+    .cs-spell-name-input {
+        @apply flex-1 border-b border-color-greyScale/200 bg-transparent text-xs py-0.5 outline-none
+            text-color-greyScale/900
+            focus:border-color-primary/default_900 transition-colors;
+    }
+
+    .cs-spell-name-input::placeholder {
+        @apply text-color-greyScale/300;
+    }
+}

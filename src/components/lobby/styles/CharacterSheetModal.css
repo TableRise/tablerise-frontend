@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .csm-overlay {
+        @apply fixed inset-0 z-50 flex items-center justify-center bg-black/50;
+    }
+
+    .csm-modal {
+        @apply w-[50rem] max-h-[90vh] overflow-y-auto bg-color-greyScale/100 rounded-2xl p-8 flex flex-col gap-6;
+    }
+
+    .csm-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .csm-list {
+        @apply flex flex-col gap-4;
+    }
+
+    .csm-loading,
+    .csm-empty {
+        @apply text-color-greyScale/500 text-center py-4;
+    }
+
+    .csm-card {
+        @apply flex items-center justify-between bg-color-greyScale/50 rounded-lg px-4 py-3 border border-color-greyScale/200 cursor-pointer;
+    }
+
+    .csm-card-left {
+        @apply flex items-center gap-3;
+    }
+
+    .csm-card-icon {
+        @apply w-10 h-10 rounded-md flex items-center justify-center;
+    }
+
+    .csm-card-info {
+        @apply flex flex-col;
+    }
+
+    .csm-card-name {
+        @apply text-color-greyScale/700;
+    }
+
+    .csm-card-date {
+        @apply text-color-greyScale/500;
+    }
+
+    .csm-card-delete {
+        @apply text-color-greyScale/300 cursor-pointer transition-opacity hover:opacity-70;
+    }
+
+    .csm-create-btn {
+        @apply w-full py-4 rounded-lg bg-color-primary/default_900 text-color-greyScale/50 cursor-pointer transition-opacity hover:opacity-80;
+    }
+
+    .csm-cancel-btn {
+        @apply w-full py-2 text-color-greyScale/700 cursor-pointer transition-opacity hover:opacity-70 bg-transparent;
+    }
+}

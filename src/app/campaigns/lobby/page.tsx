@@ -8,6 +8,7 @@ import LobbySideMenu from '@/components/lobby/LobbySideMenu';
 import { getCampaignById, confirmPlayerPresence } from '@/server/campaigns/join-campaign';
 import { getUser } from '@/server/users/get-user';
 import formatDate from '@/utils/formatDate';
+import CharacterSheetModal from '@/components/lobby/CharacterSheetModal';
 import '@/app/campaigns/lobby/page.css';
 
 interface CampaignData {
@@ -38,6 +39,7 @@ export default function CampaignLobby(): JSX.Element {
     const [confirmedPlayersInfo, setConfirmedPlayersInfo] = useState<
         ConfirmedPlayerInfo[]
     >([]);
+    const [sheetModalOpen, setSheetModalOpen] = useState(false);
 
     useEffect(() => {
         if (!campaignId) return;
@@ -491,8 +493,22 @@ export default function CampaignLobby(): JSX.Element {
                         </div>
                     </div>
                 </section>
-                <LobbySideMenu isPlayer={isPlayer} isMaster={isMaster} />
+                <LobbySideMenu
+                    isPlayer={isPlayer}
+                    isMaster={isMaster}
+                    onMenuAction={(key) => {
+                        if (key === 'create-sheet') setSheetModalOpen(true);
+                    }}
+                />
             </div>
+            {sheetModalOpen && campaign && (
+                <CharacterSheetModal
+                    campaignId={campaign.campaignId}
+                    userId={userInfo?.userId ?? ''}
+                    isPlayer={isPlayer}
+                    onClose={() => setSheetModalOpen(false)}
+                />
+            )}
         </main>
     );
 }

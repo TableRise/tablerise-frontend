@@ -45,6 +45,7 @@ const nextConfig = {
         API_USERS: process.env.API_USERS,
         API_OAUTH: process.env.API_OAUTH,
         API_CAMPAIGNS: process.env.API_CAMPAIGNS,
+        API_CHARACTERS: process.env.API_CHARACTERS,
         API_DD5E: process.env.API_DD5E,
         API_GOOGLE_YOUTUBE: process.env.API_GOOGLE_YOUTUBE,
         API_GOOGLE_KEY: process.env.API_GOOGLE_KEY,
