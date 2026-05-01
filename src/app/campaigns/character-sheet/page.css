@@ -52,6 +52,10 @@
         @apply text-color-greyScale/300;
     }
 
+    .cs-field-input--readonly {
+        @apply cursor-not-allowed bg-color-greyScale/200 text-color-greyScale/900;
+    }
+
     .cs-field-input-box {
         @apply border border-color-greyScale/200 rounded-lg bg-color-greyScale/50 px-2 py-1.5 text-sm outline-none
             text-color-greyScale/900 shadow-inner
@@ -232,6 +236,36 @@
         @apply border-2 border-color-greyScale/200 rounded-xl p-4 bg-color-greyScale/50 shadow-sm;
     }
 
+    .cs-inventory-panel {
+        @apply border border-color-greyScale/200 rounded-lg bg-color-greyScale/50 min-h-[9.5rem];
+    }
+
+    .cs-inventory-currency-row {
+        @apply grid grid-cols-5 gap-2 mb-3;
+    }
+
+    .cs-inventory-currency-item {
+        @apply flex flex-col gap-1;
+    }
+
+    .cs-inventory-currency-label {
+        @apply text-[0.6rem] font-bold uppercase tracking-wider text-color-greyScale/500 text-center;
+    }
+
+    .cs-inventory-currency-input {
+        @apply border border-color-greyScale/200 rounded-lg bg-color-greyScale/50 px-2 py-1 text-xs text-center outline-none
+            text-color-greyScale/900
+            focus:border-color-primary/default_900 focus:ring-1 focus:ring-color-primary/500 transition-all;
+    }
+
+    .cs-inventory-textarea {
+        @apply w-full h-full min-h-[9.5rem] cs-field-textarea;
+    }
+
+    .cs-inventory-textarea::placeholder {
+        @apply text-color-greyScale/300;
+    }
+
     .cs-right-col {
         @apply flex flex-col gap-3;
     }
@@ -250,7 +284,7 @@
     }
 
     .cs-bottom-row {
-        @apply grid grid-cols-3 gap-4 mt-6;
+        @apply grid grid-cols-2 gap-4 mt-6;
     }
 
     .cs-bottom-box {
@@ -282,9 +316,26 @@
             hover:border-color-primary/500 transition-colors;
     }
 
+    .cs-char-allies-top {
+        @apply flex items-start justify-between gap-4 mb-3;
+    }
+
+    .cs-char-allies-spacer {
+        @apply flex-1;
+    }
+
     .cs-char-allies-picture {
-        @apply border-2 border-dashed border-color-greyScale/300 rounded-lg p-2 bg-color-greyScale/100 w-32 h-32 float-right ml-4 mb-2
-            flex items-center justify-center;
+        @apply border-2 border-dashed border-color-greyScale/300 rounded-lg bg-color-greyScale/100 w-32 h-32
+            flex items-center justify-center shrink-0 cursor-pointer overflow-hidden
+            hover:border-color-primary/500 transition-colors;
+    }
+
+    .cs-char-allies-picture-label {
+        @apply text-xs text-color-greyScale/300 text-center px-2;
+    }
+
+    .cs-char-allies-textarea {
+        @apply w-full min-h-[14rem];
     }
 
     .cs-char-bottom {

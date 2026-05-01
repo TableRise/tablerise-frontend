@@ -18,11 +18,19 @@ const SPELLS_PER_LEVEL = 8;
 interface SheetMagiasProps {
     campaignId: string;
     characterId: string;
+    spellClassName?: string;
+    spellAbilityLabel?: string;
+    spellCd?: number;
+    spellAttackBonus?: number;
 }
 
 export default function SheetMagias({
     campaignId,
     characterId,
+    spellClassName = '',
+    spellAbilityLabel = '',
+    spellCd = 0,
+    spellAttackBonus = 0,
 }: SheetMagiasProps): JSX.Element {
     return (
         <div>
@@ -30,31 +38,37 @@ export default function SheetMagias({
             <div className="cs-spell-header">
                 <div className="cs-spell-header-box">
                     <input
-                        className="cs-field-input text-center"
+                        className="cs-field-input text-center cs-field-input--readonly bg-transparent"
+                        value={spellClassName}
                         placeholder="Classe"
+                        readOnly
                     />
                     <span className="cs-field-label">Classe de Magia</span>
                 </div>
                 <div className="cs-spell-header-box">
                     <input
-                        className="cs-field-input text-center"
-                        placeholder="0"
+                        className="cs-field-input text-center cs-field-input--readonly bg-transparent"
+                        value={spellAbilityLabel}
+                        placeholder="—"
+                        readOnly
                     />
-                    <span className="cs-field-label">
-                        Habilidade-Chave de Magia
-                    </span>
+                    <span className="cs-field-label">Habilidade-Chave de Magia</span>
                 </div>
                 <div className="cs-spell-header-box">
                     <input
-                        className="cs-field-input text-center"
+                        className="cs-field-input text-center cs-field-input--readonly bg-transparent"
+                        value={spellCd || ''}
                         placeholder="0"
+                        readOnly
                     />
                     <span className="cs-field-label">CD Resistência de Magia</span>
                 </div>
                 <div className="cs-spell-header-box">
                     <input
-                        className="cs-field-input text-center"
+                        className="cs-field-input text-center cs-field-input--readonly bg-transparent"
+                        value={spellAttackBonus ? `+${spellAttackBonus}` : ''}
                         placeholder="+0"
+                        readOnly
                     />
                     <span className="cs-field-label">Bônus de Ataque com Magia</span>
                 </div>
@@ -71,33 +85,37 @@ export default function SheetMagias({
                             {sl.slots && (
                                 <div className="cs-spell-slots">
                                     <span>Total</span>
-                                    <input className="cs-spell-slot-input" placeholder="0" />
+                                    <input
+                                        className="cs-spell-slot-input"
+                                        placeholder="0"
+                                    />
                                     <span>Usados</span>
-                                    <input className="cs-spell-slot-input" placeholder="0" />
+                                    <input
+                                        className="cs-spell-slot-input"
+                                        placeholder="0"
+                                    />
                                 </div>
                             )}
                         </div>
                         <div className="cs-spell-list">
-                            {Array.from({ length: SPELLS_PER_LEVEL }).map(
-                                (_, idx) => (
-                                    <div key={idx} className="cs-spell-row">
-                                        {sl.level > 0 && (
-                                            <input
-                                                type="checkbox"
-                                                className="cs-spell-check"
-                                            />
-                                        )}
+                            {Array.from({ length: SPELLS_PER_LEVEL }).map((_, idx) => (
+                                <div key={idx} className="cs-spell-row">
+                                    {sl.level > 0 && (
                                         <input
-                                            className="cs-spell-name-input"
-                                            placeholder={
-                                                sl.level === 0
-                                                    ? `Truque ${idx + 1}`
-                                                    : `Magia ${idx + 1}`
-                                            }
+                                            type="checkbox"
+                                            className="cs-spell-check"
                                         />
-                                    </div>
-                                ),
-                            )}
+                                    )}
+                                    <input
+                                        className="cs-spell-name-input"
+                                        placeholder={
+                                            sl.level === 0
+                                                ? `Truque ${idx + 1}`
+                                                : `Magia ${idx + 1}`
+                                        }
+                                    />
+                                </div>
+                            ))}
                         </div>
                     </div>
                 ))}

@@ -14,6 +14,12 @@ export default function CharacterSheetPage(): JSX.Element {
     const campaignId = searchParams.get('campaignId') ?? '';
     const characterId = searchParams.get('characterId') ?? '';
     const [activeTab, setActiveTab] = useState<(typeof TABS)[number]>('Principal');
+    const [spellData, setSpellData] = useState({
+        spellClassName: '',
+        spellAbilityLabel: '',
+        spellCd: 0,
+        spellAttackBonus: 0,
+    });
 
     return (
         <main>
@@ -35,24 +41,29 @@ export default function CharacterSheetPage(): JSX.Element {
                 </div>
 
                 <div className="cs-sheet">
-                    {activeTab === 'Principal' && (
+                    <div className={activeTab === 'Principal' ? '' : 'hidden'}>
                         <SheetPrincipal
                             campaignId={campaignId}
                             characterId={characterId}
+                            onSpellDataChange={setSpellData}
                         />
-                    )}
-                    {activeTab === 'Características' && (
+                    </div>
+                    <div className={activeTab === 'Características' ? '' : 'hidden'}>
                         <SheetCaracteristicas
                             campaignId={campaignId}
                             characterId={characterId}
                         />
-                    )}
-                    {activeTab === 'Magias e Habilidades' && (
+                    </div>
+                    <div className={activeTab === 'Magias e Habilidades' ? '' : 'hidden'}>
                         <SheetMagias
                             campaignId={campaignId}
                             characterId={characterId}
+                            spellClassName={spellData.spellClassName}
+                            spellAbilityLabel={spellData.spellAbilityLabel}
+                            spellCd={spellData.spellCd}
+                            spellAttackBonus={spellData.spellAttackBonus}
                         />
-                    )}
+                    </div>
                 </div>
             </div>
         </main>

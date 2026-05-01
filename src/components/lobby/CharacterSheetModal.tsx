@@ -72,7 +72,7 @@ export default function CharacterSheetModal({
                                 className="csm-card"
                                 onClick={() =>
                                     router.push(
-                                        `/campaigns/character-sheet?campaignId=${campaignId}&characterId=${char.characterId}`,
+                                        `/campaigns/character-sheet?campaignId=${campaignId}&characterId=${char.characterId}`
                                     )
                                 }
                             >
@@ -118,9 +118,7 @@ export default function CharacterSheetModal({
                     type="button"
                     className="button-L-fill bg-color-primary/default_900 text-color-greyScale/50"
                     onClick={() =>
-                        router.push(
-                            `/campaigns/character-sheet?campaignId=${campaignId}`,
-                        )
+                        router.push(`/campaigns/character-sheet?campaignId=${campaignId}`)
                     }
                 >
                     Criar Nova Ficha de Personagem

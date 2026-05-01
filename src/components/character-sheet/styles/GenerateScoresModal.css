@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    /* ── Backdrop ─────────────────────────────────────────── */
+    .gsm-backdrop {
+        @apply fixed inset-0 z-[60] flex items-center justify-center;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    /* ── Modal container ──────────────────────────────────── */
+    .gsm-modal {
+        @apply relative bg-white rounded-2xl flex flex-col p-8 gap-4;
+        width: 38rem;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    /* ── Header ───────────────────────────────────────────── */
+    .gsm-header {
+        @apply pb-3 border-b border-color-greyScale/200;
+    }
+
+    /* ── Info list ────────────────────────────────────────── */
+    .gsm-info-list {
+        @apply flex flex-col gap-4;
+    }
+
+    .gsm-info-item {
+        @apply flex flex-col gap-1;
+    }
+
+    .gsm-info-title {
+        @apply text-sm;
+    }
+
+    .gsm-info-text {
+        @apply text-sm leading-relaxed;
+    }
+
+    /* ── Score boxes ──────────────────────────────────────── */
+    .gsm-scores {
+        @apply flex gap-3 justify-center flex-wrap pt-2 border-t border-color-greyScale/200;
+    }
+
+    .gsm-score-box {
+        @apply flex items-center justify-center w-14 h-14 rounded-xl border-2 border-color-primary/default_900
+            bg-gradient-to-b from-color-greyScale/50 to-color-greyScale/100 shadow-sm;
+    }
+
+    .gsm-score-value {
+        @apply text-xl;
+    }
+
+    /* ── Reroll button ────────────────────────────────────── */
+    .gsm-reroll-btn {
+        @apply w-full h-10;
+    }
+
+    /* ── Close button ─────────────────────────────────────── */
+    .gsm-close-btn {
+        @apply w-full text-center text-color-greyScale/500 py-2 cursor-pointer;
+    }
+
+    .gsm-close-btn:hover {
+        @apply underline;
+    }
+}
