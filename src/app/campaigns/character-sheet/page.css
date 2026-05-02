@@ -427,4 +427,86 @@
     .cs-spell-name-input::placeholder {
         @apply text-color-greyScale/300;
     }
+
+    .cs-spell-name-input--inactive {
+        @apply bg-color-greyScale/200 border-transparent pointer-events-none;
+    }
+
+    .cs-spell-clear-btn {
+        @apply flex-shrink-0 text-[0.65rem] leading-none text-color-greyScale/300
+            hover:text-color-support/alert transition-colors px-1;
+    }
+
+    /* ── Spell picker modal ───────────────────── */
+
+    .cs-spell-picker-overlay {
+        @apply fixed inset-0 z-[300] flex items-center justify-center bg-black/60 px-4;
+    }
+
+    .cs-spell-picker-modal {
+        @apply bg-color-greyScale/50 rounded-2xl shadow-2xl w-full max-w-xl
+            flex flex-col max-h-[66vh] overflow-hidden border border-color-greyScale/200;
+    }
+
+    .cs-spell-picker-header {
+        @apply flex items-center justify-between px-6 pt-6 pb-4
+            border-b border-color-greyScale/200;
+    }
+
+    .cs-spell-picker-close {
+        @apply text-color-greyScale/300 hover:text-color-greyScale/700 transition-colors
+            text-lg leading-none cursor-pointer bg-transparent border-none p-1;
+    }
+
+    .cs-spell-picker-search {
+        @apply mx-6 my-4 border-2 border-color-greyScale/200 rounded-xl px-4 py-2
+            text-sm outline-none text-color-greyScale/900 bg-color-greyScale/50
+            focus:border-color-primary/default_900 transition-colors;
+    }
+
+    .cs-spell-picker-list {
+        @apply flex-1 overflow-y-auto px-6 pb-6 flex flex-col gap-2;
+    }
+
+    .cs-spell-accordion-item {
+        @apply border-2 py-4;
+    }
+
+    .cs-spell-accordion-trigger {
+        @apply w-full flex justify-between items-center px-6;
+    }
+
+    .cs-spell-accordion-chevron {
+        @apply text-[0.6rem] text-color-greyScale/300 flex-shrink-0;
+    }
+
+    .cs-spell-accordion-body {
+        @apply px-4 pt-2 pb-4 border-t border-color-greyScale/200 bg-color-greyScale/50;
+    }
+
+    .cs-spell-accordion-fields {
+        @apply grid grid-cols-2 gap-x-4 gap-y-2 mb-4;
+    }
+
+    .cs-spell-accordion-field {
+        @apply flex flex-col gap-0.5;
+    }
+
+    .cs-spell-accordion-field--full {
+        @apply col-span-2;
+    }
+
+    .cs-spell-accordion-field-label {
+        @apply text-[0.6rem] uppercase tracking-widest text-color-greyScale/500 font-semibold;
+    }
+
+    .cs-spell-accordion-field-value {
+        @apply text-xs text-color-greyScale/900 leading-snug;
+    }
+
+    .cs-spell-picker-choose-btn {
+        @apply mt-2 w-full py-2 rounded-xl text-sm font-semibold
+            bg-color-primary/default_900 text-color-greyScale/50 cursor-pointer
+            hover:opacity-90 transition-opacity border-none;
+    }
 }

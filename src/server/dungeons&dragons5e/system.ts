@@ -49,6 +49,39 @@ export const getDnd5eRaceById = async (raceId: string) => {
     }
 };
 
+export const getDnd5eSpellsByLevel = async (level: number) => {
+    try {
+        const { data }: AxiosResponse = await apiCall({
+            baseUrl: dndBaseUrl,
+            endpoint: 'spells/by-level',
+            method: 'GET',
+            params: { queryLevel: level },
+        });
+
+        return data ?? [];
+    } catch (error: AxiosError | any) {
+        const status = error?.response?.status;
+        if (status === 500) throw new Error('Erro no servidor');
+        return [];
+    }
+};
+
+export const getDnd5eSpellById = async (spellId: string) => {
+    try {
+        const { data }: AxiosResponse = await apiCall({
+            baseUrl: dndBaseUrl,
+            endpoint: `spells/${spellId}`,
+            method: 'GET',
+        });
+
+        return data ?? null;
+    } catch (error: AxiosError | any) {
+        const status = error?.response?.status;
+        if (status === 500) throw new Error('Erro no servidor');
+        return null;
+    }
+};
+
 export const getDnd5eClassById = async (classId: string) => {
     try {
         const { data }: AxiosResponse = await apiCall({

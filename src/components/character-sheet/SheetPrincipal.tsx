@@ -55,6 +55,15 @@ interface SheetPrincipalProps {
         spellAbilityLabel: string;
         spellCd: number;
         spellAttackBonus: number;
+        levelingSpecs?: {
+            cantripsKnown: { isValidToThisClass: boolean; amount: number[] };
+            spellsKnown: { isValidToThisClass: boolean; amount: number[] };
+            spellSlotsPerSpellLevel: {
+                isValidToThisClass: boolean;
+                spellLevel: number[];
+                spellSpaces: number[][];
+            };
+        };
     }) => void;
 }
 
@@ -72,6 +81,7 @@ export default function SheetPrincipal({
     const [hpTotal, setHpTotal] = useState(0);
     const [spellAbilityLabel, setSpellAbilityLabel] = useState('');
     const [spellAbilityKey, setSpellAbilityKey] = useState('');
+    const [classLevelingSpecs, setClassLevelingSpecs] = useState<any>(null);
     const [races, setRaces] = useState<{ raceId: string; pt: { name: string } }[]>([]);
     const [selectedRaceId, setSelectedRaceId] = useState('');
     const [raceSpeed, setRaceSpeed] = useState(0);
@@ -138,12 +148,14 @@ export default function SheetPrincipal({
             setHitDice('');
             setSpellAbilityLabel('');
             setSpellAbilityKey('');
+            setClassLevelingSpecs(null);
             return;
         }
         const cls = await getDnd5eClassById(classId);
         if (!cls?.en?.hitPoints?.hitPointsAtFirstLevel) return;
         setClassBaseHp(Number(cls.en.hitPoints.hitPointsAtFirstLevel));
         setHitDice(cls.en.hitPoints.hitDice?.[0] ?? '');
+        setClassLevelingSpecs(cls.levelingSpecs ?? cls.en?.levelingSpecs ?? null);
         const MAGIC_CLASS_PT: Record<string, string> = {
             strength: 'Força',
             dexterity: 'Destreza',
@@ -194,8 +206,16 @@ export default function SheetPrincipal({
             spellAbilityLabel,
             spellCd: spellAbilityKey ? 8 + 2 + mod : 0,
             spellAttackBonus: spellAbilityKey ? 2 + mod : 0,
+            levelingSpecs: classLevelingSpecs ?? undefined,
         });
-    }, [selectedClassId, classes, spellAbilityKey, spellAbilityLabel, abilityScores]);
+    }, [
+        selectedClassId,
+        classes,
+        spellAbilityKey,
+        spellAbilityLabel,
+        abilityScores,
+        classLevelingSpecs,
+    ]);
 
     useEffect(() => {
         if (!selectedRaceId) {
