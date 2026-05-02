@@ -98,6 +98,24 @@ export default function SheetPrincipal({
         wis: 0,
         cha: 0,
     });
+    const [characterName, setCharacterName] = useState('');
+    const [alignment, setAlignment] = useState('');
+    const [personalityTraits, setPersonalityTraits] = useState('');
+    const [ideals, setIdeals] = useState('');
+    const [bonds, setBonds] = useState('');
+    const [flaws, setFlaws] = useState('');
+    const [currentHp, setCurrentHp] = useState(0);
+    const [tempHp, setTempHp] = useState(0);
+    const [inspiration, setInspiration] = useState(0);
+    const [deathSaves, setDeathSaves] = useState({ success: 0, failures: 0 });
+    const [attacks, setAttacks] = useState([
+        { name: '', atkBonus: '', damageRaw: '' },
+        { name: '', atkBonus: '', damageRaw: '' },
+        { name: '', atkBonus: '', damageRaw: '' },
+    ]);
+    const [money, setMoney] = useState({ cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 });
+    const [proficienciesText, setProficienciesText] = useState('');
+    const [extraCharacteristics, setExtraCharacteristics] = useState('');
 
     const calcMod = (score: number): string => {
         if (score === 0) return '+0';
@@ -247,6 +265,8 @@ export default function SheetPrincipal({
                     <input
                         className="cs-field-input text-lg"
                         placeholder="Nome do Personagem"
+                        value={characterName}
+                        onChange={(e) => setCharacterName(e.target.value)}
                     />
                     <span className="cs-field-label">Nome do Personagem</span>
                 </div>
@@ -309,7 +329,12 @@ export default function SheetPrincipal({
                     <span className="cs-field-label">Raça</span>
                 </div>
                 <div className="cs-field">
-                    <input className="cs-field-input" placeholder="Tendência" />
+                    <input
+                        className="cs-field-input"
+                        placeholder="Tendência"
+                        value={alignment}
+                        onChange={(e) => setAlignment(e.target.value)}
+                    />
                     <span className="cs-field-label">Tendência</span>
                 </div>
                 <div className="cs-field">
@@ -371,9 +396,17 @@ export default function SheetPrincipal({
                 <div className="cs-middle-col">
                     {/* Inspiration & Proficiency */}
                     <div className="cs-inspiration-row">
-                        <span className="text-sm font-bold text-color-greyScale/300">
-                            OFF
-                        </span>
+                        <button
+                            type="button"
+                            className={`text-sm font-bold ${
+                                inspiration
+                                    ? 'text-color-primary/default_900'
+                                    : 'text-color-greyScale/300'
+                            }`}
+                            onClick={() => setInspiration(inspiration ? 0 : 1)}
+                        >
+                            {inspiration ? 'ON' : 'OFF'}
+                        </button>
                         <span className="cs-field-label">Inspiração</span>
                     </div>
                     <div className="cs-proficiency-row">
@@ -508,7 +541,10 @@ export default function SheetPrincipal({
                         <div className="cs-hp-current">
                             <input
                                 className="cs-field-input text-center w-20 text-2xl"
+                                type="number"
                                 placeholder="0"
+                                value={currentHp || ''}
+                                onChange={(e) => setCurrentHp(Number(e.target.value))}
                             />
                         </div>
                         <p className="cs-section-title">Pontos de Vida Atuais</p>
@@ -518,7 +554,10 @@ export default function SheetPrincipal({
                     <div className="cs-hp-temp">
                         <input
                             className="cs-field-input text-center w-full h-10"
+                            type="number"
                             placeholder="0"
+                            value={tempHp || ''}
+                            onChange={(e) => setTempHp(Number(e.target.value))}
                         />
                         <p className="cs-section-title">Pontos de Vida Temporários</p>
                     </div>
@@ -543,7 +582,23 @@ export default function SheetPrincipal({
                                     </span>
                                     <div className="cs-death-save-dots">
                                         {[0, 1, 2].map((i) => (
-                                            <div key={i} className="cs-death-dot" />
+                                            <div
+                                                key={i}
+                                                className={`cs-death-dot cursor-pointer${
+                                                    i < deathSaves.success
+                                                        ? ' cs-death-dot--filled'
+                                                        : ''
+                                                }`}
+                                                onClick={() =>
+                                                    setDeathSaves((prev) => ({
+                                                        ...prev,
+                                                        success:
+                                                            prev.success === i + 1
+                                                                ? i
+                                                                : i + 1,
+                                                    }))
+                                                }
+                                            />
                                         ))}
                                     </div>
                                 </div>
@@ -553,7 +608,23 @@ export default function SheetPrincipal({
                                     </span>
                                     <div className="cs-death-save-dots">
                                         {[0, 1, 2].map((i) => (
-                                            <div key={i} className="cs-death-dot" />
+                                            <div
+                                                key={i}
+                                                className={`cs-death-dot cursor-pointer${
+                                                    i < deathSaves.failures
+                                                        ? ' cs-death-dot--filled'
+                                                        : ''
+                                                }`}
+                                                onClick={() =>
+                                                    setDeathSaves((prev) => ({
+                                                        ...prev,
+                                                        failures:
+                                                            prev.failures === i + 1
+                                                                ? i
+                                                                : i + 1,
+                                                    }))
+                                                }
+                                            />
                                         ))}
                                     </div>
                                 </div>
@@ -569,11 +640,45 @@ export default function SheetPrincipal({
                             <span>Bônus</span>
                             <span>Dano/Tipo</span>
                         </div>
-                        {[0, 1, 2].map((i) => (
+                        {attacks.map((atk, i) => (
                             <div key={i} className="cs-attack-row">
-                                <input className="cs-field-input" />
-                                <input className="cs-field-input" />
-                                <input className="cs-field-input" />
+                                <input
+                                    className="cs-field-input"
+                                    value={atk.name}
+                                    onChange={(e) =>
+                                        setAttacks((prev) =>
+                                            prev.map((a, j) =>
+                                                j === i ? { ...a, name: e.target.value } : a
+                                            )
+                                        )
+                                    }
+                                />
+                                <input
+                                    className="cs-field-input"
+                                    value={atk.atkBonus}
+                                    onChange={(e) =>
+                                        setAttacks((prev) =>
+                                            prev.map((a, j) =>
+                                                j === i
+                                                    ? { ...a, atkBonus: e.target.value }
+                                                    : a
+                                            )
+                                        )
+                                    }
+                                />
+                                <input
+                                    className="cs-field-input"
+                                    value={atk.damageRaw}
+                                    onChange={(e) =>
+                                        setAttacks((prev) =>
+                                            prev.map((a, j) =>
+                                                j === i
+                                                    ? { ...a, damageRaw: e.target.value }
+                                                    : a
+                                            )
+                                        )
+                                    }
+                                />
                             </div>
                         ))}
                         <p className="cs-section-title">Ataques e Magias</p>
@@ -582,17 +687,24 @@ export default function SheetPrincipal({
                     {/* Inventory */}
                     <div className="cs-equipment-box">
                         <div className="cs-inventory-currency-row">
-                            {['CP', 'SP', 'EP', 'GP', 'PP'].map((currency) => (
+                            {(['cp', 'sp', 'ep', 'gp', 'pp'] as const).map((key) => (
                                 <label
-                                    key={currency}
+                                    key={key}
                                     className="cs-inventory-currency-item"
                                 >
                                     <span className="cs-inventory-currency-label">
-                                        {currency}
+                                        {key.toUpperCase()}
                                     </span>
                                     <input
                                         className="cs-inventory-currency-input"
                                         type="number"
+                                        value={money[key] || ''}
+                                        onChange={(e) =>
+                                            setMoney((prev) => ({
+                                                ...prev,
+                                                [key]: Number(e.target.value),
+                                            }))
+                                        }
                                     />
                                 </label>
                             ))}
@@ -613,6 +725,8 @@ export default function SheetPrincipal({
                         <textarea
                             className="cs-field-textarea w-full h-16"
                             placeholder="Traços de Personalidade..."
+                            value={personalityTraits}
+                            onChange={(e) => setPersonalityTraits(e.target.value)}
                         />
                         <p className="cs-section-title">Traços de Personalidade</p>
                     </div>
@@ -620,6 +734,8 @@ export default function SheetPrincipal({
                         <textarea
                             className="cs-field-textarea w-full h-16"
                             placeholder="Ideais..."
+                            value={ideals}
+                            onChange={(e) => setIdeals(e.target.value)}
                         />
                         <p className="cs-section-title">Ideais</p>
                     </div>
@@ -627,6 +743,8 @@ export default function SheetPrincipal({
                         <textarea
                             className="cs-field-textarea w-full h-16"
                             placeholder="Ligações..."
+                            value={bonds}
+                            onChange={(e) => setBonds(e.target.value)}
                         />
                         <p className="cs-section-title">Ligações</p>
                     </div>
@@ -634,6 +752,8 @@ export default function SheetPrincipal({
                         <textarea
                             className="cs-field-textarea w-full h-16"
                             placeholder="Defeitos..."
+                            value={flaws}
+                            onChange={(e) => setFlaws(e.target.value)}
                         />
                         <p className="cs-section-title">Defeitos</p>
                     </div>
@@ -646,6 +766,8 @@ export default function SheetPrincipal({
                     <textarea
                         className="cs-field-textarea w-full h-full"
                         placeholder="Idiomas e proficiências..."
+                        value={proficienciesText}
+                        onChange={(e) => setProficienciesText(e.target.value)}
                     />
                     <p className="cs-section-title my-4">
                         Idiomas e Outras Proficiências
@@ -655,6 +777,8 @@ export default function SheetPrincipal({
                     <textarea
                         className="cs-field-textarea w-full h-full"
                         placeholder="Características e habilidades..."
+                        value={extraCharacteristics}
+                        onChange={(e) => setExtraCharacteristics(e.target.value)}
                     />
                     <p className="cs-section-title my-4">Características e Habilidades</p>
                 </div>

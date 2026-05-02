@@ -123,6 +123,9 @@ export default function SheetMagias({
     );
     const [detailSpell, setDetailSpell] = useState<Spell | null>(null);
     const [detailLoading, setDetailLoading] = useState(false);
+    const [slotsExpended, setSlotsExpended] = useState<Record<number, number>>(
+        () => Object.fromEntries([1, 2, 3, 4, 5, 6, 7, 8, 9].map((l) => [l, 0]))
+    );
 
     const handleOpenPicker = async (level: number) => {
         setPickerLevel(level);
@@ -264,7 +267,15 @@ export default function SheetMagias({
                                     <span>Usados</span>
                                     <input
                                         className="cs-spell-slot-input"
+                                        type="number"
                                         placeholder="0"
+                                        value={slotsExpended[sl.level] || ''}
+                                        onChange={(e) =>
+                                            setSlotsExpended((prev) => ({
+                                                ...prev,
+                                                [sl.level]: Number(e.target.value),
+                                            }))
+                                        }
                                     />
                                 </div>
                             )}

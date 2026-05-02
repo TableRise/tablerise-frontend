@@ -27,6 +27,16 @@ export default function SheetCaracteristicas({
         if (!file) return;
         setAppearanceSrc(URL.createObjectURL(file));
     };
+
+    const [appearance, setAppearance] = useState({
+        age: '',
+        height: '',
+        eyes: '',
+        skin: '',
+        hair: '',
+        weight: '',
+    });
+    const [backstory, setBackstory] = useState('');
     return (
         <div>
             {/* ── Header ──────────────────────────────── */}
@@ -39,30 +49,72 @@ export default function SheetCaracteristicas({
                     <span className="cs-field-label">Nome do Personagem</span>
                 </div>
                 <div className="cs-field">
-                    <input className="cs-field-input" placeholder="Idade" />
+                    <input
+                        className="cs-field-input"
+                        placeholder="Idade"
+                        value={appearance.age}
+                        onChange={(e) =>
+                            setAppearance((p) => ({ ...p, age: e.target.value }))
+                        }
+                    />
                     <span className="cs-field-label">Idade</span>
                 </div>
                 <div className="cs-field">
-                    <input className="cs-field-input" placeholder="Altura" />
+                    <input
+                        className="cs-field-input"
+                        placeholder="Altura"
+                        value={appearance.height}
+                        onChange={(e) =>
+                            setAppearance((p) => ({ ...p, height: e.target.value }))
+                        }
+                    />
                     <span className="cs-field-label">Altura</span>
                 </div>
             </div>
 
             <div className="cs-char-header-row2">
                 <div className="cs-field">
-                    <input className="cs-field-input" placeholder="Olhos" />
+                    <input
+                        className="cs-field-input"
+                        placeholder="Olhos"
+                        value={appearance.eyes}
+                        onChange={(e) =>
+                            setAppearance((p) => ({ ...p, eyes: e.target.value }))
+                        }
+                    />
                     <span className="cs-field-label">Olhos</span>
                 </div>
                 <div className="cs-field">
-                    <input className="cs-field-input" placeholder="Pele" />
+                    <input
+                        className="cs-field-input"
+                        placeholder="Pele"
+                        value={appearance.skin}
+                        onChange={(e) =>
+                            setAppearance((p) => ({ ...p, skin: e.target.value }))
+                        }
+                    />
                     <span className="cs-field-label">Pele</span>
                 </div>
                 <div className="cs-field">
-                    <input className="cs-field-input" placeholder="Cabelo" />
+                    <input
+                        className="cs-field-input"
+                        placeholder="Cabelo"
+                        value={appearance.hair}
+                        onChange={(e) =>
+                            setAppearance((p) => ({ ...p, hair: e.target.value }))
+                        }
+                    />
                     <span className="cs-field-label">Cabelo</span>
                 </div>
                 <div className="cs-field">
-                    <input className="cs-field-input" placeholder="Peso" />
+                    <input
+                        className="cs-field-input"
+                        placeholder="Peso"
+                        value={appearance.weight}
+                        onChange={(e) =>
+                            setAppearance((p) => ({ ...p, weight: e.target.value }))
+                        }
+                    />
                     <span className="cs-field-label">Peso</span>
                 </div>
             </div>
@@ -151,6 +203,8 @@ export default function SheetCaracteristicas({
                     <textarea
                         className="cs-field-textarea w-full min-h-[18rem]"
                         placeholder="História do personagem..."
+                        value={backstory}
+                        onChange={(e) => setBackstory(e.target.value)}
                     />
                     <p className="cs-section-title">História do Personagem</p>
                 </div>
