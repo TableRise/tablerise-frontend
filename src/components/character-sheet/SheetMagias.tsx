@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 import Image from 'next/image';
 import Book from '../../../assets/icons/nav/book.svg?url';
 import {
@@ -73,15 +73,27 @@ interface SheetMagiasProps {
     levelingSpecs?: LevelingSpecs;
 }
 
-export default function SheetMagias({
-    campaignId,
-    characterId,
-    spellClassName = '',
-    spellAbilityLabel = '',
-    spellCd = 0,
-    spellAttackBonus = 0,
-    levelingSpecs,
-}: SheetMagiasProps): JSX.Element {
+export interface SheetMagiasHandle {
+    getData: () => {
+        spellNames: Record<number, { name: string; spellId: string }[]>;
+        slotsExpended: Record<number, number>;
+        slotTotals: Record<number, number>;
+    };
+}
+
+const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(
+    function SheetMagias(
+        {
+            campaignId,
+            characterId,
+            spellClassName = '',
+            spellAbilityLabel = '',
+            spellCd = 0,
+            spellAttackBonus = 0,
+            levelingSpecs,
+        },
+        ref
+    ) {
     const getActiveSlots = (spellLevel: number): number => {
         if (!levelingSpecs) return SPELLS_PER_LEVEL;
         if (spellLevel === 0) {
@@ -171,6 +183,17 @@ export default function SheetMagias({
 
     const formatBadges = (list: string[], sentinel: string) =>
         list.filter((v) => v !== sentinel);
+
+    useImperativeHandle(ref, () => ({
+        getData: () => {
+            const slotTotals: Record<number, number> = {};
+            for (let l = 1; l <= 9; l++) slotTotals[l] = Number(getSlotTotal(l));
+            const coercedExpended: Record<number, number> = {};
+            for (let l = 1; l <= 9; l++)
+                coercedExpended[l] = Number(slotsExpended[l] ?? 0);
+            return { spellNames, slotsExpended: coercedExpended, slotTotals };
+        },
+    }));
 
     const filteredSpells = pickerSpells.filter((s) =>
         s.pt.name.toLowerCase().includes(pickerSearch.toLowerCase())
@@ -658,3 +681,6 @@ export default function SheetMagias({
         </>
     );
 }
+);
+
+export default SheetMagias;

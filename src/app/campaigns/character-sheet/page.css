@@ -29,6 +29,22 @@
         @apply w-full max-w-[64rem] bg-color-greyScale/50 rounded-2xl p-8 shadow-lg border border-color-greyScale/200;
     }
 
+    .cs-footer-bar {
+        @apply w-[64rem] flex flex-col gap-1 bg-color-greyScale/50 rounded-2xl p-1.5 shadow-md border border-color-greyScale/200;
+    }
+
+    .cs-footer-btn {
+        @apply px-10 py-2.5 rounded-xl cursor-pointer transition-all w-full
+            bg-color-primary/default_900 text-color-greyScale/50 shadow-sm border-none
+            hover:opacity-90 active:scale-95;
+    }
+
+    .cs-footer-btn--secondary {
+        @apply bg-transparent text-color-greyScale/500 shadow-none
+            border border-color-primary/default_900
+            hover:bg-color-greyScale/100 hover:opacity-100;
+    }
+
     /* ── Shared sheet styles ──────────────────── */
 
     .cs-section-title {
@@ -326,8 +342,8 @@
 
     .cs-char-allies-picture {
         @apply border-2 border-dashed border-color-greyScale/300 rounded-lg bg-color-greyScale/100 w-32 h-32
-            flex items-center justify-center shrink-0 cursor-pointer overflow-hidden
-            hover:border-color-primary/500 transition-colors;
+            flex items-center justify-center shrink-0 overflow-visible
+            transition-colors;
     }
 
     .cs-char-allies-picture-label {

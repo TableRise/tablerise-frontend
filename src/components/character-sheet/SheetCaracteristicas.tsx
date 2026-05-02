@@ -1,33 +1,23 @@
 'use client';
-import { useRef, useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 
 interface SheetCaracteristicasProps {
     campaignId: string;
     characterId: string;
 }
 
-export default function SheetCaracteristicas({
-    campaignId,
-    characterId,
-}: SheetCaracteristicasProps): JSX.Element {
-    const [emblemSrc, setEmblemSrc] = useState<string | null>(null);
-    const emblemInputRef = useRef<HTMLInputElement>(null);
-
-    const handleEmblemChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        setEmblemSrc(URL.createObjectURL(file));
+export interface SheetCaracteristicasHandle {
+    getData: () => {
+        appearance: { age: string; height: string; eyes: string; skin: string; hair: string; weight: string };
+        backstory: string;
+        alliesAndOrgs: string;
+        treasure: string;
+        extraCharacteristicsDetail: string;
     };
+}
 
-    const [appearanceSrc, setAppearanceSrc] = useState<string | null>(null);
-    const appearanceInputRef = useRef<HTMLInputElement>(null);
-
-    const handleAppearanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        setAppearanceSrc(URL.createObjectURL(file));
-    };
-
+const SheetCaracteristicas = forwardRef<SheetCaracteristicasHandle, SheetCaracteristicasProps>(
+    function SheetCaracteristicas({ campaignId, characterId }, ref) {
     const [appearance, setAppearance] = useState({
         age: '',
         height: '',
@@ -37,6 +27,20 @@ export default function SheetCaracteristicas({
         weight: '',
     });
     const [backstory, setBackstory] = useState('');
+    const [alliesAndOrgs, setAlliesAndOrgs] = useState('');
+    const [treasure, setTreasure] = useState('');
+    const [extraCharacteristicsDetail, setExtraCharacteristicsDetail] = useState('');
+
+    useImperativeHandle(ref, () => ({
+        getData: () => ({
+            appearance,
+            backstory,
+            alliesAndOrgs,
+            treasure,
+            extraCharacteristicsDetail,
+        }),
+    }));
+
     return (
         <div>
             {/* ── Header ──────────────────────────────── */}
@@ -124,30 +128,13 @@ export default function SheetCaracteristicas({
                 {/* Left: Appearance */}
                 <div className="cs-char-appearance">
                     <div className="cs-char-allies-top">
-                        <div
-                            className="cs-char-allies-picture"
-                            onClick={() => appearanceInputRef.current?.click()}
-                            title="Clique para escolher imagem"
-                        >
-                            <input
-                                ref={appearanceInputRef}
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={handleAppearanceChange}
-                            />
-                            {appearanceSrc ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
-                                    src={appearanceSrc}
-                                    alt="Aparência"
-                                    className="w-full h-full object-cover rounded-md"
-                                />
-                            ) : (
-                                <span className="cs-char-allies-picture-label">
-                                    Foto do Personagem
-                                </span>
-                            )}
+                        <div className="cs-char-allies-picture relative group cursor-not-allowed">
+                            <span className="cs-char-allies-picture-label">
+                                Foto do Personagem
+                            </span>
+                            <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-56 -translate-x-1/2 rounded bg-gray-800 p-2 text-center text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                                Este campo não está disponível na criação do personagem mas estará habilitado para uso na tela de gerenciamento da sua ficha.
+                            </div>
                         </div>
                         <div className="cs-char-allies-spacer" aria-hidden="true" />
                     </div>
@@ -161,36 +148,21 @@ export default function SheetCaracteristicas({
                 {/* Right: Allies & Organizations */}
                 <div className="cs-char-allies">
                     <div className="cs-char-allies-top">
-                        <div
-                            className="cs-char-allies-picture"
-                            onClick={() => emblemInputRef.current?.click()}
-                            title="Clique para escolher imagem"
-                        >
-                            <input
-                                ref={emblemInputRef}
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={handleEmblemChange}
-                            />
-                            {emblemSrc ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
-                                    src={emblemSrc}
-                                    alt="Símbolo / Emblema"
-                                    className="w-full h-full object-cover rounded-md"
-                                />
-                            ) : (
-                                <span className="cs-char-allies-picture-label">
-                                    Símbolo / Emblema
-                                </span>
-                            )}
+                        <div className="cs-char-allies-picture relative group cursor-not-allowed">
+                            <span className="cs-char-allies-picture-label">
+                                Símbolo / Emblema
+                            </span>
+                            <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-56 -translate-x-1/2 rounded bg-gray-800 p-2 text-center text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                                Este campo não está disponível na criação do personagem mas estará habilitado para uso na tela de gerenciamento da sua ficha.
+                            </div>
                         </div>
                         <div className="cs-char-allies-spacer" aria-hidden="true" />
                     </div>
                     <textarea
                         className="cs-field-textarea cs-char-allies-textarea"
                         placeholder="Aliados e organizações..."
+                        value={alliesAndOrgs}
+                        onChange={(e) => setAlliesAndOrgs(e.target.value)}
                     />
                     <p className="cs-section-title">Aliados e Organizações</p>
                 </div>
@@ -215,6 +187,8 @@ export default function SheetCaracteristicas({
                         <textarea
                             className="cs-field-textarea w-full min-h-[6rem]"
                             placeholder="Tesouro..."
+                            value={treasure}
+                            onChange={(e) => setTreasure(e.target.value)}
                         />
                         <p className="cs-section-title">Tesouro</p>
                     </div>
@@ -224,6 +198,8 @@ export default function SheetCaracteristicas({
                         <textarea
                             className="cs-field-textarea w-full min-h-[6rem]"
                             placeholder="Características e habilidades adicionais..."
+                            value={extraCharacteristicsDetail}
+                            onChange={(e) => setExtraCharacteristicsDetail(e.target.value)}
                         />
                         <p className="cs-section-title">
                             Características e Habilidades Adicionais
@@ -234,3 +210,6 @@ export default function SheetCaracteristicas({
         </div>
     );
 }
+);
+
+export default SheetCaracteristicas;

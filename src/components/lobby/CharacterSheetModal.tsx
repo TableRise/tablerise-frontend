@@ -8,6 +8,7 @@ import {
     getCharactersByCampaign,
     type CharacterDnd,
 } from '@/server/characters/get-characters';
+import { removeCharacterFromCampaign } from '@/server/characters/create-character';
 import '@/components/lobby/styles/CharacterSheetModal.css';
 
 interface CharacterSheetModalProps {
@@ -34,6 +35,18 @@ export default function CharacterSheetModal({
     const router = useRouter();
     const [characters, setCharacters] = useState<CharacterDnd[]>([]);
     const [loading, setLoading] = useState(true);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+
+    const handleDelete = async (e: React.MouseEvent, characterId: string) => {
+        e.stopPropagation();
+        setDeletingId(characterId);
+        try {
+            await removeCharacterFromCampaign(campaignId, characterId);
+            setCharacters((prev) => prev.filter((c) => c.characterId !== characterId));
+        } finally {
+            setDeletingId(null);
+        }
+    };
 
     useEffect(() => {
         getCharactersByCampaign(campaignId)
@@ -102,7 +115,12 @@ export default function CharacterSheetModal({
                                         </span>
                                     </div>
                                 </div>
-                                <button type="button" className="csm-card-delete">
+                                <button
+                                    type="button"
+                                    className="csm-card-delete"
+                                    disabled={deletingId === char.characterId}
+                                    onClick={(e) => handleDelete(e, char.characterId)}
+                                >
                                     <Image
                                         src={TrashSVG}
                                         alt="Excluir"
