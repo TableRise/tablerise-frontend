@@ -1,0 +1,231 @@
+================================================================================
+FRONTEND GUIDE: PUT /characters/:id/update
+================================================================================
+
+OVERVIEW
+--------
+This route performs a partial (atomic) update on a character sheet.
+You only send the fields you want to change — everything else is preserved
+from the database automatically.
+
+Authentication: cookie-based session (must be logged in)
+Content-Type:   application/json
+Method:         PUT
+Path:           /characters/:id/update
+  - :id = the character's UUID (e.g. "64f1a2b3c4d5e6f7a8b9c0d1")
+
+================================================================================
+PAYLOAD STRUCTURE (full shape, all fields optional)
+================================================================================
+
+{
+  "data": {
+    "profile"?: {
+      "name"?:  string,
+      "class"?: string,    // UUID of the class
+      "race"?:  string,    // UUID of the race
+      "level"?: number,
+      "xp"?:    number,
+      "characteristics"?: {
+        "alignment"?:        string,
+        "backstory"?:        string,
+        "personalityTraits"?: string,
+        "ideals"?:           string,
+        "bonds"?:            string,
+        "flaws"?:            string,
+        "appearance"?: {
+          "eyes"?:   string,
+          "age"?:    string,
+          "weight"?: string,
+          "height"?: string,
+          "skin"?:   string,
+          "hair"?:   string
+        },
+        "other"?: {
+          "proficiencies"?:       string,
+          "extraCharacteristics"?: string
+        },
+        "alliesAndOrgs"?: string,
+        "treasure"?:      string
+      }
+    },
+
+    "stats"?: {
+      "proficiencyBonus"?: number,
+      "inspiration"?:      number,
+      "passiveWisdom"?:    number,
+      "speed"?:            number,
+      "initiative"?:       number,
+      "armorClass"?:       number,
+      "hitPoints"?: {
+        "points"?:        number,   // max HP
+        "currentPoints"?: number,   // current HP
+        "tempPoints"?:    number,   // temporary HP
+        "dicePoints"?:    string    // e.g. "1d10"
+      },
+      "deathSaves"?: {
+        "success"?:  number,
+        "failures"?: number
+      },
+      "spellCasting"?: {
+        "class"?:       string,
+        "ability"?:     string,
+        "saveDc"?:      number,
+        "attackBonus"?: number
+      },
+      "abilityScores"?: [
+        {
+          "ability"?:     string,   // e.g. "strength"
+          "value"?:       number,
+          "modifier"?:    number,
+          "proficiency"?: boolean
+        }
+      ],
+      "skills"?: {
+        [skillName: string]: number  // e.g. { "athletics": 4, "stealth": 2 }
+      }
+    },
+
+    "money"?: {
+      "cp"?: number,   // copper
+      "sp"?: number,   // silver
+      "ep"?: number,   // electrum
+      "gp"?: number,   // gold
+      "pp"?: number    // platinum
+    }
+  }
+}
+
+================================================================================
+RULES
+================================================================================
+
+1. The top-level "data" key is ALWAYS required, even for a single-field update.
+
+2. "data.profile", "data.stats", and "data.money" are all optional.
+   Only include the sections you want to update.
+
+3. Every field inside each section is optional. You can send a single field
+   inside a nested object (e.g. only "hitPoints.currentPoints") without
+   providing the other fields in that object.
+
+4. The following identifiers are ALWAYS preserved from the database and
+   cannot be changed through this route:
+     - characterId
+     - campaignId
+     - matchId
+
+5. "npc", "author", "picture", "logs", "createdAt", "updatedAt"
+   are backend-managed fields. Do NOT include them in the payload.
+
+================================================================================
+EXAMPLES
+================================================================================
+
+--- Update only the character name ---
+PUT /characters/64f1a2b3c4d5e6f7a8b9c0d1/update
+{
+  "data": {
+    "profile": {
+      "name": "Aldric Stonebrow"
+    }
+  }
+}
+
+--- Update only current HP ---
+PUT /characters/64f1a2b3c4d5e6f7a8b9c0d1/update
+{
+  "data": {
+    "stats": {
+      "hitPoints": {
+        "currentPoints": 18
+      }
+    }
+  }
+}
+
+--- Update armorClass only ---
+PUT /characters/64f1a2b3c4d5e6f7a8b9c0d1/update
+{
+  "data": {
+    "stats": {
+      "armorClass": 16
+    }
+  }
+}
+
+--- Update gold only ---
+PUT /characters/64f1a2b3c4d5e6f7a8b9c0d1/update
+{
+  "data": {
+    "money": {
+      "gp": 120
+    }
+  }
+}
+
+--- Update death saves ---
+PUT /characters/64f1a2b3c4d5e6f7a8b9c0d1/update
+{
+  "data": {
+    "stats": {
+      "deathSaves": {
+        "success": 2,
+        "failures": 1
+      }
+    }
+  }
+}
+
+--- Update level, XP, and current HP together ---
+PUT /characters/64f1a2b3c4d5e6f7a8b9c0d1/update
+{
+  "data": {
+    "profile": {
+      "level": 5,
+      "xp": 6500
+    },
+    "stats": {
+      "hitPoints": {
+        "currentPoints": 38,
+        "points": 38
+      }
+    }
+  }
+}
+
+--- Update backstory ---
+PUT /characters/64f1a2b3c4d5e6f7a8b9c0d1/update
+{
+  "data": {
+    "profile": {
+      "characteristics": {
+        "backstory": "Raised by wolves in the Ashwood forest..."
+      }
+    }
+  }
+}
+
+--- Update spell casting info ---
+PUT /characters/64f1a2b3c4d5e6f7a8b9c0d1/update
+{
+  "data": {
+    "stats": {
+      "spellCasting": {
+        "saveDc": 14,
+        "attackBonus": 6
+      }
+    }
+  }
+}
+
+================================================================================
+RELATED ROUTES
+================================================================================
+
+| Field           | Dedicated route                         |
+|-----------------|-----------------------------------------|
+| profile picture | POST /characters/:id/picture            |
+| org symbol      | POST /characters/:id/symbol?orgName=... |
+
+================================================================================

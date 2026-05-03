@@ -1,5 +1,5 @@
 import { AxiosResponse, AxiosError } from 'axios';
-import { apiCall, charactersBaseUrl } from '../wrapper';
+import { apiCall, charactersBaseUrl, campaignsBaseUrl } from '../wrapper';
 
 export interface CharacterAuthor {
     userId: string;
@@ -37,6 +37,121 @@ export const getCharactersByCampaign = async (
         const status = error?.response?.status;
         if (status === 404) return [];
         if (status === 500) throw new Error('Erro no servidor');
+        return [];
+    }
+};
+
+export interface CampaignCharacter {
+    id: string;
+    name: string;
+    image: string;
+}
+
+export interface FullCharacterDnd {
+    characterId: string;
+    author: CharacterAuthor;
+    npc: boolean;
+    createdAt: string;
+    updatedAt: string;
+    data: {
+        profile: {
+            name: string;
+            class: string;
+            race: string;
+            level: number;
+            xp: number;
+            characteristics: {
+                alignment?: string;
+                backstory?: string;
+                personalityTraits?: string;
+                ideals?: string;
+                bonds?: string;
+                flaws?: string;
+                appearance?: {
+                    age?: string;
+                    height?: string;
+                    weight?: string;
+                    eyes?: string;
+                    skin?: string;
+                    hair?: string;
+                    picture?: {
+                        link: string;
+                    };
+                };
+                alliesAndOrgs?: string;
+                treasure?: string;
+                other?: { proficiencies?: string; extraCharacteristics?: string };
+            };
+        };
+        stats: {
+            abilityScores: {
+                ability: string;
+                value: number;
+                modifier: number;
+                proficiency: boolean;
+            }[];
+            skills: Record<string, number>;
+            proficiencyBonus: number;
+            inspiration: number;
+            passiveWisdom: number;
+            speed: number;
+            initiative: number;
+            armorClass: number;
+            hitPoints: {
+                points: number;
+                currentPoints: number;
+                tempPoints: number;
+                dicePoints: string;
+            };
+            deathSaves: { success: number; failures: number };
+            spellCasting?: {
+                class?: string;
+                ability?: string;
+                saveDc?: number;
+                attackBonus?: number;
+            };
+        };
+        attacks: { name: string; atkBonus: string; damage: string }[];
+        equipments?: string;
+        money?: { cp: number; sp: number; ep: number; gp: number; pp: number };
+        features?: string;
+        spells?: any;
+        extraAbilities?: any;
+    };
+}
+
+export const getCharacterById = async (
+    characterId: string
+): Promise<FullCharacterDnd | null> => {
+    try {
+        const { data }: AxiosResponse = await apiCall({
+            baseUrl: charactersBaseUrl,
+            endpoint: characterId,
+            method: 'GET',
+        });
+        return data;
+    } catch {
+        return null;
+    }
+};
+
+export const getCharactersByCampaignLobby = async (
+    campaignId: string
+): Promise<CampaignCharacter[]> => {
+    try {
+        const { data }: AxiosResponse = await apiCall({
+            baseUrl: campaignsBaseUrl,
+            endpoint: `${campaignId}/characters`,
+            method: 'GET',
+        });
+
+        const list = Array.isArray(data) ? data : [];
+        return list.map((result: any) => ({
+            id: result.characterId,
+            name: result.data?.profile?.name ?? 'Sem nome',
+            image: result.data?.profile?.characteristics?.appearance?.picture.link,
+        }));
+    } catch {
         return [];
     }
 };

@@ -1,0 +1,187 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .cdm-overlay {
+        @apply fixed inset-0 z-[200] flex items-center justify-center bg-black/60;
+    }
+
+    .cdm-modal {
+        @apply w-[62rem] max-h-[92vh] overflow-y-auto bg-color-greyScale/100 rounded-2xl p-8 flex flex-col gap-6;
+    }
+
+    .cdm-loading {
+        @apply text-color-greyScale/500 text-center py-8;
+    }
+
+    .cdm-back-btn {
+        @apply self-start text-color-primary/default_900 cursor-pointer transition-opacity hover:opacity-70 bg-transparent;
+    }
+
+    .cdm-tabs {
+        @apply flex gap-1 border-b border-color-greyScale/200 mb-6 mt-4;
+    }
+
+    .cdm-tab {
+        @apply px-4 py-2 text-color-greyScale/500 border-b-2 border-transparent -mb-px
+            cursor-pointer transition-colors hover:text-color-greyScale/900 bg-transparent;
+    }
+
+    .cdm-tab--active {
+        @apply text-color-primary/default_900 border-color-primary/default_900;
+    }
+
+    .cdm-tab-content {
+        @apply flex flex-col gap-6;
+    }
+
+    .cdm-name-row {
+        @apply flex items-center justify-between gap-4;
+    }
+
+    .cdm-edit-btn {
+        @apply shrink-0;
+    }
+
+    /* ── Header ───────────────────────────── */
+    .cdm-header {
+        @apply flex gap-6 items-start border-color-greyScale/200;
+    }
+
+    .cdm-picture-wrapper {
+        @apply relative w-32 h-32 rounded-xl overflow-hidden flex-shrink-0 border border-color-greyScale/200;
+    }
+
+    .cdm-picture-overlay {
+        @apply absolute inset-0 flex items-center justify-center
+            bg-black/0 opacity-0 transition-all duration-300
+            cursor-pointer;
+    }
+
+    .cdm-picture-wrapper:hover .cdm-picture-overlay {
+        @apply bg-black/60 opacity-100;
+    }
+
+    .cdm-header-info {
+        @apply flex flex-col gap-3 flex-1;
+    }
+
+    .cdm-char-name {
+        @apply text-color-greyScale/950;
+    }
+
+    .cdm-badges {
+        @apply flex flex-wrap gap-2;
+    }
+
+    .cdm-badge {
+        @apply px-3 py-1 rounded-full bg-color-primary/default_900 text-color-greyScale/50;
+    }
+
+    .cdm-header-meta {
+        @apply flex flex-wrap gap-x-6 gap-y-1;
+    }
+
+    .cdm-label {
+        @apply text-color-greyScale/700;
+    }
+
+    /* ── Sections ─────────────────────────── */
+    .cdm-section {
+        @apply flex flex-col gap-4;
+    }
+
+    .cdm-section-title {
+        @apply text-color-primary/default_900 pb-1 border-b border-color-greyScale/200;
+    }
+
+    /* ── Ability scores ───────────────────── */
+    .cdm-attributes-grid {
+        @apply grid grid-cols-6 gap-3;
+    }
+
+    .cdm-attr-box {
+        @apply flex flex-col items-center gap-0.5 bg-color-greyScale/50 border border-color-greyScale/200 rounded-xl py-3 px-2;
+    }
+
+    .cdm-attr-label {
+        @apply text-color-primary/default_900;
+    }
+
+    .cdm-attr-value {
+        @apply text-color-greyScale/950;
+    }
+
+    .cdm-attr-modifier {
+        @apply bg-color-primary/default_900 text-color-greyScale/50 rounded-md px-2 py-0.5 text-sm font-bold;
+    }
+
+    .cdm-attr-full {
+        @apply text-color-greyScale/500 text-center leading-tight;
+    }
+
+    /* ── Info grid (combat / appearance) ─── */
+    .cdm-info-grid {
+        @apply grid grid-cols-3 gap-3;
+    }
+
+    .cdm-info-box {
+        @apply flex flex-col gap-0.5 bg-color-greyScale/50 border border-color-greyScale/200 rounded-lg px-4 py-3;
+    }
+
+    .cdm-info-label {
+        @apply text-color-greyScale/500;
+    }
+
+    /* ── Text blocks ──────────────────────── */
+    .cdm-text-grid {
+        @apply grid grid-cols-2 gap-4;
+    }
+
+    .cdm-text-block {
+        @apply flex flex-col gap-1 bg-color-greyScale/50 border border-color-greyScale/200 rounded-lg px-4 py-3;
+    }
+
+    .cdm-text-content {
+        @apply text-color-greyScale/800 whitespace-pre-wrap leading-relaxed;
+    }
+
+    .cdm-text-scrollable {
+        @apply max-h-40 overflow-y-auto;
+    }
+
+    /* ── Attacks table ────────────────────── */
+    .cdm-attacks-table {
+        @apply flex flex-col rounded-lg overflow-hidden border border-color-greyScale/200;
+    }
+
+    .cdm-attacks-header {
+        @apply grid grid-cols-3 bg-color-primary/default_900 text-color-greyScale/50 px-4 py-2 gap-4;
+    }
+
+    .cdm-attacks-row {
+        @apply grid grid-cols-3 px-4 py-3 gap-4 border-t border-color-greyScale/200 even:bg-color-greyScale/50;
+    }
+
+    /* ── Money grid ───────────────────────── */
+    .cdm-money-grid {
+        @apply grid grid-cols-5 gap-3 mt-2;
+    }
+
+    /* ── Edit inputs ──────────────────────── */
+    .cdm-edit-number {
+        @apply w-full text-center border-b-2 border-color-greyScale/200 bg-transparent outline-none
+            focus:border-color-primary/default_900 transition-colors;
+    }
+
+    .cdm-edit-text {
+        @apply w-full border-b-2 border-color-greyScale/200 bg-transparent outline-none
+            focus:border-color-primary/default_900 transition-colors;
+    }
+
+    .cdm-edit-textarea {
+        @apply w-full border-2 border-color-greyScale/200 rounded-lg px-3 py-2 bg-transparent
+            outline-none resize-none focus:border-color-primary/default_900 transition-colors;
+    }
+}

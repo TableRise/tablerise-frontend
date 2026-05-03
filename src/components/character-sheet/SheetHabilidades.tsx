@@ -20,6 +20,9 @@ interface SheetHabilidadesProps {
     campaignId: string;
     characterId: string;
     spellClassName?: string;
+    initialAbilityNames?: Record<number, string[]>;
+    initialSlotsTotal?: Record<number, string>;
+    initialSlotsExpended?: Record<number, number>;
 }
 
 export interface SheetHabilidadesHandle {
@@ -34,24 +37,37 @@ export interface SheetHabilidadesHandle {
 }
 
 const SheetHabilidades = forwardRef<SheetHabilidadesHandle, SheetHabilidadesProps>(
-    function SheetHabilidades({ spellClassName = '' }, ref) {
+    function SheetHabilidades(
+        {
+            spellClassName = '',
+            initialAbilityNames,
+            initialSlotsTotal: initialSlotsTotalProp,
+            initialSlotsExpended: initialSlotsExpendedProp,
+        },
+        ref
+    ) {
         const [abilityKey, setAbilityKey] = useState('');
         const [saveDc, setSaveDc] = useState('');
         const [attackBonus, setAttackBonus] = useState('');
         const [abilityNames, setAbilityNames] = useState<Record<number, string[]>>(
             () =>
-                Object.fromEntries(
+                initialAbilityNames ??
+                (Object.fromEntries(
                     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((l) => [
                         l,
                         Array(ABILITIES_PER_LEVEL).fill(''),
                     ])
-                ) as Record<number, string[]>
+                ) as Record<number, string[]>)
         );
         const [slotsTotal, setSlotsTotal] = useState<Record<number, string>>(
-            () => Object.fromEntries([1, 2, 3, 4, 5, 6, 7, 8, 9].map((l) => [l, '']))
+            () =>
+                initialSlotsTotalProp ??
+                Object.fromEntries([1, 2, 3, 4, 5, 6, 7, 8, 9].map((l) => [l, '']))
         );
         const [slotsExpended, setSlotsExpended] = useState<Record<number, number>>(
-            () => Object.fromEntries([1, 2, 3, 4, 5, 6, 7, 8, 9].map((l) => [l, 0]))
+            () =>
+                initialSlotsExpendedProp ??
+                Object.fromEntries([1, 2, 3, 4, 5, 6, 7, 8, 9].map((l) => [l, 0]))
         );
 
         useImperativeHandle(ref, () => ({

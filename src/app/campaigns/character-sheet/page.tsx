@@ -208,25 +208,22 @@ export default function CharacterSheetPage(): JSX.Element {
                     {TABS.map((tab) => {
                         const isDisabled = tab === 'Magias' && magiasDisabled;
                         return (
-                        <button
-                            key={tab}
-                            type="button"
-                            disabled={isDisabled}
-                            className={`font-S-bold cs-tab ${
-                                activeTab === tab ? 'cs-tab--active' : ''
-                            } ${isDisabled ? 'opacity-30 cursor-not-allowed' : ''}`}
-                            onClick={() => {
-                                if (isDisabled) return;
-                                setActiveTab(tab);
-                                if (
-                                    tab === 'Magias' &&
-                                    !spellModalDismissed
-                                )
-                                    setShowSpellModal(true);
-                            }}
-                        >
-                            {tab}
-                        </button>
+                            <button
+                                key={tab}
+                                type="button"
+                                disabled={isDisabled}
+                                className={`font-S-bold cs-tab ${
+                                    activeTab === tab ? 'cs-tab--active' : ''
+                                } ${isDisabled ? 'opacity-30 cursor-not-allowed' : ''}`}
+                                onClick={() => {
+                                    if (isDisabled) return;
+                                    setActiveTab(tab);
+                                    if (tab === 'Magias' && !spellModalDismissed)
+                                        setShowSpellModal(true);
+                                }}
+                            >
+                                {tab}
+                            </button>
                         );
                     })}
                 </div>

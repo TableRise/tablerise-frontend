@@ -9,6 +9,10 @@ import { getCampaignById, confirmPlayerPresence } from '@/server/campaigns/join-
 import { getUser } from '@/server/users/get-user';
 import formatDate from '@/utils/formatDate';
 import CharacterSheetModal from '@/components/lobby/CharacterSheetModal';
+import {
+    getCharactersByCampaignLobby,
+    type CampaignCharacter,
+} from '@/server/characters/get-characters';
 import '@/app/campaigns/lobby/page.css';
 
 interface CampaignData {
@@ -40,6 +44,7 @@ export default function CampaignLobby(): JSX.Element {
         ConfirmedPlayerInfo[]
     >([]);
     const [sheetModalOpen, setSheetModalOpen] = useState(false);
+    const [lobbyCharacters, setLobbyCharacters] = useState<CampaignCharacter[]>([]);
 
     useEffect(() => {
         if (!campaignId) return;
@@ -77,6 +82,11 @@ export default function CampaignLobby(): JSX.Element {
             });
         }
     }, [campaignId, userCampaigns]);
+
+    useEffect(() => {
+        if (!campaignId) return;
+        getCharactersByCampaignLobby(campaignId).then(setLobbyCharacters);
+    }, [campaignId]);
 
     const refreshCampaign = useCallback(() => {
         if (!campaignId) return;
@@ -366,60 +376,27 @@ export default function CampaignLobby(): JSX.Element {
                     <div className="lobby-characters">
                         <h2 className="font-L-semibold">Personagens</h2>
                         <div className="lobby-characters-slider">
-                            {[
-                                {
-                                    id: '1',
-                                    name: 'Thorin',
-                                    image: '/images/SideImageBackground.svg',
-                                },
-                                {
-                                    id: '2',
-                                    name: 'Elara',
-                                    image: '/images/SideImageBackground.svg',
-                                },
-                                {
-                                    id: '3',
-                                    name: 'Grimm',
-                                    image: '/images/SideImageBackground.svg',
-                                },
-                                {
-                                    id: '4',
-                                    name: 'Lyra',
-                                    image: '/images/SideImageBackground.svg',
-                                },
-                                {
-                                    id: '5',
-                                    name: 'Zarak',
-                                    image: '/images/SideImageBackground.svg',
-                                },
-                                {
-                                    id: '6',
-                                    name: 'Mira',
-                                    image: '/images/SideImageBackground.svg',
-                                },
-                                {
-                                    id: '7',
-                                    name: 'Orin',
-                                    image: '/images/SideImageBackground.svg',
-                                },
-                                {
-                                    id: '8',
-                                    name: 'Nyx',
-                                    image: '/images/SideImageBackground.svg',
-                                },
-                            ].map((char) => (
-                                <div key={char.id} className="lobby-character">
-                                    <div className="lobby-character-avatar">
-                                        <Image
-                                            src={char.image}
-                                            alt={char.name}
-                                            fill
-                                            style={{ objectFit: 'cover' }}
-                                        />
+                            {lobbyCharacters.length > 0 ? (
+                                lobbyCharacters.map((char) => (
+                                    <div key={char.id} className="lobby-character">
+                                        <div className="lobby-character-avatar">
+                                            <Image
+                                                src={char.image}
+                                                alt={char.name}
+                                                fill
+                                                style={{ objectFit: 'cover' }}
+                                            />
+                                        </div>
+                                        <span className="font-XXS-regular">
+                                            {char.name}
+                                        </span>
                                     </div>
-                                    <span className="font-XXS-regular">{char.name}</span>
-                                </div>
-                            ))}
+                                ))
+                            ) : (
+                                <span className="font-XS-regular">
+                                    Nenhum personagem criado
+                                </span>
+                            )}
                         </div>
                     </div>
                     <div className="lobby-articles">

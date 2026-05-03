@@ -3,7 +3,6 @@ import Image from 'next/image';
 import SheetSVG from '../../../assets/icons/menu-panel-lobby/sheet.svg?url';
 import ParticipantsSVG from '../../../assets/icons/menu-panel-lobby/participants.svg?url';
 import PostSVG from '../../../assets/icons/menu-panel-lobby/post.svg?url';
-import WikiSVG from '../../../assets/icons/menu-panel-lobby/wiki.svg?url';
 import ExitRedSVG from '../../../assets/icons/sys/exit-red.svg?url';
 import HistorySVG from '../../../assets/icons/menu-panel-lobby/history.svg?url';
 import SettingsSVG from '../../../assets/icons/menu-panel-lobby/settings.svg?url';
@@ -20,7 +19,6 @@ const playerMenuItems = [
     { key: 'create-sheet', icon: SheetSVG, label: 'Criar/Editar Ficha de Personagem' },
     { key: 'participants', icon: ParticipantsSVG, label: 'Ver Participantes' },
     { key: 'new-post', icon: PostSVG, label: 'Criar Novo Post' },
-    { key: 'wiki', icon: WikiSVG, label: 'Consultar Wiki do Sistema' },
     { key: 'leave', icon: ExitRedSVG, label: 'Sair da Campanha', danger: true },
 ];
 

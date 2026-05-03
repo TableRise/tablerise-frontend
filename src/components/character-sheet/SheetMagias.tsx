@@ -71,6 +71,9 @@ interface SheetMagiasProps {
     spellCd?: number;
     spellAttackBonus?: number;
     levelingSpecs?: LevelingSpecs;
+    initialSpellNames?: Record<number, { name: string; spellId: string }[]>;
+    initialSlotTotals?: Record<number, number>;
+    initialSlotsExpended?: Record<number, number>;
 }
 
 export interface SheetMagiasHandle {
@@ -81,19 +84,21 @@ export interface SheetMagiasHandle {
     };
 }
 
-const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(
-    function SheetMagias(
-        {
-            campaignId,
-            characterId,
-            spellClassName = '',
-            spellAbilityLabel = '',
-            spellCd = 0,
-            spellAttackBonus = 0,
-            levelingSpecs,
-        },
-        ref
-    ) {
+const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function SheetMagias(
+    {
+        campaignId,
+        characterId,
+        spellClassName = '',
+        spellAbilityLabel = '',
+        spellCd = 0,
+        spellAttackBonus = 0,
+        levelingSpecs,
+        initialSpellNames,
+        initialSlotTotals,
+        initialSlotsExpended: initialSlotsExpendedProp,
+    },
+    ref
+) {
     const getActiveSlots = (spellLevel: number): number => {
         if (!levelingSpecs) return SPELLS_PER_LEVEL;
         if (spellLevel === 0) {
@@ -111,11 +116,13 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(
     };
 
     const getSlotTotal = (spellLevel: number): number => {
-        if (!levelingSpecs || !levelingSpecs.spellSlotsPerSpellLevel.isValidToThisClass)
-            return 0;
-        return (
-            levelingSpecs.spellSlotsPerSpellLevel.spellSpaces[0]?.[spellLevel - 1] ?? 0
-        );
+        if (levelingSpecs?.spellSlotsPerSpellLevel.isValidToThisClass) {
+            return (
+                levelingSpecs.spellSlotsPerSpellLevel.spellSpaces[0]?.[spellLevel - 1] ??
+                0
+            );
+        }
+        return initialSlotTotals?.[spellLevel] ?? 0;
     };
     const [pickerLevel, setPickerLevel] = useState<number | null>(null);
     const [pickerSpells, setPickerSpells] = useState<Spell[]>([]);
@@ -126,17 +133,20 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(
         Record<number, { name: string; spellId: string }[]>
     >(
         () =>
-            Object.fromEntries(
+            initialSpellNames ??
+            (Object.fromEntries(
                 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((l) => [
                     l,
                     Array(SPELLS_PER_LEVEL).fill({ name: '', spellId: '' }),
                 ])
-            ) as Record<number, { name: string; spellId: string }[]>
+            ) as Record<number, { name: string; spellId: string }[]>)
     );
     const [detailSpell, setDetailSpell] = useState<Spell | null>(null);
     const [detailLoading, setDetailLoading] = useState(false);
     const [slotsExpended, setSlotsExpended] = useState<Record<number, number>>(
-        () => Object.fromEntries([1, 2, 3, 4, 5, 6, 7, 8, 9].map((l) => [l, 0]))
+        () =>
+            initialSlotsExpendedProp ??
+            Object.fromEntries([1, 2, 3, 4, 5, 6, 7, 8, 9].map((l) => [l, 0]))
     );
 
     const handleOpenPicker = async (level: number) => {
@@ -680,7 +690,6 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(
             )}
         </>
     );
-}
-);
+});
 
 export default SheetMagias;

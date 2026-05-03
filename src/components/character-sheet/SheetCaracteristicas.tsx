@@ -8,7 +8,14 @@ interface SheetCaracteristicasProps {
 
 export interface SheetCaracteristicasHandle {
     getData: () => {
-        appearance: { age: string; height: string; eyes: string; skin: string; hair: string; weight: string };
+        appearance: {
+            age: string;
+            height: string;
+            eyes: string;
+            skin: string;
+            hair: string;
+            weight: string;
+        };
         backstory: string;
         alliesAndOrgs: string;
         treasure: string;
@@ -16,8 +23,10 @@ export interface SheetCaracteristicasHandle {
     };
 }
 
-const SheetCaracteristicas = forwardRef<SheetCaracteristicasHandle, SheetCaracteristicasProps>(
-    function SheetCaracteristicas({ campaignId, characterId }, ref) {
+const SheetCaracteristicas = forwardRef<
+    SheetCaracteristicasHandle,
+    SheetCaracteristicasProps
+>(function SheetCaracteristicas({ campaignId, characterId }, ref) {
     const [appearance, setAppearance] = useState({
         age: '',
         height: '',
@@ -133,7 +142,9 @@ const SheetCaracteristicas = forwardRef<SheetCaracteristicasHandle, SheetCaracte
                                 Foto do Personagem
                             </span>
                             <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-56 -translate-x-1/2 rounded bg-gray-800 p-2 text-center text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
-                                Este campo não está disponível na criação do personagem mas estará habilitado para uso na tela de gerenciamento da sua ficha.
+                                Este campo não está disponível na criação do personagem
+                                mas estará habilitado para uso na tela de gerenciamento da
+                                sua ficha.
                             </div>
                         </div>
                         <div className="cs-char-allies-spacer" aria-hidden="true" />
@@ -153,7 +164,9 @@ const SheetCaracteristicas = forwardRef<SheetCaracteristicasHandle, SheetCaracte
                                 Símbolo / Emblema
                             </span>
                             <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-56 -translate-x-1/2 rounded bg-gray-800 p-2 text-center text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
-                                Este campo não está disponível na criação do personagem mas estará habilitado para uso na tela de gerenciamento da sua ficha.
+                                Este campo não está disponível na criação do personagem
+                                mas estará habilitado para uso na tela de gerenciamento da
+                                sua ficha.
                             </div>
                         </div>
                         <div className="cs-char-allies-spacer" aria-hidden="true" />
@@ -199,7 +212,9 @@ const SheetCaracteristicas = forwardRef<SheetCaracteristicasHandle, SheetCaracte
                             className="cs-field-textarea w-full min-h-[6rem]"
                             placeholder="Características e habilidades adicionais..."
                             value={extraCharacteristicsDetail}
-                            onChange={(e) => setExtraCharacteristicsDetail(e.target.value)}
+                            onChange={(e) =>
+                                setExtraCharacteristicsDetail(e.target.value)
+                            }
                         />
                         <p className="cs-section-title">
                             Características e Habilidades Adicionais
@@ -209,7 +224,6 @@ const SheetCaracteristicas = forwardRef<SheetCaracteristicasHandle, SheetCaracte
             </div>
         </div>
     );
-}
-);
+});
 
 export default SheetCaracteristicas;

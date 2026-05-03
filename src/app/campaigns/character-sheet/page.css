@@ -522,7 +522,7 @@
 
     .cs-spell-picker-choose-btn {
         @apply mt-2 w-full py-2 rounded-xl text-sm font-semibold
-            bg-color-primary/default_900 text-color-greyScale/50 cursor-pointer
+            !bg-color-primary/default_900 text-color-greyScale/50 cursor-pointer
             hover:opacity-90 transition-opacity border-none;
     }
 }
