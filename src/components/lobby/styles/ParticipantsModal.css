@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .pm-overlay {
+        @apply fixed inset-0 z-[200] flex items-center justify-center bg-black/60;
+    }
+
+    .pm-modal {
+        @apply w-[58rem] max-h-[90vh] overflow-hidden bg-color-greyScale/100 rounded-2xl flex flex-col;
+    }
+
+    /* ── Header ─────────────────────────────────── */
+    .pm-header {
+        @apply flex items-center justify-between px-6 py-4
+            border-b border-color-greyScale/200
+            flex-shrink-0;
+    }
+
+    .pm-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .pm-close-btn {
+        @apply flex items-center justify-center w-8 h-8 rounded-full
+            text-color-primary/default_900 bg-transparent cursor-pointer
+            transition-opacity hover:opacity-70;
+    }
+
+    /* ── Grid ───────────────────────────────────── */
+    .pm-grid {
+        @apply p-6 overflow-y-auto grid grid-cols-3 gap-4;
+    }
+
+    .pm-loading {
+        @apply flex items-center justify-center p-10 text-color-greyScale/500;
+    }
+
+    .pm-empty {
+        @apply col-span-3 text-center text-color-greyScale/500 py-6;
+    }
+
+    /* ── Card ───────────────────────────────────── */
+    .pm-card {
+        @apply flex flex-col bg-color-greyScale/50 rounded-xl
+            border border-color-greyScale/200 overflow-hidden;
+    }
+
+    .pm-card-body {
+        @apply flex items-center gap-3 p-4;
+    }
+
+    .pm-avatar {
+        @apply relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0
+            bg-color-greyScale/200 border border-color-greyScale/200;
+    }
+
+    .pm-card-info {
+        @apply flex flex-col gap-0.5 min-w-0;
+    }
+
+    .pm-char-name {
+        @apply text-color-greyScale/500 truncate;
+    }
+
+    .pm-nickname {
+        @apply text-color-greyScale/900 truncate;
+    }
+
+    .pm-role {
+        @apply text-color-primary/default_900 truncate;
+    }
+
+    /* ── Card footer ────────────────────────────── */
+    .pm-card-footer {
+        @apply px-4 py-3
+            border-t border-color-greyScale/200;
+    }
+
+    .pm-profile-btn {
+        @apply w-full py-1.5 text-center rounded-lg
+            bg-color-primary/default_900 text-color-greyScale/50
+            cursor-pointer transition-opacity hover:opacity-80;
+    }
+}

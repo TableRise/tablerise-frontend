@@ -9,11 +9,13 @@ import { getCampaignById, confirmPlayerPresence } from '@/server/campaigns/join-
 import { getUser } from '@/server/users/get-user';
 import formatDate from '@/utils/formatDate';
 import CharacterSheetModal from '@/components/lobby/CharacterSheetModal';
+import ParticipantsModal from '@/components/lobby/ParticipantsModal';
 import {
     getCharactersByCampaignLobby,
     type CampaignCharacter,
 } from '@/server/characters/get-characters';
 import '@/app/campaigns/lobby/page.css';
+import Footer from '@/components/common/Footer';
 
 interface CampaignData {
     campaignId: string;
@@ -44,6 +46,7 @@ export default function CampaignLobby(): JSX.Element {
         ConfirmedPlayerInfo[]
     >([]);
     const [sheetModalOpen, setSheetModalOpen] = useState(false);
+    const [participantsModalOpen, setParticipantsModalOpen] = useState(false);
     const [lobbyCharacters, setLobbyCharacters] = useState<CampaignCharacter[]>([]);
 
     useEffect(() => {
@@ -475,9 +478,16 @@ export default function CampaignLobby(): JSX.Element {
                     isMaster={isMaster}
                     onMenuAction={(key) => {
                         if (key === 'create-sheet') setSheetModalOpen(true);
+                        if (key === 'participants') setParticipantsModalOpen(true);
                     }}
                 />
             </div>
+            {participantsModalOpen && campaign && (
+                <ParticipantsModal
+                    campaignId={campaign.campaignId}
+                    onClose={() => setParticipantsModalOpen(false)}
+                />
+            )}
             {sheetModalOpen && campaign && (
                 <CharacterSheetModal
                     campaignId={campaign.campaignId}
@@ -486,6 +496,7 @@ export default function CampaignLobby(): JSX.Element {
                     onClose={() => setSheetModalOpen(false)}
                 />
             )}
+            <Footer />
         </main>
     );
 }

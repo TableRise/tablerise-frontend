@@ -19,6 +19,7 @@ import {
     linkCharacterToCampaign,
 } from '@/server/characters/create-character';
 import '@/app/campaigns/character-sheet/page.css';
+import Footer from '@/components/common/Footer';
 
 const TABS = ['Principal', 'Características', 'Magias', 'Habilidades'] as const;
 
@@ -323,6 +324,8 @@ export default function CharacterSheetPage(): JSX.Element {
                     </div>
                 </div>
             )}
+
+            <Footer />
         </main>
     );
 }
