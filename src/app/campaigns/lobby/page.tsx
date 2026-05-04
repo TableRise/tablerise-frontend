@@ -12,6 +12,9 @@ import CharacterSheetModal from '@/components/lobby/CharacterSheetModal';
 import ParticipantsModal from '@/components/lobby/ParticipantsModal';
 import JournalPostModal from '@/components/lobby/JournalPostModal';
 import CreatePostModal from '@/components/lobby/CreatePostModal';
+import EditCampaignModal from '@/components/lobby/EditCampaignModal';
+import LeaveCampaignModal from '@/components/lobby/LeaveCampaignModal';
+import type { CampaignMusic } from '@/server/campaigns/create-campaign';
 import {
     getCampaignJournalPosts,
     type JournalPost,
@@ -33,6 +36,12 @@ interface CampaignData {
     nextMatchDate: string;
     socialMedia: { discord?: string; twitter?: string; youtube?: string };
     confirmedPlayers: (string | { userId: string })[];
+    visibility: string;
+    ageRestriction: string;
+    nextSessionResume: string;
+    playerAmountLimit: number;
+    mapImages: { link: string }[];
+    musics: CampaignMusic[];
 }
 
 interface ConfirmedPlayerInfo {
@@ -54,6 +63,8 @@ export default function CampaignLobby(): JSX.Element {
     const [sheetModalOpen, setSheetModalOpen] = useState(false);
     const [participantsModalOpen, setParticipantsModalOpen] = useState(false);
     const [createPostModalOpen, setCreatePostModalOpen] = useState(false);
+    const [editSettingsModalOpen, setEditSettingsModalOpen] = useState(false);
+    const [leaveCampaignModalOpen, setLeaveCampaignModalOpen] = useState(false);
     const [lobbyCharacters, setLobbyCharacters] = useState<CampaignCharacter[]>([]);
     const [journalPosts, setJournalPosts] = useState<JournalPost[]>([]);
     const [selectedPost, setSelectedPost] = useState<JournalPost | null>(null);
@@ -75,23 +86,34 @@ export default function CampaignLobby(): JSX.Element {
                 nextMatchDate: cached.infos?.nextMatchDate ?? '',
                 socialMedia: cached.infos?.socialMedia ?? {},
                 confirmedPlayers: cached.matchData?.confirmedPlayers ?? [],
-            });
-        } else {
-            getCampaignById(campaignId).then((data) => {
-                if (data)
-                    setCampaign({
-                        campaignId: data.campaignId,
-                        title: data.title,
-                        cover: { link: data.cover?.link },
-                        description: data.description,
-                        system: data.system,
-                        campaignPlayers: data.campaignPlayers,
-                        nextMatchDate: data.infos?.nextMatchDate ?? '',
-                        socialMedia: data.infos?.socialMedia ?? {},
-                        confirmedPlayers: data.matchData?.confirmedPlayers ?? [],
-                    });
+                mapImages: cached.matchData?.mapImages ?? [],
+                musics: cached.musics ?? [],
+                visibility: cached.visibility ?? '',
+                ageRestriction: cached.ageRestriction ?? '',
+                nextSessionResume: cached.infos?.nextSessionResume ?? '',
+                playerAmountLimit: cached.infos?.playerAmountLimit ?? 1,
             });
         }
+        getCampaignById(campaignId).then((data) => {
+            if (data)
+                setCampaign({
+                    campaignId: data.campaignId,
+                    title: data.title,
+                    cover: { link: data.cover?.link },
+                    description: data.description,
+                    system: data.system,
+                    campaignPlayers: data.campaignPlayers,
+                    nextMatchDate: data.infos?.nextMatchDate ?? '',
+                    socialMedia: data.infos?.socialMedia ?? {},
+                    confirmedPlayers: data.matchData?.confirmedPlayers ?? [],
+                    mapImages: data.matchData?.mapImages ?? [],
+                    musics: data.musics ?? [],
+                    visibility: data.visibility ?? '',
+                    ageRestriction: data.ageRestriction ?? '',
+                    nextSessionResume: data.infos?.nextSessionResume ?? '',
+                    playerAmountLimit: data.infos?.playerAmountLimit ?? 1,
+                });
+        });
     }, [campaignId, userCampaigns]);
 
     useEffect(() => {
@@ -118,6 +140,12 @@ export default function CampaignLobby(): JSX.Element {
                     nextMatchDate: data.infos?.nextMatchDate ?? '',
                     socialMedia: data.infos?.socialMedia ?? {},
                     confirmedPlayers: data.matchData?.confirmedPlayers ?? [],
+                    mapImages: data.matchData?.mapImages ?? [],
+                    musics: data.musics ?? [],
+                    visibility: data.visibility ?? '',
+                    ageRestriction: data.ageRestriction ?? '',
+                    nextSessionResume: data.infos?.nextSessionResume ?? '',
+                    playerAmountLimit: data.infos?.playerAmountLimit ?? 1,
                 });
         });
     }, [campaignId]);
@@ -174,7 +202,8 @@ export default function CampaignLobby(): JSX.Element {
     );
 
     const isPlayer = userRole === 'player' || userRole === 'admin_player';
-    const isMaster = userRole === 'master' || isMasterCampaign;
+    const isMaster =
+        userRole === 'master' || userRole === 'dungeon_master' || isMasterCampaign;
 
     const CATEGORY_LABEL: Record<string, string> = {
         all: 'Todos',
@@ -311,11 +340,8 @@ export default function CampaignLobby(): JSX.Element {
                                     </button>
                                 </div>
                                 <p className="font-S-regular lobby-session-modal-text">
-                                    Na próxima sessão, o grupo seguirá rumo à floresta
-                                    sombria em busca do artefato perdido. Rumores indicam
-                                    a presença de criaturas hostis no caminho. Preparem
-                                    seus equipamentos e revisem seus feitiços — a jornada
-                                    promete ser intensa.
+                                    {campaign.nextSessionResume ||
+                                        'Sem resumo disponível para a próxima sessão.'}
                                 </p>
                             </div>
                         </div>
@@ -452,6 +478,8 @@ export default function CampaignLobby(): JSX.Element {
                         if (key === 'create-sheet') setSheetModalOpen(true);
                         if (key === 'participants') setParticipantsModalOpen(true);
                         if (key === 'new-post') setCreatePostModalOpen(true);
+                        if (key === 'edit-settings') setEditSettingsModalOpen(true);
+                        if (key === 'leave') setLeaveCampaignModalOpen(true);
                     }}
                 />
             </div>
@@ -485,6 +513,37 @@ export default function CampaignLobby(): JSX.Element {
                     isPlayer={isPlayer}
                     isMaster={isMaster}
                     onClose={() => setSheetModalOpen(false)}
+                />
+            )}
+            {leaveCampaignModalOpen && campaign && (
+                <LeaveCampaignModal
+                    campaignId={campaign.campaignId}
+                    isMaster={isMaster}
+                    onClose={() => setLeaveCampaignModalOpen(false)}
+                />
+            )}
+            {editSettingsModalOpen && campaign && (
+                <EditCampaignModal
+                    campaignId={campaign.campaignId}
+                    initialData={{
+                        title: campaign.title,
+                        description: campaign.description,
+                        nextMatchDate: campaign.nextMatchDate,
+                        socialMedia: campaign.socialMedia,
+                        nextSessionResume: campaign.nextSessionResume,
+                        visibility: campaign.visibility,
+                        ageRestriction: campaign.ageRestriction,
+                        playerAmountLimit: campaign.playerAmountLimit,
+                        adminId:
+                            campaign.campaignPlayers.find(
+                                (p) => p.role === 'admin_player'
+                            )?.userId ?? '',
+                        cover: campaign.cover?.link ?? '',
+                        mapImages: campaign.mapImages?.map((m) => m.link) ?? [],
+                        musics: campaign.musics ?? [],
+                    }}
+                    onClose={() => setEditSettingsModalOpen(false)}
+                    onSaved={refreshCampaign}
                 />
             )}
             <Footer />

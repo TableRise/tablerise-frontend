@@ -1,0 +1,297 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    /* ── Backdrop ─────────────────────────────────────────── */
+    .ecm-backdrop {
+        @apply fixed inset-0 z-[200] flex items-center justify-center;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    /* ── Modal container ──────────────────────────────────── */
+    .ecm-modal {
+        @apply relative bg-white rounded-2xl flex flex-col;
+        width: 45rem;
+        max-height: 90vh;
+        overflow: hidden;
+    }
+
+    /* ── Header ───────────────────────────────────────────── */
+    .ecm-header {
+        @apply flex items-center justify-between px-8 pt-6 pb-4 flex-shrink-0
+            border-b border-color-greyScale/200;
+    }
+
+    .ecm-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .ecm-close-btn {
+        @apply w-8 h-8 flex items-center justify-center rounded-lg
+            text-color-greyScale/500 transition-colors;
+    }
+
+    .ecm-close-btn:hover {
+        @apply bg-color-greyScale/100;
+    }
+
+    /* ── Scrollable body ──────────────────────────────────── */
+    .ecm-body {
+        @apply flex-1 overflow-y-auto px-8 py-6;
+    }
+
+    .ecm-fields {
+        @apply flex flex-col gap-5;
+    }
+
+    /* ── Field ────────────────────────────────────────────── */
+    .ecm-field {
+        @apply flex flex-col gap-1;
+    }
+
+    .ecm-field-label {
+        @apply text-color-greyScale/950;
+    }
+
+    .ecm-field-hint {
+        @apply text-color-greyScale/500;
+    }
+
+    .ecm-input {
+        @apply w-full;
+    }
+
+    .ecm-input--narrow {
+        @apply w-28;
+    }
+
+    .ecm-select {
+        @apply w-full appearance-none cursor-pointer;
+    }
+
+    /* ── Textarea ─────────────────────────────────────────── */
+    .ecm-textarea-wrapper {
+        @apply relative;
+    }
+
+    .ecm-textarea {
+        @apply w-full bg-color-greyScale/50 border border-color-greyScale/300 rounded-lg
+            p-3 resize-none text-color-greyScale/950 outline-none;
+        font-size: 0.8rem;
+        line-height: 1.4;
+    }
+
+    .ecm-textarea:focus {
+        border-color: #0a358a;
+    }
+
+    .ecm-textarea--tall {
+        padding-bottom: 1.5rem;
+    }
+
+    .ecm-char-count {
+        @apply absolute bottom-2 right-3 text-color-greyScale/500;
+        font-size: 0.7rem;
+    }
+
+    /* ── Date row ─────────────────────────────────────────── */
+    .ecm-date-row {
+        @apply flex items-center gap-3;
+    }
+
+    .ecm-date-cell {
+        @apply flex items-center;
+        position: relative;
+    }
+
+    .ecm-date-input {
+        @apply w-44;
+        padding-right: 2rem;
+    }
+
+    .ecm-calendar-icon {
+        position: absolute;
+        right: 0.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0;
+    }
+
+    .ecm-date-hidden {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        height: 0;
+    }
+
+    .ecm-time-input {
+        @apply w-fit;
+    }
+
+    /* ── Social fields ────────────────────────────────────── */
+    .ecm-social-fields {
+        @apply flex flex-col gap-3 mt-1;
+    }
+
+    .ecm-social-field {
+        @apply flex flex-col gap-1;
+    }
+
+    .ecm-social-label {
+        @apply text-color-primary/default_900;
+    }
+
+    /* ── Age ratings ──────────────────────────────────────── */
+    .ecm-age-ratings {
+        @apply flex gap-3 flex-wrap mt-1;
+    }
+
+    .ecm-age-square {
+        @apply w-12 h-12 rounded-lg text-white transition-all;
+        opacity: 0.55;
+    }
+
+    .ecm-age-square:hover {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+
+    .ecm-age-square--selected {
+        opacity: 1;
+        transform: scale(1.1);
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+    }
+
+    /* ── Error ────────────────────────────────────────────── */
+    .ecm-error {
+        @apply text-color-support/alert px-8 pb-2 flex-shrink-0;
+    }
+
+    /* ── Tabs ─────────────────────────────────────────────── */
+    .ecm-tabs {
+        @apply flex px-8 flex-shrink-0 border-b border-color-greyScale/200;
+    }
+
+    .ecm-tab {
+        @apply px-4 py-3 text-color-greyScale/500 border-b-2 border-transparent transition-colors;
+        margin-bottom: -1px;
+    }
+
+    .ecm-tab:hover {
+        @apply text-color-greyScale/800;
+    }
+
+    .ecm-tab--active {
+        @apply text-color-primary/default_900 border-color-primary/default_900;
+    }
+
+    /* ── Image upload ─────────────────────────────────────── */
+    .ecm-img-upload {
+        @apply flex flex-col items-center justify-center gap-3
+            border-2 border-dashed border-color-greyScale/300 rounded-lg p-6;
+        min-height: 8rem;
+    }
+
+    .ecm-img-upload--small {
+        @apply p-4;
+        min-height: auto;
+    }
+
+    .ecm-cover-preview {
+        @apply flex flex-col items-center gap-3 w-full;
+    }
+
+    .ecm-cover-preview-img {
+        @apply w-full rounded-lg object-cover;
+        max-height: 12rem;
+    }
+    .ecm-upload-btn {
+        @apply flex items-center gap-2 px-4 py-2
+            border border-color-greyScale/300 rounded-lg
+            text-color-greyScale/700 bg-color-greyScale/50 transition-colors;
+    }
+
+    .ecm-upload-btn:hover {
+        @apply bg-color-greyScale/100;
+    }
+
+    .ecm-map-images {
+        @apply flex flex-col gap-3 w-full;
+    }
+
+    .ecm-map-images-grid {
+        @apply flex flex-col gap-4;
+    }
+
+    .ecm-map-images-item {
+        @apply flex flex-col gap-2 w-full;
+    }
+
+    .ecm-map-images-thumb {
+        @apply w-full rounded-lg object-cover;
+        height: 10rem;
+    }
+
+    .ecm-img-actions {
+        @apply flex gap-2 flex-wrap;
+    }
+
+    .ecm-remove-btn {
+        @apply flex items-center gap-1 px-4 py-2
+            border border-red-300 rounded-lg
+            text-red-500 bg-white transition-colors;
+    }
+
+    .ecm-remove-btn:hover {
+        @apply bg-red-50;
+    }
+
+    /* ── Footer ───────────────────────────────────────────── */
+    .ecm-footer {
+        @apply flex items-center justify-between px-8 py-5
+            border-t border-color-greyScale/200 flex-shrink-0;
+    }
+
+    .ecm-btn-ghost {
+        @apply w-2/4 text-color-greyScale/700 transition-colors flex justify-center;
+    }
+
+    .ecm-btn-ghost:hover {
+        @apply text-color-greyScale/950;
+    }
+
+    .ecm-btn-remove-admin {
+        @apply mt-1 self-start text-red-500 transition-colors;
+    }
+
+    .ecm-btn-remove-admin:hover {
+        @apply text-red-700;
+    }
+
+    .ecm-btn-save {
+        @apply w-full;
+    }
+
+    .ecm-tab-content {
+        @apply flex flex-col gap-6 px-8 py-6 overflow-y-auto flex-1;
+    }
+
+    .ecm-section {
+        @apply flex flex-col gap-2;
+    }
+
+    .ecm-section-title {
+        @apply text-color-greyScale/900;
+    }
+
+    .ecm-section-hint {
+        @apply text-color-greyScale/500;
+    }
+}

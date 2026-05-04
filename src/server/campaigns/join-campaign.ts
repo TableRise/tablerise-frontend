@@ -58,3 +58,37 @@ export const confirmPlayerPresence = async (campaignId: string, cancel?: boolean
         throw new Error('Erro ao confirmar presença');
     }
 };
+
+export const leaveCampaign = async (campaignId: string): Promise<void> => {
+    try {
+        await apiCall({
+            baseUrl: campaignsBaseUrl,
+            endpoint: `${campaignId}/update/player/remove`,
+            method: 'POST',
+        });
+    } catch (error: AxiosError | any) {
+        const status = error?.response?.status;
+        if (status === 404) throw new Error('Campanha não encontrada');
+        if (status === 500) throw new Error('Erro no servidor');
+        throw new Error('Erro ao sair da campanha');
+    }
+};
+
+export const transferDungeonMaster = async (
+    campaignId: string,
+    userToMaster: string
+): Promise<void> => {
+    try {
+        await apiCall({
+            baseUrl: campaignsBaseUrl,
+            endpoint: `${campaignId}/update/player/dungeon-master`,
+            method: 'PATCH',
+            params: { userToMaster },
+        });
+    } catch (error: AxiosError | any) {
+        const status = error?.response?.status;
+        if (status === 404) throw new Error('Campanha não encontrada');
+        if (status === 500) throw new Error('Erro no servidor');
+        throw new Error('Erro ao transferir função de mestre');
+    }
+};

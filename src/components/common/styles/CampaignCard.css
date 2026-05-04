@@ -16,15 +16,15 @@
     }
 
     .campaign-card .card-fog {
-        @apply relative w-full h-44 top-[5rem] rounded-xl z-0;
+        @apply absolute bottom-0 w-full h-44 rounded-xl z-0;
     }
 
     .campaign-card .card-infos {
-        @apply relative w-full px-4 h-[5rem] flex -top-16 flex-col z-10;
+        @apply absolute bottom-0 w-full px-4 pb-4 flex flex-col gap-2 z-10;
     }
 
     .campaign-card .card-infos .date-schedule {
-        @apply p-1 pr-2 w-fit my-4 bg-color-primary/default_900 flex items-center text-color-greyScale/50 rounded-lg;
+        @apply p-1 pr-2 w-fit bg-color-primary/default_900 flex items-center text-color-greyScale/50 rounded-lg;
     }
 
     .campaign-card .card-infos .date-schedule span {

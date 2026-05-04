@@ -87,7 +87,11 @@ export default function CampaignCard(cardProps: CampaignCardProps): JSX.Element 
                 }}
             />
             <div className="card-infos">
-                <span className={`font-L-semibold ${textColorCSS}`}>{title}</span>
+                <span
+                    className={`font-L-semibold ${textColorCSS} truncate min-w-0 w-full`}
+                >
+                    {title}
+                </span>
 
                 <div className="date-schedule">
                     <Image

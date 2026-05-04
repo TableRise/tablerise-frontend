@@ -25,7 +25,6 @@ const playerMenuItems = [
 const masterExtraItems = [
     { key: 'history', icon: HistorySVG, label: 'Histórico de partidas' },
     { key: 'edit-settings', icon: SettingsSVG, label: 'Editar Configurações' },
-    { key: 'manage-media', icon: MediaSVG, label: 'Gerenciar mídias' },
 ];
 
 export default function LobbySideMenu({

@@ -14,15 +14,19 @@ interface UserCampaign {
     description: string;
     system: string;
     ageRestriction: string;
+    visibility: string;
     campaignPlayers: CampaignPlayer[];
     infos: {
         nextMatchDate: string;
         playerAmountLimit?: number;
         socialMedia?: { discord?: string; twitter?: string; youtube?: string };
+        nextSessionResume?: string;
     };
     matchData?: {
         confirmedPlayers?: string[];
+        mapImages?: { link: string }[];
     };
+    musics?: { id: string; title: string; thumbnail: string }[];
 }
 
 export interface UserCampaignsContract {
