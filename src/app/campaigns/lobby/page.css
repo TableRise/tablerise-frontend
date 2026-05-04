@@ -208,4 +208,8 @@
     .lobby-article-date {
         @apply text-color-greyScale/200;
     }
+
+    .lobby-articles-empty {
+        @apply text-color-greyScale/500 py-4 text-center;
+    }
 }

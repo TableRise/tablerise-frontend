@@ -25,3 +25,27 @@ export const getCampaignPlayers = async (
         return [];
     }
 };
+
+export const confirmCampaignPlayer = async (
+    campaignId: string,
+    userToActivate: string
+): Promise<void> => {
+    await apiCall({
+        baseUrl: campaignsBaseUrl,
+        endpoint: `${campaignId}/update/player/confirm`,
+        method: 'PATCH',
+        params: { userToActivate },
+    });
+};
+
+export const removeCampaignPlayer = async (
+    campaignId: string,
+    userToRemove: string
+): Promise<void> => {
+    await apiCall({
+        baseUrl: campaignsBaseUrl,
+        endpoint: `${campaignId}/update/player/remove`,
+        method: 'POST',
+        params: { userToRemove },
+    });
+};

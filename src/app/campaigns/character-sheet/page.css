@@ -22,7 +22,7 @@
     }
 
     .cs-tab--active {
-        @apply bg-color-primary/default_900 text-color-greyScale/50 shadow-sm;
+        @apply !bg-color-primary/default_900 text-color-greyScale/50 shadow-sm;
     }
 
     .cs-sheet {
@@ -35,7 +35,7 @@
 
     .cs-footer-btn {
         @apply px-10 py-2.5 rounded-xl cursor-pointer transition-all w-full
-            bg-color-primary/default_900 text-color-greyScale/50 shadow-sm border-none
+            text-color-greyScale/50 shadow-sm border-none
             hover:opacity-90 active:scale-95;
     }
 

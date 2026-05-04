@@ -51,7 +51,7 @@ export default function LoggedHeader(): JSX.Element {
                 <nav className="logged-header-nav">
                     <ul className="font-XS-bold">
                         <li>
-                            <Link href="/campaigns">Campanhas</Link>
+                            <Link href="/">Campanhas</Link>
                         </li>
                         <li>
                             <Link href="/tutorial">Tutorial</Link>

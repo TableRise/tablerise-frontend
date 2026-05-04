@@ -83,4 +83,54 @@
             bg-color-primary/default_900 text-color-greyScale/50
             cursor-pointer transition-opacity hover:opacity-80;
     }
+
+    .pm-pending {
+        @apply text-yellow-600;
+    }
+
+    .pm-confirmed {
+        @apply text-green-600;
+    }
+
+    .pm-confirm-btn {
+        @apply w-full mt-2 py-1.5 text-center rounded-lg
+            border border-color-primary/default_900 text-color-primary/default_900
+            bg-transparent cursor-pointer transition-colors
+            hover:bg-color-primary/default_900 hover:text-color-greyScale/50
+            disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+
+    /* ── Remove confirmation dialog ─────────────── */
+    .pm-remove-overlay {
+        @apply fixed inset-0 z-[300] flex items-center justify-center bg-black/60;
+    }
+
+    .pm-remove-dialog {
+        @apply w-80 bg-color-greyScale/100 rounded-2xl p-6 flex flex-col gap-4
+            border border-color-greyScale/200;
+    }
+
+    .pm-remove-title {
+        @apply text-color-greyScale/900;
+    }
+
+    .pm-remove-body {
+        @apply text-color-greyScale/500;
+    }
+
+    .pm-remove-actions {
+        @apply flex gap-3 justify-end;
+    }
+
+    .pm-remove-cancel {
+        @apply px-4 py-2 rounded-lg
+            border border-color-greyScale/300 text-color-greyScale/700
+            bg-transparent cursor-pointer transition-opacity hover:opacity-70;
+    }
+
+    .pm-remove-confirm {
+        @apply px-4 py-2 rounded-lg
+            bg-red-600 text-white cursor-pointer
+            transition-opacity hover:opacity-80;
+    }
 }

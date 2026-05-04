@@ -275,7 +275,7 @@ export default function CharacterSheetPage(): JSX.Element {
                     )}
                     <button
                         type="button"
-                        className="cs-footer-btn font-S-bold"
+                        className="cs-footer-btn font-S-bold bg-color-primary/default_900"
                         disabled={submitLoading}
                         onClick={handleCreateCharacter}
                     >

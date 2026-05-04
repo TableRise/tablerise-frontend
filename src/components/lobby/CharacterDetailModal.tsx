@@ -25,6 +25,7 @@ import { uploadCharacterPicture } from '@/server/characters/upload-character-pic
 interface CharacterDetailModalProps {
     characterId: string;
     campaignId: string;
+    isMaster?: boolean;
     onBack: () => void;
 }
 
@@ -84,6 +85,7 @@ const ABILITIES_PER_LEVEL = 8;
 export default function CharacterDetailModal({
     characterId,
     campaignId,
+    isMaster = false,
     onBack,
 }: CharacterDetailModalProps): JSX.Element {
     const [char, setChar] = useState<FullCharacterDnd | null>(null);
@@ -331,6 +333,7 @@ export default function CharacterDetailModal({
             ? JSON.parse(localStorage.getItem('userLogged') ?? 'null')?.userId
             : null;
     const isAuthor = !!loggedUserId && loggedUserId === char?.author?.userId;
+    const canEdit = isAuthor || isMaster;
 
     return (
         <div className="cdm-overlay" onClick={onBack}>
@@ -366,7 +369,7 @@ export default function CharacterDetailModal({
                                     fill
                                     style={{ objectFit: 'cover' }}
                                 />
-                                {isAuthor && (
+                                {canEdit && (
                                     <div
                                         className="cdm-picture-overlay"
                                         onClick={handlePictureClick}
@@ -392,7 +395,7 @@ export default function CharacterDetailModal({
                                     <h2 className="font-L-semibold cdm-char-name">
                                         {profile.name}
                                     </h2>
-                                    {isAuthor && (
+                                    {canEdit && (
                                         <button
                                             type="button"
                                             className="button-L-fill font-XS-bold cdm-edit-btn"

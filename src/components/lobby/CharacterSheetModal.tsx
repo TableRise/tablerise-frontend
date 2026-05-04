@@ -5,8 +5,9 @@ import Image from 'next/image';
 import FichaSVG from '../../../assets/icons/sys/ficha.svg?url';
 import TrashSVG from '../../../assets/icons/sys/trash.svg?url';
 import {
-    getCharactersByCampaign,
-    type CharacterDnd,
+    getCharactersByPlayer,
+    getCharactersByCampaignLobby,
+    type CampaignCharacter,
 } from '@/server/characters/get-characters';
 import { removeCharacterFromCampaign } from '@/server/characters/create-character';
 import CharacterDetailModal from '@/components/lobby/CharacterDetailModal';
@@ -16,6 +17,7 @@ interface CharacterSheetModalProps {
     campaignId: string;
     userId: string;
     isPlayer: boolean;
+    isMaster: boolean;
     onClose: () => void;
 }
 
@@ -31,42 +33,91 @@ export default function CharacterSheetModal({
     campaignId,
     userId,
     isPlayer,
+    isMaster,
     onClose,
 }: CharacterSheetModalProps): JSX.Element {
     const router = useRouter();
-    const [characters, setCharacters] = useState<CharacterDnd[]>([]);
+    const [myChars, setMyChars] = useState<CampaignCharacter[]>([]);
+    const [playerChars, setPlayerChars] = useState<CampaignCharacter[]>([]);
+    const [characters, setCharacters] = useState<CampaignCharacter[]>([]);
+    const [activeTab, setActiveTab] = useState<'mine' | 'players'>('mine');
     const [loading, setLoading] = useState(true);
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [selectedCharId, setSelectedCharId] = useState<string | null>(null);
+    const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
-    const handleDelete = async (e: React.MouseEvent, characterId: string) => {
-        e.stopPropagation();
-        setDeletingId(characterId);
+    const handleDelete = async () => {
+        if (!confirmDeleteId) return;
+        setDeletingId(confirmDeleteId);
+        setConfirmDeleteId(null);
         try {
-            await removeCharacterFromCampaign(campaignId, characterId);
-            setCharacters((prev) => prev.filter((c) => c.characterId !== characterId));
+            await removeCharacterFromCampaign(campaignId, confirmDeleteId);
+            if (isMaster) {
+                setMyChars((prev) => prev.filter((c) => c.id !== confirmDeleteId));
+                setPlayerChars((prev) => prev.filter((c) => c.id !== confirmDeleteId));
+            } else {
+                setCharacters((prev) => prev.filter((c) => c.id !== confirmDeleteId));
+            }
         } finally {
             setDeletingId(null);
         }
     };
 
     useEffect(() => {
-        getCharactersByCampaign(campaignId)
-            .then((data) => {
-                if (isPlayer) {
-                    setCharacters(data.filter((c) => c.author.userId === userId));
-                } else {
-                    setCharacters(data);
-                }
-            })
-            .finally(() => setLoading(false));
-    }, [campaignId, userId, isPlayer]);
+        if (isMaster) {
+            getCharactersByCampaignLobby(campaignId)
+                .then((data) => {
+                    setMyChars(data.filter((c) => c.authorUserId === userId));
+                    setPlayerChars(data.filter((c) => c.authorUserId !== userId));
+                })
+                .finally(() => setLoading(false));
+        } else {
+            getCharactersByPlayer(campaignId)
+                .then((data) => {
+                    if (isPlayer) {
+                        setCharacters(data.filter((c) => c.authorUserId === userId));
+                    } else {
+                        setCharacters(data);
+                    }
+                })
+                .finally(() => setLoading(false));
+        }
+    }, [campaignId, userId, isPlayer, isMaster]);
+
+    const displayChars = isMaster
+        ? activeTab === 'mine'
+            ? myChars
+            : playerChars
+        : characters;
 
     return (
         <>
             <div className="csm-overlay" onClick={onClose}>
                 <div className="csm-modal" onClick={(e) => e.stopPropagation()}>
                     <h2 className="font-L-semibold csm-title">Gerenciamento de Fichas</h2>
+
+                    {isMaster && (
+                        <div className="csm-tabs">
+                            <button
+                                type="button"
+                                className={`csm-tab font-XS-bold${
+                                    activeTab === 'mine' ? ' csm-tab--active' : ''
+                                }`}
+                                onClick={() => setActiveTab('mine')}
+                            >
+                                Minhas Fichas
+                            </button>
+                            <button
+                                type="button"
+                                className={`csm-tab font-XS-bold${
+                                    activeTab === 'players' ? ' csm-tab--active' : ''
+                                }`}
+                                onClick={() => setActiveTab('players')}
+                            >
+                                Fichas dos Jogadores
+                            </button>
+                        </div>
+                    )}
 
                     <div className="csm-list">
                         {loading && (
@@ -75,18 +126,18 @@ export default function CharacterSheetModal({
                             </span>
                         )}
 
-                        {!loading && characters.length === 0 && (
+                        {!loading && displayChars.length === 0 && (
                             <span className="font-XS-regular csm-empty">
                                 Nenhuma ficha encontrada
                             </span>
                         )}
 
                         {!loading &&
-                            characters.map((char) => (
+                            displayChars.map((char) => (
                                 <div
-                                    key={char.characterId}
+                                    key={char.id}
                                     className="csm-card"
-                                    onClick={() => setSelectedCharId(char.characterId)}
+                                    onClick={() => setSelectedCharId(char.id)}
                                 >
                                     <div className="csm-card-left">
                                         <div className="csm-card-icon">
@@ -102,7 +153,7 @@ export default function CharacterSheetModal({
                                                 Ficha de Personagem
                                             </span>
                                             <span className="font-XXS-regular csm-card-name">
-                                                {char.profile?.name ?? 'Sem nome'}
+                                                {char.name}
                                             </span>
                                             <span className="font-XXS-regular csm-card-date">
                                                 Data de criação:{' '}
@@ -117,8 +168,11 @@ export default function CharacterSheetModal({
                                     <button
                                         type="button"
                                         className="csm-card-delete"
-                                        disabled={deletingId === char.characterId}
-                                        onClick={(e) => handleDelete(e, char.characterId)}
+                                        disabled={deletingId === char.id}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setConfirmDeleteId(char.id);
+                                        }}
                                     >
                                         <Image
                                             src={TrashSVG}
@@ -157,8 +211,43 @@ export default function CharacterSheetModal({
                 <CharacterDetailModal
                     characterId={selectedCharId}
                     campaignId={campaignId}
+                    isMaster={isMaster}
                     onBack={() => setSelectedCharId(null)}
                 />
+            )}
+
+            {confirmDeleteId && (
+                <div
+                    className="csm-confirm-overlay"
+                    onClick={() => setConfirmDeleteId(null)}
+                >
+                    <div
+                        className="csm-confirm-modal"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h3 className="font-M-bold csm-confirm-title">Excluir ficha</h3>
+                        <p className="font-XS-regular csm-confirm-text">
+                            Tem certeza que deseja excluir esta ficha? Esta ação não pode
+                            ser desfeita.
+                        </p>
+                        <div className="csm-confirm-actions">
+                            <button
+                                type="button"
+                                className="csm-confirm-btn-cancel font-XS-bold"
+                                onClick={() => setConfirmDeleteId(null)}
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="button"
+                                className="csm-confirm-btn-delete font-XS-bold bg-color-primary/default_900"
+                                onClick={handleDelete}
+                            >
+                                Excluir
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </>
     );

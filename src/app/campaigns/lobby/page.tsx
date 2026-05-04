@@ -10,6 +10,12 @@ import { getUser } from '@/server/users/get-user';
 import formatDate from '@/utils/formatDate';
 import CharacterSheetModal from '@/components/lobby/CharacterSheetModal';
 import ParticipantsModal from '@/components/lobby/ParticipantsModal';
+import JournalPostModal from '@/components/lobby/JournalPostModal';
+import CreatePostModal from '@/components/lobby/CreatePostModal';
+import {
+    getCampaignJournalPosts,
+    type JournalPost,
+} from '@/server/campaigns/get-journal-posts';
 import {
     getCharactersByCampaignLobby,
     type CampaignCharacter,
@@ -47,8 +53,10 @@ export default function CampaignLobby(): JSX.Element {
     >([]);
     const [sheetModalOpen, setSheetModalOpen] = useState(false);
     const [participantsModalOpen, setParticipantsModalOpen] = useState(false);
+    const [createPostModalOpen, setCreatePostModalOpen] = useState(false);
     const [lobbyCharacters, setLobbyCharacters] = useState<CampaignCharacter[]>([]);
-
+    const [journalPosts, setJournalPosts] = useState<JournalPost[]>([]);
+    const [selectedPost, setSelectedPost] = useState<JournalPost | null>(null);
     useEffect(() => {
         if (!campaignId) return;
 
@@ -89,6 +97,11 @@ export default function CampaignLobby(): JSX.Element {
     useEffect(() => {
         if (!campaignId) return;
         getCharactersByCampaignLobby(campaignId).then(setLobbyCharacters);
+    }, [campaignId]);
+
+    useEffect(() => {
+        if (!campaignId) return;
+        getCampaignJournalPosts(campaignId).then(setJournalPosts);
     }, [campaignId]);
 
     const refreshCampaign = useCallback(() => {
@@ -163,75 +176,32 @@ export default function CampaignLobby(): JSX.Element {
     const isPlayer = userRole === 'player' || userRole === 'admin_player';
     const isMaster = userRole === 'master' || isMasterCampaign;
 
-    const postFilters = [
-        'Mestre',
-        'Admin',
-        'Players',
-        'Personagens (Jogadores)',
-        'Personagens (Mestre)',
-        'Ambiente',
-        'Notícias do Mundo',
-        'Anúncios',
-    ];
-    const [activeFilter, setActiveFilter] = useState('Mestre');
+    const CATEGORY_LABEL: Record<string, string> = {
+        all: 'Todos',
+        master: 'Mestre',
+        admin: 'Admin',
+        players: 'Jogadores',
+        'characters-players': 'Personagens (Jogadores)',
+        'characters-master': 'Personagens (Mestre)',
+        environment: 'Ambiente',
+        'world-news': 'Notícias do Mundo',
+        announcements: 'Anúncios',
+    };
 
-    const placeholderArticles = [
-        {
-            id: '1',
-            title: 'Sessão 1 - O Início da Jornada',
-            resume: 'A aventura começou em uma taverna antiga...',
-            date: '12/04/2026',
-            thumbnail: '/images/SideImageBackground.svg',
-        },
-        {
-            id: '2',
-            title: 'Sessão 2 - A Floresta Sombria',
-            resume: 'O grupo adentrou a floresta e encontrou criaturas misteriosas...',
-            date: '14/04/2026',
-            thumbnail: '/images/SideImageBackground.svg',
-        },
-        {
-            id: '3',
-            title: 'Sessão 3 - O Covil do Dragão',
-            resume: 'Finalmente chegaram ao covil, onde o ar estava quente...',
-            date: '16/04/2026',
-            thumbnail: '/images/SideImageBackground.svg',
-        },
-        {
-            id: '4',
-            title: 'Sessão 3 - O Covil do Dragão',
-            resume: 'Finalmente chegaram ao covil, onde o ar estava quente...',
-            date: '16/04/2026',
-            thumbnail: '/images/SideImageBackground.svg',
-        },
-        {
-            id: '5',
-            title: 'Sessão 3 - O Covil do Dragão',
-            resume: 'Finalmente chegaram ao covil, onde o ar estava quente...',
-            date: '16/04/2026',
-            thumbnail: '/images/SideImageBackground.svg',
-        },
-        {
-            id: '6',
-            title: 'Sessão 3 - O Covil do Dragão',
-            resume: 'Finalmente chegaram ao covil, onde o ar estava quente...',
-            date: '16/04/2026',
-            thumbnail: '/images/SideImageBackground.svg',
-        },
-        {
-            id: '7',
-            title: 'Sessão 3 - O Covil do Dragão',
-            resume: 'Finalmente chegaram ao covil, onde o ar estava quente...',
-            date: '16/04/2026',
-            thumbnail: '/images/SideImageBackground.svg',
-        },
-    ];
+    const postFilters = Object.keys(CATEGORY_LABEL);
+    const [activeFilter, setActiveFilter] = useState('all');
+
+    const filteredPosts =
+        activeFilter === 'all'
+            ? journalPosts
+            : journalPosts.filter((p) => p.category === activeFilter);
 
     const rollingTitles = useMemo(() => {
-        const shuffled = [...placeholderArticles].sort(() => Math.random() - 0.5);
-        return shuffled.slice(0, 3).map((a) => a.title);
+        const titles = journalPosts.map((p) => p.title);
+        const shuffled = [...titles].sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, 3);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [journalPosts]);
 
     if (!campaign) {
         return (
@@ -441,34 +411,36 @@ export default function CampaignLobby(): JSX.Element {
                                         }`}
                                         onClick={() => setActiveFilter(filter)}
                                     >
-                                        {filter}
+                                        {CATEGORY_LABEL[filter]}
                                     </button>
                                 ))}
                             </div>
                             <div className="lobby-articles-list">
-                                {placeholderArticles.map((article) => (
-                                    <article key={article.id} className="lobby-article">
-                                        <div className="lobby-article-thumbnail">
-                                            <Image
-                                                src={article.thumbnail}
-                                                alt={article.title}
-                                                fill
-                                                style={{ objectFit: 'cover' }}
-                                            />
-                                        </div>
-                                        <div className="lobby-article-info">
-                                            <h3 className="font-S-bold">
-                                                {article.title}
-                                            </h3>
-                                            <p className="lobby-article-resume font-XS-regular">
-                                                {article.resume}
-                                            </p>
-                                            <span className="lobby-article-date font-XXS-regular">
-                                                {article.date}
-                                            </span>
-                                        </div>
-                                    </article>
-                                ))}
+                                {filteredPosts.length > 0 ? (
+                                    filteredPosts.map((post, i) => (
+                                        <article
+                                            key={i}
+                                            className="lobby-article"
+                                            onClick={() => setSelectedPost(post)}
+                                        >
+                                            <div className="lobby-article-info">
+                                                <h3 className="font-S-bold">
+                                                    {post.title}
+                                                </h3>
+                                                <p className="lobby-article-resume font-XS-regular">
+                                                    {post.content.split('\n')[0]}
+                                                </p>
+                                                <span className="lobby-article-date font-XXS-regular">
+                                                    {formatDate(post.timestamp)}
+                                                </span>
+                                            </div>
+                                        </article>
+                                    ))
+                                ) : (
+                                    <span className="font-XS-regular lobby-articles-empty">
+                                        Nenhuma publicação nesta categoria.
+                                    </span>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -479,12 +451,30 @@ export default function CampaignLobby(): JSX.Element {
                     onMenuAction={(key) => {
                         if (key === 'create-sheet') setSheetModalOpen(true);
                         if (key === 'participants') setParticipantsModalOpen(true);
+                        if (key === 'new-post') setCreatePostModalOpen(true);
                     }}
                 />
             </div>
+            {createPostModalOpen && campaign && (
+                <CreatePostModal
+                    campaignId={campaign.campaignId}
+                    userRole={userRole}
+                    onClose={() => setCreatePostModalOpen(false)}
+                    onCreated={() =>
+                        getCampaignJournalPosts(campaign.campaignId).then(setJournalPosts)
+                    }
+                />
+            )}
+            {selectedPost && (
+                <JournalPostModal
+                    post={selectedPost}
+                    onClose={() => setSelectedPost(null)}
+                />
+            )}
             {participantsModalOpen && campaign && (
                 <ParticipantsModal
                     campaignId={campaign.campaignId}
+                    isMaster={isMaster}
                     onClose={() => setParticipantsModalOpen(false)}
                 />
             )}
@@ -493,6 +483,7 @@ export default function CampaignLobby(): JSX.Element {
                     campaignId={campaign.campaignId}
                     userId={userInfo?.userId ?? ''}
                     isPlayer={isPlayer}
+                    isMaster={isMaster}
                     onClose={() => setSheetModalOpen(false)}
                 />
             )}

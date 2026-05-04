@@ -1,11 +1,11 @@
 import { AxiosResponse, AxiosError } from 'axios';
-import { apiCall, campaignsBaseUrl } from '../wrapper';
+import { apiCall, usersBaseUrl } from '../wrapper';
 
 export const getCampaignsByUserId = async (userId: string) => {
     try {
         const { data }: AxiosResponse = await apiCall({
-            baseUrl: campaignsBaseUrl,
-            endpoint: `user/${userId}`,
+            baseUrl: usersBaseUrl,
+            endpoint: `${userId}/campaigns`,
             method: 'GET',
         });
 

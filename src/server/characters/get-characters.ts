@@ -22,29 +22,13 @@ export interface CharacterDnd {
     updatedAt: string;
 }
 
-export const getCharactersByCampaign = async (
-    campaignId: string
-): Promise<CharacterDnd[]> => {
-    try {
-        const { data }: AxiosResponse = await apiCall({
-            baseUrl: charactersBaseUrl,
-            endpoint: `by-campaign/${campaignId}`,
-            method: 'GET',
-        });
-
-        return data;
-    } catch (error: AxiosError | any) {
-        const status = error?.response?.status;
-        if (status === 404) return [];
-        if (status === 500) throw new Error('Erro no servidor');
-        return [];
-    }
-};
-
 export interface CampaignCharacter {
     id: string;
     name: string;
     image: string;
+    authorUserId: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface FullCharacterDnd {
@@ -135,6 +119,21 @@ export const getCharacterById = async (
     }
 };
 
+function mapCampaignCharacter(result: any): CampaignCharacter {
+    return {
+        id: result.characterId,
+        name: result.data?.profile?.name ?? result.profile?.name ?? 'Sem nome',
+        image:
+            result.data?.profile?.characteristics?.appearance?.picture?.link ??
+            result.profile?.characteristics?.appearance?.picture?.link ??
+            result.picture?.link ??
+            '',
+        authorUserId: result.author?.userId ?? '',
+        createdAt: result.data?.createdAt ?? result.createdAt ?? '',
+        updatedAt: result.data?.updatedAt ?? result.updatedAt ?? '',
+    };
+}
+
 export const getCharactersByCampaignLobby = async (
     campaignId: string
 ): Promise<CampaignCharacter[]> => {
@@ -144,13 +143,24 @@ export const getCharactersByCampaignLobby = async (
             endpoint: `${campaignId}/characters`,
             method: 'GET',
         });
-
         const list = Array.isArray(data) ? data : [];
-        return list.map((result: any) => ({
-            id: result.characterId,
-            name: result.data?.profile?.name ?? 'Sem nome',
-            image: result.data?.profile?.characteristics?.appearance?.picture.link,
-        }));
+        return list.map(mapCampaignCharacter);
+    } catch {
+        return [];
+    }
+};
+
+export const getCharactersByPlayer = async (
+    campaignId: string
+): Promise<CampaignCharacter[]> => {
+    try {
+        const { data }: AxiosResponse = await apiCall({
+            baseUrl: campaignsBaseUrl,
+            endpoint: `${campaignId}/characters-by-player`,
+            method: 'GET',
+        });
+        const list = Array.isArray(data) ? data : [];
+        return list.map(mapCampaignCharacter);
     } catch {
         return [];
     }
