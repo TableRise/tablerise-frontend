@@ -6,7 +6,7 @@ import PostSVG from '../../../assets/icons/menu-panel-lobby/post.svg?url';
 import ExitRedSVG from '../../../assets/icons/sys/exit-red.svg?url';
 import HistorySVG from '../../../assets/icons/menu-panel-lobby/history.svg?url';
 import SettingsSVG from '../../../assets/icons/menu-panel-lobby/settings.svg?url';
-import MediaSVG from '../../../assets/icons/menu-panel-lobby/media.svg?url';
+import PlaySVG from '../../../assets/icons/menu-panel-lobby/play.svg?url';
 import '@/components/lobby/styles/LobbySideMenu.css';
 
 interface LobbySideMenuProps {
@@ -16,6 +16,7 @@ interface LobbySideMenuProps {
 }
 
 const playerMenuItems = [
+    { key: 'play-match', icon: PlaySVG, label: 'Entrar na Partida' },
     { key: 'create-sheet', icon: SheetSVG, label: 'Criar/Editar Ficha de Personagem' },
     { key: 'participants', icon: ParticipantsSVG, label: 'Ver Participantes' },
     { key: 'new-post', icon: PostSVG, label: 'Criar Novo Post' },

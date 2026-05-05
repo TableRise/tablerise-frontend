@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import TableriseContext from '@/context/TableriseContext';
 import LoggedHeader from '@/components/common/LoggedHeader';
@@ -53,6 +53,7 @@ interface ConfirmedPlayerInfo {
 export default function CampaignLobby(): JSX.Element {
     const searchParams = useSearchParams();
     const campaignId = searchParams.get('campaignId') ?? '';
+    const router = useRouter();
     const { userCampaigns } = useContext(TableriseContext);
     const [campaign, setCampaign] = useState<CampaignData | null>(null);
     const [presenceConfirmed, setPresenceConfirmed] = useState(false);
@@ -90,7 +91,7 @@ export default function CampaignLobby(): JSX.Element {
                 musics: cached.musics ?? [],
                 visibility: cached.visibility ?? '',
                 ageRestriction: cached.ageRestriction ?? '',
-                nextSessionResume: cached.infos?.nextSessionResume ?? '',
+                nextSessionResume: cached.matchData?.nextSessionResume ?? '',
                 playerAmountLimit: cached.infos?.playerAmountLimit ?? 1,
             });
         }
@@ -110,7 +111,7 @@ export default function CampaignLobby(): JSX.Element {
                     musics: data.musics ?? [],
                     visibility: data.visibility ?? '',
                     ageRestriction: data.ageRestriction ?? '',
-                    nextSessionResume: data.infos?.nextSessionResume ?? '',
+                    nextSessionResume: data.matchData?.nextSessionResume ?? '',
                     playerAmountLimit: data.infos?.playerAmountLimit ?? 1,
                 });
         });
@@ -144,7 +145,7 @@ export default function CampaignLobby(): JSX.Element {
                     musics: data.musics ?? [],
                     visibility: data.visibility ?? '',
                     ageRestriction: data.ageRestriction ?? '',
-                    nextSessionResume: data.infos?.nextSessionResume ?? '',
+                    nextSessionResume: data.matchData?.nextSessionResume ?? '',
                     playerAmountLimit: data.infos?.playerAmountLimit ?? 1,
                 });
         });
@@ -475,6 +476,8 @@ export default function CampaignLobby(): JSX.Element {
                     isPlayer={isPlayer}
                     isMaster={isMaster}
                     onMenuAction={(key) => {
+                        if (key === 'play-match')
+                            router.push(`/campaigns/match?campaignId=${campaignId}`);
                         if (key === 'create-sheet') setSheetModalOpen(true);
                         if (key === 'participants') setParticipantsModalOpen(true);
                         if (key === 'new-post') setCreatePostModalOpen(true);

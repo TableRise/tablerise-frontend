@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import FichaSVG from '../../../assets/icons/sys/ficha.svg?url';
 import TrashSVG from '../../../assets/icons/sys/trash.svg?url';
 import {
     getCharactersByPlayer,
@@ -142,10 +141,13 @@ export default function CharacterSheetModal({
                                     <div className="csm-card-left">
                                         <div className="csm-card-icon">
                                             <Image
-                                                src={FichaSVG}
-                                                alt="Ficha"
-                                                width={60}
-                                                height={60}
+                                                src={
+                                                    char.image ||
+                                                    '/images/SideImageBackground.svg'
+                                                }
+                                                alt={char.name}
+                                                fill
+                                                style={{ objectFit: 'cover' }}
                                             />
                                         </div>
                                         <div className="csm-card-info">

@@ -44,6 +44,9 @@ export interface FullCharacterDnd {
             race: string;
             level: number;
             xp: number;
+            picture?: {
+                link: string;
+            };
             characteristics: {
                 alignment?: string;
                 backstory?: string;
@@ -74,7 +77,7 @@ export interface FullCharacterDnd {
                 modifier: number;
                 proficiency: boolean;
             }[];
-            skills: Record<string, number>;
+            skills: { name: string; value: number; checked: boolean }[];
             proficiencyBonus: number;
             inspiration: number;
             passiveWisdom: number;
@@ -102,6 +105,9 @@ export interface FullCharacterDnd {
         spells?: any;
         extraAbilities?: any;
     };
+    picture?: {
+        link: string;
+    };
 }
 
 export const getCharacterById = async (
@@ -126,7 +132,10 @@ function mapCampaignCharacter(result: any): CampaignCharacter {
         image:
             result.data?.profile?.characteristics?.appearance?.picture?.link ??
             result.profile?.characteristics?.appearance?.picture?.link ??
+            result.character?.picture?.link ??
+            result.character?.picture ??
             result.picture?.link ??
+            result.picture ??
             '',
         authorUserId: result.author?.userId ?? '',
         createdAt: result.data?.createdAt ?? result.createdAt ?? '',

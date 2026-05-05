@@ -47,9 +47,56 @@ const ABILITY_FULL: Record<string, string> = {
     cha: 'Carisma',
 };
 
+const SKILL_LABELS: Record<string, string> = {
+    athletics: 'Atletismo',
+    acrobatics: 'Acrobacia',
+    sleightOfHand: 'Prestidigitação',
+    stealth: 'Furtividade',
+    arcana: 'Arcanismo',
+    history: 'História',
+    investigation: 'Investigação',
+    nature: 'Natureza',
+    religion: 'Religião',
+    animalHandling: 'Lidar com Animais',
+    insight: 'Intuição',
+    medicine: 'Medicina',
+    perception: 'Percepção',
+    survival: 'Sobrevivência',
+    deception: 'Enganação',
+    intimidation: 'Intimidação',
+    performance: 'Atuação',
+    persuasion: 'Persuasão',
+};
+
+// maps skill key → ability key (str/dex/con/int/wis/cha)
+const SKILL_TO_ABILITY: Record<string, string> = {
+    acrobatics: 'dex',
+    arcana: 'int',
+    athletics: 'str',
+    performance: 'cha',
+    deception: 'cha',
+    stealth: 'dex',
+    history: 'int',
+    intimidation: 'cha',
+    insight: 'wis',
+    investigation: 'int',
+    animalHandling: 'wis',
+    medicine: 'wis',
+    nature: 'int',
+    perception: 'wis',
+    persuasion: 'cha',
+    sleightOfHand: 'dex',
+    religion: 'int',
+    survival: 'wis',
+};
+
 function modifier(value: number): string {
     const mod = Math.floor((value - 10) / 2);
     return mod >= 0 ? `+${mod}` : `${mod}`;
+}
+
+function signed(value: number): string {
+    return value >= 0 ? `+${value}` : `${value}`;
 }
 
 const SPELL_LEVELS = [
@@ -132,6 +179,7 @@ export default function CharacterDetailModal({
         alliesAndOrgs: '',
         treasure: '',
     });
+    const [editSkillProfs, setEditSkillProfs] = useState<Record<string, boolean>>({});
 
     const handleStartEdit = () => {
         if (!char || !profile || !stats) return;
@@ -167,6 +215,12 @@ export default function CharacterDetailModal({
             alliesAndOrgs: profile.characteristics?.alliesAndOrgs ?? '',
             treasure: profile.characteristics?.treasure ?? '',
         });
+        // initialize per-skill proficiency from stored array
+        const skillProfsInit: Record<string, boolean> = {};
+        for (const sk of stats.skills ?? []) {
+            skillProfsInit[sk.name] = sk.checked;
+        }
+        setEditSkillProfs(skillProfsInit);
         setIsEditing(true);
     };
 
@@ -235,6 +289,24 @@ export default function CharacterDetailModal({
                         tempPoints: editCombat.hitPointsTemp,
                         dicePoints: char.data.stats.hitPoints.dicePoints,
                     },
+                    skills: (() => {
+                        const profBonus = char.data.stats.proficiencyBonus ?? 2;
+                        return Object.entries(editSkillProfs)
+                            .filter(([, checked]) => checked)
+                            .map(([key]) => {
+                                const abilityKey = SKILL_TO_ABILITY[key];
+                                const abilityScore =
+                                    editAbilityScores.find(
+                                        (a) => a.ability === abilityKey
+                                    )?.value ?? 10;
+                                const rawMod = Math.floor((abilityScore - 10) / 2);
+                                return {
+                                    name: key,
+                                    value: rawMod + profBonus,
+                                    checked: true,
+                                };
+                            });
+                    })(),
                 },
                 money: editMoney,
                 equipments: editEquipments,
@@ -326,7 +398,11 @@ export default function CharacterDetailModal({
     const profile = char?.data?.profile;
     const stats = char?.data?.stats;
     const appearance = profile?.characteristics?.appearance;
-    const picture = profile?.characteristics.appearance?.picture?.link;
+    const picture =
+        profile?.picture?.link ??
+        appearance?.picture?.link ??
+        char?.picture?.link ??
+        '/images/SideImageBackground.svg';
 
     const loggedUserId =
         typeof window !== 'undefined'
@@ -528,6 +604,83 @@ export default function CharacterDetailModal({
                                                 </span>
                                             </div>
                                         ))}
+                                    </div>
+                                </div>
+
+                                {/* ── Perícias ─────────────────── */}
+                                <div className="cdm-section">
+                                    <h3 className="font-M-semibold cdm-section-title">
+                                        Perícias
+                                    </h3>
+                                    <div className="cdm-info-grid">
+                                        {(isEditing
+                                            ? Object.keys(SKILL_LABELS)
+                                            : (stats.skills ?? []).map((sk) => sk.name)
+                                        ).map((skillKey) => {
+                                            const isProf = isEditing
+                                                ? !!editSkillProfs[skillKey]
+                                                : true;
+                                            const bonus = isEditing
+                                                ? (() => {
+                                                      const profBonus =
+                                                          stats.proficiencyBonus ?? 2;
+                                                      const abilityKey =
+                                                          SKILL_TO_ABILITY[skillKey];
+                                                      const abilityScore =
+                                                          editAbilityScores.find(
+                                                              (a) =>
+                                                                  a.ability === abilityKey
+                                                          )?.value ?? 10;
+                                                      const rawMod = Math.floor(
+                                                          (abilityScore - 10) / 2
+                                                      );
+                                                      return isProf
+                                                          ? rawMod + profBonus
+                                                          : rawMod;
+                                                  })()
+                                                : (stats.skills ?? []).find(
+                                                      (sk) => sk.name === skillKey
+                                                  )?.value ?? 0;
+                                            return (
+                                                <div
+                                                    key={skillKey}
+                                                    className="cdm-info-box"
+                                                    style={{
+                                                        flexDirection: 'row',
+                                                        alignItems: 'center',
+                                                        gap: '0.5rem',
+                                                    }}
+                                                >
+                                                    {isEditing && (
+                                                        <input
+                                                            type="checkbox"
+                                                            className="cs-save-check"
+                                                            checked={isProf}
+                                                            onChange={(e) =>
+                                                                setEditSkillProfs(
+                                                                    (prev) => ({
+                                                                        ...prev,
+                                                                        [skillKey]:
+                                                                            e.target
+                                                                                .checked,
+                                                                    })
+                                                                )
+                                                            }
+                                                            style={{ cursor: 'pointer' }}
+                                                        />
+                                                    )}
+                                                    <div style={{ flex: 1 }}>
+                                                        <span className="font-XXS-regular cdm-info-label mr-2">
+                                                            {SKILL_LABELS[skillKey] ||
+                                                                skillKey}
+                                                        </span>
+                                                        <span className="font-S-bold">
+                                                            {signed(bonus)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
 

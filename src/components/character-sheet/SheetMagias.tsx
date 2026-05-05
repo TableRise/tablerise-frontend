@@ -111,8 +111,8 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
             : 0;
         if (slotCount === 0) return 0;
         return levelingSpecs.spellsKnown.isValidToThisClass
-            ? levelingSpecs.spellsKnown.amount[0] ?? SPELLS_PER_LEVEL
-            : SPELLS_PER_LEVEL;
+            ? levelingSpecs.spellsKnown.amount[0] ?? slotCount
+            : slotCount;
     };
 
     const getSlotTotal = (spellLevel: number): number => {

@@ -25,6 +25,7 @@ interface UserCampaign {
     matchData?: {
         confirmedPlayers?: string[];
         mapImages?: { link: string }[];
+        nextSessionResume?: string;
     };
     musics?: { id: string; title: string; thumbnail: string }[];
 }

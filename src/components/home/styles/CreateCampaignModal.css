@@ -5,7 +5,7 @@
 @layer base {
     /* ── Backdrop ─────────────────────────────────────────── */
     .ccm-backdrop {
-        @apply fixed inset-0 z-50 flex items-center justify-center;
+        @apply fixed inset-0 z-[150] flex items-center justify-center;
         background-color: rgba(0, 0, 0, 0.5);
     }
 

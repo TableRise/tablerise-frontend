@@ -1,0 +1,245 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .match-page {
+        @apply relative w-screen h-screen bg-cover bg-center overflow-hidden;
+    }
+
+    /* ── Grid overlay ─────────────────────────────────────── */
+    .match-grid {
+        @apply absolute inset-0 pointer-events-none;
+        background-image: linear-gradient(rgba(255, 255, 255, 0.3) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.3) 1px, transparent 1px);
+        background-size: 4% 4%;
+    }
+
+    /* ── Top-left logo badge ──────────────────────────────── */
+    .match-logo-badge {
+        @apply absolute top-4 left-4 z-10 bg-white rounded-xl px-3 py-2 flex items-center justify-center shadow-md;
+    }
+
+    /* ── Top-right horizontal bar ────────────────────────── */
+    .match-top-bar {
+        @apply absolute top-4 right-4 z-10 flex flex-row gap-2 bg-white bg-opacity-90 rounded-xl px-3 py-2 shadow-md;
+    }
+
+    .match-top-bar-item {
+        @apply flex items-center justify-center w-10 h-10 rounded-lg transition-colors hover:bg-color-greyScale/50;
+    }
+
+    /* ── Middle-left character panel ─────────────────────── */
+    .match-char-panel-anchor {
+        @apply absolute left-4 top-1/2 z-10;
+        transform: translateY(-50%);
+    }
+
+    .match-char-panel-toggle {
+        @apply relative z-[1] flex items-center justify-center w-12 h-12 bg-white bg-opacity-90 rounded-xl shadow-md transition-colors hover:bg-color-greyScale/50;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+    }
+
+    .match-char-panel {
+        @apply absolute left-[calc(100%+0.5rem)] top-1/2 bg-white bg-opacity-95 rounded-xl shadow-lg overflow-hidden;
+        width: 22rem;
+        opacity: 0;
+        transform: translateY(-50%) translateX(-0.5rem) scale(0.98);
+        transition:
+            opacity 0.2s ease,
+            transform 0.25s ease;
+        @apply p-4;
+        pointer-events: none;
+        visibility: hidden;
+        will-change: opacity, transform;
+    }
+
+    .match-char-panel--open {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0) scale(1);
+        pointer-events: auto;
+        visibility: visible;
+    }
+
+    .match-char-panel-header {
+        @apply flex items-center justify-between mb-2;
+    }
+
+    .match-char-panel-open-sheet {
+        @apply text-color-primary/default_900 underline;
+    }
+
+    .match-char-empty {
+        @apply block py-2 text-color-greyScale/700;
+    }
+
+    .match-char-select {
+        @apply w-full border border-color-greyScale/200 rounded-lg px-2 py-2 mb-2;
+    }
+
+    .match-char-single-name {
+        @apply block mb-2 text-color-greyScale/900;
+    }
+
+    .match-char-tabs {
+        @apply flex gap-1 mb-2;
+    }
+
+    .match-char-tab {
+        @apply px-2 py-1 rounded-md text-color-greyScale/500;
+    }
+
+    .match-char-tab--active {
+        @apply bg-color-primary/default_900 text-color-greyScale/50;
+    }
+
+    .match-char-content {
+        @apply max-h-[24rem] overflow-y-auto pr-1;
+    }
+
+    .match-char-profile {
+        @apply flex items-center gap-2 mb-3;
+    }
+
+    .match-char-avatar {
+        @apply relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0;
+    }
+
+    .match-char-grid-two {
+        @apply grid grid-cols-2 gap-x-3 gap-y-1 mb-3;
+    }
+
+    .match-char-section {
+        @apply mb-2;
+    }
+
+    .match-char-tags {
+        @apply flex flex-wrap gap-1;
+    }
+
+    .match-char-tag {
+        @apply px-2 py-1 bg-color-greyScale/100 rounded-md;
+    }
+
+    /* ── Bottom-left vertical bar ────────────────────────── */
+    .match-bottom-bar {
+        @apply absolute bottom-4 left-4 z-10 flex flex-col gap-2 bg-white bg-opacity-90 rounded-xl px-2 py-3 shadow-md;
+    }
+
+    .match-bottom-bar-item {
+        @apply flex items-center justify-center w-10 h-10 rounded-lg transition-colors hover:bg-color-greyScale/50;
+    }
+
+    .match-bottom-bar-item--danger {
+        @apply hover:bg-red-50;
+    }
+
+    /* ── Bottom-right dice button ─────────────────────────── */
+    .match-dice-wrapper {
+        @apply absolute bottom-4 right-4 z-10 flex flex-row items-end gap-3;
+    }
+
+    .match-dice-controls {
+        @apply flex flex-col items-end gap-2;
+    }
+
+    /* ── Dice picker panel ────────────────────────────────── */
+    .match-dice-picker {
+        @apply flex flex-col items-center gap-3 bg-white bg-opacity-95 rounded-xl shadow-lg px-5 py-4;
+        min-width: 9rem;
+    }
+
+    .match-dice-picker-label {
+        @apply text-color-greyScale/500 uppercase tracking-widest;
+        font-size: 0.65rem;
+    }
+
+    .match-dice-picker-counter {
+        @apply flex items-center gap-3;
+    }
+
+    .match-dice-picker-counter-btn {
+        @apply w-8 h-8 rounded-lg bg-color-greyScale/100 flex items-center justify-center transition-colors hover:bg-color-greyScale/200;
+    }
+
+    .match-dice-picker-count {
+        @apply w-6 text-center text-color-greyScale/900;
+    }
+
+    .match-dice-picker-roll-btn {
+        @apply w-full py-2 px-4 bg-color-primary/default_900 text-white rounded-lg transition-opacity hover:opacity-80;
+    }
+
+    .match-dice-tray {
+        @apply flex flex-col items-center gap-2 bg-white bg-opacity-90 rounded-xl py-2 shadow-md overflow-hidden;
+        max-height: 0;
+        opacity: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        transition:
+            max-height 0.35s ease,
+            opacity 0.25s ease,
+            padding 0.25s ease;
+    }
+
+    .match-dice-tray--open {
+        max-height: 20rem;
+        opacity: 1;
+        @apply py-2;
+    }
+
+    .match-dice-tray-item {
+        @apply flex items-center justify-center w-16 h-16 rounded-lg transition-colors hover:bg-color-greyScale/50;
+    }
+
+    .match-dice-tray-item--active {
+        @apply bg-color-primary/default_900 bg-opacity-15;
+    }
+
+    .match-dice-btn {
+        @apply flex items-center justify-center w-16 h-16 bg-white bg-opacity-90 rounded-2xl shadow-md transition-transform hover:scale-110;
+    }
+
+    /* ── Full-screen dice throw overlay ──────────────────── */
+    .match-throw-overlay {
+        @apply absolute inset-0 z-50 flex flex-col items-center justify-center cursor-pointer;
+        background: rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(2px);
+    }
+
+    .match-throw-die {
+        @apply relative flex items-center justify-center;
+    }
+
+    .match-throw-result {
+        @apply absolute inset-0 flex items-center justify-center;
+        color: #fff;
+        text-shadow:
+            0 2px 8px rgba(0, 0, 0, 0.8),
+            0 0 2px rgba(0, 0, 0, 1);
+        font-size: 3.5rem;
+        pointer-events: none;
+    }
+
+    .match-throw-label {
+        @apply text-white uppercase tracking-widest text-center;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+        font-size: 1.1rem;
+    }
+
+    .match-throw-details {
+        @apply mt-4 flex flex-col items-center gap-2;
+    }
+
+    .match-throw-rolls {
+        @apply flex flex-wrap justify-center gap-2 max-w-xs;
+    }
+
+    .match-throw-roll-badge {
+        @apply px-2 py-1 rounded-md text-white;
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(4px);
+        font-size: 0.8rem;
+    }
+}

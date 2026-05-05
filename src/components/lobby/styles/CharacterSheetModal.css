@@ -46,7 +46,7 @@
     }
 
     .csm-card-icon {
-        @apply w-10 h-10 rounded-md flex items-center justify-center;
+        @apply relative w-10 h-10 rounded-md overflow-hidden flex-shrink-0;
     }
 
     .csm-card-info {

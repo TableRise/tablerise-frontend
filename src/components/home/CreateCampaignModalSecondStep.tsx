@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Image from 'next/image';
 import UploadSVG from '../../../assets/icons/sys/upload-gray.svg?url';
 import type { CampaignMusic } from '@/server/campaigns/create-campaign';

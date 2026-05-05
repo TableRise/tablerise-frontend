@@ -59,7 +59,7 @@ export interface SheetPrincipalHandle {
         flaws: string;
         abilityScores: Record<string, number>;
         saveProfs: Record<string, boolean>;
-        skills: Record<string, number>;
+        skills: { name: string; value: number; checked: boolean }[];
         hpTotal: number;
         currentHp: number;
         tempHp: number;
@@ -158,12 +158,11 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                     Sab: 'wis',
                     Con: 'con',
                 };
-                const skills: Record<string, number> = {};
-                for (const sk of SKILLS) {
+                const skills = SKILLS.filter((sk) => skillProfs[sk.key]).map((sk) => {
                     const ab = SKILL_AB[sk.ability] as keyof typeof abilityScores;
                     const mod = numMod(abilityScores[ab]);
-                    skills[sk.key] = skillProfs[sk.key] ? mod + 2 : mod;
-                }
+                    return { name: sk.key, value: mod + 2, checked: true };
+                });
                 return {
                     characterName,
                     selectedClassId,
