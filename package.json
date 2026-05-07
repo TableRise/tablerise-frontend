@@ -14,9 +14,13 @@
         "prepare": "husky install"
     },
     "dependencies": {
-        "@3d-dice/dice-box": "^1.1.4",
+        "@3d-dice/dice-box": "1.1.4",
+        "@3d-dice/dice-box-threejs": "^0.0.12",
         "@hookform/resolvers": "3.9.1",
         "@sentry/nextjs": "10.48.0",
+        "@tsparticles/engine": "^3.9.1",
+        "@tsparticles/react": "^3.0.0",
+        "@tsparticles/slim": "^3.9.1",
         "axios": "1.7.4",
         "embla-carousel-react": "8.6.0",
         "framer-motion": "^12.38.0",

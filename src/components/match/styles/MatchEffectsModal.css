@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .mem-overlay {
+        @apply fixed inset-0 z-[220] flex items-center justify-center bg-black/60;
+    }
+
+    .mem-modal {
+        @apply w-[30rem] max-w-[calc(100vw-2rem)] bg-color-greyScale/100 rounded-2xl
+            shadow-2xl flex flex-col overflow-hidden;
+    }
+
+    .mem-header {
+        @apply flex items-start justify-between gap-4 px-8 pt-8 pb-4;
+    }
+
+    .mem-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .mem-subtitle {
+        @apply mt-1 text-color-greyScale/500;
+    }
+
+    .mem-close-btn {
+        @apply flex items-center justify-center w-8 h-8 rounded-full flex-shrink-0
+            text-color-primary/default_900 bg-transparent cursor-pointer
+            transition-opacity hover:opacity-70;
+    }
+
+    .mem-divider {
+        @apply border-b border-color-greyScale/200 mx-8;
+    }
+
+    .mem-body {
+        @apply px-8 py-6;
+    }
+
+    .mem-option {
+        @apply w-full flex items-center justify-between gap-4 rounded-xl border
+            border-color-greyScale/200 bg-color-greyScale/50 px-5 py-4 text-left
+            transition-colors hover:border-color-primary/default_900 hover:bg-white
+            mb-2;
+    }
+
+    .mem-option--active {
+        @apply border-color-primary/default_900 bg-white;
+        box-shadow: inset 0 0 0 1px rgba(10, 53, 138, 0.15);
+    }
+
+    .mem-option-copy {
+        @apply flex flex-col gap-1;
+    }
+
+    .mem-option-title {
+        @apply text-color-greyScale/900;
+    }
+
+    .mem-option-text {
+        @apply text-color-greyScale/500;
+    }
+
+    .mem-option-state {
+        @apply rounded-full px-3 py-1 bg-color-primary/default_900 text-color-greyScale/50;
+    }
+}

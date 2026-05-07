@@ -1,13 +1,21 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { DiceRoller } from 'rpg-dice-roller';
+import DiceBoxThreejs, { type DiceBoxThreejsRollResult } from '@3d-dice/dice-box-threejs';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { getCampaignById } from '@/server/campaigns/join-campaign';
 import {
+    getCampaignHighlightedJournalPost,
+    getCampaignJournalPosts,
+    setCampaignHighlightedJournalPost,
+    type JournalPost,
+} from '@/server/campaigns/get-journal-posts';
+import {
     getCharacterById,
+    getCharactersByCampaignLobby,
     getCharactersByPlayer,
     type CampaignCharacter,
     type FullCharacterDnd,
@@ -18,12 +26,25 @@ import {
     getDnd5eSpellById,
 } from '@/server/dungeons&dragons5e/system';
 import CharacterSheetModal from '@/components/lobby/CharacterSheetModal';
+import CharacterDetailModal from '@/components/lobby/CharacterDetailModal';
+import JournalPostModal from '@/components/lobby/JournalPostModal';
+import MatchEffectsModal, { type MapEffect } from '@/components/match/MatchEffectsModal';
+import MatchAvatarSelectionModal from '@/components/match/MatchAvatarSelectionModal';
+import MapFogOverlay, { type FogVariant } from '@/components/match/MapFogOverlay';
+import MapRainOverlay from '@/components/match/MapRainOverlay';
 import MatchMediaModal from '@/components/lobby/MatchMediaModal';
+import MatchNotesModal from '@/components/match/MatchNotesModal';
 import type { CampaignMusic } from '@/server/campaigns/create-campaign';
 import LogoSVG from '../../../../assets/icons/logo-blue.svg?url';
 import SheetSVG from '../../../../assets/icons/menu-panel-lobby/sheet.svg?url';
 import MediaSVG from '../../../../assets/icons/menu-panel-lobby/media.svg?url';
 import LeftPanelOpenSVG from '../../../../assets/icons/game/left-panel-open.svg?url';
+import NotesBlueSVG from '../../../../assets/icons/game/notes-blue.svg?url';
+import StarBlueSVG from '../../../../assets/icons/game/star-blue.svg?url';
+import AvatarSelectionSVG from '../../../../assets/icons/game/avatar-selection.svg?url';
+import ResizeBlueSVG from '../../../../assets/icons/game/resize-blue.svg?url';
+import CloneSVG from '../../../../assets/icons/game/clone.svg?url';
+import BookmarkSVG from '../../../../assets/icons/game/bookmark.svg?url';
 import DiceSVG from '../../../../assets/icons/dice/default.svg?url';
 import D4SVG from '../../../../assets/icons/dice/d4.svg?url';
 import D6SVG from '../../../../assets/icons/dice/d6.svg?url';
@@ -67,14 +88,194 @@ const SKILL_LABELS: Record<string, string> = {
     persuasion: 'Persuasão',
 };
 
+const MIN_TOKEN_WIDTH_PCT = 4.5;
+const DEFAULT_TOKEN_WIDTH_PCT = MIN_TOKEN_WIDTH_PCT;
+const MAX_TOKEN_WIDTH_PCT = 14;
+const TOKEN_SHELL_ASPECT_RATIO = 58 / 52;
+const TOKEN_INFO_HEIGHT_PX = 44;
+const DRAG_CLICK_THRESHOLD_PX = 6;
+const MATCH_DICE_BOX_HOST_ID = 'match-dice-box-host';
+
+type DiceRollStatus = 'idle' | 'rolling' | 'settled';
+
+interface DiceRollSession {
+    status: DiceRollStatus;
+    label: string;
+    count: number;
+    notation: string;
+    rolls: number[] | null;
+    total: number | null;
+}
+
+function createIdleDiceRollSession(): DiceRollSession {
+    return {
+        status: 'idle',
+        label: '',
+        count: 1,
+        notation: '',
+        rolls: null,
+        total: null,
+    };
+}
+
 function signed(value: number): string {
     return value >= 0 ? `+${value}` : `${value}`;
+}
+
+function areJournalPostsEqual(
+    first: JournalPost | null,
+    second: JournalPost | null
+): boolean {
+    if (!first || !second) return false;
+
+    return (
+        first.title === second.title &&
+        first.timestamp === second.timestamp &&
+        first.category === second.category &&
+        first.content === second.content
+    );
+}
+
+function getMapTokenPosition(
+    index: number,
+    total: number
+): {
+    left: string;
+    top: string;
+} {
+    const columns = Math.max(1, Math.min(total, 5));
+    const row = Math.floor(index / columns);
+    const column = index % columns;
+    const spread = columns === 1 ? 0.5 : column / (columns - 1);
+    const left = 22 + spread * 56;
+    const top = Math.min(60 + row * 14 + (column % 2 === 0 ? 0 : 2), 86);
+
+    return {
+        left: `${left}%`,
+        top: `${top}%`,
+    };
+}
+
+interface MapTokenSummary {
+    currentHitPoints: number | null;
+    level: number | null;
+}
+
+interface MapTokenLayout {
+    xPct: number;
+    yPct: number;
+    widthPct: number;
+}
+
+interface MapTokenInstance {
+    tokenId: string;
+    characterId: string;
+    isClone: boolean;
+}
+
+type TokenInteractionType = 'drag' | 'resize';
+
+interface ActiveTokenInteraction {
+    type: TokenInteractionType;
+    tokenId: string;
+    startClientX: number;
+    startClientY: number;
+    startXPct: number;
+    startYPct: number;
+    startWidthPct: number;
+    didMove: boolean;
+}
+
+function clamp(value: number, min: number, max: number): number {
+    return Math.min(Math.max(value, min), max);
+}
+
+function getTokenTotalHeightPx(widthPx: number): number {
+    return widthPx * TOKEN_SHELL_ASPECT_RATIO + TOKEN_INFO_HEIGHT_PX;
+}
+
+function createDefaultTokenLayout(
+    index: number,
+    total: number,
+    containerRect: DOMRect
+): MapTokenLayout {
+    const defaultPosition = getMapTokenPosition(index, total);
+    const centerXPct = Number.parseFloat(defaultPosition.left);
+    const centerYPct = Number.parseFloat(defaultPosition.top);
+    const widthPx = (containerRect.width * DEFAULT_TOKEN_WIDTH_PCT) / 100;
+    const heightPx = getTokenTotalHeightPx(widthPx);
+    const xPx = (containerRect.width * centerXPct) / 100 - widthPx / 2;
+    const yPx = (containerRect.height * centerYPct) / 100 - heightPx / 2;
+    const maxXPct = Math.max(
+        0,
+        ((containerRect.width - widthPx) / containerRect.width) * 100
+    );
+    const maxYPct = Math.max(
+        0,
+        ((containerRect.height - heightPx) / containerRect.height) * 100
+    );
+
+    return {
+        xPct: clamp((xPx / containerRect.width) * 100, 0, maxXPct),
+        yPct: clamp((yPx / containerRect.height) * 100, 0, maxYPct),
+        widthPct: DEFAULT_TOKEN_WIDTH_PCT,
+    };
+}
+
+function getBaseTokenId(characterId: string): string {
+    return `base:${characterId}`;
+}
+
+function getCloneTokenId(characterId: string): string {
+    return `clone:${characterId}:${Date.now()}:${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function createCloneTokenLayout(
+    sourceLayout: MapTokenLayout,
+    containerRect: DOMRect,
+    cloneIndex: number
+): MapTokenLayout {
+    const sourceWidthPx = (sourceLayout.widthPct / 100) * containerRect.width;
+    const sourceHeightPx = getTokenTotalHeightPx(sourceWidthPx);
+    const sourceXPx = (sourceLayout.xPct / 100) * containerRect.width;
+    const sourceYPx = (sourceLayout.yPct / 100) * containerRect.height;
+    const offsetPatterns = [
+        { x: 28, y: 18 },
+        { x: 42, y: -10 },
+        { x: 14, y: 34 },
+        { x: 48, y: 22 },
+        { x: 24, y: 42 },
+    ];
+    const offset = offsetPatterns[cloneIndex % offsetPatterns.length];
+    const xPx = clamp(
+        sourceXPx + offset.x,
+        0,
+        Math.max(0, containerRect.width - sourceWidthPx)
+    );
+    const yPx = clamp(
+        sourceYPx + offset.y,
+        0,
+        Math.max(0, containerRect.height - sourceHeightPx)
+    );
+
+    return {
+        xPct: (xPx / containerRect.width) * 100,
+        yPct: (yPx / containerRect.height) * 100,
+        widthPct: sourceLayout.widthPct,
+    };
 }
 
 export default function MatchPage(): JSX.Element {
     const searchParams = useSearchParams();
     const campaignId = searchParams.get('campaignId') ?? '';
     const router = useRouter();
+    const mapContainerRef = useRef<HTMLDivElement>(null);
+    const diceBoxHostRef = useRef<HTMLDivElement>(null);
+    const diceBoxRef = useRef<DiceBoxThreejs | null>(null);
+    const diceBoxInitPromiseRef = useRef<Promise<DiceBoxThreejs> | null>(null);
+    const diceRollSessionIdRef = useRef(0);
+    const activeTokenInteractionRef = useRef<ActiveTokenInteraction | null>(null);
+    const suppressTokenClickIdRef = useRef<string | null>(null);
     const [backgroundImage, setBackgroundImage] = useState<string>(
         SideImageBackground.src
     );
@@ -84,6 +285,15 @@ export default function MatchPage(): JSX.Element {
     const [gridVisible, setGridVisible] = useState(true);
     const [diceTrayOpen, setDiceTrayOpen] = useState(false);
     const [mediaModalOpen, setMediaModalOpen] = useState(false);
+    const [notesModalOpen, setNotesModalOpen] = useState(false);
+    const [effectsModalOpen, setEffectsModalOpen] = useState(false);
+    const [avatarSelectionModalOpen, setAvatarSelectionModalOpen] = useState(false);
+    const [journalHighlightModalOpen, setJournalHighlightModalOpen] = useState(false);
+    const [journalHighlightReaderOpen, setJournalHighlightReaderOpen] = useState(false);
+    const [journalHighlightNoticeOpen, setJournalHighlightNoticeOpen] = useState(false);
+    const [resizeModeOpen, setResizeModeOpen] = useState(false);
+    const [cloneModeOpen, setCloneModeOpen] = useState(false);
+    const [activeEffect, setActiveEffect] = useState<MapEffect | null>(null);
     const [musics, setMusics] = useState<CampaignMusic[]>([]);
     const [mapImages, setMapImages] = useState<{ link: string }[]>([]);
     const [playingMusicId, setPlayingMusicId] = useState<string | null>(null);
@@ -91,7 +301,23 @@ export default function MatchPage(): JSX.Element {
     const [charPanelTab, setCharPanelTab] = useState<'resumo' | 'magias' | 'habilidades'>(
         'resumo'
     );
+    const [campaignCharacters, setCampaignCharacters] = useState<CampaignCharacter[]>([]);
+    const [campaignCharacterSummaries, setCampaignCharacterSummaries] = useState<
+        Record<string, MapTokenSummary>
+    >({});
+    const [mapTokenLayoutById, setMapTokenLayoutById] = useState<
+        Record<string, MapTokenLayout>
+    >({});
+    const [clonedMapTokens, setClonedMapTokens] = useState<MapTokenInstance[]>([]);
+    const [visibleMapCharacterIds, setVisibleMapCharacterIds] = useState<string[]>([]);
+    const [avatarSearch, setAvatarSearch] = useState('');
+    const [journalPosts, setJournalPosts] = useState<JournalPost[]>([]);
+    const [highlightedJournalPost, setHighlightedJournalPost] =
+        useState<JournalPost | null>(null);
     const [myCharacters, setMyCharacters] = useState<CampaignCharacter[]>([]);
+    const [selectedMapCharacterId, setSelectedMapCharacterId] = useState<string | null>(
+        null
+    );
     const [selectedCharacterId, setSelectedCharacterId] = useState<string>('');
     const [selectedCharacter, setSelectedCharacter] = useState<FullCharacterDnd | null>(
         null
@@ -100,6 +326,16 @@ export default function MatchPage(): JSX.Element {
     const [className, setClassName] = useState('');
     const [raceName, setRaceName] = useState('');
     const [spellNameMap, setSpellNameMap] = useState<Record<string, string>>({});
+    const [journalPostsLoading, setJournalPostsLoading] = useState(false);
+    const [journalHighlightLoading, setJournalHighlightLoading] = useState(false);
+    const [journalHighlightSaving, setJournalHighlightSaving] = useState(false);
+    const [journalHighlightError, setJournalHighlightError] = useState('');
+    const [journalHighlightNoticeMessage, setJournalHighlightNoticeMessage] =
+        useState('');
+    const [activeTokenInteractionMeta, setActiveTokenInteractionMeta] = useState<{
+        tokenId: string;
+        type: TokenInteractionType;
+    } | null>(null);
 
     const diceOptions = [
         { label: 'D20', icon: D20SVG, sides: 20 },
@@ -110,19 +346,187 @@ export default function MatchPage(): JSX.Element {
         { label: 'D4', icon: D4SVG, sides: 4 },
     ];
 
-    const diceRollerRef = useRef(new DiceRoller());
+    const previousCampaignCharacterIdsRef = useRef<string[]>([]);
+    const hasInitializedVisibleMapCharactersRef = useRef(false);
     const [dicePickerState, setDicePickerState] = useState<{
         sides: number;
         label: string;
         icon: string;
         count: number;
     } | null>(null);
-    const [throwState, setThrowState] = useState<{
-        icon: string;
-        label: string;
-        rolls: number[] | null;
-        total: number | null;
-    } | null>(null);
+    const [diceRollSession, setDiceRollSession] = useState<DiceRollSession>(
+        createIdleDiceRollSession
+    );
+
+    const dismissDiceRoll = () => {
+        diceRollSessionIdRef.current += 1;
+        diceBoxRef.current?.clearDice();
+        setDiceRollSession(createIdleDiceRollSession());
+    };
+
+    const handleDiceLayerClick = () => {
+        if (diceRollSession.status !== 'settled') return;
+        dismissDiceRoll();
+    };
+
+    const loadHighlightedJournalPost = async (options?: {
+        suppressLoading?: boolean;
+        suppressErrorState?: boolean;
+    }): Promise<JournalPost | null> => {
+        const shouldShowLoading = !options?.suppressLoading;
+        const shouldSetErrorState = !options?.suppressErrorState;
+
+        if (shouldShowLoading) {
+            setJournalHighlightLoading(true);
+        }
+
+        if (shouldSetErrorState) {
+            setJournalHighlightError('');
+        }
+
+        try {
+            const recoveredHighlightedPost = await getCampaignHighlightedJournalPost(
+                campaignId
+            );
+            setHighlightedJournalPost(recoveredHighlightedPost);
+            return recoveredHighlightedPost;
+        } catch (error: any) {
+            const message = error?.message ?? 'Erro ao carregar publicação em destaque.';
+
+            if (shouldSetErrorState) {
+                setJournalHighlightError(message);
+            }
+
+            throw error;
+        } finally {
+            if (shouldShowLoading) {
+                setJournalHighlightLoading(false);
+            }
+        }
+    };
+
+    const loadCampaignPosts = async (): Promise<JournalPost[]> => {
+        setJournalPostsLoading(true);
+        setJournalHighlightError('');
+
+        try {
+            const recoveredPosts = await getCampaignJournalPosts(campaignId);
+            setJournalPosts(recoveredPosts);
+            return recoveredPosts;
+        } catch (error: any) {
+            setJournalHighlightError(
+                error?.message ?? 'Erro ao carregar publicações do jornal.'
+            );
+            return [];
+        } finally {
+            setJournalPostsLoading(false);
+        }
+    };
+
+    const handleOpenJournalHighlightModal = async () => {
+        setJournalHighlightModalOpen(true);
+        setJournalHighlightError('');
+
+        const requests: Promise<unknown>[] = [
+            loadHighlightedJournalPost({ suppressErrorState: false }),
+        ];
+
+        if (journalPosts.length === 0) {
+            requests.push(loadCampaignPosts());
+        }
+
+        await Promise.allSettled(requests);
+    };
+
+    const handleToggleJournalHighlight = async (post: JournalPost) => {
+        setJournalHighlightSaving(true);
+        setJournalHighlightError('');
+
+        try {
+            if (areJournalPostsEqual(highlightedJournalPost, post)) {
+                await setCampaignHighlightedJournalPost(campaignId, {
+                    toggle: 'off',
+                });
+                setHighlightedJournalPost(null);
+                return;
+            }
+
+            await setCampaignHighlightedJournalPost(campaignId, {
+                post,
+                toggle: 'on',
+            });
+            setHighlightedJournalPost(post);
+        } catch (error: any) {
+            setJournalHighlightError(
+                error?.message ?? 'Erro ao atualizar publicação em destaque.'
+            );
+        } finally {
+            setJournalHighlightSaving(false);
+        }
+    };
+
+    const handleOpenHighlightedJournalPost = async () => {
+        setJournalHighlightError('');
+
+        try {
+            const currentHighlightedPost =
+                highlightedJournalPost ??
+                (await loadHighlightedJournalPost({
+                    suppressErrorState: false,
+                }));
+
+            if (currentHighlightedPost) {
+                setJournalHighlightReaderOpen(true);
+                return;
+            }
+
+            setJournalHighlightNoticeMessage(
+                'Nenhuma publicação em destaque no momento.'
+            );
+            setJournalHighlightNoticeOpen(true);
+        } catch (error: any) {
+            setJournalHighlightNoticeMessage(
+                error?.message ?? 'Erro ao carregar publicação em destaque.'
+            );
+            setJournalHighlightNoticeOpen(true);
+        }
+    };
+
+    const ensureDiceBox = async (): Promise<DiceBoxThreejs> => {
+        if (diceBoxRef.current) {
+            return diceBoxRef.current;
+        }
+
+        if (!diceBoxHostRef.current) {
+            throw new Error('Dice box host is not mounted.');
+        }
+
+        if (!diceBoxInitPromiseRef.current) {
+            diceBoxInitPromiseRef.current = (async () => {
+                const box = new DiceBoxThreejs(`#${MATCH_DICE_BOX_HOST_ID}`, {
+                    assetPath: '/assets/dice-box-threejs/',
+                    sounds: false,
+                    shadows: true,
+                    gravity_multiplier: 400,
+                    light_intensity: 0.7,
+                    baseScale: 90,
+                    strength: 1.2,
+                    theme_colorset: 'black',
+                    theme_material: 'glass',
+                });
+
+                await box.initialize();
+                box.clearDice();
+                diceBoxRef.current = box;
+                return box;
+            })().catch((error) => {
+                diceBoxInitPromiseRef.current = null;
+                throw error;
+            });
+        }
+
+        return diceBoxInitPromiseRef.current;
+    };
 
     const selectDie = (sides: number, label: string, iconSrc: string) => {
         setDicePickerState((prev) =>
@@ -130,28 +534,63 @@ export default function MatchPage(): JSX.Element {
         );
     };
 
-    const rollDice = () => {
-        if (!dicePickerState || throwState) return;
-        const { count, sides, label, icon } = dicePickerState;
-        const result = diceRollerRef.current.roll(`${count}d${sides}`);
-        const rolls = result.rolls[0]?.rolls?.map((r) => r.value) ?? [];
+    const rollDice = async () => {
+        if (!dicePickerState || diceRollSession.status !== 'idle') return;
+        const { count, sides, label } = dicePickerState;
+        const notation = `${count}d${sides}`;
         const rollLabel = count > 1 ? `${count}${label}` : label;
+        const sessionId = diceRollSessionIdRef.current + 1;
+
+        diceRollSessionIdRef.current = sessionId;
         setDicePickerState(null);
-        setThrowState({ icon, label: rollLabel, rolls: null, total: null });
-        setTimeout(() => {
-            setThrowState((prev) =>
-                prev ? { ...prev, rolls, total: result.total } : null
-            );
-        }, 950);
-        setTimeout(() => {
-            setThrowState(null);
-        }, 3000);
+        setDiceRollSession({
+            status: 'rolling',
+            label: rollLabel,
+            count,
+            notation,
+            rolls: null,
+            total: null,
+        });
+
+        try {
+            const diceBox = await ensureDiceBox();
+            const result: DiceBoxThreejsRollResult = await diceBox.roll(notation);
+
+            if (diceRollSessionIdRef.current !== sessionId) return;
+
+            const rolls = result.sets
+                .flatMap((set) => set.rolls)
+                .map((roll) => Number(roll.value))
+                .filter((value) => Number.isFinite(value));
+            const total = Number(result.total);
+
+            setDiceRollSession({
+                status: 'settled',
+                label: rollLabel,
+                count,
+                notation,
+                rolls,
+                total,
+            });
+        } catch (error) {
+            if (diceRollSessionIdRef.current === sessionId) {
+                dismissDiceRoll();
+            }
+        }
     };
 
     const userInfo =
         typeof window !== 'undefined'
             ? JSON.parse(localStorage.getItem('userLogged') as string)
             : null;
+
+    useEffect(() => {
+        return () => {
+            diceRollSessionIdRef.current += 1;
+            diceBoxRef.current?.clearDice();
+            diceBoxHostRef.current?.replaceChildren();
+        };
+    }, []);
 
     useEffect(() => {
         if (!campaignId) return;
@@ -164,11 +603,163 @@ export default function MatchPage(): JSX.Element {
                 const role = data.campaignPlayers?.find(
                     (p: { userId: string; role: string }) => p.userId === userInfo.userId
                 )?.role;
-                setIsMaster(role === 'master' || role === 'dungeon_master');
+                setIsMaster(role === 'dungeon_master');
                 setIsPlayer(role === 'player' || role === 'admin_player');
             }
         });
-    }, [campaignId, userInfo]);
+    }, [campaignId]);
+
+    useEffect(() => {
+        if (!campaignId) return;
+        getCharactersByCampaignLobby(campaignId).then((data) => {
+            setCampaignCharacters(data);
+        });
+    }, [campaignId]);
+
+    useEffect(() => {
+        if (!campaignId) return;
+
+        loadHighlightedJournalPost({
+            suppressLoading: true,
+            suppressErrorState: true,
+        }).catch(() => null);
+    }, [campaignId]);
+
+    useEffect(() => {
+        if (campaignCharacters.length === 0) {
+            setCampaignCharacterSummaries({});
+            setMapTokenLayoutById({});
+            setVisibleMapCharacterIds([]);
+            previousCampaignCharacterIdsRef.current = [];
+            hasInitializedVisibleMapCharactersRef.current = false;
+            return;
+        }
+
+        let isActive = true;
+
+        Promise.all(
+            campaignCharacters.map(async (character) => {
+                const detail = await getCharacterById(character.id);
+
+                return [
+                    character.id,
+                    {
+                        currentHitPoints:
+                            detail?.data?.stats?.hitPoints?.currentPoints ?? null,
+                        level: detail?.data?.profile?.level ?? null,
+                    },
+                ] as const;
+            })
+        ).then((entries) => {
+            if (!isActive) return;
+            setCampaignCharacterSummaries(Object.fromEntries(entries));
+        });
+
+        return () => {
+            isActive = false;
+        };
+    }, [campaignCharacters]);
+
+    useEffect(() => {
+        const validCharacterIds = new Set(
+            campaignCharacters.map((character) => character.id)
+        );
+
+        setClonedMapTokens((previousClones) => {
+            const nextClones = previousClones.filter(
+                (token) =>
+                    validCharacterIds.has(token.characterId) &&
+                    visibleMapCharacterIds.includes(token.characterId)
+            );
+
+            return nextClones.length === previousClones.length
+                ? previousClones
+                : nextClones;
+        });
+    }, [campaignCharacters, visibleMapCharacterIds]);
+
+    useEffect(() => {
+        if (campaignCharacters.length === 0) {
+            return;
+        }
+
+        const currentIds = campaignCharacters.map((character) => character.id);
+        const previousIds = previousCampaignCharacterIdsRef.current;
+
+        setVisibleMapCharacterIds((previousVisibleIds) => {
+            if (!hasInitializedVisibleMapCharactersRef.current) {
+                return currentIds;
+            }
+
+            const visibleSet = new Set(
+                previousVisibleIds.filter((id) => currentIds.includes(id))
+            );
+
+            currentIds.forEach((id) => {
+                if (!previousIds.includes(id)) {
+                    visibleSet.add(id);
+                }
+            });
+
+            return currentIds.filter((id) => visibleSet.has(id));
+        });
+
+        previousCampaignCharacterIdsRef.current = currentIds;
+        hasInitializedVisibleMapCharactersRef.current = true;
+    }, [campaignCharacters]);
+
+    useEffect(() => {
+        const visibleCharacters = campaignCharacters.filter((character) =>
+            visibleMapCharacterIds.includes(character.id)
+        );
+        const tokenInstances: MapTokenInstance[] = [
+            ...visibleCharacters.map((character) => ({
+                tokenId: getBaseTokenId(character.id),
+                characterId: character.id,
+                isClone: false,
+            })),
+            ...clonedMapTokens.filter((token) =>
+                visibleMapCharacterIds.includes(token.characterId)
+            ),
+        ];
+        const container = mapContainerRef.current;
+
+        if (!container) return;
+
+        if (tokenInstances.length === 0) {
+            setMapTokenLayoutById({});
+            return;
+        }
+
+        const containerRect = container.getBoundingClientRect();
+
+        setMapTokenLayoutById((previousLayouts) => {
+            const nextLayouts: Record<string, MapTokenLayout> = {};
+
+            tokenInstances.forEach((token, index) => {
+                nextLayouts[token.tokenId] =
+                    previousLayouts[token.tokenId] ??
+                    createDefaultTokenLayout(index, tokenInstances.length, containerRect);
+            });
+
+            const previousKeys = Object.keys(previousLayouts);
+            const nextKeys = Object.keys(nextLayouts);
+            const keysChanged =
+                previousKeys.length !== nextKeys.length ||
+                previousKeys.some((key) => !nextLayouts[key]);
+
+            if (!keysChanged) {
+                const allSame = nextKeys.every(
+                    (key) => previousLayouts[key] === nextLayouts[key]
+                );
+                if (allSame) {
+                    return previousLayouts;
+                }
+            }
+
+            return nextLayouts;
+        });
+    }, [campaignCharacters, visibleMapCharacterIds, clonedMapTokens]);
 
     useEffect(() => {
         if (!campaignId || !userInfo?.userId) return;
@@ -180,7 +771,7 @@ export default function MatchPage(): JSX.Element {
                 setSelectedCharacterId(mine[0].id);
             }
         });
-    }, [campaignId, userInfo]);
+    }, [campaignId]);
 
     useEffect(() => {
         if (!selectedCharacterId) {
@@ -288,9 +879,200 @@ export default function MatchPage(): JSX.Element {
             };
         }),
     ];
+    const filteredCampaignCharacters = campaignCharacters.filter((character) =>
+        visibleMapCharacterIds.includes(character.id)
+    );
+    const visibleMapTokenInstances: MapTokenInstance[] = [
+        ...filteredCampaignCharacters.map((character) => ({
+            tokenId: getBaseTokenId(character.id),
+            characterId: character.id,
+            isClone: false,
+        })),
+        ...clonedMapTokens.filter((token) =>
+            visibleMapCharacterIds.includes(token.characterId)
+        ),
+    ];
+    const campaignCharacterById = Object.fromEntries(
+        campaignCharacters.map((character) => [character.id, character] as const)
+    );
+    const searchedCampaignCharacters = campaignCharacters.filter((character) =>
+        character.name.toLowerCase().includes(avatarSearch.trim().toLowerCase())
+    );
+
+    useEffect(() => {
+        if (!activeTokenInteractionMeta) {
+            return;
+        }
+
+        const handlePointerMove = (event: PointerEvent) => {
+            const interaction = activeTokenInteractionRef.current;
+            const container = mapContainerRef.current;
+            if (!interaction || !container) return;
+
+            const containerRect = container.getBoundingClientRect();
+            const deltaX = event.clientX - interaction.startClientX;
+            const deltaY = event.clientY - interaction.startClientY;
+
+            if (
+                Math.hypot(deltaX, deltaY) > DRAG_CLICK_THRESHOLD_PX &&
+                !interaction.didMove
+            ) {
+                interaction.didMove = true;
+            }
+
+            setMapTokenLayoutById((previousLayouts) => {
+                const currentLayout = previousLayouts[interaction.tokenId];
+                if (!currentLayout) return previousLayouts;
+
+                const nextLayouts = { ...previousLayouts };
+                const startWidthPx =
+                    (interaction.startWidthPct / 100) * containerRect.width;
+
+                if (interaction.type === 'drag') {
+                    const widthPx = (currentLayout.widthPct / 100) * containerRect.width;
+                    const heightPx = getTokenTotalHeightPx(widthPx);
+                    const nextXPx =
+                        (interaction.startXPct / 100) * containerRect.width + deltaX;
+                    const nextYPx =
+                        (interaction.startYPct / 100) * containerRect.height + deltaY;
+                    const maxXPx = Math.max(0, containerRect.width - widthPx);
+                    const maxYPx = Math.max(0, containerRect.height - heightPx);
+
+                    nextLayouts[interaction.tokenId] = {
+                        ...currentLayout,
+                        xPct: (clamp(nextXPx, 0, maxXPx) / containerRect.width) * 100,
+                        yPct: (clamp(nextYPx, 0, maxYPx) / containerRect.height) * 100,
+                    };
+
+                    return nextLayouts;
+                }
+
+                const currentXPx = (interaction.startXPct / 100) * containerRect.width;
+                const currentYPx = (interaction.startYPct / 100) * containerRect.height;
+                const resizeDelta = Math.max(deltaX, deltaY / TOKEN_SHELL_ASPECT_RATIO);
+                const maxWidthFromRightPx = containerRect.width - currentXPx;
+                const maxWidthFromBottomPx = Math.max(
+                    0,
+                    (containerRect.height - currentYPx - TOKEN_INFO_HEIGHT_PX) /
+                        TOKEN_SHELL_ASPECT_RATIO
+                );
+                const maxWidthPctFromBounds =
+                    (Math.min(maxWidthFromRightPx, maxWidthFromBottomPx) /
+                        containerRect.width) *
+                    100;
+                const nextWidthPct =
+                    ((startWidthPx + resizeDelta) / containerRect.width) * 100;
+
+                nextLayouts[interaction.tokenId] = {
+                    ...currentLayout,
+                    widthPct: clamp(
+                        nextWidthPct,
+                        MIN_TOKEN_WIDTH_PCT,
+                        Math.max(
+                            MIN_TOKEN_WIDTH_PCT,
+                            Math.min(MAX_TOKEN_WIDTH_PCT, maxWidthPctFromBounds)
+                        )
+                    ),
+                };
+
+                return nextLayouts;
+            });
+        };
+
+        const handlePointerEnd = () => {
+            const interaction = activeTokenInteractionRef.current;
+            if (interaction?.didMove) {
+                suppressTokenClickIdRef.current = interaction.tokenId;
+            }
+            activeTokenInteractionRef.current = null;
+            setActiveTokenInteractionMeta(null);
+        };
+
+        window.addEventListener('pointermove', handlePointerMove);
+        window.addEventListener('pointerup', handlePointerEnd);
+        window.addEventListener('pointercancel', handlePointerEnd);
+
+        return () => {
+            window.removeEventListener('pointermove', handlePointerMove);
+            window.removeEventListener('pointerup', handlePointerEnd);
+            window.removeEventListener('pointercancel', handlePointerEnd);
+        };
+    }, [activeTokenInteractionMeta]);
+
+    const startTokenInteraction = (
+        type: TokenInteractionType,
+        event: React.PointerEvent<HTMLElement>,
+        tokenId: string
+    ) => {
+        if (event.button !== 0) return;
+        if (type === 'resize' && !isMaster) return;
+
+        const tokenLayout = mapTokenLayoutById[tokenId];
+        if (!tokenLayout) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        activeTokenInteractionRef.current = {
+            type,
+            tokenId,
+            startClientX: event.clientX,
+            startClientY: event.clientY,
+            startXPct: tokenLayout.xPct,
+            startYPct: tokenLayout.yPct,
+            startWidthPct: tokenLayout.widthPct,
+            didMove: false,
+        };
+        setActiveTokenInteractionMeta({ tokenId, type });
+    };
+
+    const handleTokenClick = (token: MapTokenInstance, character: CampaignCharacter) => {
+        if (suppressTokenClickIdRef.current) {
+            const suppressedId = suppressTokenClickIdRef.current;
+            suppressTokenClickIdRef.current = null;
+            if (suppressedId === token.tokenId) {
+                return;
+            }
+        }
+
+        if (token.isClone || character.authorUserId !== userInfo?.userId) {
+            setSelectedMapCharacterId(character.id);
+        }
+    };
+
+    const handleCloneToken = (token: MapTokenInstance) => {
+        const container = mapContainerRef.current;
+        const sourceLayout = mapTokenLayoutById[token.tokenId];
+        if (!container || !sourceLayout) return;
+
+        const characterId = token.characterId;
+        const cloneTokenId = getCloneTokenId(characterId);
+        const cloneIndex =
+            clonedMapTokens.filter((cloneToken) => cloneToken.characterId === characterId)
+                .length + 1;
+        const cloneLayout = createCloneTokenLayout(
+            sourceLayout,
+            container.getBoundingClientRect(),
+            cloneIndex
+        );
+
+        setClonedMapTokens((current) => [
+            ...current,
+            {
+                tokenId: cloneTokenId,
+                characterId,
+                isClone: true,
+            },
+        ]);
+        setMapTokenLayoutById((current) => ({
+            ...current,
+            [cloneTokenId]: cloneLayout,
+        }));
+    };
 
     return (
         <div
+            ref={mapContainerRef}
             className="match-page"
             style={{
                 backgroundImage: `url(${backgroundImage})`,
@@ -299,6 +1081,10 @@ export default function MatchPage(): JSX.Element {
         >
             {/* Grid overlay */}
             {gridVisible && <div className="match-grid" />}
+            {(activeEffect === 'dark' || activeEffect === 'light') && (
+                <MapFogOverlay variant={activeEffect as FogVariant} />
+            )}
+            {activeEffect === 'rain' && <MapRainOverlay />}
 
             {/* Top-left: Tablerise logo */}
             <div
@@ -312,6 +1098,116 @@ export default function MatchPage(): JSX.Element {
                     height={LogoSVG.height}
                 />
             </div>
+
+            {visibleMapTokenInstances.length > 0 && (
+                <div className="match-map-tokens" aria-label="Personagens da campanha">
+                    {visibleMapTokenInstances.map((token) => {
+                        const character = campaignCharacterById[token.characterId];
+                        if (!character) {
+                            return null;
+                        }
+
+                        const summary = campaignCharacterSummaries[character.id];
+                        const tokenLayout = mapTokenLayoutById[token.tokenId];
+                        const isInspectable =
+                            token.isClone || character.authorUserId !== userInfo?.userId;
+                        const isActiveToken =
+                            activeTokenInteractionMeta?.tokenId === token.tokenId;
+
+                        if (!tokenLayout) {
+                            return null;
+                        }
+
+                        return (
+                            <div
+                                key={token.tokenId}
+                                className={`match-map-token${
+                                    isInspectable ? ' match-map-token--inspectable' : ''
+                                }${
+                                    isActiveToken
+                                        ? ` match-map-token--${activeTokenInteractionMeta?.type}`
+                                        : ''
+                                }`}
+                                title={character.name}
+                                style={{
+                                    left: `${tokenLayout.xPct}%`,
+                                    top: `${tokenLayout.yPct}%`,
+                                    width: `${tokenLayout.widthPct}%`,
+                                }}
+                                onPointerDown={(event) =>
+                                    startTokenInteraction('drag', event, token.tokenId)
+                                }
+                                onClick={() => handleTokenClick(token, character)}
+                            >
+                                <div className="match-map-token-shell">
+                                    {isMaster && cloneModeOpen && (
+                                        <button
+                                            type="button"
+                                            className="match-map-token-clone-handle"
+                                            aria-label={`Duplicar ${character.name}`}
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                handleCloneToken(token);
+                                            }}
+                                            onPointerDown={(event) => {
+                                                event.preventDefault();
+                                                event.stopPropagation();
+                                            }}
+                                        >
+                                            <span className="match-map-token-clone-icon">
+                                                +
+                                            </span>
+                                        </button>
+                                    )}
+                                    <div className="match-map-token-frame">
+                                        <div className="match-map-token-image">
+                                            <Image
+                                                src={
+                                                    character.image ||
+                                                    SideImageBackground.src
+                                                }
+                                                alt={character.name}
+                                                fill
+                                                style={{ objectFit: 'cover' }}
+                                            />
+                                        </div>
+                                    </div>
+                                    {isMaster && resizeModeOpen && (
+                                        <button
+                                            type="button"
+                                            className="match-map-token-resize-handle"
+                                            aria-label={`Redimensionar ${character.name}`}
+                                            onClick={(event) => event.stopPropagation()}
+                                            onPointerDown={(event) =>
+                                                startTokenInteraction(
+                                                    'resize',
+                                                    event,
+                                                    token.tokenId
+                                                )
+                                            }
+                                        >
+                                            <span className="match-map-token-resize-icon">
+                                                ↘
+                                            </span>
+                                        </button>
+                                    )}
+                                </div>
+                                <span className="font-XXS-regular match-map-token-name">
+                                    {character.name}
+                                </span>
+                                <div className="match-map-token-meta">
+                                    <span className="font-XXS-regular match-map-token-stat">
+                                        &#9829; {summary?.currentHitPoints ?? '-'}
+                                    </span>
+                                    <span className="font-XXS-regular match-map-token-stat">
+                                        <strong>LVL</strong> {summary?.level ?? '-'}
+                                    </span>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
 
             {/* Middle-left: character panel toggle + drawer */}
             <div className="match-char-panel-anchor">
@@ -478,14 +1374,6 @@ export default function MatchPage(): JSX.Element {
                                         </div>
                                     </div>
 
-                                    <div className="match-char-section">
-                                        <p className="font-XXS-bold">Proficiências</p>
-                                        <p className="font-XXS-regular">
-                                            {profile.characteristics?.other
-                                                ?.proficiencies || 'Não informado'}
-                                        </p>
-                                    </div>
-
                                     {(stats.skills?.length ?? 0) > 0 && (
                                         <div className="match-char-section">
                                             <p className="font-XXS-bold">Perícias</p>
@@ -585,37 +1473,165 @@ export default function MatchPage(): JSX.Element {
             </div>
 
             {/* Top-right: horizontal action bar */}
-            <nav className="match-top-bar">
+            {isMaster && (
+                <nav className="match-top-bar">
+                    <button
+                        className={`match-top-bar-item${
+                            resizeModeOpen ? ' match-top-bar-item--active' : ''
+                        }`}
+                        title={
+                            resizeModeOpen
+                                ? 'Encerrar redimensionamento'
+                                : 'Redimensionar avatares'
+                        }
+                        onClick={() => {
+                            setResizeModeOpen((current) => {
+                                const nextValue = !current;
+                                if (nextValue) {
+                                    setCloneModeOpen(false);
+                                }
+                                return nextValue;
+                            });
+                        }}
+                    >
+                        <Image
+                            src={ResizeBlueSVG.src}
+                            alt="Redimensionar avatares"
+                            width={28}
+                            height={28}
+                        />
+                    </button>
+                    <button
+                        className={`match-top-bar-item${
+                            cloneModeOpen ? ' match-top-bar-item--active' : ''
+                        }`}
+                        title={
+                            cloneModeOpen ? 'Encerrar duplicacao' : 'Duplicar avatares'
+                        }
+                        onClick={() => {
+                            setCloneModeOpen((current) => {
+                                const nextValue = !current;
+                                if (nextValue) {
+                                    setResizeModeOpen(false);
+                                }
+                                return nextValue;
+                            });
+                        }}
+                    >
+                        <Image
+                            src={CloneSVG.src}
+                            alt="Duplicar avatares"
+                            width={28}
+                            height={28}
+                        />
+                    </button>
+                    <button
+                        className={`match-top-bar-item${
+                            journalHighlightModalOpen ? ' match-top-bar-item--active' : ''
+                        }`}
+                        title="Destaque do jornal"
+                        onClick={handleOpenJournalHighlightModal}
+                    >
+                        <Image
+                            src={BookmarkSVG.src}
+                            alt="Destaque do jornal"
+                            width={28}
+                            height={28}
+                        />
+                    </button>
+                    <button
+                        className="match-top-bar-item"
+                        title="Selecao de avatares"
+                        onClick={() => setAvatarSelectionModalOpen(true)}
+                    >
+                        <Image
+                            src={AvatarSelectionSVG.src}
+                            alt="Selecao de avatares"
+                            width={28}
+                            height={28}
+                        />
+                    </button>
+                    <button
+                        className="match-top-bar-item"
+                        title="Efeitos de mapa"
+                        onClick={() => setEffectsModalOpen(true)}
+                    >
+                        <Image
+                            src={StarBlueSVG.src}
+                            alt="Efeitos de mapa"
+                            width={28}
+                            height={28}
+                        />
+                    </button>
+                    <button
+                        className="match-top-bar-item"
+                        title="Anotações"
+                        onClick={() => setNotesModalOpen(true)}
+                    >
+                        <Image
+                            src={NotesBlueSVG.src}
+                            alt="Anotações"
+                            width={28}
+                            height={28}
+                        />
+                    </button>
+                    <button
+                        className="match-top-bar-item"
+                        title="Mídia"
+                        onClick={() => setMediaModalOpen(true)}
+                    >
+                        <Image src={MediaSVG.src} alt="Mídia" width={28} height={28} />
+                    </button>
+                    <button
+                        className="match-top-bar-item"
+                        title={gridVisible ? 'Ocultar grid' : 'Mostrar grid'}
+                        onClick={() => setGridVisible((v) => !v)}
+                    >
+                        <Image
+                            src={gridVisible ? GridOffSVG.src : GridOnSVG.src}
+                            alt="Grid"
+                            width={28}
+                            height={28}
+                        />
+                    </button>
+                    <button
+                        className="match-top-bar-item"
+                        title="Fichas"
+                        onClick={() => setSheetModalOpen(true)}
+                    >
+                        <Image src={SheetSVG.src} alt="Fichas" width={32} height={32} />
+                    </button>
+                </nav>
+            )}
+
+            {/* Bottom-left: vertical action bar */}
+            <nav className="match-bottom-bar">
                 <button
-                    className="match-top-bar-item"
-                    title="Mídia"
-                    onClick={() => setMediaModalOpen(true)}
-                >
-                    <Image src={MediaSVG.src} alt="Mídia" width={28} height={28} />
-                </button>
-                <button
-                    className="match-top-bar-item"
-                    title={gridVisible ? 'Ocultar grid' : 'Mostrar grid'}
-                    onClick={() => setGridVisible((v) => !v)}
+                    className="match-bottom-bar-item"
+                    title="Publicação em destaque"
+                    onClick={handleOpenHighlightedJournalPost}
                 >
                     <Image
-                        src={gridVisible ? GridOffSVG.src : GridOnSVG.src}
-                        alt="Grid"
+                        src={BookmarkSVG.src}
+                        alt="Publicação em destaque"
                         width={28}
                         height={28}
                     />
                 </button>
-                <button
-                    className="match-top-bar-item"
-                    title="Fichas"
-                    onClick={() => setSheetModalOpen(true)}
-                >
-                    <Image src={SheetSVG.src} alt="Fichas" width={28} height={28} />
-                </button>
-            </nav>
-
-            {/* Bottom-left: vertical action bar */}
-            <nav className="match-bottom-bar">
+                {isPlayer && (
+                    <button
+                        className="match-bottom-bar-item"
+                        title="Anotações"
+                        onClick={() => setNotesModalOpen(true)}
+                    >
+                        <Image
+                            src={NotesBlueSVG.src}
+                            alt="Anotações"
+                            width={28}
+                            height={28}
+                        />
+                    </button>
+                )}
                 <button
                     className="match-bottom-bar-item match-bottom-bar-item--danger"
                     title="Sair da Partida"
@@ -731,87 +1747,59 @@ export default function MatchPage(): JSX.Element {
                 </div>
             </div>
 
-            {/* Full-screen dice throw overlay */}
-            <AnimatePresence>
-                {throwState && (
-                    <div
-                        className="match-throw-overlay"
-                        onClick={() => setThrowState(null)}
-                    >
-                        <motion.div
-                            className="match-throw-die"
-                            initial={{ y: '-60vh', rotate: -180, scale: 1.4, opacity: 0 }}
-                            animate={{
-                                y: ['-60vh', '0vh', '-8vh', '0vh', '-3vh', '0vh'],
-                                rotate: [-180, 360, 280, 340, 320, 330],
-                                scale: [1.4, 1, 1.08, 1, 1.03, 1],
-                                opacity: [0, 1, 1, 1, 1, 1],
-                            }}
-                            transition={{
-                                duration: 0.95,
-                                times: [0, 0.55, 0.7, 0.82, 0.92, 1],
-                                ease: 'easeOut',
-                            }}
-                        >
-                            <Image
-                                src={throwState.icon}
-                                alt={throwState.label}
-                                width={140}
-                                height={140}
-                                style={{
-                                    filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.55))',
-                                }}
-                            />
-                            <AnimatePresence>
-                                {throwState.total !== null && (
-                                    <motion.span
-                                        className="match-throw-result font-XL-bold"
-                                        initial={{ opacity: 0, scale: 0.4 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        transition={{ duration: 0.25, ease: 'backOut' }}
-                                        style={{
-                                            fontSize:
-                                                (throwState.total ?? 0) >= 100
-                                                    ? '2rem'
-                                                    : '3.5rem',
-                                        }}
-                                    >
-                                        {throwState.total}
-                                    </motion.span>
-                                )}
-                            </AnimatePresence>
-                        </motion.div>
-                        <AnimatePresence>
-                            {throwState.total !== null && (
-                                <motion.div
-                                    className="match-throw-details"
-                                    initial={{ opacity: 0, y: 12 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.2 }}
+            {/* Full-screen 3D dice layer */}
+            <div
+                className={`match-dice-layer${
+                    diceRollSession.status !== 'idle' ? ' match-dice-layer--active' : ''
+                }`}
+                onClick={handleDiceLayerClick}
+                aria-hidden={diceRollSession.status === 'idle'}
+            >
+                <div className="match-dice-layer-backdrop" />
+                <div
+                    ref={diceBoxHostRef}
+                    id={MATCH_DICE_BOX_HOST_ID}
+                    className="match-dice-box-host"
+                />
+                {diceRollSession.status === 'settled' &&
+                    diceRollSession.total !== null && (
+                        <div className="match-throw-ui">
+                            <div className="match-throw-card">
+                                <span
+                                    className="match-throw-result font-XL-bold"
+                                    style={{
+                                        fontSize:
+                                            (diceRollSession.total ?? 0) >= 100
+                                                ? '2rem'
+                                                : '3.5rem',
+                                    }}
                                 >
+                                    {diceRollSession.total}
+                                </span>
+                                <div className="match-throw-details">
                                     <span className="match-throw-label font-S-bold">
-                                        {throwState.label}
+                                        {diceRollSession.label}
                                     </span>
-                                    {(throwState.rolls?.length ?? 0) > 1 && (
+                                    {(diceRollSession.rolls?.length ?? 0) > 1 && (
                                         <div className="match-throw-rolls">
-                                            {throwState.rolls!.map((r, i) => (
+                                            {diceRollSession.rolls!.map((roll, index) => (
                                                 <span
-                                                    key={i}
+                                                    key={`${diceRollSession.notation}-${index}`}
                                                     className="match-throw-roll-badge font-XXS-bold"
                                                 >
-                                                    {r}
+                                                    {roll}
                                                 </span>
                                             ))}
                                         </div>
                                     )}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-                )}
-            </AnimatePresence>
+                                    <span className="match-throw-close font-XXS-bold">
+                                        Clique para fechar
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+            </div>
 
             {sheetModalOpen && campaignId && userInfo?.userId && (
                 <CharacterSheetModal
@@ -820,6 +1808,15 @@ export default function MatchPage(): JSX.Element {
                     isPlayer={isPlayer}
                     isMaster={isMaster}
                     onClose={() => setSheetModalOpen(false)}
+                />
+            )}
+
+            {selectedMapCharacterId && campaignId && (
+                <CharacterDetailModal
+                    characterId={selectedMapCharacterId}
+                    campaignId={campaignId}
+                    isMaster={isMaster}
+                    onBack={() => setSelectedMapCharacterId(null)}
                 />
             )}
 
@@ -833,6 +1830,176 @@ export default function MatchPage(): JSX.Element {
                     }
                     onClose={() => setMediaModalOpen(false)}
                     onMapSelect={(link) => setBackgroundImage(link)}
+                />
+            )}
+
+            {notesModalOpen && campaignId && userInfo?.userId && (
+                <MatchNotesModal
+                    campaignId={campaignId}
+                    userId={userInfo.userId}
+                    onClose={() => setNotesModalOpen(false)}
+                />
+            )}
+
+            {effectsModalOpen && (
+                <MatchEffectsModal
+                    activeEffect={activeEffect}
+                    onClose={() => setEffectsModalOpen(false)}
+                    onToggleEffect={(effect) =>
+                        setActiveEffect((current) => (current === effect ? null : effect))
+                    }
+                />
+            )}
+
+            {avatarSelectionModalOpen && (
+                <MatchAvatarSelectionModal
+                    characters={searchedCampaignCharacters}
+                    searchValue={avatarSearch}
+                    visibleCharacterIds={visibleMapCharacterIds}
+                    onClose={() => setAvatarSelectionModalOpen(false)}
+                    onSearchChange={setAvatarSearch}
+                    onToggleCharacter={(characterId) =>
+                        setVisibleMapCharacterIds((current) =>
+                            current.includes(characterId)
+                                ? current.filter((id) => id !== characterId)
+                                : [...current, characterId]
+                        )
+                    }
+                />
+            )}
+
+            {journalHighlightModalOpen && (
+                <div
+                    className="match-journal-highlight-overlay"
+                    onClick={() => {
+                        if (journalHighlightSaving) return;
+                        setJournalHighlightModalOpen(false);
+                    }}
+                >
+                    <div
+                        className="match-journal-highlight-modal"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <div className="match-journal-highlight-header">
+                            <div>
+                                <h2 className="font-L-bold match-journal-highlight-title">
+                                    Destaque do Jornal
+                                </h2>
+                                <p className="font-XXS-regular match-journal-highlight-subtitle">
+                                    Selecione uma publicação para destacar aos jogadores.
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                className="match-journal-highlight-close"
+                                onClick={() => setJournalHighlightModalOpen(false)}
+                                aria-label="Fechar"
+                                disabled={journalHighlightSaving}
+                            >
+                                <svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                >
+                                    <path d="M18 6 6 18M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div className="match-journal-highlight-divider" />
+                        <div className="match-journal-highlight-body">
+                            {journalHighlightLoading || journalPostsLoading ? (
+                                <span className="font-XS-regular match-journal-highlight-empty">
+                                    Carregando publicaÃ§Ãµes...
+                                </span>
+                            ) : journalPosts.length === 0 ? (
+                                <span className="font-XS-regular match-journal-highlight-empty">
+                                    Nenhuma publicação encontrada para esta campanha.
+                                </span>
+                            ) : (
+                                <div className="match-journal-highlight-list">
+                                    {journalPosts.map((post, index) => {
+                                        const isSelected = areJournalPostsEqual(
+                                            highlightedJournalPost,
+                                            post
+                                        );
+
+                                        return (
+                                            <button
+                                                key={`${post.title}-${post.timestamp}-${index}`}
+                                                type="button"
+                                                className={`match-journal-highlight-option${
+                                                    isSelected
+                                                        ? ' match-journal-highlight-option--active'
+                                                        : ''
+                                                }`}
+                                                onClick={() =>
+                                                    handleToggleJournalHighlight(post)
+                                                }
+                                                disabled={journalHighlightSaving}
+                                            >
+                                                <span className="font-S-bold match-journal-highlight-option-title">
+                                                    {post.title}
+                                                </span>
+                                                <span className="font-XXS-bold match-journal-highlight-option-state">
+                                                    {isSelected
+                                                        ? 'Em destaque'
+                                                        : 'Selecionar'}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                            {journalHighlightError && (
+                                <span className="font-XS-regular match-journal-highlight-error">
+                                    {journalHighlightError}
+                                </span>
+                            )}
+                        </div>
+                        <div className="match-journal-highlight-footer">
+                            <span className="font-XXS-regular match-journal-highlight-footer-text">
+                                {journalHighlightSaving
+                                    ? 'Salvando destaque...'
+                                    : 'Clique novamente em uma publicação destacada para remove-la.'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {journalHighlightNoticeOpen && (
+                <div
+                    className="match-journal-highlight-overlay"
+                    onClick={() => setJournalHighlightNoticeOpen(false)}
+                >
+                    <div
+                        className="match-journal-highlight-notice"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <h2 className="font-L-bold match-journal-highlight-title">
+                            Publicação em Destaque
+                        </h2>
+                        <p className="font-XS-regular match-journal-highlight-notice-text">
+                            {journalHighlightNoticeMessage}
+                        </p>
+                        <button
+                            type="button"
+                            className="match-journal-highlight-notice-btn font-XS-bold"
+                            onClick={() => setJournalHighlightNoticeOpen(false)}
+                        >
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {journalHighlightReaderOpen && highlightedJournalPost && (
+                <JournalPostModal
+                    post={highlightedJournalPost}
+                    onClose={() => setJournalHighlightReaderOpen(false)}
                 />
             )}
 

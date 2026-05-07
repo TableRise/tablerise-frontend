@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .mnm-overlay {
+        @apply fixed inset-0 z-[220] flex items-center justify-center bg-black/60;
+    }
+
+    .mnm-modal {
+        @apply w-[50rem] max-h-[88vh] overflow-hidden bg-color-greyScale/100 rounded-2xl flex flex-col;
+    }
+
+    .mnm-header {
+        @apply flex items-start justify-between gap-4 px-8 pt-8 pb-4 flex-shrink-0;
+    }
+
+    .mnm-header-left {
+        @apply flex flex-col gap-1;
+    }
+
+    .mnm-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .mnm-meta {
+        @apply text-color-greyScale/500;
+    }
+
+    .mnm-close-btn {
+        @apply flex items-center justify-center w-8 h-8 rounded-full flex-shrink-0
+            text-color-primary/default_900 bg-transparent cursor-pointer
+            transition-opacity hover:opacity-70;
+    }
+
+    .mnm-divider {
+        @apply border-b border-color-greyScale/200 mx-8 flex-shrink-0;
+    }
+
+    .mnm-body {
+        @apply px-8 py-6 overflow-y-auto flex flex-col gap-5;
+    }
+
+    .mnm-actions {
+        @apply flex justify-end;
+    }
+
+    .mnm-list {
+        @apply flex flex-col gap-3;
+    }
+
+    .mnm-note-card {
+        @apply w-full text-left border border-color-greyScale/200 rounded-xl px-4 py-4
+            bg-color-greyScale/50 transition-colors hover:border-color-primary/default_900
+            hover:bg-white;
+    }
+
+    .mnm-note-title {
+        @apply block text-color-greyScale/900 mb-1;
+    }
+
+    .mnm-note-preview {
+        @apply block text-color-greyScale/500 leading-relaxed;
+    }
+
+    .mnm-empty {
+        @apply text-color-greyScale/500;
+    }
+
+    .mnm-back-btn {
+        @apply self-start text-color-primary/default_900 underline;
+    }
+
+    .mnm-field {
+        @apply flex flex-col gap-1.5;
+    }
+
+    .mnm-label {
+        @apply text-color-greyScale/700;
+    }
+
+    .mnm-input {
+        @apply w-full px-4 py-2.5 rounded-lg border border-color-greyScale/200
+            bg-color-greyScale/50 text-color-greyScale/900 outline-none
+            transition-colors focus:border-color-primary/default_900;
+    }
+
+    .mnm-toolbar {
+        @apply flex items-center gap-1 px-2 py-1.5 border border-b-0 border-color-greyScale/200
+            bg-color-greyScale/100 rounded-t-lg;
+    }
+
+    .mnm-toolbar-btn {
+        @apply px-2.5 py-1 rounded cursor-pointer select-none text-color-greyScale/800
+            bg-color-greyScale/200 hover:bg-color-greyScale/300 transition-colors;
+    }
+
+    .mnm-toolbar-btn--italic {
+        @apply italic;
+    }
+
+    .mnm-toolbar-btn--strike {
+        @apply line-through;
+    }
+
+    .mnm-toolbar-divider {
+        @apply w-px h-5 bg-color-greyScale/300 mx-1;
+    }
+
+    .mnm-toolbar-select {
+        @apply px-2 py-1 rounded border border-color-greyScale/200 bg-color-greyScale/50
+            text-color-greyScale/800 cursor-pointer outline-none transition-colors
+            hover:border-color-greyScale/300;
+    }
+
+    .mnm-textarea {
+        @apply w-full px-4 py-3 border border-color-greyScale/200 rounded-b-lg
+            bg-color-greyScale/50 text-color-greyScale/900 outline-none transition-colors
+            focus:border-color-primary/default_900 resize-none min-h-[12rem];
+    }
+
+    .mnm-read-body {
+        @apply flex flex-col gap-3;
+    }
+
+    .mnm-paragraph {
+        @apply text-color-greyScale/700 leading-relaxed;
+    }
+
+    .mnm-error {
+        @apply text-red-500;
+    }
+
+    .mnm-footer {
+        @apply px-8 pb-6 flex flex-col gap-3 flex-shrink-0;
+    }
+
+    .mnm-primary-btn {
+        @apply w-full py-3 rounded-lg bg-color-primary/default_900 text-color-greyScale/50
+            cursor-pointer transition-opacity hover:opacity-80
+            disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+
+    .mnm-cancel-btn {
+        @apply w-full py-2 text-color-greyScale/700 bg-transparent cursor-pointer
+            transition-opacity hover:opacity-70;
+    }
+}

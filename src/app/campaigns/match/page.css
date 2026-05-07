@@ -15,9 +15,119 @@
         background-size: 4% 4%;
     }
 
+    .match-fog-overlay {
+        @apply absolute inset-0 z-[3] pointer-events-none overflow-hidden;
+    }
+
+    .match-fog-canvas {
+        @apply w-full h-full;
+        opacity: 1;
+        filter: blur(14px) brightness(0.6) saturate(0.7);
+    }
+
+    .match-rain-overlay {
+        @apply absolute inset-0 z-[3] pointer-events-none overflow-hidden;
+    }
+
+    .match-rain-canvas {
+        @apply w-full h-full;
+        opacity: 0.9;
+        filter: blur(0.2px) brightness(0.95);
+    }
+
     /* ── Top-left logo badge ──────────────────────────────── */
     .match-logo-badge {
         @apply absolute top-4 left-4 z-10 bg-white rounded-xl px-3 py-2 flex items-center justify-center shadow-md;
+    }
+
+    .match-map-tokens {
+        @apply absolute inset-0 z-[4];
+        pointer-events: none;
+    }
+
+    .match-map-token {
+        @apply absolute flex flex-col items-center gap-1 border-none bg-transparent p-0;
+        pointer-events: auto;
+        cursor: grab;
+        min-width: 4.5rem;
+        touch-action: none;
+        user-select: none;
+    }
+
+    .match-map-token--inspectable {
+        cursor: grab;
+    }
+
+    .match-map-token--drag {
+        cursor: grabbing;
+        z-index: 6;
+    }
+
+    .match-map-token--resize {
+        z-index: 6;
+    }
+
+    .match-map-token-shell {
+        @apply relative w-full;
+        aspect-ratio: 52 / 58;
+    }
+
+    .match-map-token-clone-handle {
+        @apply absolute -top-2 -right-2 z-[2] flex items-center justify-center w-7 h-7
+            rounded-full border border-white/80 bg-color-primary/default_900 text-white
+            shadow-md transition-transform hover:scale-105;
+        touch-action: none;
+    }
+
+    .match-map-token-clone-icon {
+        @apply block text-base leading-none font-bold;
+    }
+
+    .match-map-token-frame {
+        @apply relative w-full h-full p-[4px];
+        background: linear-gradient(180deg, #f5f7fa 0%, #c9d1db 45%, #8c98a6 100%);
+        clip-path: polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0 50%);
+        box-shadow:
+            0 12px 24px rgba(12, 16, 24, 0.28),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.65);
+    }
+
+    .match-map-token-image {
+        @apply relative w-full h-full overflow-hidden;
+        background: rgba(238, 241, 245, 0.96);
+        clip-path: polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0 50%);
+    }
+
+    .match-map-token-name {
+        @apply max-w-full px-2 py-[0.15rem] text-center text-white rounded-md;
+        background: rgba(15, 23, 35, 0.58);
+        backdrop-filter: blur(4px);
+        line-height: 1.1;
+        word-break: break-word;
+        width: 100%;
+    }
+
+    .match-map-token-meta {
+        @apply flex items-center justify-center gap-2 max-w-full px-2 py-[0.15rem] rounded-md;
+        background: rgba(15, 23, 35, 0.5);
+        backdrop-filter: blur(4px);
+        width: 100%;
+    }
+
+    .match-map-token-stat {
+        @apply text-white whitespace-nowrap;
+        line-height: 1;
+    }
+
+    .match-map-token-resize-handle {
+        @apply absolute bottom-1 right-1 z-[1] flex items-center justify-center w-6 h-6
+            rounded-full border border-white/70 bg-color-primary/default_900 text-white
+            shadow-md cursor-se-resize;
+        touch-action: none;
+    }
+
+    .match-map-token-resize-icon {
+        @apply block text-[0.8rem] leading-none;
     }
 
     /* ── Top-right horizontal bar ────────────────────────── */
@@ -27,6 +137,91 @@
 
     .match-top-bar-item {
         @apply flex items-center justify-center w-10 h-10 rounded-lg transition-colors hover:bg-color-greyScale/50;
+    }
+
+    .match-top-bar-item--active {
+        @apply bg-color-primary/default_900 bg-opacity-15;
+    }
+
+    .match-journal-highlight-overlay {
+        @apply fixed inset-0 z-[120] flex items-center justify-center bg-black/60 px-4;
+    }
+
+    .match-journal-highlight-modal,
+    .match-journal-highlight-notice {
+        @apply w-full max-w-[34rem] rounded-2xl bg-color-greyScale/100 shadow-2xl;
+    }
+
+    .match-journal-highlight-header {
+        @apply flex items-start justify-between gap-4 px-6 pt-6 pb-4;
+    }
+
+    .match-journal-highlight-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .match-journal-highlight-subtitle {
+        @apply mt-1 text-color-greyScale/500;
+    }
+
+    .match-journal-highlight-close {
+        @apply flex h-8 w-8 items-center justify-center rounded-full text-color-primary/default_900 transition-opacity hover:opacity-70 disabled:opacity-50;
+    }
+
+    .match-journal-highlight-divider {
+        @apply mx-6 border-b border-color-greyScale/200;
+    }
+
+    .match-journal-highlight-body {
+        @apply flex max-h-[24rem] flex-col gap-3 overflow-y-auto px-6 py-5;
+    }
+
+    .match-journal-highlight-list {
+        @apply flex flex-col gap-2;
+    }
+
+    .match-journal-highlight-option {
+        @apply flex items-center justify-between gap-3 rounded-xl border border-color-greyScale/200 bg-white px-4 py-3 text-left transition-colors hover:bg-color-greyScale/50 disabled:opacity-60;
+    }
+
+    .match-journal-highlight-option--active {
+        @apply border-color-primary/default_900 bg-color-primary/default_900 bg-opacity-10;
+    }
+
+    .match-journal-highlight-option-title {
+        @apply text-color-greyScale/900;
+    }
+
+    .match-journal-highlight-option-state {
+        @apply whitespace-nowrap text-color-primary/default_900;
+    }
+
+    .match-journal-highlight-empty {
+        @apply text-color-greyScale/500;
+    }
+
+    .match-journal-highlight-error {
+        @apply text-red-600;
+    }
+
+    .match-journal-highlight-footer {
+        @apply px-6 pb-6 pt-1;
+    }
+
+    .match-journal-highlight-footer-text {
+        @apply text-color-greyScale/500;
+    }
+
+    .match-journal-highlight-notice {
+        @apply flex flex-col items-center gap-4 px-6 py-7 text-center;
+    }
+
+    .match-journal-highlight-notice-text {
+        @apply text-color-greyScale/700;
+    }
+
+    .match-journal-highlight-notice-btn {
+        @apply rounded-lg bg-color-primary/default_900 px-5 py-2 text-white transition-opacity hover:opacity-85;
     }
 
     /* ── Middle-left character panel ─────────────────────── */
@@ -202,24 +397,70 @@
     }
 
     /* ── Full-screen dice throw overlay ──────────────────── */
-    .match-throw-overlay {
-        @apply absolute inset-0 z-50 flex flex-col items-center justify-center cursor-pointer;
-        background: rgba(0, 0, 0, 0.45);
-        backdrop-filter: blur(2px);
+    .match-dice-layer {
+        @apply absolute inset-0 z-50 cursor-pointer;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.08s ease-out;
     }
 
-    .match-throw-die {
-        @apply relative flex items-center justify-center;
+    .match-dice-layer--active {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .match-dice-layer-backdrop {
+        @apply absolute inset-0;
+        background: rgba(0, 0, 0, 0.28);
+        backdrop-filter: blur(1.5px);
+    }
+
+    .match-dice-box-host {
+        @apply absolute left-1/2 top-1/2;
+        width: min(68vw, 56rem);
+        height: min(54vh, 32rem);
+        transform: translate(-50%, -50%);
+    }
+
+    .match-dice-box-host .dice-box-canvas,
+    .match-dice-box-host canvas {
+        width: 100% !important;
+        height: 100% !important;
+        display: block;
+    }
+
+    @media (max-width: 768px) {
+        .match-dice-box-host {
+            width: min(88vw, 30rem);
+            height: min(42vh, 22rem);
+        }
+    }
+
+    .match-throw-ui {
+        @apply absolute inset-0 z-[1] flex flex-col items-center justify-center px-4;
+        pointer-events: none;
+    }
+
+    .match-throw-card {
+        @apply flex flex-col items-center gap-4 rounded-[1.75rem] px-8 py-7;
+        min-width: min(22rem, calc(100vw - 2rem));
+        max-width: min(28rem, calc(100vw - 2rem));
+        background: rgba(11, 18, 29, 0.78);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        box-shadow:
+            0 24px 60px rgba(0, 0, 0, 0.42),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(14px);
     }
 
     .match-throw-result {
-        @apply absolute inset-0 flex items-center justify-center;
+        @apply flex items-center justify-center;
         color: #fff;
         text-shadow:
             0 2px 8px rgba(0, 0, 0, 0.8),
             0 0 2px rgba(0, 0, 0, 1);
         font-size: 3.5rem;
-        pointer-events: none;
+        line-height: 1;
     }
 
     .match-throw-label {
@@ -229,7 +470,7 @@
     }
 
     .match-throw-details {
-        @apply mt-4 flex flex-col items-center gap-2;
+        @apply flex flex-col items-center gap-2;
     }
 
     .match-throw-rolls {
@@ -241,5 +482,11 @@
         background: rgba(255, 255, 255, 0.25);
         backdrop-filter: blur(4px);
         font-size: 0.8rem;
+    }
+
+    .match-throw-close {
+        color: rgba(255, 255, 255, 0.76);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
     }
 }
