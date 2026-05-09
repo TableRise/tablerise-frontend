@@ -1,5 +1,12 @@
 'use client';
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import {
+    forwardRef,
+    useEffect,
+    useImperativeHandle,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import {
     getDnd5eClasses,
     getDnd5eRaces,
@@ -7,6 +14,9 @@ import {
     getDnd5eClassById,
 } from '@/server/dungeons&dragons5e/system';
 import GenerateScoresModal from '@/components/character-sheet/GenerateScoresModal';
+import XpIncreaseModal from '@/components/common/XpIncreaseModal';
+import { applyXpGain } from '@/utils/characterXp';
+import { generateAbilityScores } from '@/utils/rollAbilityScore';
 
 const ABILITIES = [
     { key: 'str', label: 'Força' },
@@ -16,6 +26,20 @@ const ABILITIES = [
     { key: 'wis', label: 'Sabedoria' },
     { key: 'cha', label: 'Carisma' },
 ] as const;
+
+type AbilityKey = (typeof ABILITIES)[number]['key'];
+
+const EMPTY_ABILITY_SCORES: Record<AbilityKey, number> = {
+    str: 0,
+    dex: 0,
+    con: 0,
+    int: 0,
+    wis: 0,
+    cha: 0,
+};
+
+const GENERATED_SCORES_INFO_MESSAGE =
+    'Caso hajam valores adicionais para distribuir, como de caracteristicas ou sub raças, os anote e distribua na edição de personagem, depois de criar a ficha.';
 
 const SAVES = [
     { key: 'str', label: 'Força' },
@@ -73,12 +97,15 @@ export interface SheetPrincipalHandle {
         extraCharacteristics: string;
         inventory: string;
         passiveWisdom: number;
+        xp: number;
+        level: number;
     };
 }
 
 interface SheetPrincipalProps {
     campaignId: string;
     characterId: string;
+    isMaster: boolean;
     onSpellDataChange?: (data: {
         spellClassName: string;
         spellAbilityLabel: string;
@@ -97,10 +124,11 @@ interface SheetPrincipalProps {
 }
 
 const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
-    function SheetPrincipal({ campaignId, characterId, onSpellDataChange }, ref) {
-        const [classes, setClasses] = useState<
-            { classId: string; pt: { name: string } }[]
-        >([]);
+    function SheetPrincipal(
+        { campaignId, characterId, isMaster, onSpellDataChange },
+        ref
+    ) {
+        const [classes, setClasses] = useState<{ classId: string; name: string }[]>([]);
         const [selectedClassId, setSelectedClassId] = useState('');
         const [classBaseHp, setClassBaseHp] = useState(0);
         const [hitDice, setHitDice] = useState('');
@@ -108,24 +136,26 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
         const [spellAbilityLabel, setSpellAbilityLabel] = useState('');
         const [spellAbilityKey, setSpellAbilityKey] = useState('');
         const [classLevelingSpecs, setClassLevelingSpecs] = useState<any>(null);
-        const [races, setRaces] = useState<{ raceId: string; pt: { name: string } }[]>(
-            []
-        );
+        const [races, setRaces] = useState<{ raceId: string; name: string }[]>([]);
         const [selectedRaceId, setSelectedRaceId] = useState('');
         const [raceSpeed, setRaceSpeed] = useState(0);
         const [raceBonusApplied, setRaceBonusApplied] = useState(false);
         const [showGenerateModal, setShowGenerateModal] = useState(false);
         const [skillProfs, setSkillProfs] = useState<Record<string, boolean>>({});
         const [saveProfs, setSaveProfs] = useState<Record<string, boolean>>({});
-        type AbilityKey = (typeof ABILITIES)[number]['key'];
-        const [abilityScores, setAbilityScores] = useState<Record<AbilityKey, number>>({
-            str: 0,
-            dex: 0,
-            con: 0,
-            int: 0,
-            wis: 0,
-            cha: 0,
-        });
+        const [baseAbilityScores, setBaseAbilityScores] =
+            useState<Record<AbilityKey, number>>(EMPTY_ABILITY_SCORES);
+        const [raceAbilityBonuses, setRaceAbilityBonuses] =
+            useState<Record<AbilityKey, number>>(EMPTY_ABILITY_SCORES);
+        const [generatedScores, setGeneratedScores] = useState<number[]>([]);
+        const [usedGeneratedScoreIndexes, setUsedGeneratedScoreIndexes] = useState<
+            boolean[]
+        >([]);
+        const [assignedGeneratedScoresByAbility, setAssignedGeneratedScoresByAbility] =
+            useState<Partial<Record<AbilityKey, boolean>>>({});
+        const [selectedAbilityKey, setSelectedAbilityKey] = useState<AbilityKey | null>(
+            null
+        );
         const [characterName, setCharacterName] = useState('');
         const [alignment, setAlignment] = useState('');
         const [personalityTraits, setPersonalityTraits] = useState('');
@@ -145,6 +175,20 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
         const [proficienciesText, setProficienciesText] = useState('');
         const [extraCharacteristics, setExtraCharacteristics] = useState('');
         const [inventory, setInventory] = useState('');
+        const [xp, setXp] = useState(0);
+        const [level, setLevel] = useState(1);
+        const [xpModalOpen, setXpModalOpen] = useState(false);
+        const abilityScores = useMemo<Record<AbilityKey, number>>(
+            () => ({
+                str: baseAbilityScores.str + raceAbilityBonuses.str,
+                dex: baseAbilityScores.dex + raceAbilityBonuses.dex,
+                con: baseAbilityScores.con + raceAbilityBonuses.con,
+                int: baseAbilityScores.int + raceAbilityBonuses.int,
+                wis: baseAbilityScores.wis + raceAbilityBonuses.wis,
+                cha: baseAbilityScores.cha + raceAbilityBonuses.cha,
+            }),
+            [baseAbilityScores, raceAbilityBonuses]
+        );
 
         useImperativeHandle(ref, () => ({
             getData: () => {
@@ -199,6 +243,8 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                     extraCharacteristics,
                     inventory,
                     passiveWisdom: Number(passiveWisdom),
+                    xp: Number(xp),
+                    level: Number(level),
                 };
             },
         }));
@@ -230,6 +276,12 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
             Con: 'con',
         };
 
+        const normalizeAbilityName = (value: string): string =>
+            value
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '');
+
         const ABILITY_KEY_MAP: Record<string, string> = {
             strength: 'str',
             dexterity: 'dex',
@@ -237,12 +289,75 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
             intelligence: 'int',
             wisdom: 'wis',
             charisma: 'cha',
+            forca: 'str',
+            constituicao: 'con',
+            inteligencia: 'int',
             força: 'str',
             destreza: 'dex',
             constituição: 'con',
             inteligência: 'int',
             sabedoria: 'wis',
             carisma: 'cha',
+        };
+
+        const resetGeneratedScoreState = () => {
+            setGeneratedScores([]);
+            setUsedGeneratedScoreIndexes([]);
+            setAssignedGeneratedScoresByAbility({});
+            setBaseAbilityScores({ ...EMPTY_ABILITY_SCORES });
+            setRaceAbilityBonuses({ ...EMPTY_ABILITY_SCORES });
+            setRaceBonusApplied(false);
+            setSelectedAbilityKey(null);
+            setShowGenerateModal(false);
+        };
+
+        const handleGenerateAbilityScores = () => {
+            const nextScores = generateAbilityScores();
+            setGeneratedScores(nextScores);
+            setUsedGeneratedScoreIndexes(
+                Array.from({ length: nextScores.length }, () => false)
+            );
+            setAssignedGeneratedScoresByAbility({});
+            setBaseAbilityScores({ ...EMPTY_ABILITY_SCORES });
+            setRaceAbilityBonuses({ ...EMPTY_ABILITY_SCORES });
+            setRaceBonusApplied(false);
+            setSelectedAbilityKey(null);
+            setShowGenerateModal(true);
+        };
+
+        const handleOpenAbilityScorePicker = (abilityKey: AbilityKey) => {
+            if (!generatedScores.length) return;
+            if (assignedGeneratedScoresByAbility[abilityKey]) return;
+            setSelectedAbilityKey(abilityKey);
+            setShowGenerateModal(true);
+        };
+
+        const availableGeneratedScoreIndexes = generatedScores.map(
+            (_, index) => !usedGeneratedScoreIndexes[index]
+        );
+
+        const handleSelectGeneratedScore = (scoreIndex: number) => {
+            if (!selectedAbilityKey) return;
+            if (!availableGeneratedScoreIndexes[scoreIndex]) return;
+
+            setUsedGeneratedScoreIndexes((prev) =>
+                prev.map((used, index) => (index === scoreIndex ? true : used))
+            );
+            setAssignedGeneratedScoresByAbility((prev) => ({
+                ...prev,
+                [selectedAbilityKey]: true,
+            }));
+            setBaseAbilityScores((prev) => ({
+                ...prev,
+                [selectedAbilityKey]: generatedScores[scoreIndex] ?? 0,
+            }));
+            setSelectedAbilityKey(null);
+            setShowGenerateModal(false);
+        };
+
+        const handleCloseGenerateModal = () => {
+            setSelectedAbilityKey(null);
+            setShowGenerateModal(false);
         };
 
         const handleSelectClass = async (classId: string) => {
@@ -256,10 +371,10 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                 return;
             }
             const cls = await getDnd5eClassById(classId);
-            if (!cls?.en?.hitPoints?.hitPointsAtFirstLevel) return;
-            setClassBaseHp(Number(cls.en.hitPoints.hitPointsAtFirstLevel));
-            setHitDice(cls.en.hitPoints.hitDice?.[0] ?? '');
-            setClassLevelingSpecs(cls.levelingSpecs ?? cls.en?.levelingSpecs ?? null);
+            if (!cls?.hitPoints?.hitPointsAtFirstLevel) return;
+            setClassBaseHp(Number(cls.hitPoints.hitPointsAtFirstLevel));
+            setHitDice(cls.hitPoints.hitDice?.[0] ?? '');
+            setClassLevelingSpecs(cls.levelingSpecs ?? null);
             const MAGIC_CLASS_PT: Record<string, string> = {
                 strength: 'Força',
                 dexterity: 'Destreza',
@@ -268,26 +383,26 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                 wisdom: 'Sabedoria',
                 charisma: 'Carisma',
             };
-            const magicClass: string = cls.magicClass ?? cls.en?.magicClass ?? '';
+            const magicClass: string = cls.magicClass ?? '';
             const magicClassPt = MAGIC_CLASS_PT[magicClass.toLowerCase()] ?? magicClass;
             setSpellAbilityLabel(magicClassPt || '-');
-            setSpellAbilityKey(ABILITY_KEY_MAP[magicClass.toLowerCase()] ?? '');
+            setSpellAbilityKey(ABILITY_KEY_MAP[normalizeAbilityName(magicClass)] ?? '');
         };
 
         const handleApplyRaceBonus = async () => {
             if (!selectedRaceId) return;
             const race = await getDnd5eRaceById(selectedRaceId);
-            if (!race?.en?.abilityScoreIncrease) return;
+            if (!race?.abilityScoreIncrease) return;
             const increases: { name: string; value: number }[] =
-                race.en.abilityScoreIncrease;
-            setAbilityScores((prev) => {
-                const next = { ...prev };
-                for (const entry of increases) {
-                    const key = ABILITY_KEY_MAP[entry.name.toLowerCase()];
-                    if (key) next[key as keyof typeof prev] += Number(entry.value);
+                race.abilityScoreIncrease;
+            const nextBonuses = { ...EMPTY_ABILITY_SCORES };
+            for (const entry of increases) {
+                const key = ABILITY_KEY_MAP[normalizeAbilityName(entry.name)];
+                if (key) {
+                    nextBonuses[key as AbilityKey] += Number(entry.value);
                 }
-                return next;
-            });
+            }
+            setRaceAbilityBonuses(nextBonuses);
             setRaceBonusApplied(true);
         };
 
@@ -305,7 +420,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                 : 0;
             const mod = Math.max(0, Math.floor((score - 10) / 2));
             const spellClassName =
-                classes.find((c) => c.classId === selectedClassId)?.pt.name ?? '';
+                classes.find((c) => c.classId === selectedClassId)?.name ?? '';
             onSpellDataChangeRef.current({
                 spellClassName,
                 spellAbilityLabel,
@@ -328,7 +443,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                 return;
             }
             getDnd5eRaceById(selectedRaceId)
-                .then((race) => setRaceSpeed(race?.en.speed?.[0] ?? 0))
+                .then((race) => setRaceSpeed(race?.speed?.[0] ?? 0))
                 .catch(() => {});
         }, [selectedRaceId]);
 
@@ -344,7 +459,21 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
         return (
             <div>
                 {showGenerateModal && (
-                    <GenerateScoresModal onClose={() => setShowGenerateModal(false)} />
+                    <GenerateScoresModal
+                        scores={generatedScores}
+                        availableScoreIndexes={availableGeneratedScoreIndexes}
+                        selectedAbilityLabel={
+                            selectedAbilityKey
+                                ? ABILITIES.find(
+                                      (ability) => ability.key === selectedAbilityKey
+                                  )?.label
+                                : undefined
+                        }
+                        selectionEnabled={selectedAbilityKey !== null}
+                        onSelectScore={handleSelectGeneratedScore}
+                        infoMessage={GENERATED_SCORES_INFO_MESSAGE}
+                        onClose={handleCloseGenerateModal}
+                    />
                 )}
                 {/* ── Header ──────────────────────────────── */}
                 <div className="cs-header">
@@ -366,7 +495,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                             <option value="">Escolha sua Classe</option>
                             {classes.map((c) => (
                                 <option key={c.classId} value={c.classId}>
-                                    {c.pt.name}
+                                    {c.name}
                                 </option>
                             ))}
                         </select>
@@ -376,7 +505,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                         <input
                             className="cs-field-input cs-field-input--readonly"
                             placeholder="1"
-                            value={1}
+                            value={level}
                             readOnly
                         />
                         <span className="cs-field-label">Nível</span>
@@ -395,21 +524,13 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                             value={selectedRaceId}
                             onChange={(e) => {
                                 setSelectedRaceId(e.target.value);
-                                setRaceBonusApplied(false);
-                                setAbilityScores({
-                                    str: 0,
-                                    dex: 0,
-                                    con: 0,
-                                    int: 0,
-                                    wis: 0,
-                                    cha: 0,
-                                });
+                                resetGeneratedScoreState();
                             }}
                         >
                             <option value="">Escolha sua Raça</option>
                             {races.map((r) => (
                                 <option key={r.raceId} value={r.raceId}>
-                                    {r.pt.name}
+                                    {r.name}
                                 </option>
                             ))}
                         </select>
@@ -428,7 +549,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                         <input
                             className="cs-field-input cs-field-input--readonly"
                             placeholder="0"
-                            value={0}
+                            value={xp}
                             readOnly
                         />
                         <span className="cs-field-label">Pontos de Experiência</span>
@@ -440,21 +561,44 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                     {/* ─ Left: Ability Scores ─ */}
                     <div className="cs-ability-col">
                         {/* ── Generate Buttons ─── */}
-                        <button
-                            type="button"
-                            className="button-L-fill font-S-bold bg-color-primary/default_900 text-color-greyScale/50 w-full text-sm"
-                            onClick={() => setShowGenerateModal(true)}
-                        >
-                            Gerar Valores e Modificadores
-                        </button>
-                        <button
-                            type="button"
-                            className="button-L-fill font-S-bold bg-color-primary/default_900 text-color-greyScale/50 w-full text-sm"
-                            disabled={!selectedRaceId || raceBonusApplied}
-                            onClick={handleApplyRaceBonus}
-                        >
-                            Aplicar Bonus de Raças
-                        </button>
+                        <div className="relative group w-full">
+                            <button
+                                type="button"
+                                className="button-L-fill font-S-bold bg-color-primary/default_900 text-color-greyScale/50 w-full text-sm"
+                                disabled={!selectedRaceId}
+                                onClick={handleGenerateAbilityScores}
+                            >
+                                Gerar Valores e Modificadores
+                            </button>
+                            {!selectedRaceId && (
+                                <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-64 -translate-x-1/2 rounded bg-gray-800 p-2 text-center text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                                    Para gerar os valores de habilidade escolha primeiro a
+                                    raça
+                                </div>
+                            )}
+                        </div>
+                        <div className="relative group w-full">
+                            <button
+                                type="button"
+                                className="button-L-fill font-S-bold bg-color-primary/default_900 text-color-greyScale/50 w-full text-sm"
+                                disabled={
+                                    !selectedRaceId ||
+                                    !generatedScores.length ||
+                                    raceBonusApplied
+                                }
+                                onClick={handleApplyRaceBonus}
+                            >
+                                Aplicar Bônus de Raças
+                            </button>
+                            {selectedRaceId &&
+                                !generatedScores.length &&
+                                !raceBonusApplied && (
+                                    <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-64 -translate-x-1/2 rounded bg-gray-800 p-2 text-center text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                                        Para aplicar os Bônus de Raças primeiro gere os
+                                        valores de habilidade no botão acima.
+                                    </div>
+                                )}
+                        </div>
                         {ABILITIES.map((ab) => (
                             <div key={ab.key} className="cs-ability-block">
                                 <span className="cs-ability-name">{ab.label}</span>
@@ -464,17 +608,13 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                                     readOnly
                                     tabIndex={-1}
                                 />
-                                <input
+                                <button
+                                    type="button"
                                     className="cs-ability-score"
-                                    type="number"
-                                    value={abilityScores[ab.key]}
-                                    onChange={(e) =>
-                                        setAbilityScores((prev) => ({
-                                            ...prev,
-                                            [ab.key]: Number(e.target.value),
-                                        }))
-                                    }
-                                />
+                                    onClick={() => handleOpenAbilityScorePicker(ab.key)}
+                                >
+                                    {abilityScores[ab.key]}
+                                </button>
                             </div>
                         ))}
                     </div>
@@ -485,14 +625,10 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                         <div className="cs-inspiration-row">
                             <button
                                 type="button"
-                                className={`text-sm font-bold ${
-                                    inspiration
-                                        ? 'text-color-primary/default_900'
-                                        : 'text-color-greyScale/300'
-                                }`}
-                                onClick={() => setInspiration(inspiration ? 0 : 1)}
+                                className="text-sm font-bold text-color-greyScale/300 cursor-not-allowed"
+                                disabled
                             >
-                                {inspiration ? 'ON' : 'OFF'}
+                                OFF
                             </button>
                             <span className="cs-field-label">Inspiração</span>
                         </div>
@@ -818,6 +954,15 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
 
                     {/* ─ Right: Personality ─ */}
                     <div className="cs-right-col">
+                        {isMaster && (
+                            <button
+                                type="button"
+                                className="button-L-fill font-S-bold bg-color-primary/default_900 text-color-greyScale/50 w-full text-sm"
+                                onClick={() => setXpModalOpen(true)}
+                            >
+                                {'Aumentar XP'}
+                            </button>
+                        )}
                         <div className="cs-trait-box">
                             <textarea
                                 className="cs-field-textarea w-full h-16"
@@ -882,6 +1027,19 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                         </p>
                     </div>
                 </div>
+
+                {xpModalOpen && (
+                    <XpIncreaseModal
+                        currentXp={xp}
+                        onClose={() => setXpModalOpen(false)}
+                        onConfirm={(addedXp) => {
+                            const nextProgression = applyXpGain(xp, addedXp);
+                            setXp(nextProgression.xp);
+                            setLevel(nextProgression.level);
+                            setXpModalOpen(false);
+                        }}
+                    />
+                )}
             </div>
         );
     }

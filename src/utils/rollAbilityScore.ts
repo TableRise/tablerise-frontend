@@ -6,7 +6,10 @@ function rollAbilityScore(): number {
     const lowest = Math.min(...rolls);
     const idx = rolls.indexOf(lowest);
     rolls.splice(idx, 1);
-    return rolls.reduce((acc, n) => acc + n, 0);
+    return Math.min(
+        15,
+        rolls.reduce((acc, n) => acc + n, 0)
+    );
 }
 
 /**

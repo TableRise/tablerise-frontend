@@ -3,7 +3,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import PlayIcon from '../../../assets/icons/media/play.svg?url';
 import AddSVG from '../../../assets/icons/nav/add-16.svg?url';
-import CloseSVG from '../../../assets/icons/nav/close.svg?url';
+import CloseSVG from '../../../assets/icons/nav/close-red.svg?url';
+import CheckSVG from '../../../assets/icons/sys/check-blue.svg?url';
+import EditSVG from '../../../assets/icons/sys/edit-blue.svg?url';
 import TrashSVG from '../../../assets/icons/sys/trash.svg?url';
 import SoundWave from '@/components/common/SoundWave';
 import { getYouTubeVideoDetails } from '@/server/youtube/get-video-details';
@@ -22,8 +24,12 @@ export default function SoundtrackUI({ musics, setMusics }: Props) {
     const [loading, setLoading] = useState(false);
     const [inputError, setInputError] = useState('');
     const [playingId, setPlayingId] = useState<string | null>(null);
+    const [editingMusicId, setEditingMusicId] = useState<string | null>(null);
+    const [editingTitle, setEditingTitle] = useState('');
+    const [editingError, setEditingError] = useState('');
     const playerRef = useRef<any>(null);
     const playerContainerRef = useRef<HTMLDivElement>(null);
+    const titleInputRef = useRef<HTMLInputElement>(null);
     const apiReadyRef = useRef(false);
 
     useEffect(() => {
@@ -44,6 +50,12 @@ export default function SoundtrackUI({ musics, setMusics }: Props) {
             document.head.appendChild(tag);
         }
     }, []);
+
+    useEffect(() => {
+        if (!editingMusicId) return;
+        titleInputRef.current?.focus();
+        titleInputRef.current?.select();
+    }, [editingMusicId]);
 
     const ensurePlayer = useCallback((videoId: string) => {
         function create() {
@@ -135,6 +147,11 @@ export default function SoundtrackUI({ musics, setMusics }: Props) {
             playerRef.current = null;
             setPlayingId(null);
         }
+        if (editingMusicId === id) {
+            setEditingMusicId(null);
+            setEditingTitle('');
+            setEditingError('');
+        }
         setMusics((prev) => prev.filter((v) => v.id !== id));
     }
 
@@ -142,6 +159,37 @@ export default function SoundtrackUI({ musics, setMusics }: Props) {
         setShowInput(false);
         setVideoUrl('');
         setInputError('');
+    }
+
+    function handleStartEditing(music: CampaignMusic) {
+        setEditingMusicId(music.id);
+        setEditingTitle(music.title);
+        setEditingError('');
+    }
+
+    function handleCancelEditing() {
+        setEditingMusicId(null);
+        setEditingTitle('');
+        setEditingError('');
+    }
+
+    function handleSaveEditingTitle(musicId: string): boolean {
+        const nextTitle = editingTitle.trim();
+
+        if (!nextTitle) {
+            setEditingError('O título não pode ficar vazio.');
+            return false;
+        }
+
+        setMusics((prev) =>
+            prev.map((music) =>
+                music.id === musicId ? { ...music, title: nextTitle } : music
+            )
+        );
+        setEditingMusicId(null);
+        setEditingTitle('');
+        setEditingError('');
+        return true;
     }
 
     return (
@@ -193,21 +241,119 @@ export default function SoundtrackUI({ musics, setMusics }: Props) {
                                 )}
                             </span>
                         </button>
-                        <span className="font-XS-regular ccm-playlist-item-title">
-                            {video.title}
-                        </span>
-                        <button
-                            type="button"
-                            className="ccm-playlist-remove-btn"
-                            onClick={() => handleRemove(video.id)}
-                        >
-                            <Image
-                                src={TrashSVG.src}
-                                alt="remover"
-                                width={16}
-                                height={16}
-                            />
-                        </button>
+                        <div className="ccm-playlist-item-main">
+                            {editingMusicId === video.id ? (
+                                <>
+                                    <input
+                                        ref={titleInputRef}
+                                        className="input-default-light ccm-playlist-title-input"
+                                        type="text"
+                                        value={editingTitle}
+                                        onChange={(e) => {
+                                            setEditingTitle(e.target.value);
+                                            setEditingError('');
+                                        }}
+                                        onBlur={(e) => {
+                                            const nextTarget =
+                                                e.relatedTarget as HTMLElement | null;
+                                            const action =
+                                                nextTarget?.dataset.playlistEditAction;
+
+                                            if (
+                                                action === 'save' ||
+                                                action === 'cancel'
+                                            ) {
+                                                return;
+                                            }
+
+                                            if (!editingTitle.trim()) {
+                                                handleCancelEditing();
+                                                return;
+                                            }
+
+                                            handleSaveEditingTitle(video.id);
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                handleSaveEditingTitle(video.id);
+                                            }
+
+                                            if (e.key === 'Escape') {
+                                                e.preventDefault();
+                                                handleCancelEditing();
+                                            }
+                                        }}
+                                    />
+                                    {editingError && (
+                                        <span className="font-XXS-regular ccm-playlist-title-error">
+                                            {editingError}
+                                        </span>
+                                    )}
+                                </>
+                            ) : (
+                                <span className="font-XS-regular ccm-playlist-item-title">
+                                    {video.title}
+                                </span>
+                            )}
+                        </div>
+                        <div className="ccm-playlist-actions">
+                            {editingMusicId === video.id ? (
+                                <>
+                                    <button
+                                        type="button"
+                                        className="ccm-playlist-edit-btn"
+                                        data-playlist-edit-action="save"
+                                        onClick={() => handleSaveEditingTitle(video.id)}
+                                    >
+                                        <Image
+                                            src={CheckSVG.src}
+                                            alt="salvar título"
+                                            width={16}
+                                            height={16}
+                                        />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="ccm-playlist-edit-btn"
+                                        data-playlist-edit-action="cancel"
+                                        onClick={handleCancelEditing}
+                                    >
+                                        <Image
+                                            src={CloseSVG.src}
+                                            alt="cancelar edição"
+                                            width={14}
+                                            height={14}
+                                        />
+                                    </button>
+                                </>
+                            ) : (
+                                <button
+                                    type="button"
+                                    className="ccm-playlist-edit-btn"
+                                    onClick={() => handleStartEditing(video)}
+                                >
+                                    <Image
+                                        src={EditSVG.src}
+                                        alt="editar título"
+                                        width={16}
+                                        height={16}
+                                    />
+                                </button>
+                            )}
+                            <button
+                                type="button"
+                                className="ccm-playlist-remove-btn"
+                                onClick={() => handleRemove(video.id)}
+                            >
+                                <Image
+                                    src={TrashSVG.src}
+                                    alt="remover"
+                                    width={16}
+                                    height={16}
+                                />
+                            </button>
+                        </div>
                     </div>
                 ))}
             </div>

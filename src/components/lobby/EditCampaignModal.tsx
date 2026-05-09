@@ -136,7 +136,7 @@ export default function EditCampaignModal({
             const socialMediaChanged =
                 JSON.stringify(currentSocialMedia) !== JSON.stringify(initSocialMedia);
 
-            const payload: Record<string, unknown> = {};
+            const payload: Record<string, any> = {};
             if (title !== initialData.title) payload.title = title;
             if (description !== initialData.description)
                 payload.description = description;
@@ -186,7 +186,7 @@ export default function EditCampaignModal({
             if (coverFile) {
                 tasks.push(updateCampaignCover(campaignId, coverFile));
             } else if (coverRemoved && initialData.cover) {
-                tasks.push(removeCampaignImage(campaignId, 'cover', initialData.cover));
+                tasks.push(removeCampaignImage(campaignId, 'cover'));
             }
 
             if (newMapFiles.length > 0) {
@@ -213,11 +213,23 @@ export default function EditCampaignModal({
     async function handleSaveMusics() {
         const initialIds = new Set(initialData.musics.map((m) => m.id));
         const currentIds = new Set(musics.map((m) => m.id));
+        const initialMusicById = Object.fromEntries(
+            initialData.musics.map((music) => [music.id, music])
+        );
 
         const added = musics.filter((m) => !initialIds.has(m.id));
         const removed = initialData.musics.filter((m) => !currentIds.has(m.id));
+        const edited = musics.filter((music) => {
+            const initialMusic = initialMusicById[music.id];
 
-        if (added.length === 0 && removed.length === 0) {
+            if (!initialMusic) {
+                return false;
+            }
+
+            return initialMusic.title !== music.title;
+        });
+
+        if (added.length === 0 && removed.length === 0 && edited.length === 0) {
             onClose();
             return;
         }
@@ -228,9 +240,10 @@ export default function EditCampaignModal({
                 ...added.map((m) =>
                     updateCampaignMusic(campaignId, 'add', m.id, m.title, m.thumbnail)
                 ),
-                ...removed.map((m) =>
-                    updateCampaignMusic(campaignId, 'remove', m.id, m.title, m.thumbnail)
+                ...edited.map((m) =>
+                    updateCampaignMusic(campaignId, 'edit', m.id, m.title, m.thumbnail)
                 ),
+                ...removed.map((m) => updateCampaignMusic(campaignId, 'remove', m.id)),
             ];
             await Promise.all(tasks);
             onSaved();
@@ -630,7 +643,7 @@ export default function EditCampaignModal({
                             <div className="ecm-field">
                                 <span className="font-S-bold ecm-field-label">Mapas</span>
                                 <span className="font-XS-regular ecm-field-hint">
-                                    Adicione até 3 imagens de mapa
+                                    Adicione imagens de mapa
                                 </span>
                                 <div className="ecm-img-upload ecm-img-upload--small">
                                     <input
@@ -640,12 +653,7 @@ export default function EditCampaignModal({
                                         className="hidden"
                                         onChange={(e) => {
                                             const file = e.target.files?.[0];
-                                            const total =
-                                                initialData.mapImages.filter(
-                                                    (_, i) =>
-                                                        !removedMapIndexes.includes(i)
-                                                ).length + newMapFiles.length;
-                                            if (file && total < 3) {
+                                            if (file) {
                                                 setNewMapFiles((prev) => [...prev, file]);
                                             }
                                             if (mapInputRef.current)
@@ -719,32 +727,21 @@ export default function EditCampaignModal({
                                                     </div>
                                                 ))}
                                             </div>
-                                            {initialData.mapImages.filter(
-                                                (_, i) => !removedMapIndexes.includes(i)
-                                            ).length +
-                                                newMapFiles.length <
-                                                3 && (
-                                                <button
-                                                    type="button"
-                                                    className="font-XS-bold ecm-upload-btn"
-                                                    onClick={() =>
-                                                        mapInputRef.current?.click()
-                                                    }
-                                                >
-                                                    <Image
-                                                        src={UploadSVG.src}
-                                                        alt="upload"
-                                                        width={16}
-                                                        height={16}
-                                                    />
-                                                    Adicionar mapa (
-                                                    {initialData.mapImages.filter(
-                                                        (_, i) =>
-                                                            !removedMapIndexes.includes(i)
-                                                    ).length + newMapFiles.length}
-                                                    /3)
-                                                </button>
-                                            )}
+                                            <button
+                                                type="button"
+                                                className="font-XS-bold ecm-upload-btn"
+                                                onClick={() =>
+                                                    mapInputRef.current?.click()
+                                                }
+                                            >
+                                                <Image
+                                                    src={UploadSVG.src}
+                                                    alt="upload"
+                                                    width={16}
+                                                    height={16}
+                                                />
+                                                Adicionar mapa
+                                            </button>
                                         </div>
                                     ) : (
                                         <button
@@ -758,7 +755,7 @@ export default function EditCampaignModal({
                                                 width={16}
                                                 height={16}
                                             />
-                                            Adicionar mapa (0/3)
+                                            Adicionar mapa
                                         </button>
                                     )}
                                 </div>

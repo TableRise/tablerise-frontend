@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .xpm-overlay {
+        @apply fixed inset-0 z-[320] flex items-center justify-center bg-black/60 px-4;
+    }
+
+    .xpm-modal {
+        @apply w-full max-w-md rounded-2xl bg-color-greyScale/50 p-6 shadow-xl border border-color-greyScale/200 flex flex-col gap-4;
+    }
+
+    .xpm-header {
+        @apply flex items-center justify-between gap-4;
+    }
+
+    .xpm-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .xpm-close {
+        @apply bg-transparent text-color-greyScale/500 transition-colors hover:text-color-primary/default_900;
+    }
+
+    .xpm-field {
+        @apply flex flex-col gap-2;
+    }
+
+    .xpm-label {
+        @apply text-color-primary/default_900;
+    }
+
+    .xpm-input {
+        @apply border-2 border-color-greyScale/200 rounded-xl px-4 py-3 bg-color-greyScale/100 outline-none text-color-greyScale/900 transition-colors focus:border-color-primary/default_900;
+    }
+
+    .xpm-summary {
+        @apply rounded-xl border border-color-greyScale/200 bg-color-greyScale/100 px-4 py-3 flex flex-col gap-2;
+    }
+
+    .xpm-summary-row {
+        @apply flex items-center justify-between gap-4;
+    }
+
+    .xpm-summary-label {
+        @apply text-color-greyScale/700;
+    }
+
+    .xpm-error {
+        @apply text-red-600;
+    }
+
+    .xpm-actions {
+        @apply flex items-center justify-end gap-3;
+    }
+
+    .xpm-cancel {
+        @apply bg-transparent text-color-greyScale/500 transition-colors hover:text-color-primary/default_900;
+    }
+}

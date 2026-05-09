@@ -1,7 +1,10 @@
 import { AxiosResponse, AxiosError } from 'axios';
 import { apiCall, usersBaseUrl } from '../wrapper';
+import type { DatabaseCampaignGroupsResponse } from '@/types/shared/entities';
 
-export const getCampaignsByUserId = async (userId: string) => {
+export const getCampaignsByUserId = async (
+    userId: string
+): Promise<DatabaseCampaignGroupsResponse | undefined> => {
     try {
         const { data }: AxiosResponse = await apiCall({
             baseUrl: usersBaseUrl,

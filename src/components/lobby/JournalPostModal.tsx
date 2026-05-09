@@ -1,6 +1,9 @@
 'use client';
+import Image from 'next/image';
 import formatDate from '@/utils/formatDate';
 import { type JournalPost } from '@/server/campaigns/get-journal-posts';
+import TrashSVG from '../../../assets/icons/sys/trash.svg?url';
+import EditBlueSVG from '../../../assets/icons/sys/edit-blue.svg?url';
 import '@/components/lobby/styles/JournalPostModal.css';
 
 const CATEGORY_LABEL: Record<string, string> = {
@@ -16,7 +19,21 @@ const CATEGORY_LABEL: Record<string, string> = {
 
 interface JournalPostModalProps {
     post: JournalPost;
+    canDelete?: boolean;
+    canEdit?: boolean;
+    isDeleting?: boolean;
+    actionError?: string;
+    onDelete?: () => void;
+    onEdit?: () => void;
     onClose: () => void;
+}
+
+function normalizePostContent(content: string): string[] {
+    return content
+        .replace(/\\r\\n/g, '\n')
+        .replace(/\\n/g, '\n')
+        .replace(/\r\n/g, '\n')
+        .split('\n');
 }
 
 function renderInline(text: string, keyOffset: number): React.ReactNode[] {
@@ -41,6 +58,10 @@ function renderInline(text: string, keyOffset: number): React.ReactNode[] {
 }
 
 function renderLine(line: string, index: number): React.ReactNode {
+    if (!line.trim()) {
+        return <div key={index} className="jpm-line-break" aria-hidden="true" />;
+    }
+
     const h1 = line.match(/^#\s(.+)/);
     const h2 = line.match(/^##\s(.+)/);
     const h3 = line.match(/^###\s(.+)/);
@@ -71,9 +92,15 @@ function renderLine(line: string, index: number): React.ReactNode {
 
 export default function JournalPostModal({
     post,
+    canDelete = false,
+    canEdit = false,
+    isDeleting = false,
+    actionError,
+    onDelete,
+    onEdit,
     onClose,
 }: JournalPostModalProps): JSX.Element {
-    const lines = post.content.split('\n').filter((l) => l.trim().length > 0);
+    const lines = normalizePostContent(post.content);
 
     return (
         <div className="jpm-overlay" onClick={onClose}>
@@ -90,25 +117,64 @@ export default function JournalPostModal({
                             </span>
                         </div>
                     </div>
-                    <button
-                        className="jpm-close-btn"
-                        onClick={onClose}
-                        aria-label="Fechar"
-                    >
-                        <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
+                    <div className="jpm-header-actions">
+                        {canDelete && onDelete && (
+                            <button
+                                type="button"
+                                className="jpm-action-btn"
+                                onClick={onDelete}
+                                disabled={isDeleting}
+                                aria-label="Excluir post"
+                                title="Excluir post"
+                            >
+                                <Image
+                                    src={TrashSVG.src}
+                                    alt="Excluir post"
+                                    width={16}
+                                    height={16}
+                                />
+                            </button>
+                        )}
+                        {canEdit && onEdit && (
+                            <button
+                                type="button"
+                                className="jpm-action-btn"
+                                onClick={onEdit}
+                                disabled={isDeleting}
+                                aria-label="Editar post"
+                                title="Editar post"
+                            >
+                                <Image
+                                    src={EditBlueSVG.src}
+                                    alt="Editar post"
+                                    width={16}
+                                    height={16}
+                                />
+                            </button>
+                        )}
+                        <button
+                            className="jpm-close-btn"
+                            onClick={onClose}
+                            aria-label="Fechar"
                         >
-                            <path d="M18 6 6 18M6 6l12 12" />
-                        </svg>
-                    </button>
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                            >
+                                <path d="M18 6 6 18M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <div className="jpm-divider" />
                 <div className="jpm-body">
+                    {actionError && (
+                        <span className="jpm-error font-XS-regular">{actionError}</span>
+                    )}
                     {lines.map((line, i) => renderLine(line, i))}
                 </div>
             </div>

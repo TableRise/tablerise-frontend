@@ -32,7 +32,7 @@ declare module '@3d-dice/dice-box-threejs' {
         shadows?: boolean;
         theme_surface?: string;
         sound_dieMaterial?: string;
-        theme_customColorset?: unknown;
+        theme_customColorset?: any;
         theme_colorset?: string;
         theme_texture?: string;
         theme_material?: string;

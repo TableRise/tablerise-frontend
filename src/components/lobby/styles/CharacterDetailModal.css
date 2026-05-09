@@ -92,6 +92,10 @@
         @apply flex flex-col gap-4;
     }
 
+    .cdm-section-header {
+        @apply flex items-center justify-between gap-4;
+    }
+
     .cdm-section-title {
         @apply text-color-primary/default_900 pb-1 border-b border-color-greyScale/200;
     }

@@ -360,6 +360,10 @@
         @apply w-full flex items-center gap-3 bg-white rounded-lg p-2;
     }
 
+    .ccm-playlist-item-main {
+        @apply flex-1 min-w-0 flex flex-col gap-1;
+    }
+
     .ccm-playlist-thumb-btn {
         @apply relative flex-shrink-0 rounded overflow-hidden cursor-pointer;
         width: 60px;
@@ -389,6 +393,27 @@
 
     .ccm-playlist-item-title {
         @apply flex-1 text-color-greyScale/950 truncate;
+    }
+
+    .ccm-playlist-title-input {
+        @apply w-full min-w-0;
+    }
+
+    .ccm-playlist-title-error {
+        @apply text-color-support/alert;
+    }
+
+    .ccm-playlist-actions {
+        @apply flex items-center gap-1 flex-shrink-0;
+    }
+
+    .ccm-playlist-edit-btn {
+        @apply flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg
+               text-color-greyScale/500 transition-colors;
+    }
+
+    .ccm-playlist-edit-btn:hover {
+        @apply bg-color-greyScale/100 text-color-primary/default_900;
     }
 
     .ccm-playlist-remove-btn {

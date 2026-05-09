@@ -2,7 +2,7 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import DiceBoxThreejs, { type DiceBoxThreejsRollResult } from '@3d-dice/dice-box-threejs';
+import DiceBoxThreejs from '@3d-dice/dice-box-threejs';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -35,16 +35,37 @@ import MapRainOverlay from '@/components/match/MapRainOverlay';
 import MatchMediaModal from '@/components/lobby/MatchMediaModal';
 import MatchNotesModal from '@/components/match/MatchNotesModal';
 import type { CampaignMusic } from '@/server/campaigns/create-campaign';
+import {
+    disconnectCampaignSocket,
+    emitCampaignSocketAck,
+    getCampaignSocket,
+    type CampaignSocket,
+} from '@/utils/campaignSocket';
+import type {
+    CampaignMapsUpdatedPayload,
+    CampaignMusicsUpdatedPayload,
+    CampaignSyncPayload,
+    CharacterUpdatedPayload,
+    DiceRollResolvedPayload,
+    MatchToken,
+    SocketJournal,
+    TokenBatchUpdatedPayload,
+    TokenBatchWrappedPayload,
+    TokenDeletedPayload,
+    TokenWrappedPayload,
+} from '@/types/shared/socket';
+import type { ImageObject } from '@/types/shared/general';
 import LogoSVG from '../../../../assets/icons/logo-blue.svg?url';
 import SheetSVG from '../../../../assets/icons/menu-panel-lobby/sheet.svg?url';
 import MediaSVG from '../../../../assets/icons/menu-panel-lobby/media.svg?url';
 import LeftPanelOpenSVG from '../../../../assets/icons/game/left-panel-open.svg?url';
-import NotesBlueSVG from '../../../../assets/icons/game/notes-blue.svg?url';
+import EditBlueSVG from '../../../../assets/icons/sys/edit-blue.svg?url';
 import StarBlueSVG from '../../../../assets/icons/game/star-blue.svg?url';
 import AvatarSelectionSVG from '../../../../assets/icons/game/avatar-selection.svg?url';
 import ResizeBlueSVG from '../../../../assets/icons/game/resize-blue.svg?url';
 import CloneSVG from '../../../../assets/icons/game/clone.svg?url';
 import BookmarkSVG from '../../../../assets/icons/game/bookmark.svg?url';
+import VolumeSVG from '../../../../assets/icons/game/volume.svg?url';
 import DiceSVG from '../../../../assets/icons/dice/default.svg?url';
 import D4SVG from '../../../../assets/icons/dice/d4.svg?url';
 import D6SVG from '../../../../assets/icons/dice/d6.svg?url';
@@ -127,6 +148,10 @@ function areJournalPostsEqual(
     second: JournalPost | null
 ): boolean {
     if (!first || !second) return false;
+
+    if (first.postId && second.postId) {
+        return first.postId === second.postId;
+    }
 
     return (
         first.title === second.title &&
@@ -226,43 +251,35 @@ function getBaseTokenId(characterId: string): string {
     return `base:${characterId}`;
 }
 
-function getCloneTokenId(characterId: string): string {
-    return `clone:${characterId}:${Date.now()}:${Math.random().toString(36).slice(2, 8)}`;
+function getCharacterIdFromBaseTokenId(tokenId: string): string | null {
+    return tokenId.startsWith('base:') ? tokenId.slice(5) : null;
 }
 
-function createCloneTokenLayout(
-    sourceLayout: MapTokenLayout,
-    containerRect: DOMRect,
-    cloneIndex: number
-): MapTokenLayout {
-    const sourceWidthPx = (sourceLayout.widthPct / 100) * containerRect.width;
-    const sourceHeightPx = getTokenTotalHeightPx(sourceWidthPx);
-    const sourceXPx = (sourceLayout.xPct / 100) * containerRect.width;
-    const sourceYPx = (sourceLayout.yPct / 100) * containerRect.height;
-    const offsetPatterns = [
-        { x: 28, y: 18 },
-        { x: 42, y: -10 },
-        { x: 14, y: 34 },
-        { x: 48, y: 22 },
-        { x: 24, y: 42 },
-    ];
-    const offset = offsetPatterns[cloneIndex % offsetPatterns.length];
-    const xPx = clamp(
-        sourceXPx + offset.x,
-        0,
-        Math.max(0, containerRect.width - sourceWidthPx)
-    );
-    const yPx = clamp(
-        sourceYPx + offset.y,
-        0,
-        Math.max(0, containerRect.height - sourceHeightPx)
-    );
+function getUniqueSpellIds(spellsData: any): string[] {
+    if (!spellsData) {
+        return [];
+    }
 
-    return {
-        xPct: (xPx / containerRect.width) * 100,
-        yPct: (yPx / containerRect.height) * 100,
-        widthPct: sourceLayout.widthPct,
-    };
+    const ids: string[] = [];
+
+    if (Array.isArray(spellsData.cantrips)) {
+        ids.push(...spellsData.cantrips);
+    }
+
+    for (let level = 1; level <= 9; level++) {
+        const levelIds = spellsData[level]?.spellIds;
+        if (Array.isArray(levelIds)) {
+            ids.push(...levelIds);
+        }
+    }
+
+    return Array.from(new Set(ids.filter(Boolean)));
+}
+
+function normalizeHighlightedJournalPostPayload(payload: {
+    highlightedJournalPost?: JournalPost | null;
+}): JournalPost | null {
+    return payload.highlightedJournalPost ?? null;
 }
 
 export default function MatchPage(): JSX.Element {
@@ -270,17 +287,29 @@ export default function MatchPage(): JSX.Element {
     const campaignId = searchParams.get('campaignId') ?? '';
     const router = useRouter();
     const mapContainerRef = useRef<HTMLDivElement>(null);
+    const campaignSocketRef = useRef<CampaignSocket | null>(null);
     const diceBoxHostRef = useRef<HTMLDivElement>(null);
     const diceBoxRef = useRef<DiceBoxThreejs | null>(null);
     const diceBoxInitPromiseRef = useRef<Promise<DiceBoxThreejs> | null>(null);
     const diceRollSessionIdRef = useRef(0);
     const activeTokenInteractionRef = useRef<ActiveTokenInteraction | null>(null);
     const suppressTokenClickIdRef = useRef<string | null>(null);
+    const tokenBatchSyncTimeoutRef = useRef<number | null>(null);
+    const pendingTokenSocketUpdatesRef = useRef<
+        Record<string, { tokenId: string; xPct: number; yPct: number; widthPct: number }>
+    >({});
+    const musicPlayerFrameRef = useRef<HTMLIFrameElement | null>(null);
+    const hasHydratedMatchSyncRef = useRef(false);
+    const hasAppliedVisibleCharacterSyncRef = useRef(false);
+    const selectedCharacterIdRef = useRef('');
+    const selectedMapCharacterIdRef = useRef<string | null>(null);
+    const mapTokenLayoutByIdRef = useRef<Record<string, MapTokenLayout>>({});
     const [backgroundImage, setBackgroundImage] = useState<string>(
         SideImageBackground.src
     );
     const [sheetModalOpen, setSheetModalOpen] = useState(false);
     const [isMaster, setIsMaster] = useState(false);
+    const [isAdminPlayer, setIsAdminPlayer] = useState(false);
     const [isPlayer, setIsPlayer] = useState(false);
     const [gridVisible, setGridVisible] = useState(true);
     const [diceTrayOpen, setDiceTrayOpen] = useState(false);
@@ -295,8 +324,10 @@ export default function MatchPage(): JSX.Element {
     const [cloneModeOpen, setCloneModeOpen] = useState(false);
     const [activeEffect, setActiveEffect] = useState<MapEffect | null>(null);
     const [musics, setMusics] = useState<CampaignMusic[]>([]);
-    const [mapImages, setMapImages] = useState<{ link: string }[]>([]);
+    const [mapImages, setMapImages] = useState<ImageObject[]>([]);
     const [playingMusicId, setPlayingMusicId] = useState<string | null>(null);
+    const [musicVolume, setMusicVolume] = useState(50);
+    const [musicVolumeOpen, setMusicVolumeOpen] = useState(false);
     const [charPanelOpen, setCharPanelOpen] = useState(false);
     const [charPanelTab, setCharPanelTab] = useState<'resumo' | 'magias' | 'habilidades'>(
         'resumo'
@@ -318,6 +349,7 @@ export default function MatchPage(): JSX.Element {
     const [selectedMapCharacterId, setSelectedMapCharacterId] = useState<string | null>(
         null
     );
+    const [characterDetailRefreshVersion, setCharacterDetailRefreshVersion] = useState(0);
     const [selectedCharacterId, setSelectedCharacterId] = useState<string>('');
     const [selectedCharacter, setSelectedCharacter] = useState<FullCharacterDnd | null>(
         null
@@ -348,6 +380,7 @@ export default function MatchPage(): JSX.Element {
 
     const previousCampaignCharacterIdsRef = useRef<string[]>([]);
     const hasInitializedVisibleMapCharactersRef = useRef(false);
+    const loadedSpellKeyRef = useRef<string | null>(null);
     const [dicePickerState, setDicePickerState] = useState<{
         sides: number;
         label: string;
@@ -357,6 +390,7 @@ export default function MatchPage(): JSX.Element {
     const [diceRollSession, setDiceRollSession] = useState<DiceRollSession>(
         createIdleDiceRollSession
     );
+    const reportSocketIssue = (_message: string) => undefined;
 
     const dismissDiceRoll = () => {
         diceRollSessionIdRef.current += 1;
@@ -367,6 +401,29 @@ export default function MatchPage(): JSX.Element {
     const handleDiceLayerClick = () => {
         if (diceRollSession.status !== 'settled') return;
         dismissDiceRoll();
+    };
+
+    const applyMusicVolume = (volume: number) => {
+        const playerWindow = musicPlayerFrameRef.current?.contentWindow;
+
+        if (!playerWindow) {
+            return;
+        }
+
+        const muteCommand =
+            volume <= 0
+                ? { event: 'command', func: 'mute', args: [] }
+                : { event: 'command', func: 'unMute', args: [] };
+
+        playerWindow.postMessage(JSON.stringify(muteCommand), '*');
+        playerWindow.postMessage(
+            JSON.stringify({
+                event: 'command',
+                func: 'setVolume',
+                args: [volume],
+            }),
+            '*'
+        );
     };
 
     const loadHighlightedJournalPost = async (options?: {
@@ -427,7 +484,7 @@ export default function MatchPage(): JSX.Element {
         setJournalHighlightModalOpen(true);
         setJournalHighlightError('');
 
-        const requests: Promise<unknown>[] = [
+        const requests: Promise<any>[] = [
             loadHighlightedJournalPost({ suppressErrorState: false }),
         ];
 
@@ -444,10 +501,11 @@ export default function MatchPage(): JSX.Element {
 
         try {
             if (areJournalPostsEqual(highlightedJournalPost, post)) {
+                setHighlightedJournalPost(null);
+                setJournalHighlightReaderOpen(false);
                 await setCampaignHighlightedJournalPost(campaignId, {
                     toggle: 'off',
                 });
-                setHighlightedJournalPost(null);
                 return;
             }
 
@@ -469,28 +527,41 @@ export default function MatchPage(): JSX.Element {
         setJournalHighlightError('');
 
         try {
-            const currentHighlightedPost =
-                highlightedJournalPost ??
-                (await loadHighlightedJournalPost({
-                    suppressErrorState: false,
-                }));
+            const currentHighlightedPost = await loadHighlightedJournalPost({
+                suppressErrorState: false,
+            });
 
             if (currentHighlightedPost) {
                 setJournalHighlightReaderOpen(true);
                 return;
             }
 
+            setJournalHighlightReaderOpen(false);
             setJournalHighlightNoticeMessage(
                 'Nenhuma publicação em destaque no momento.'
             );
             setJournalHighlightNoticeOpen(true);
         } catch (error: any) {
+            setJournalHighlightReaderOpen(false);
             setJournalHighlightNoticeMessage(
                 error?.message ?? 'Erro ao carregar publicação em destaque.'
             );
             setJournalHighlightNoticeOpen(true);
         }
     };
+
+    useEffect(() => {
+        if (!playingMusicId) {
+            setMusicVolumeOpen(false);
+            return;
+        }
+
+        const timeoutId = window.setTimeout(() => {
+            applyMusicVolume(musicVolume);
+        }, 700);
+
+        return () => window.clearTimeout(timeoutId);
+    }, [playingMusicId, musicVolume]);
 
     const ensureDiceBox = async (): Promise<DiceBoxThreejs> => {
         if (diceBoxRef.current) {
@@ -536,6 +607,9 @@ export default function MatchPage(): JSX.Element {
 
     const rollDice = async () => {
         if (!dicePickerState || diceRollSession.status !== 'idle') return;
+        const socket = campaignSocketRef.current;
+        if (!socket) return;
+
         const { count, sides, label } = dicePickerState;
         const notation = `${count}d${sides}`;
         const rollLabel = count > 1 ? `${count}${label}` : label;
@@ -553,25 +627,17 @@ export default function MatchPage(): JSX.Element {
         });
 
         try {
-            const diceBox = await ensureDiceBox();
-            const result: DiceBoxThreejsRollResult = await diceBox.roll(notation);
-
-            if (diceRollSessionIdRef.current !== sessionId) return;
-
-            const rolls = result.sets
-                .flatMap((set) => set.rolls)
-                .map((roll) => Number(roll.value))
-                .filter((value) => Number.isFinite(value));
-            const total = Number(result.total);
-
-            setDiceRollSession({
-                status: 'settled',
-                label: rollLabel,
-                count,
+            const ack = await emitCampaignSocketAck(socket, 'dice:roll_requested', {
+                campaignId,
+                characterId: selectedCharacterId || null,
                 notation,
-                rolls,
-                total,
+                label: rollLabel,
+                visibility: 'room',
             });
+
+            if (!ack.ok && diceRollSessionIdRef.current === sessionId) {
+                dismissDiceRoll();
+            }
         } catch (error) {
             if (diceRollSessionIdRef.current === sessionId) {
                 dismissDiceRoll();
@@ -584,19 +650,608 @@ export default function MatchPage(): JSX.Element {
             ? JSON.parse(localStorage.getItem('userLogged') as string)
             : null;
 
+    const getMapLinkById = (mapId: string | null): string => {
+        if (!mapId) return SideImageBackground.src;
+
+        return mapImages.find((map) => map.id === mapId)?.link ?? SideImageBackground.src;
+    };
+
+    const canMoveCharacterToken = (character: CampaignCharacter): boolean => {
+        if (!userInfo?.userId) return false;
+
+        return isMaster || isAdminPlayer || character.authorUserId === userInfo.userId;
+    };
+
+    const getTokenIdentity = (
+        tokenId: string
+    ): { characterId: string; isClone: boolean } | null => {
+        const baseCharacterId = getCharacterIdFromBaseTokenId(tokenId);
+
+        if (baseCharacterId) {
+            return {
+                characterId: baseCharacterId,
+                isClone: false,
+            };
+        }
+
+        const cloneToken = clonedMapTokens.find((token) => token.tokenId === tokenId);
+
+        if (!cloneToken) {
+            return null;
+        }
+
+        return {
+            characterId: cloneToken.characterId,
+            isClone: true,
+        };
+    };
+
+    const normalizeIncomingToken = (
+        payload: MatchToken | TokenWrappedPayload
+    ): MatchToken | null => {
+        if ('token' in payload) {
+            return payload.token;
+        }
+
+        return payload;
+    };
+
+    const normalizeIncomingTokenBatch = (
+        payload: TokenBatchUpdatedPayload | TokenBatchWrappedPayload
+    ): { campaignId: string; tokens: MatchToken[] } => {
+        if ('tokens' in payload) {
+            return {
+                campaignId: payload.campaignId,
+                tokens: payload.tokens,
+            };
+        }
+
+        return {
+            campaignId: payload.campaignId,
+            tokens: payload.updates,
+        };
+    };
+
+    const clearTokenBatchSyncTimeout = () => {
+        if (tokenBatchSyncTimeoutRef.current === null) return;
+
+        window.clearTimeout(tokenBatchSyncTimeoutRef.current);
+        tokenBatchSyncTimeoutRef.current = null;
+    };
+
+    const flushPendingTokenSocketUpdates = async (): Promise<boolean> => {
+        const socket = campaignSocketRef.current;
+        const updates = Object.values(pendingTokenSocketUpdatesRef.current);
+
+        clearTokenBatchSyncTimeout();
+
+        if (!socket || !campaignId || updates.length === 0) {
+            pendingTokenSocketUpdatesRef.current = {};
+            return true;
+        }
+
+        pendingTokenSocketUpdatesRef.current = {};
+
+        const normalizedUpdates = updates
+            .map((update) => {
+                const tokenIdentity = getTokenIdentity(update.tokenId);
+
+                if (!tokenIdentity) {
+                    return null;
+                }
+
+                return {
+                    ...update,
+                    characterId: tokenIdentity.characterId,
+                    isClone: tokenIdentity.isClone,
+                };
+            })
+            .filter(Boolean) as Array<{
+            tokenId: string;
+            characterId?: string;
+            isClone?: boolean;
+            xPct: number;
+            yPct: number;
+            widthPct: number;
+        }>;
+
+        if (normalizedUpdates.length === 0) {
+            return true;
+        }
+
+        const ack = await emitCampaignSocketAck(socket, 'token:batch_update', {
+            campaignId,
+            updates: normalizedUpdates,
+        });
+
+        if (!ack.ok) {
+            reportSocketIssue(ack.error.message);
+            return false;
+        }
+
+        return true;
+    };
+
+    const scheduleTokenSocketUpdate = (update: {
+        tokenId: string;
+        xPct: number;
+        yPct: number;
+        widthPct: number;
+    }) => {
+        pendingTokenSocketUpdatesRef.current[update.tokenId] = update;
+
+        if (tokenBatchSyncTimeoutRef.current !== null) {
+            return;
+        }
+
+        tokenBatchSyncTimeoutRef.current = window.setTimeout(() => {
+            flushPendingTokenSocketUpdates().catch((error) => {
+                reportSocketIssue(String(error));
+            });
+        }, 120);
+    };
+
+    const shouldIgnoreIncomingTokenUpdate = (token: MatchToken): boolean => {
+        return (
+            activeTokenInteractionRef.current?.tokenId === token.tokenId &&
+            token.updatedBy === userInfo?.userId
+        );
+    };
+
+    const applyIncomingToken = (token: MatchToken) => {
+        if (shouldIgnoreIncomingTokenUpdate(token)) return;
+
+        setMapTokenLayoutById((current) => ({
+            ...current,
+            [token.tokenId]: {
+                xPct: token.xPct,
+                yPct: token.yPct,
+                widthPct: token.widthPct,
+            },
+        }));
+
+        if (token.isClone) {
+            setClonedMapTokens((current) =>
+                current.some((entry) => entry.tokenId === token.tokenId)
+                    ? current.map((entry) =>
+                          entry.tokenId === token.tokenId
+                              ? {
+                                    ...entry,
+                                    characterId: token.characterId,
+                                }
+                              : entry
+                      )
+                    : [
+                          ...current,
+                          {
+                              tokenId: token.tokenId,
+                              characterId: token.characterId,
+                              isClone: true,
+                          },
+                      ]
+            );
+        }
+    };
+
+    const applyIncomingTokenBatch = (tokens: MatchToken[]) => {
+        const filteredTokens = tokens.filter(
+            (token) => !shouldIgnoreIncomingTokenUpdate(token)
+        );
+
+        if (filteredTokens.length === 0) return;
+
+        setMapTokenLayoutById((current) => {
+            const nextLayouts = { ...current };
+
+            filteredTokens.forEach((token) => {
+                nextLayouts[token.tokenId] = {
+                    xPct: token.xPct,
+                    yPct: token.yPct,
+                    widthPct: token.widthPct,
+                };
+            });
+
+            return nextLayouts;
+        });
+
+        setClonedMapTokens((current) => {
+            const cloneMap = new Map(current.map((token) => [token.tokenId, token]));
+
+            filteredTokens
+                .filter((token) => token.isClone)
+                .forEach((token) => {
+                    cloneMap.set(token.tokenId, {
+                        tokenId: token.tokenId,
+                        characterId: token.characterId,
+                        isClone: true,
+                    });
+                });
+
+            return Array.from(cloneMap.values());
+        });
+    };
+
+    const applySocketTokenSnapshot = (tokens: MatchToken[]) => {
+        setClonedMapTokens(
+            tokens
+                .filter((token) => token.isClone)
+                .map((token) => ({
+                    tokenId: token.tokenId,
+                    characterId: token.characterId,
+                    isClone: true,
+                }))
+        );
+        setMapTokenLayoutById(
+            Object.fromEntries(
+                tokens.map((token) => [
+                    token.tokenId,
+                    {
+                        xPct: token.xPct,
+                        yPct: token.yPct,
+                        widthPct: token.widthPct,
+                    },
+                ])
+            )
+        );
+    };
+
+    const playResolvedDiceRoll = async (payload: DiceRollResolvedPayload) => {
+        const sessionId = diceRollSessionIdRef.current + 1;
+        diceRollSessionIdRef.current = sessionId;
+
+        setDicePickerState(null);
+        setDiceRollSession({
+            status: 'rolling',
+            label: payload.label,
+            count: payload.rolls.length || 1,
+            notation: payload.notation,
+            rolls: null,
+            total: null,
+        });
+
+        try {
+            const diceBox = await ensureDiceBox();
+            await diceBox.roll(payload.notation);
+
+            if (diceRollSessionIdRef.current !== sessionId) return;
+
+            setDiceRollSession({
+                status: 'settled',
+                label: payload.label,
+                count: payload.rolls.length || 1,
+                notation: payload.notation,
+                rolls: payload.rolls,
+                total: payload.total,
+            });
+        } catch (error) {
+            if (diceRollSessionIdRef.current === sessionId) {
+                setDiceRollSession({
+                    status: 'settled',
+                    label: payload.label,
+                    count: payload.rolls.length || 1,
+                    notation: payload.notation,
+                    rolls: payload.rolls,
+                    total: payload.total,
+                });
+            }
+        }
+    };
+
     useEffect(() => {
         return () => {
             diceRollSessionIdRef.current += 1;
+            clearTokenBatchSyncTimeout();
             diceBoxRef.current?.clearDice();
             diceBoxHostRef.current?.replaceChildren();
         };
     }, []);
 
     useEffect(() => {
+        const warningMessage =
+            'Atualizar esta pagina pode levar a comportamentos inesperados, por favor, se possível saia da partida e entre novamente.';
+
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+            event.preventDefault();
+            event.returnValue = warningMessage;
+            return warningMessage;
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!campaignId || !userInfo?.userId) return;
+
+        hasHydratedMatchSyncRef.current = false;
+        hasAppliedVisibleCharacterSyncRef.current = false;
+
+        const socket = getCampaignSocket();
+        campaignSocketRef.current = socket;
+
+        const handleCampaignSync = (payload: CampaignSyncPayload) => {
+            if (payload.campaignId !== campaignId) return;
+
+            hasHydratedMatchSyncRef.current = true;
+            setBackgroundImage((current) => {
+                if (payload.match.activeMap) {
+                    return payload.match.activeMap;
+                }
+
+                return current || mapImages[0]?.link || SideImageBackground.src;
+            });
+            setGridVisible(payload.match.gridVisible);
+            setActiveEffect(payload.match.activeEffect);
+            setPlayingMusicId(payload.match.playingMusicId);
+
+            if (payload.match.visibleCharacterIds.length > 0) {
+                hasAppliedVisibleCharacterSyncRef.current = true;
+                setVisibleMapCharacterIds(payload.match.visibleCharacterIds);
+            }
+
+            setHighlightedJournalPost(
+                normalizeHighlightedJournalPostPayload(payload.match)
+            );
+            applySocketTokenSnapshot(payload.match.tokens);
+        };
+
+        const handleMapChanged = (payload: {
+            campaignId: string;
+            activeMap: string | null;
+        }) => {
+            if (payload.campaignId !== campaignId) return;
+            setBackgroundImage((current) => {
+                if (payload.activeMap) {
+                    return payload.activeMap;
+                }
+
+                return current || mapImages[0]?.link || SideImageBackground.src;
+            });
+        };
+
+        const handleGridChanged = (payload: {
+            campaignId: string;
+            gridVisible: boolean;
+        }) => {
+            if (payload.campaignId !== campaignId) return;
+            setGridVisible(payload.gridVisible);
+        };
+
+        const handleEffectChanged = (payload: {
+            campaignId: string;
+            activeEffect: MapEffect | null;
+        }) => {
+            if (payload.campaignId !== campaignId) return;
+            setActiveEffect(payload.activeEffect);
+        };
+
+        const handleMusicChanged = (payload: {
+            campaignId: string;
+            playingMusicId: string | null;
+        }) => {
+            if (payload.campaignId !== campaignId) return;
+            setPlayingMusicId(payload.playingMusicId);
+        };
+
+        const handleVisibleCharactersChanged = (payload: {
+            campaignId: string;
+            visibleCharacterIds: string[];
+        }) => {
+            if (payload.campaignId !== campaignId) return;
+
+            hasHydratedMatchSyncRef.current = true;
+            hasAppliedVisibleCharacterSyncRef.current = true;
+            setVisibleMapCharacterIds(payload.visibleCharacterIds);
+        };
+
+        const handleTokenCloneCreated = (payload: MatchToken | TokenWrappedPayload) => {
+            const token = normalizeIncomingToken(payload);
+
+            if (
+                !token ||
+                ('campaignId' in payload && payload.campaignId !== campaignId)
+            ) {
+                return;
+            }
+
+            applyIncomingToken(token);
+        };
+
+        const handleTokenUpdated = (payload: MatchToken | TokenWrappedPayload) => {
+            const token = normalizeIncomingToken(payload);
+
+            if (
+                !token ||
+                ('campaignId' in payload && payload.campaignId !== campaignId)
+            ) {
+                return;
+            }
+
+            applyIncomingToken(token);
+        };
+
+        const handleTokenBatchUpdated = (
+            payload: TokenBatchUpdatedPayload | TokenBatchWrappedPayload
+        ) => {
+            const normalizedPayload = normalizeIncomingTokenBatch(payload);
+
+            if (normalizedPayload.campaignId !== campaignId) return;
+            applyIncomingTokenBatch(normalizedPayload.tokens);
+        };
+
+        const handleTokenDeleted = (payload: TokenDeletedPayload) => {
+            if (payload.campaignId !== campaignId) return;
+
+            setClonedMapTokens((current) =>
+                current.filter((token) => token.tokenId !== payload.tokenId)
+            );
+            setMapTokenLayoutById((current) => {
+                const nextLayouts = { ...current };
+                delete nextLayouts[payload.tokenId];
+                return nextLayouts;
+            });
+        };
+
+        const handleDiceRollResolved = (payload: DiceRollResolvedPayload) => {
+            if (payload.campaignId !== campaignId) return;
+
+            playResolvedDiceRoll(payload).catch((error) => {
+                reportSocketIssue(String(error));
+            });
+        };
+
+        const handleJournalHighlightChanged = (payload: {
+            campaignId: string;
+            highlightedJournalPost?: SocketJournal | null;
+        }) => {
+            if (payload.campaignId !== campaignId) return;
+            const nextHighlightedPost = normalizeHighlightedJournalPostPayload(payload);
+
+            setHighlightedJournalPost(nextHighlightedPost);
+
+            if (!nextHighlightedPost) {
+                setJournalHighlightReaderOpen(false);
+            }
+        };
+
+        const handleJournalPostCreated = (payload: {
+            campaignId: string;
+            post: SocketJournal;
+        }) => {
+            if (payload.campaignId !== campaignId) return;
+
+            setJournalPosts((current) =>
+                current.some((post) =>
+                    post.postId
+                        ? post.postId === payload.post.postId
+                        : post.title === payload.post.title &&
+                          post.timestamp === payload.post.timestamp
+                )
+                    ? current
+                    : [payload.post, ...current]
+            );
+        };
+
+        const handleCharacterUpdated = (payload: CharacterUpdatedPayload) => {
+            if (payload.campaignId !== campaignId) return;
+
+            setCampaignCharacterSummaries((current) => ({
+                ...current,
+                [payload.characterId]: {
+                    currentHitPoints: payload.summary.currentHitPoints,
+                    level: payload.summary.level,
+                },
+            }));
+
+            if (selectedCharacterIdRef.current === payload.characterId) {
+                setCharacterLoading(true);
+                getCharacterById(payload.characterId)
+                    .then((data) => setSelectedCharacter(data))
+                    .finally(() => setCharacterLoading(false));
+            }
+
+            if (selectedMapCharacterIdRef.current === payload.characterId) {
+                setCharacterDetailRefreshVersion((current) => current + 1);
+            }
+
+            if (
+                payload.updatedFields.some(
+                    (field) => field.startsWith('profile') || field.startsWith('picture')
+                )
+            ) {
+                getCharactersByCampaignLobby(campaignId).then((data) => {
+                    setCampaignCharacters(data);
+                });
+            }
+        };
+
+        const handleMapsUpdated = (payload: CampaignMapsUpdatedPayload) => {
+            if (payload.campaignId !== campaignId) return;
+            setMapImages(payload.mapImages);
+        };
+
+        const handleMusicsUpdated = (payload: CampaignMusicsUpdatedPayload) => {
+            if (payload.campaignId !== campaignId) return;
+            setMusics(payload.musics);
+        };
+
+        const handleSocketError = (payload: { message: string }) => {
+            reportSocketIssue(payload.message);
+        };
+
+        socket.on('campaign:sync', handleCampaignSync);
+        socket.on('match:map_changed', handleMapChanged as never);
+        socket.on('match:grid_changed', handleGridChanged as never);
+        socket.on('match:effect_changed', handleEffectChanged as never);
+        socket.on('match:music_changed', handleMusicChanged as never);
+        socket.on(
+            'match:visible_characters_changed',
+            handleVisibleCharactersChanged as never
+        );
+        socket.on('token:clone_created', handleTokenCloneCreated);
+        socket.on('token:updated', handleTokenUpdated);
+        socket.on('token:batch_updated', handleTokenBatchUpdated as never);
+        socket.on('token:deleted', handleTokenDeleted as never);
+        socket.on('dice:roll_resolved', handleDiceRollResolved);
+        socket.on('journal:highlight_changed', handleJournalHighlightChanged as never);
+        socket.on('journal:post_created', handleJournalPostCreated as never);
+        socket.on('character:updated', handleCharacterUpdated as never);
+        socket.on('campaign:maps_updated', handleMapsUpdated);
+        socket.on('campaign:musics_updated', handleMusicsUpdated);
+        socket.on('campaign:error', handleSocketError as never);
+
+        emitCampaignSocketAck(socket, 'campaign:join', { campaignId }).then((ack) => {
+            if (!ack.ok) {
+                reportSocketIssue(ack.error.message);
+            }
+        });
+
+        return () => {
+            clearTokenBatchSyncTimeout();
+            pendingTokenSocketUpdatesRef.current = {};
+            socket.off('campaign:sync', handleCampaignSync);
+            socket.off('match:map_changed', handleMapChanged as never);
+            socket.off('match:grid_changed', handleGridChanged as never);
+            socket.off('match:effect_changed', handleEffectChanged as never);
+            socket.off('match:music_changed', handleMusicChanged as never);
+            socket.off(
+                'match:visible_characters_changed',
+                handleVisibleCharactersChanged as never
+            );
+            socket.off('token:clone_created', handleTokenCloneCreated);
+            socket.off('token:updated', handleTokenUpdated);
+            socket.off('token:batch_updated', handleTokenBatchUpdated as never);
+            socket.off('token:deleted', handleTokenDeleted as never);
+            socket.off('dice:roll_resolved', handleDiceRollResolved);
+            socket.off(
+                'journal:highlight_changed',
+                handleJournalHighlightChanged as never
+            );
+            socket.off('journal:post_created', handleJournalPostCreated as never);
+            socket.off('character:updated', handleCharacterUpdated as never);
+            socket.off('campaign:maps_updated', handleMapsUpdated);
+            socket.off('campaign:musics_updated', handleMusicsUpdated);
+            socket.off('campaign:error', handleSocketError as never);
+            campaignSocketRef.current = null;
+            disconnectCampaignSocket();
+        };
+    }, [campaignId, userInfo?.userId]);
+
+    useEffect(() => {
         if (!campaignId) return;
         getCampaignById(campaignId).then((data) => {
             const firstMap = data?.matchData?.mapImages?.[0]?.link;
-            if (firstMap) setBackgroundImage(firstMap);
+            if (firstMap) {
+                setBackgroundImage((current) =>
+                    !hasHydratedMatchSyncRef.current ||
+                    current === SideImageBackground.src
+                        ? firstMap
+                        : current
+                );
+            }
             setMusics(data?.musics ?? []);
             setMapImages(data?.matchData?.mapImages ?? []);
             if (data && userInfo?.userId) {
@@ -604,6 +1259,7 @@ export default function MatchPage(): JSX.Element {
                     (p: { userId: string; role: string }) => p.userId === userInfo.userId
                 )?.role;
                 setIsMaster(role === 'dungeon_master');
+                setIsAdminPlayer(role === 'admin_player');
                 setIsPlayer(role === 'player' || role === 'admin_player');
             }
         });
@@ -661,6 +1317,10 @@ export default function MatchPage(): JSX.Element {
     }, [campaignCharacters]);
 
     useEffect(() => {
+        if (campaignCharacters.length === 0) {
+            return;
+        }
+
         const validCharacterIds = new Set(
             campaignCharacters.map((character) => character.id)
         );
@@ -688,6 +1348,9 @@ export default function MatchPage(): JSX.Element {
 
         setVisibleMapCharacterIds((previousVisibleIds) => {
             if (!hasInitializedVisibleMapCharactersRef.current) {
+                if (hasAppliedVisibleCharacterSyncRef.current) {
+                    return currentIds.filter((id) => previousVisibleIds.includes(id));
+                }
                 return currentIds;
             }
 
@@ -801,39 +1464,55 @@ export default function MatchPage(): JSX.Element {
             classId ? getDnd5eClassById(classId) : Promise.resolve(null),
             raceId ? getDnd5eRaceById(raceId) : Promise.resolve(null),
         ]).then(([classData, raceData]) => {
-            setClassName(classData?.pt?.name ?? '');
-            setRaceName(raceData?.pt?.name ?? '');
+            setClassName(classData?.name ?? '');
+            setRaceName(raceData?.name ?? '');
         });
     }, [selectedCharacter?.data?.profile?.class, selectedCharacter?.data?.profile?.race]);
 
+    const spellData = (selectedCharacter?.data?.spells as any) ?? null;
+    const selectedCharacterSpellIds = getUniqueSpellIds(spellData);
+    const selectedCharacterSpellIdsKey = selectedCharacterSpellIds.join('|');
+
     useEffect(() => {
-        const spellsData = (selectedCharacter?.data?.spells as any) ?? null;
-        if (!spellsData) {
-            setSpellNameMap({});
+        if (!charPanelOpen || charPanelTab !== 'magias') {
             return;
         }
 
-        const ids: string[] = [];
-        if (Array.isArray(spellsData.cantrips)) ids.push(...spellsData.cantrips);
-        for (let level = 1; level <= 9; level++) {
-            const levelIds = spellsData[level]?.spellIds;
-            if (Array.isArray(levelIds)) ids.push(...levelIds);
-        }
-
-        const uniqueIds = Array.from(new Set(ids.filter(Boolean)));
-        if (uniqueIds.length === 0) {
+        if (!selectedCharacterSpellIdsKey) {
             setSpellNameMap({});
+            loadedSpellKeyRef.current = null;
             return;
         }
 
-        Promise.all(uniqueIds.map((id) => getDnd5eSpellById(id))).then((results) => {
-            const map: Record<string, string> = {};
-            results.forEach((result: any, i: number) => {
-                if (result?.pt?.name) map[uniqueIds[i]] = result.pt.name;
-            });
-            setSpellNameMap(map);
-        });
-    }, [selectedCharacter?.data?.spells]);
+        if (loadedSpellKeyRef.current === selectedCharacterSpellIdsKey) {
+            return;
+        }
+
+        Promise.all(selectedCharacterSpellIds.map((id) => getDnd5eSpellById(id))).then(
+            (results) => {
+                const map: Record<string, string> = {};
+                results.forEach((result: any, i: number) => {
+                    if (result?.name) {
+                        map[selectedCharacterSpellIds[i]] = result.name;
+                    }
+                });
+                setSpellNameMap(map);
+                loadedSpellKeyRef.current = selectedCharacterSpellIdsKey;
+            }
+        );
+    }, [charPanelOpen, charPanelTab, selectedCharacterSpellIdsKey]);
+
+    useEffect(() => {
+        selectedCharacterIdRef.current = selectedCharacterId;
+    }, [selectedCharacterId]);
+
+    useEffect(() => {
+        selectedMapCharacterIdRef.current = selectedMapCharacterId;
+    }, [selectedMapCharacterId]);
+
+    useEffect(() => {
+        mapTokenLayoutByIdRef.current = mapTokenLayoutById;
+    }, [mapTokenLayoutById]);
 
     const profile = selectedCharacter?.data?.profile;
     const stats = selectedCharacter?.data?.stats;
@@ -846,7 +1525,6 @@ export default function MatchPage(): JSX.Element {
     const deathSaves = stats?.deathSaves;
     const money = selectedCharacter?.data?.money;
 
-    const spellData = (selectedCharacter?.data?.spells as any) ?? null;
     const spellsByLevel: Array<{ label: string; items: string[]; slots?: string }> = [
         { label: 'Truques', items: spellData?.cantrips ?? [] },
         ...Array.from({ length: 9 }, (_, i) => {
@@ -938,11 +1616,18 @@ export default function MatchPage(): JSX.Element {
                     const maxXPx = Math.max(0, containerRect.width - widthPx);
                     const maxYPx = Math.max(0, containerRect.height - heightPx);
 
-                    nextLayouts[interaction.tokenId] = {
+                    const nextLayout = {
                         ...currentLayout,
                         xPct: (clamp(nextXPx, 0, maxXPx) / containerRect.width) * 100,
                         yPct: (clamp(nextYPx, 0, maxYPx) / containerRect.height) * 100,
                     };
+                    nextLayouts[interaction.tokenId] = nextLayout;
+                    scheduleTokenSocketUpdate({
+                        tokenId: interaction.tokenId,
+                        xPct: nextLayout.xPct,
+                        yPct: nextLayout.yPct,
+                        widthPct: nextLayout.widthPct,
+                    });
 
                     return nextLayouts;
                 }
@@ -963,7 +1648,7 @@ export default function MatchPage(): JSX.Element {
                 const nextWidthPct =
                     ((startWidthPx + resizeDelta) / containerRect.width) * 100;
 
-                nextLayouts[interaction.tokenId] = {
+                const nextLayout = {
                     ...currentLayout,
                     widthPct: clamp(
                         nextWidthPct,
@@ -974,18 +1659,42 @@ export default function MatchPage(): JSX.Element {
                         )
                     ),
                 };
+                nextLayouts[interaction.tokenId] = nextLayout;
+                scheduleTokenSocketUpdate({
+                    tokenId: interaction.tokenId,
+                    xPct: nextLayout.xPct,
+                    yPct: nextLayout.yPct,
+                    widthPct: nextLayout.widthPct,
+                });
 
                 return nextLayouts;
             });
         };
 
-        const handlePointerEnd = () => {
+        const handlePointerEnd = async () => {
             const interaction = activeTokenInteractionRef.current;
             if (interaction?.didMove) {
                 suppressTokenClickIdRef.current = interaction.tokenId;
             }
             activeTokenInteractionRef.current = null;
             setActiveTokenInteractionMeta(null);
+
+            if (!interaction?.didMove) {
+                return;
+            }
+
+            const didFlush = await flushPendingTokenSocketUpdates();
+
+            if (!didFlush) {
+                setMapTokenLayoutById((current) => ({
+                    ...current,
+                    [interaction.tokenId]: {
+                        xPct: interaction.startXPct,
+                        yPct: interaction.startYPct,
+                        widthPct: interaction.startWidthPct,
+                    },
+                }));
+            }
         };
 
         window.addEventListener('pointermove', handlePointerMove);
@@ -1002,9 +1711,11 @@ export default function MatchPage(): JSX.Element {
     const startTokenInteraction = (
         type: TokenInteractionType,
         event: React.PointerEvent<HTMLElement>,
-        tokenId: string
+        tokenId: string,
+        canMoveToken: boolean
     ) => {
         if (event.button !== 0) return;
+        if (type === 'drag' && !canMoveToken) return;
         if (type === 'resize' && !isMaster) return;
 
         const tokenLayout = mapTokenLayoutById[tokenId];
@@ -1041,33 +1752,142 @@ export default function MatchPage(): JSX.Element {
     };
 
     const handleCloneToken = (token: MapTokenInstance) => {
-        const container = mapContainerRef.current;
-        const sourceLayout = mapTokenLayoutById[token.tokenId];
-        if (!container || !sourceLayout) return;
+        const socket = campaignSocketRef.current;
+        const sourceLayout = mapTokenLayoutByIdRef.current[token.tokenId];
+        if (!socket || !sourceLayout) return;
 
-        const characterId = token.characterId;
-        const cloneTokenId = getCloneTokenId(characterId);
-        const cloneIndex =
-            clonedMapTokens.filter((cloneToken) => cloneToken.characterId === characterId)
-                .length + 1;
-        const cloneLayout = createCloneTokenLayout(
-            sourceLayout,
-            container.getBoundingClientRect(),
-            cloneIndex
-        );
+        emitCampaignSocketAck(socket, 'token:create_clone', {
+            campaignId,
+            characterId: token.characterId,
+            xPct: sourceLayout.xPct,
+            yPct: sourceLayout.yPct,
+            widthPct: sourceLayout.widthPct,
+        }).then((ack) => {
+            if (!ack.ok) {
+                reportSocketIssue(ack.error.message);
+            }
+        });
+    };
 
-        setClonedMapTokens((current) => [
-            ...current,
-            {
-                tokenId: cloneTokenId,
-                characterId,
-                isClone: true,
-            },
-        ]);
-        setMapTokenLayoutById((current) => ({
-            ...current,
-            [cloneTokenId]: cloneLayout,
-        }));
+    const handleDeleteCloneToken = (token: MapTokenInstance) => {
+        if (!token.isClone) return;
+
+        const socket = campaignSocketRef.current;
+        if (!socket) return;
+
+        emitCampaignSocketAck(socket, 'token:delete', {
+            campaignId,
+            tokenId: token.tokenId,
+        }).then((ack) => {
+            if (!ack.ok) {
+                reportSocketIssue(ack.error.message);
+                return;
+            }
+
+            setClonedMapTokens((current) =>
+                current.filter((entry) => entry.tokenId !== token.tokenId)
+            );
+            setMapTokenLayoutById((current) => {
+                if (!current[token.tokenId]) {
+                    return current;
+                }
+
+                const nextLayouts = { ...current };
+                delete nextLayouts[token.tokenId];
+                return nextLayouts;
+            });
+        });
+    };
+
+    const handleGridToggle = async () => {
+        const socket = campaignSocketRef.current;
+        if (!socket) return;
+
+        const previousValue = gridVisible;
+        const nextValue = !previousValue;
+
+        setGridVisible(nextValue);
+
+        const ack = await emitCampaignSocketAck(socket, 'match:set_grid', {
+            campaignId,
+            gridVisible: nextValue,
+        });
+
+        if (!ack.ok) {
+            setGridVisible(previousValue);
+        }
+    };
+
+    const handleEffectToggle = async (effect: MapEffect) => {
+        const socket = campaignSocketRef.current;
+        if (!socket) return;
+
+        const previousEffect = activeEffect;
+        const nextEffect = previousEffect === effect ? null : effect;
+
+        setActiveEffect(nextEffect);
+
+        const ack = await emitCampaignSocketAck(socket, 'match:set_effect', {
+            campaignId,
+            activeEffect: nextEffect,
+        });
+
+        if (!ack.ok) {
+            setActiveEffect(previousEffect);
+        }
+    };
+
+    const handleMusicSelection = async (musicId: string) => {
+        const socket = campaignSocketRef.current;
+        if (!socket) return;
+
+        const previousMusicId = playingMusicId;
+        const nextMusicId = previousMusicId === musicId ? null : musicId;
+
+        setPlayingMusicId(nextMusicId);
+
+        const ack = await emitCampaignSocketAck(socket, 'match:set_music', {
+            campaignId,
+            playingMusicId: nextMusicId,
+        });
+
+        if (!ack.ok) {
+            setPlayingMusicId(previousMusicId);
+        }
+    };
+
+    const handleMapSelection = async (mapId: string | null) => {
+        const socket = campaignSocketRef.current;
+        if (!socket) return;
+
+        const previousBackgroundImage = backgroundImage;
+        setBackgroundImage(getMapLinkById(mapId));
+
+        const ack = await emitCampaignSocketAck(socket, 'match:set_map', {
+            campaignId,
+            mapId,
+        });
+
+        if (!ack.ok) {
+            setBackgroundImage(previousBackgroundImage);
+        }
+    };
+
+    const handleVisibleCharacterIdsChange = async (nextIds: string[]) => {
+        const socket = campaignSocketRef.current;
+        if (!socket) return;
+
+        const previousIds = visibleMapCharacterIds;
+        setVisibleMapCharacterIds(nextIds);
+
+        const ack = await emitCampaignSocketAck(socket, 'match:set_visible_characters', {
+            campaignId,
+            visibleCharacterIds: nextIds,
+        });
+
+        if (!ack.ok) {
+            setVisibleMapCharacterIds(previousIds);
+        }
     };
 
     return (
@@ -1111,6 +1931,7 @@ export default function MatchPage(): JSX.Element {
                         const tokenLayout = mapTokenLayoutById[token.tokenId];
                         const isInspectable =
                             token.isClone || character.authorUserId !== userInfo?.userId;
+                        const canMoveToken = canMoveCharacterToken(character);
                         const isActiveToken =
                             activeTokenInteractionMeta?.tokenId === token.tokenId;
 
@@ -1123,7 +1944,7 @@ export default function MatchPage(): JSX.Element {
                                 key={token.tokenId}
                                 className={`match-map-token${
                                     isInspectable ? ' match-map-token--inspectable' : ''
-                                }${
+                                }${!canMoveToken ? ' match-map-token--locked' : ''}${
                                     isActiveToken
                                         ? ` match-map-token--${activeTokenInteractionMeta?.type}`
                                         : ''
@@ -1135,7 +1956,12 @@ export default function MatchPage(): JSX.Element {
                                     width: `${tokenLayout.widthPct}%`,
                                 }}
                                 onPointerDown={(event) =>
-                                    startTokenInteraction('drag', event, token.tokenId)
+                                    startTokenInteraction(
+                                        'drag',
+                                        event,
+                                        token.tokenId,
+                                        canMoveToken
+                                    )
                                 }
                                 onClick={() => handleTokenClick(token, character)}
                             >
@@ -1143,10 +1969,23 @@ export default function MatchPage(): JSX.Element {
                                     {isMaster && cloneModeOpen && (
                                         <button
                                             type="button"
-                                            className="match-map-token-clone-handle"
-                                            aria-label={`Duplicar ${character.name}`}
+                                            className={`match-map-token-clone-handle${
+                                                token.isClone
+                                                    ? ' match-map-token-clone-handle--delete'
+                                                    : ''
+                                            }`}
+                                            aria-label={
+                                                token.isClone
+                                                    ? `Remover clone de ${character.name}`
+                                                    : `Duplicar ${character.name}`
+                                            }
                                             onClick={(event) => {
                                                 event.stopPropagation();
+                                                if (token.isClone) {
+                                                    handleDeleteCloneToken(token);
+                                                    return;
+                                                }
+
                                                 handleCloneToken(token);
                                             }}
                                             onPointerDown={(event) => {
@@ -1155,7 +1994,7 @@ export default function MatchPage(): JSX.Element {
                                             }}
                                         >
                                             <span className="match-map-token-clone-icon">
-                                                +
+                                                {token.isClone ? '×' : '+'}
                                             </span>
                                         </button>
                                     )}
@@ -1182,7 +2021,8 @@ export default function MatchPage(): JSX.Element {
                                                 startTokenInteraction(
                                                     'resize',
                                                     event,
-                                                    token.tokenId
+                                                    token.tokenId,
+                                                    canMoveToken
                                                 )
                                             }
                                         >
@@ -1569,7 +2409,7 @@ export default function MatchPage(): JSX.Element {
                         onClick={() => setNotesModalOpen(true)}
                     >
                         <Image
-                            src={NotesBlueSVG.src}
+                            src={EditBlueSVG.src}
                             alt="Anotações"
                             width={28}
                             height={28}
@@ -1585,7 +2425,7 @@ export default function MatchPage(): JSX.Element {
                     <button
                         className="match-top-bar-item"
                         title={gridVisible ? 'Ocultar grid' : 'Mostrar grid'}
-                        onClick={() => setGridVisible((v) => !v)}
+                        onClick={handleGridToggle}
                     >
                         <Image
                             src={gridVisible ? GridOffSVG.src : GridOnSVG.src}
@@ -1618,6 +2458,47 @@ export default function MatchPage(): JSX.Element {
                         height={28}
                     />
                 </button>
+                <div className="match-bottom-bar-control">
+                    <button
+                        className={`match-bottom-bar-item${
+                            !playingMusicId ? ' match-bottom-bar-item--disabled' : ''
+                        }`}
+                        title={
+                            playingMusicId
+                                ? 'Volume da mÃºsica'
+                                : 'Nenhuma mÃºsica em reproduÃ§Ã£o'
+                        }
+                        onClick={() => {
+                            if (!playingMusicId) return;
+                            setMusicVolumeOpen((current) => !current);
+                        }}
+                        disabled={!playingMusicId}
+                    >
+                        <Image src={VolumeSVG.src} alt="Volume" width={28} height={28} />
+                    </button>
+                    {musicVolumeOpen && playingMusicId && (
+                        <div className="match-volume-panel">
+                            <span className="match-volume-label font-XXS-bold">
+                                Volume
+                            </span>
+                            <input
+                                className="match-volume-slider"
+                                type="range"
+                                min={0}
+                                max={100}
+                                step={1}
+                                value={musicVolume}
+                                onChange={(event) =>
+                                    setMusicVolume(Number(event.target.value))
+                                }
+                                aria-label="Controlar volume da mÃºsica"
+                            />
+                            <span className="match-volume-value font-XXS-regular">
+                                {musicVolume}%
+                            </span>
+                        </div>
+                    )}
+                </div>
                 {isPlayer && (
                     <button
                         className="match-bottom-bar-item"
@@ -1625,7 +2506,7 @@ export default function MatchPage(): JSX.Element {
                         onClick={() => setNotesModalOpen(true)}
                     >
                         <Image
-                            src={NotesBlueSVG.src}
+                            src={EditBlueSVG.src}
                             alt="Anotações"
                             width={28}
                             height={28}
@@ -1813,6 +2694,7 @@ export default function MatchPage(): JSX.Element {
 
             {selectedMapCharacterId && campaignId && (
                 <CharacterDetailModal
+                    key={`${selectedMapCharacterId}-${characterDetailRefreshVersion}`}
                     characterId={selectedMapCharacterId}
                     campaignId={campaignId}
                     isMaster={isMaster}
@@ -1825,11 +2707,9 @@ export default function MatchPage(): JSX.Element {
                     musics={musics}
                     mapImages={mapImages}
                     selectedMusic={playingMusicId}
-                    onMusicSelect={(id) =>
-                        setPlayingMusicId((prev) => (prev === id ? null : id))
-                    }
+                    onMusicSelect={handleMusicSelection}
                     onClose={() => setMediaModalOpen(false)}
-                    onMapSelect={(link) => setBackgroundImage(link)}
+                    onMapSelect={handleMapSelection}
                 />
             )}
 
@@ -1845,9 +2725,7 @@ export default function MatchPage(): JSX.Element {
                 <MatchEffectsModal
                     activeEffect={activeEffect}
                     onClose={() => setEffectsModalOpen(false)}
-                    onToggleEffect={(effect) =>
-                        setActiveEffect((current) => (current === effect ? null : effect))
-                    }
+                    onToggleEffect={handleEffectToggle}
                 />
             )}
 
@@ -1859,10 +2737,12 @@ export default function MatchPage(): JSX.Element {
                     onClose={() => setAvatarSelectionModalOpen(false)}
                     onSearchChange={setAvatarSearch}
                     onToggleCharacter={(characterId) =>
-                        setVisibleMapCharacterIds((current) =>
-                            current.includes(characterId)
-                                ? current.filter((id) => id !== characterId)
-                                : [...current, characterId]
+                        handleVisibleCharacterIdsChange(
+                            visibleMapCharacterIds.includes(characterId)
+                                ? visibleMapCharacterIds.filter(
+                                      (id) => id !== characterId
+                                  )
+                                : [...visibleMapCharacterIds, characterId]
                         )
                     }
                 />
@@ -2006,10 +2886,12 @@ export default function MatchPage(): JSX.Element {
             {/* Persistent YouTube player (hidden) */}
             {playingMusicId && (
                 <iframe
+                    ref={musicPlayerFrameRef}
                     key={playingMusicId}
-                    src={`https://www.youtube.com/embed/${playingMusicId}?autoplay=1&loop=1&playlist=${playingMusicId}`}
+                    src={`https://www.youtube.com/embed/${playingMusicId}?autoplay=1&loop=1&playlist=${playingMusicId}&enablejsapi=1&controls=0`}
                     allow="autoplay; encrypted-media"
                     className="hidden"
+                    onLoad={() => applyMusicVolume(musicVolume)}
                 />
             )}
         </div>

@@ -3,6 +3,7 @@ import { useMemo, useState, useEffect, useCallback } from 'react';
 import TableriseContext from '@/context/TableriseContext';
 import { UserCampaignsContract } from '@/types/modules/context/TableriseContext';
 import { getCampaignsByUserId } from '@/server/campaigns/get-campaigns';
+import type { DatabaseCampaign } from '@/types/shared/entities';
 
 export default function TableriseProvider({
     children,
@@ -33,43 +34,55 @@ export default function TableriseProvider({
                 player: [],
             } as UserCampaignsContract;
 
-            userCampaigns.master.forEach((campaign: any) => {
+            userCampaigns.master.forEach((campaign: DatabaseCampaign) => {
                 userCampaignsHomeData.master.push({
-                    campaignId: campaign.campaignId,
+                    campaignId: campaign.campaignId ?? '',
                     title: campaign.title,
                     cover: campaign.cover,
                     description: campaign.description,
+                    mainHistory: campaign.mainHistory ?? '',
                     system: campaign.system,
                     ageRestriction: campaign.ageRestriction,
+                    visibility: campaign.infos.visibility,
                     campaignPlayers: campaign.campaignPlayers ?? [],
                     infos: {
                         nextMatchDate: campaign.infos.nextMatchDate,
                         playerAmountLimit: campaign.infos.playerAmountLimit,
-                        socialMedia: campaign.infos.socialMedia ?? [],
+                        socialMedia: campaign.infos.socialMedia ?? {},
+                        nextSessionResume: campaign.matchData?.nextSessionResume ?? '',
                     },
                     matchData: {
                         confirmedPlayers: campaign.matchData?.confirmedPlayers ?? [],
+                        mapImages: campaign.matchData?.mapImages ?? [],
+                        nextSessionResume: campaign.matchData?.nextSessionResume ?? '',
                     },
+                    musics: campaign.musics ?? [],
                 });
             });
 
-            userCampaigns.player.forEach((campaign: any) => {
+            userCampaigns.player.forEach((campaign: DatabaseCampaign) => {
                 userCampaignsHomeData.player.push({
-                    campaignId: campaign.campaignId,
+                    campaignId: campaign.campaignId ?? '',
                     title: campaign.title,
                     cover: campaign.cover,
                     description: campaign.description,
+                    mainHistory: campaign.mainHistory ?? '',
                     system: campaign.system,
                     ageRestriction: campaign.ageRestriction,
+                    visibility: campaign.infos.visibility,
                     campaignPlayers: campaign.campaignPlayers ?? [],
                     infos: {
                         nextMatchDate: campaign.infos.nextMatchDate,
                         playerAmountLimit: campaign.infos.playerAmountLimit,
-                        socialMedia: campaign.infos.socialMedia ?? [],
+                        socialMedia: campaign.infos.socialMedia ?? {},
+                        nextSessionResume: campaign.matchData?.nextSessionResume ?? '',
                     },
                     matchData: {
                         confirmedPlayers: campaign.matchData?.confirmedPlayers ?? [],
+                        mapImages: campaign.matchData?.mapImages ?? [],
+                        nextSessionResume: campaign.matchData?.nextSessionResume ?? '',
                     },
+                    musics: campaign.musics ?? [],
                 });
             });
 

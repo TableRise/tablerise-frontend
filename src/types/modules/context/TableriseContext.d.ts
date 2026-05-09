@@ -1,34 +1,41 @@
-import { ImageObject } from '@/types/shared/general';
+import type { ImageObject } from '@/types/shared/general';
+import type { DatabaseCampaign, DatabaseCampaignPlayer } from '@/types/shared/entities';
 
-interface CampaignPlayer {
-    userId: string;
-    userId_sk: string;
-    userId_pk: string;
-    role: string;
-}
+export type CampaignPlayer = DatabaseCampaignPlayer & {
+    userId_sk?: string;
+    userId_pk?: string;
+};
 
-interface UserCampaign {
+export type UserCampaign = Omit<
+    Pick<
+        DatabaseCampaign,
+        | 'campaignId'
+        | 'title'
+        | 'description'
+        | 'mainHistory'
+        | 'system'
+        | 'ageRestriction'
+        | 'musics'
+    >,
+    'campaignPlayers' | 'cover'
+> & {
     campaignId: string;
-    title: string;
     cover: ImageObject;
-    description: string;
-    system: string;
-    ageRestriction: string;
-    visibility: string;
+    visibility: DatabaseCampaign['infos']['visibility'];
     campaignPlayers: CampaignPlayer[];
     infos: {
-        nextMatchDate: string;
-        playerAmountLimit?: number;
-        socialMedia?: { discord?: string; twitter?: string; youtube?: string };
-        nextSessionResume?: string;
+        nextMatchDate: DatabaseCampaign['infos']['nextMatchDate'];
+        playerAmountLimit?: DatabaseCampaign['infos']['playerAmountLimit'];
+        socialMedia?: DatabaseCampaign['infos']['socialMedia'];
+        nextSessionResume?: DatabaseCampaign['matchData']['nextSessionResume'];
     };
     matchData?: {
-        confirmedPlayers?: string[];
-        mapImages?: { link: string }[];
-        nextSessionResume?: string;
+        confirmedPlayers?: Array<string | Pick<CampaignPlayer, 'userId' | 'role'>>;
+        mapImages?: ImageObject[];
+        nextSessionResume?: DatabaseCampaign['matchData']['nextSessionResume'];
     };
-    musics?: { id: string; title: string; thumbnail: string }[];
-}
+    musics?: DatabaseCampaign['musics'];
+};
 
 export interface UserCampaignsContract {
     master: UserCampaign[];

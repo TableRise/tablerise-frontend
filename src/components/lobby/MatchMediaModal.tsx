@@ -2,15 +2,16 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import type { CampaignMusic } from '@/server/campaigns/create-campaign';
+import type { ImageObject } from '@/types/shared/general';
 import '@/components/lobby/styles/MatchMediaModal.css';
 
 interface MatchMediaModalProps {
     musics: CampaignMusic[];
-    mapImages: { link: string }[];
+    mapImages: ImageObject[];
     selectedMusic: string | null;
     onMusicSelect: (id: string) => void;
     onClose: () => void;
-    onMapSelect: (link: string) => void;
+    onMapSelect: (mapId: string | null) => void;
 }
 
 export default function MatchMediaModal({
@@ -103,11 +104,11 @@ export default function MatchMediaModal({
                             )}
                             {mapImages.map((map, i) => (
                                 <button
-                                    key={i}
+                                    key={map.id ?? i}
                                     className="mmm-map-item"
-                                    title={`Mapa ${i + 1}`}
+                                    title={map.title || `Mapa ${i + 1}`}
                                     onClick={() => {
-                                        onMapSelect(map.link);
+                                        onMapSelect(map.id);
                                         onClose();
                                     }}
                                 >
@@ -118,7 +119,7 @@ export default function MatchMediaModal({
                                         style={{ objectFit: 'cover' }}
                                     />
                                     <span className="mmm-map-label font-XXS-bold">
-                                        Mapa {i + 1}
+                                        {map.title || `Mapa ${i + 1}`}
                                     </span>
                                 </button>
                             ))}

@@ -2,7 +2,7 @@ import { apiCall, charactersBaseUrl } from '../wrapper';
 
 export const updateCharacter = async (
     characterId: string,
-    payload: Record<string, unknown>
+    payload: Record<string, any>
 ): Promise<boolean> => {
     try {
         await apiCall({

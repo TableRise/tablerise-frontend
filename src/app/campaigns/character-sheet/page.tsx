@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import LoggedHeader from '@/components/common/LoggedHeader';
 import SheetPrincipal, {
@@ -18,6 +18,7 @@ import {
     createCharacter,
     linkCharacterToCampaign,
 } from '@/server/characters/create-character';
+import { getCampaignById } from '@/server/campaigns/join-campaign';
 import '@/app/campaigns/character-sheet/page.css';
 import Footer from '@/components/common/Footer';
 
@@ -59,6 +60,26 @@ export default function CharacterSheetPage(): JSX.Element {
     });
     const [showSpellModal, setShowSpellModal] = useState(false);
     const [spellModalDismissed, setSpellModalDismissed] = useState(false);
+    const [isMaster, setIsMaster] = useState(false);
+    const userInfo =
+        typeof window !== 'undefined'
+            ? JSON.parse(localStorage.getItem('userLogged') ?? 'null')
+            : null;
+
+    useEffect(() => {
+        if (!campaignId || !userInfo?.userId) {
+            setIsMaster(false);
+            return;
+        }
+
+        getCampaignById(campaignId).then((data) => {
+            const role = data?.campaignPlayers?.find(
+                (player: { userId: string; role: string }) =>
+                    player.userId === userInfo.userId
+            )?.role;
+            setIsMaster(role === 'dungeon_master');
+        });
+    }, [campaignId, userInfo?.userId]);
 
     const handleCreateCharacter = async () => {
         const p = principalRef.current?.getData();
@@ -101,8 +122,8 @@ export default function CharacterSheetPage(): JSX.Element {
                     name: p.characterName,
                     class: p.selectedClassId,
                     race: p.selectedRaceId,
-                    level: 1,
-                    xp: 0,
+                    level: p.level,
+                    xp: p.xp,
                     characteristics: {
                         alignment: p.alignment,
                         backstory: c.backstory,
@@ -235,6 +256,7 @@ export default function CharacterSheetPage(): JSX.Element {
                             ref={principalRef}
                             campaignId={campaignId}
                             characterId={characterId}
+                            isMaster={isMaster}
                             onSpellDataChange={setSpellData}
                         />
                     </div>

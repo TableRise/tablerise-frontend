@@ -1,11 +1,8 @@
 import { AxiosResponse, AxiosError } from 'axios';
 import { apiCall, charactersBaseUrl, campaignsBaseUrl } from '../wrapper';
+import type { DatabaseCharacterAuthor } from '@/types/shared/entities';
 
-export interface CharacterAuthor {
-    userId: string;
-    nickname: string;
-    fullname: string;
-}
+export type CharacterAuthor = DatabaseCharacterAuthor;
 
 export interface CharacterDnd {
     characterId: string;

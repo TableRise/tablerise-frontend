@@ -12,6 +12,7 @@ export default function LoginRedirectParams(): JSX.Element {
 
     const getUserAndRedirect = useCallback(async () => {
         const data = await getUser(userId as string);
+        if (!data) return;
 
         const userToStorage = {
             userId: data.userId,

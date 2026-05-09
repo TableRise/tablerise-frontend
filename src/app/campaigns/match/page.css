@@ -58,6 +58,10 @@
         cursor: grab;
     }
 
+    .match-map-token--locked {
+        cursor: pointer;
+    }
+
     .match-map-token--drag {
         cursor: grabbing;
         z-index: 6;
@@ -77,6 +81,11 @@
             rounded-full border border-white/80 bg-color-primary/default_900 text-white
             shadow-md transition-transform hover:scale-105;
         touch-action: none;
+    }
+
+    .match-map-token-clone-handle--delete {
+        background: rgba(185, 28, 28, 0.96);
+        border-color: rgba(255, 255, 255, 0.88);
     }
 
     .match-map-token-clone-icon {
@@ -322,12 +331,45 @@
         @apply absolute bottom-4 left-4 z-10 flex flex-col gap-2 bg-white bg-opacity-90 rounded-xl px-2 py-3 shadow-md;
     }
 
+    .match-bottom-bar-control {
+        @apply relative;
+    }
+
     .match-bottom-bar-item {
         @apply flex items-center justify-center w-10 h-10 rounded-lg transition-colors hover:bg-color-greyScale/50;
     }
 
+    .match-bottom-bar-item--disabled {
+        @apply opacity-45 cursor-not-allowed;
+    }
+
+    .match-bottom-bar-item--disabled:hover {
+        @apply bg-transparent;
+    }
+
     .match-bottom-bar-item--danger {
         @apply hover:bg-red-50;
+    }
+
+    .match-volume-panel {
+        @apply absolute left-[calc(100%+0.75rem)] top-1/2 flex items-center gap-3 rounded-xl bg-white bg-opacity-95 px-4 py-3 shadow-lg;
+        transform: translateY(-50%);
+        min-width: 14rem;
+    }
+
+    .match-volume-label {
+        @apply uppercase tracking-widest text-color-greyScale/500;
+        font-size: 0.65rem;
+    }
+
+    .match-volume-slider {
+        @apply flex-1;
+        accent-color: #345cdb;
+    }
+
+    .match-volume-value {
+        @apply text-color-greyScale/700 text-right;
+        min-width: 2.75rem;
     }
 
     /* ── Bottom-right dice button ─────────────────────────── */

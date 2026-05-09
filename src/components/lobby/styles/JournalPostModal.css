@@ -39,15 +39,33 @@
             transition-opacity hover:opacity-70;
     }
 
+    .jpm-header-actions {
+        @apply flex items-center gap-2 flex-shrink-0;
+    }
+
+    .jpm-action-btn {
+        @apply flex items-center justify-center w-8 h-8 rounded-full text-color-primary/default_900
+            bg-transparent cursor-pointer transition-opacity hover:opacity-70
+            disabled:opacity-40 disabled:cursor-not-allowed;
+    }
+
     .jpm-divider {
         @apply border-b border-color-greyScale/200 mx-8 flex-shrink-0;
     }
 
     .jpm-body {
-        @apply px-8 py-6 overflow-y-auto flex flex-col gap-3;
+        @apply px-8 py-6 overflow-y-auto flex flex-col;
     }
 
     .jpm-paragraph {
         @apply text-color-greyScale/700 leading-relaxed;
+    }
+
+    .jpm-line-break {
+        @apply h-3;
+    }
+
+    .jpm-error {
+        @apply text-color-support/alert;
     }
 }

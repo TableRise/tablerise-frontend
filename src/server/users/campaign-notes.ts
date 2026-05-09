@@ -1,6 +1,10 @@
 import { AxiosError } from 'axios';
 import { apiCall, usersBaseUrl } from '../wrapper';
 import { getUser } from './get-user';
+import type {
+    DatabaseUserCampaignInfo,
+    DatabaseUserWithDetails,
+} from '@/types/shared/entities';
 
 export interface CampaignNote {
     id?: string;
@@ -15,7 +19,9 @@ interface CreateCampaignNotePayload {
     content: string;
 }
 
-function getCampaignsFromUser(userData: any): any[] {
+function getCampaignsFromUser(
+    userData: DatabaseUserWithDetails | null
+): DatabaseUserCampaignInfo[] {
     if (Array.isArray(userData?.result?.details?.gameInfo?.campaigns)) {
         return userData.result.details.gameInfo.campaigns;
     }

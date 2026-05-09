@@ -125,9 +125,9 @@
     }
 
     .cs-ability-score {
-        @apply w-9 h-6 text-center text-xs border-2 border-color-greyScale/300 rounded-full bg-color-greyScale/50
-            font-semibold text-color-greyScale/700 mt-0.5 outline-none
-            focus:border-color-primary/default_900 transition-colors;
+        @apply w-9 h-6 flex items-center justify-center text-center text-xs border-2 border-color-greyScale/300 rounded-full bg-color-greyScale/50
+            font-semibold text-color-greyScale/700 mt-0.5 outline-none cursor-pointer
+            hover:border-color-primary/default_900 focus:border-color-primary/default_900 transition-colors;
     }
 
     .cs-middle-col {

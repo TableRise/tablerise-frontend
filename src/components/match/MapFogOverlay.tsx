@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import Particles, { initParticlesEngine } from '@tsparticles/react';
 import type { ISourceOptions } from '@tsparticles/engine';
 import { loadSlim } from '@tsparticles/slim';
@@ -97,10 +97,9 @@ interface MapFogOverlayProps {
     variant: FogVariant;
 }
 
-export default function MapFogOverlay({
-    variant,
-}: MapFogOverlayProps): JSX.Element | null {
+function MapFogOverlayComponent({ variant }: MapFogOverlayProps): JSX.Element | null {
     const [isReady, setIsReady] = useState(false);
+    const options = useMemo(() => createFogOptions(variant), [variant]);
 
     useEffect(() => {
         initParticlesEngine(async (engine) => {
@@ -115,8 +114,15 @@ export default function MapFogOverlay({
             <Particles
                 id="match-fog-particles"
                 className="match-fog-canvas"
-                options={createFogOptions(variant)}
+                options={options}
             />
         </div>
     );
 }
+
+const MapFogOverlay = memo(
+    MapFogOverlayComponent,
+    (previousProps, nextProps) => previousProps.variant === nextProps.variant
+);
+
+export default MapFogOverlay;

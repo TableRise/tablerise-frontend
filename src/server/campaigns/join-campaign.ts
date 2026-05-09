@@ -1,7 +1,10 @@
 import { AxiosResponse, AxiosError } from 'axios';
 import { apiCall, campaignsBaseUrl } from '../wrapper';
+import type { DatabaseCampaign } from '@/types/shared/entities';
 
-export const getCampaignById = async (campaignId: string) => {
+export const getCampaignById = async (
+    campaignId: string
+): Promise<DatabaseCampaign | null> => {
     try {
         const { data }: AxiosResponse = await apiCall({
             baseUrl: campaignsBaseUrl,

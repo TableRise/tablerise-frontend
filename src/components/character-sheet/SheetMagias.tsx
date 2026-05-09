@@ -34,8 +34,19 @@ interface SpellLocale {
 interface Spell {
     active: boolean;
     spellId: string;
-    en: SpellLocale;
-    pt: SpellLocale;
+    homebrew: boolean;
+    name: string;
+    description: string;
+    type: string;
+    level: number;
+    higherLevels: HigherLevel[];
+    damage: string[];
+    castingTime: string;
+    duration: string;
+    range: string;
+    components: string;
+    buffs: string[];
+    debuffs: string[];
 }
 
 interface LevelingSpecs {
@@ -206,12 +217,12 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
     }));
 
     const filteredSpells = pickerSpells.filter((s) =>
-        s.pt.name.toLowerCase().includes(pickerSearch.toLowerCase())
+        s.name.toLowerCase().includes(pickerSearch.toLowerCase())
     );
 
-    const detailBuffs = detailSpell ? formatBadges(detailSpell.pt.buffs, 'no-buff') : [];
+    const detailBuffs = detailSpell ? formatBadges(detailSpell.buffs, 'no-buff') : [];
     const detailDebuffs = detailSpell
-        ? formatBadges(detailSpell.pt.debuffs, 'no-debuffs')
+        ? formatBadges(detailSpell.debuffs, 'no-debuffs')
         : [];
 
     return (
@@ -422,11 +433,11 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                 filteredSpells.map((spell, idx) => {
                                     const isOpen = openSpellIdx === idx;
                                     const realDebuffs = formatBadges(
-                                        spell.pt.debuffs,
+                                        spell.debuffs,
                                         'no-debuffs'
                                     );
                                     const realBuffs = formatBadges(
-                                        spell.pt.buffs,
+                                        spell.buffs,
                                         'no-buff'
                                     );
                                     return (
@@ -443,7 +454,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                 }
                                             >
                                                 <span className="font-semibold">
-                                                    {spell.pt.name}
+                                                    {spell.name}
                                                 </span>
                                                 <span className="cs-spell-accordion-chevron">
                                                     {isOpen ? '▲' : '▼'}
@@ -454,7 +465,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                             {isOpen && (
                                                 <div className="cs-spell-accordion-body">
                                                     <p className="text-xs text-color-greyScale/700 leading-relaxed mb-3">
-                                                        {spell.pt.description}
+                                                        {spell.description}
                                                     </p>
 
                                                     <div className="cs-spell-accordion-fields">
@@ -463,7 +474,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                                 Tipo
                                                             </span>
                                                             <span className="cs-spell-accordion-field-value">
-                                                                {spell.pt.type}
+                                                                {spell.type}
                                                             </span>
                                                         </div>
                                                         <div className="cs-spell-accordion-field">
@@ -471,7 +482,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                                 Tempo de Conjuração
                                                             </span>
                                                             <span className="cs-spell-accordion-field-value">
-                                                                {spell.pt.castingTime}
+                                                                {spell.castingTime}
                                                             </span>
                                                         </div>
                                                         <div className="cs-spell-accordion-field">
@@ -479,7 +490,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                                 Duração
                                                             </span>
                                                             <span className="cs-spell-accordion-field-value">
-                                                                {spell.pt.duration}
+                                                                {spell.duration}
                                                             </span>
                                                         </div>
                                                         <div className="cs-spell-accordion-field">
@@ -487,7 +498,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                                 Alcance
                                                             </span>
                                                             <span className="cs-spell-accordion-field-value">
-                                                                {spell.pt.range}
+                                                                {spell.range}
                                                             </span>
                                                         </div>
                                                         <div className="cs-spell-accordion-field">
@@ -495,16 +506,16 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                                 Componentes
                                                             </span>
                                                             <span className="cs-spell-accordion-field-value">
-                                                                {spell.pt.components}
+                                                                {spell.components}
                                                             </span>
                                                         </div>
-                                                        {spell.pt.damage.length > 0 && (
+                                                        {spell.damage.length > 0 && (
                                                             <div className="cs-spell-accordion-field">
                                                                 <span className="cs-spell-accordion-field-label">
                                                                     Dano
                                                                 </span>
                                                                 <span className="cs-spell-accordion-field-value">
-                                                                    {spell.pt.damage.join(
+                                                                    {spell.damage.join(
                                                                         ', '
                                                                     )}
                                                                 </span>
@@ -532,7 +543,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                                 </span>
                                                             </div>
                                                         )}
-                                                        {spell.pt.higherLevels.length >
+                                                        {spell.higherLevels.length >
                                                             0 && (
                                                             <div className="cs-spell-accordion-field cs-spell-accordion-field--full">
                                                                 <span className="cs-spell-accordion-field-label">
@@ -540,7 +551,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                                 </span>
                                                                 <span className="cs-spell-accordion-field-value">
                                                                     {
-                                                                        spell.pt
+                                                                        spell
                                                                             .higherLevels[0]
                                                                             .level
                                                                     }
@@ -554,7 +565,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                         className="cs-spell-picker-choose-btn"
                                                         onClick={() =>
                                                             handleChooseSpell(
-                                                                spell.pt.name,
+                                                                spell.name,
                                                                 spell.spellId
                                                             )
                                                         }
@@ -580,7 +591,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                     >
                         <div className="cs-spell-picker-header">
                             <h2 className="font-S-bold text-base">
-                                {detailLoading ? 'Carregando...' : detailSpell?.pt.name}
+                                {detailLoading ? 'Carregando...' : detailSpell?.name}
                             </h2>
                             <button
                                 type="button"
@@ -598,7 +609,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                             {!detailLoading && detailSpell && (
                                 <div className="cs-spell-accordion-body border-none px-0">
                                     <p className="text-xs leading-relaxed mb-3">
-                                        {detailSpell.pt.description}
+                                        {detailSpell.description}
                                     </p>
                                     <div className="cs-spell-accordion-fields">
                                         <div className="cs-spell-accordion-field">
@@ -606,7 +617,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                 Tipo
                                             </span>
                                             <span className="cs-spell-accordion-field-value">
-                                                {detailSpell.pt.type}
+                                                {detailSpell.type}
                                             </span>
                                         </div>
                                         <div className="cs-spell-accordion-field">
@@ -614,7 +625,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                 Tempo de Conjuração
                                             </span>
                                             <span className="cs-spell-accordion-field-value">
-                                                {detailSpell.pt.castingTime}
+                                                {detailSpell.castingTime}
                                             </span>
                                         </div>
                                         <div className="cs-spell-accordion-field">
@@ -622,7 +633,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                 Duração
                                             </span>
                                             <span className="cs-spell-accordion-field-value">
-                                                {detailSpell.pt.duration}
+                                                {detailSpell.duration}
                                             </span>
                                         </div>
                                         <div className="cs-spell-accordion-field">
@@ -630,7 +641,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                 Alcance
                                             </span>
                                             <span className="cs-spell-accordion-field-value">
-                                                {detailSpell.pt.range}
+                                                {detailSpell.range}
                                             </span>
                                         </div>
                                         <div className="cs-spell-accordion-field">
@@ -638,16 +649,16 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                 Componentes
                                             </span>
                                             <span className="cs-spell-accordion-field-value">
-                                                {detailSpell.pt.components}
+                                                {detailSpell.components}
                                             </span>
                                         </div>
-                                        {detailSpell.pt.damage.length > 0 && (
+                                        {detailSpell.damage.length > 0 && (
                                             <div className="cs-spell-accordion-field">
                                                 <span className="cs-spell-accordion-field-label">
                                                     Dano
                                                 </span>
                                                 <span className="cs-spell-accordion-field-value">
-                                                    {detailSpell.pt.damage.join(', ')}
+                                                    {detailSpell.damage.join(', ')}
                                                 </span>
                                             </div>
                                         )}
@@ -671,13 +682,13 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                 </span>
                                             </div>
                                         )}
-                                        {detailSpell.pt.higherLevels.length > 0 && (
+                                        {detailSpell.higherLevels.length > 0 && (
                                             <div className="cs-spell-accordion-field cs-spell-accordion-field--full">
                                                 <span className="cs-spell-accordion-field-label">
                                                     Em Níveis Superiores
                                                 </span>
                                                 <span className="cs-spell-accordion-field-value">
-                                                    {detailSpell.pt.higherLevels[0].level}
+                                                    {detailSpell.higherLevels[0].level}
                                                 </span>
                                             </div>
                                         )}

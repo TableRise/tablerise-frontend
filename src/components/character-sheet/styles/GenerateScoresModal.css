@@ -39,6 +39,14 @@
         @apply text-sm leading-relaxed;
     }
 
+    .gsm-selection-target {
+        @apply text-center;
+    }
+
+    .gsm-extra-message {
+        @apply p-3 rounded-xl bg-color-greyScale/100 border border-color-greyScale/200 leading-relaxed;
+    }
+
     /* ── Score boxes ──────────────────────────────────────── */
     .gsm-scores {
         @apply flex gap-3 justify-center flex-wrap pt-2 border-t border-color-greyScale/200;
@@ -46,7 +54,15 @@
 
     .gsm-score-box {
         @apply flex items-center justify-center w-14 h-14 rounded-xl border-2 border-color-primary/default_900
-            bg-gradient-to-b from-color-greyScale/50 to-color-greyScale/100 shadow-sm;
+            bg-gradient-to-b from-color-greyScale/50 to-color-greyScale/100 shadow-sm transition-all;
+    }
+
+    .gsm-score-box--selectable {
+        @apply cursor-pointer hover:-translate-y-0.5 hover:shadow-md;
+    }
+
+    .gsm-score-box--disabled {
+        @apply opacity-35 cursor-not-allowed border-color-greyScale/300;
     }
 
     .gsm-score-value {

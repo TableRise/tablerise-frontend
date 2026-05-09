@@ -1,6 +1,10 @@
 'use client';
-import { useRef, useState } from 'react';
-import { createJournalPost } from '@/server/campaigns/get-journal-posts';
+import { useEffect, useRef, useState } from 'react';
+import {
+    createJournalPost,
+    updateCampaignJournalPost,
+    type JournalPost,
+} from '@/server/campaigns/get-journal-posts';
 import '@/components/lobby/styles/CreatePostModal.css';
 
 const ALL_CATEGORY_OPTIONS = [
@@ -40,28 +44,48 @@ function getCategoryOptions(userRole?: string) {
     return ALL_CATEGORY_OPTIONS.filter((opt) => allowed.includes(opt.value));
 }
 
+function normalizeEditorContent(content: string): string {
+    return content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+}
+
 interface CreatePostModalProps {
     campaignId: string;
+    userId?: string;
     userRole?: string;
+    mode?: 'create' | 'edit';
+    initialPost?: JournalPost | null;
     onClose: () => void;
-    onCreated: () => void;
+    onCreated: (post?: { title: string; content: string; category: string }) => void;
 }
 
 export default function CreatePostModal({
     campaignId,
+    userId,
     userRole,
+    mode = 'create',
+    initialPost = null,
     onClose,
     onCreated,
 }: CreatePostModalProps): JSX.Element {
     const categoryOptions = getCategoryOptions(userRole);
-    const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
+    const [title, setTitle] = useState(initialPost?.title ?? '');
+    const [content, setContent] = useState(initialPost?.content ?? '');
     const [category, setCategory] = useState(
-        () => getCategoryOptions(userRole)[0]?.value ?? ''
+        () => initialPost?.category ?? getCategoryOptions(userRole)[0]?.value ?? ''
     );
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const isEditMode = mode === 'edit';
+
+    useEffect(() => {
+        setTitle(initialPost?.title ?? '');
+        setContent(initialPost?.content ?? '');
+        setCategory(
+            initialPost?.category ?? getCategoryOptions(userRole)[0]?.value ?? ''
+        );
+        setError('');
+    }, [initialPost, userRole]);
 
     const wrapSelection = (before: string, after: string) => {
         const el = textareaRef.current;
@@ -93,7 +117,10 @@ export default function CreatePostModal({
     };
 
     const handleSubmit = async () => {
-        if (!title.trim() || !content.trim()) {
+        const trimmedTitle = title.trim();
+        const trimmedContent = normalizeEditorContent(content).trim();
+
+        if (!trimmedTitle || !trimmedContent) {
             setError('Título e conteúdo são obrigatórios.');
             return;
         }
@@ -101,15 +128,35 @@ export default function CreatePostModal({
         setError('');
         setSubmitting(true);
         try {
-            await createJournalPost(campaignId, {
-                title: title.trim(),
-                content: content.trim(),
+            if (isEditMode) {
+                if (!userId) {
+                    throw new Error('UsuÃ¡rio invÃ¡lido para editar o post.');
+                }
+
+                await updateCampaignJournalPost(campaignId, userId, {
+                    postId: initialPost?.postId ?? '',
+                    title: trimmedTitle,
+                    content: trimmedContent,
+                    category,
+                });
+            } else {
+                await createJournalPost(campaignId, {
+                    title: trimmedTitle,
+                    content: trimmedContent,
+                    category,
+                });
+            }
+            onCreated({
+                title: trimmedTitle,
+                content: trimmedContent,
                 category,
             });
-            onCreated();
             onClose();
         } catch (err: any) {
-            setError(err?.message ?? 'Erro ao criar post.');
+            setError(
+                err?.message ??
+                    (isEditMode ? 'Erro ao atualizar post.' : 'Erro ao criar post.')
+            );
         } finally {
             setSubmitting(false);
         }
@@ -119,7 +166,9 @@ export default function CreatePostModal({
         <div className="cpm-overlay" onClick={onClose}>
             <div className="cpm-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="cpm-header">
-                    <h2 className="font-L-bold cpm-title">Criar Post</h2>
+                    <h2 className="font-L-bold cpm-title">
+                        {isEditMode ? 'Editar Post' : 'Criar Post'}
+                    </h2>
                     <button
                         className="cpm-close-btn"
                         onClick={onClose}
@@ -226,7 +275,13 @@ export default function CreatePostModal({
                         onClick={handleSubmit}
                         disabled={submitting}
                     >
-                        {submitting ? 'Publicando...' : 'Publicar'}
+                        {submitting
+                            ? isEditMode
+                                ? 'Salvando...'
+                                : 'Publicando...'
+                            : isEditMode
+                            ? 'Salvar alterações'
+                            : 'Publicar'}
                     </button>
                     <button className="cpm-cancel-btn font-XS-regular" onClick={onClose}>
                         Cancelar

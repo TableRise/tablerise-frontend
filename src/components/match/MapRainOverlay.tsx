@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import Particles, { initParticlesEngine } from '@tsparticles/react';
 import type { ISourceOptions } from '@tsparticles/engine';
 import { loadSlim } from '@tsparticles/slim';
@@ -84,7 +84,7 @@ const rainOptions: ISourceOptions = {
     },
 };
 
-export default function MapRainOverlay(): JSX.Element | null {
+function MapRainOverlayComponent(): JSX.Element | null {
     const [isReady, setIsReady] = useState(false);
 
     useEffect(() => {
@@ -105,3 +105,7 @@ export default function MapRainOverlay(): JSX.Element | null {
         </div>
     );
 }
+
+const MapRainOverlay = memo(MapRainOverlayComponent);
+
+export default MapRainOverlay;

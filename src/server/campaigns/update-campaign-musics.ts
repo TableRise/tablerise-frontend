@@ -3,17 +3,27 @@ import { apiCall, campaignsBaseUrl } from '../wrapper';
 
 export const updateCampaignMusic = async (
     campaignId: string,
-    operation: 'add' | 'remove',
+    operation: 'add' | 'remove' | 'edit',
     id: string,
-    title: string,
-    thumbnail: string
+    title?: string,
+    thumbnail?: string
 ): Promise<void> => {
     try {
+        const endpoint = `${campaignId}/update/match/musics/${operation}`;
+        const data =
+            operation === 'remove'
+                ? { id }
+                : {
+                      id,
+                      title: title ?? '',
+                      thumbnail: thumbnail ?? '',
+                  };
+
         await apiCall({
             baseUrl: campaignsBaseUrl,
-            endpoint: `${campaignId}/update/match/musics`,
+            endpoint,
             method: 'PATCH',
-            data: { operation, id, title, thumbnail },
+            data,
         });
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;

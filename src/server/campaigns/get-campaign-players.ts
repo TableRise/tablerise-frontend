@@ -1,12 +1,8 @@
 import { AxiosResponse, AxiosError } from 'axios';
 import { apiCall, campaignsBaseUrl } from '../wrapper';
+import type { DatabaseCampaignPlayer } from '@/types/shared/entities';
 
-export interface CampaignPlayer {
-    userId: string;
-    characterIds: string[];
-    role: string;
-    status: string;
-}
+export type CampaignPlayer = DatabaseCampaignPlayer;
 
 export const getCampaignPlayers = async (
     campaignId: string

@@ -63,7 +63,7 @@ export default function MatchEffectsModal({
                             <span className="font-XXS-regular mem-option-text">
                                 {activeEffect === 'dark'
                                     ? 'Clique para desativar o efeito.'
-                                    : 'Clique para ativar a passagem contÃ­nua de nevoa.'}
+                                    : 'Clique para ativar a passagem contínua de nevoa.'}
                             </span>
                         </div>
                         <span className="mem-option-state font-XXS-bold">
@@ -84,7 +84,7 @@ export default function MatchEffectsModal({
                             <span className="font-XXS-regular mem-option-text">
                                 {activeEffect === 'light'
                                     ? 'Clique para desativar o efeito.'
-                                    : 'Clique para ativar a passagem contÃ­nua de nevoa.'}
+                                    : 'Clique para ativar a passagem contínua de nevoa.'}
                             </span>
                         </div>
                         <span className="mem-option-state font-XXS-bold">
@@ -103,7 +103,7 @@ export default function MatchEffectsModal({
                             <span className="font-XXS-regular mem-option-text">
                                 {activeEffect === 'rain'
                                     ? 'Clique para desativar o efeito.'
-                                    : 'Clique para ativar a chuva contÃ­nua sobre o mapa.'}
+                                    : 'Clique para ativar a chuva contínua sobre o mapa.'}
                             </span>
                         </div>
                         <span className="mem-option-state font-XXS-bold">

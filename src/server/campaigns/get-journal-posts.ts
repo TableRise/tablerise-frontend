@@ -9,6 +9,7 @@ export interface JournalPostAuthor {
 }
 
 export interface JournalPost {
+    postId: string;
     title: string;
     author: JournalPostAuthor;
     content: string;
@@ -17,6 +18,7 @@ export interface JournalPost {
 }
 
 export interface HighlightedJournalPostResponse {
+    postId: string;
     title: string;
     author: string;
     content: string;
@@ -35,6 +37,7 @@ export type JournalHighlightTogglePayload =
 
 function normalizeHighlightedJournalPost(post: any): JournalPost | null {
     if (!post || typeof post !== 'object') return null;
+
     if (
         typeof post.title !== 'string' ||
         typeof post.content !== 'string' ||
@@ -45,6 +48,7 @@ function normalizeHighlightedJournalPost(post: any): JournalPost | null {
     }
 
     return {
+        postId: typeof post.postId === 'string' ? post.postId : '',
         title: post.title,
         content: post.content,
         timestamp: post.timestamp,
@@ -102,6 +106,13 @@ export interface CreateJournalPostPayload {
     category: string;
 }
 
+export interface UpdateJournalPostPayload {
+    postId: string;
+    title: string;
+    content: string;
+    category: string;
+}
+
 export const createJournalPost = async (
     campaignId: string,
     payload: CreateJournalPostPayload
@@ -119,6 +130,56 @@ export const createJournalPost = async (
         if (status === 400) throw new Error('Dados inválidos');
         if (status === 500) throw new Error('Erro no servidor');
         throw new Error('Erro ao criar post');
+    }
+};
+
+export const deleteCampaignJournalPost = async (
+    campaignId: string,
+    post: JournalPost,
+    userId: string
+): Promise<boolean> => {
+    try {
+        await apiCall({
+            baseUrl: campaignsBaseUrl,
+            endpoint: `${campaignId}/journal/delete`,
+            method: 'PATCH',
+            params: { userId, postId: post.postId },
+        });
+        return true;
+    } catch (error: AxiosError | any) {
+        const status = error?.response?.status;
+        if (status === 400) throw new Error('Dados invÃ¡lidos');
+        if (status === 404) throw new Error('PublicaÃ§Ã£o nÃ£o encontrada');
+        if (status === 500) throw new Error('Erro no servidor');
+        throw new Error('Erro ao excluir post');
+    }
+};
+
+export const updateCampaignJournalPost = async (
+    campaignId: string,
+    userId: string,
+    payload: UpdateJournalPostPayload
+): Promise<boolean> => {
+    try {
+        await apiCall({
+            baseUrl: campaignsBaseUrl,
+            endpoint: `${campaignId}/journal/update`,
+            method: 'PATCH',
+            params: { userId },
+            data: {
+                postId: payload.postId,
+                title: payload.title,
+                post: payload.content,
+                category: payload.category,
+            },
+        });
+        return true;
+    } catch (error: AxiosError | any) {
+        const status = error?.response?.status;
+        if (status === 400) throw new Error('Dados invÃ¡lidos');
+        if (status === 404) throw new Error('PublicaÃ§Ã£o nÃ£o encontrada');
+        if (status === 500) throw new Error('Erro no servidor');
+        throw new Error('Erro ao atualizar post');
     }
 };
 

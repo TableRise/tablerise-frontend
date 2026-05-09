@@ -39,7 +39,7 @@ export const updateCampaignMapImages = async (
     try {
         await axios({
             method: 'PATCH',
-            url: `${campaignsBaseUrl}/${campaignId}/update/match/map-images`,
+            url: `${campaignsBaseUrl}/${campaignId}/update/match/map-images/add`,
             withCredentials: true,
             headers: {
                 'Content-Type': 'multipart/form-data',
@@ -59,14 +59,20 @@ export const updateCampaignMapImages = async (
 export const removeCampaignImage = async (
     campaignId: string,
     type: 'cover' | 'mapImages',
-    imageUrl: string
+    imageUrl?: string
 ): Promise<void> => {
     try {
+        const endpoint =
+            type === 'cover'
+                ? `${campaignId}/update/cover/remove`
+                : `${campaignId}/update/match/map-images/remove`;
+        const params = type === 'mapImages' ? { imageUrl } : undefined;
+
         await apiCall({
             baseUrl: campaignsBaseUrl,
-            endpoint: `${campaignId}/update/images/remove`,
+            endpoint,
             method: 'PATCH',
-            params: { type, imageUrl },
+            params,
         });
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;

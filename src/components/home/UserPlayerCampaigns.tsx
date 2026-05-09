@@ -46,7 +46,9 @@ export default function UserPlayerCampaigns({
     ));
 
     const cards =
-        cardMap.length > 0 ? cardMap : [<BasicParticipationCard key="no-campaigns" />];
+        cardMap.length > 0
+            ? cardMap
+            : [<BasicParticipationCard key="no-campaigns" onClick={onJoinClick} />];
 
     return (
         <section className="user-player-campaigns">
