@@ -15,6 +15,7 @@ export interface SheetCaracteristicasHandle {
             skin: string;
             hair: string;
             weight: string;
+            description: string;
         };
         backstory: string;
         alliesAndOrgs: string;
@@ -34,6 +35,7 @@ const SheetCaracteristicas = forwardRef<
         skin: '',
         hair: '',
         weight: '',
+        description: '',
     });
     const [backstory, setBackstory] = useState('');
     const [alliesAndOrgs, setAlliesAndOrgs] = useState('');
@@ -152,6 +154,13 @@ const SheetCaracteristicas = forwardRef<
                     <textarea
                         className="cs-field-textarea w-full min-h-[14rem]"
                         placeholder="Aparência do personagem..."
+                        value={appearance.description}
+                        onChange={(e) =>
+                            setAppearance((p) => ({
+                                ...p,
+                                description: e.target.value,
+                            }))
+                        }
                     />
                     <p className="cs-section-title">Aparência do Personagem</p>
                 </div>

@@ -26,6 +26,7 @@ interface InitialData {
     visibility: string;
     ageRestriction: string;
     playerAmountLimit: number;
+    shopOn: boolean;
     adminId: string;
     cover: string;
     mapImages: string[];
@@ -70,6 +71,7 @@ export default function EditCampaignModal({
     const [playerAmountLimit, setPlayerAmountLimit] = useState(
         initialData.playerAmountLimit
     );
+    const [shopOn, setShopOn] = useState(initialData.shopOn);
     const [adminId, setAdminId] = useState(initialData.adminId);
     const [activeTab, setActiveTab] = useState<'settings' | 'images' | 'musics'>(
         'settings'
@@ -149,6 +151,9 @@ export default function EditCampaignModal({
                 payload.ageRestriction = ageRestriction;
             if (playerAmountLimit !== initialData.playerAmountLimit)
                 payload.playerAmountLimit = playerAmountLimit;
+            if (shopOn !== initialData.shopOn) {
+                payload.configurations = { shopOn };
+            }
             if (socialMediaChanged) payload.socialMedia = currentSocialMedia;
             if (
                 adminId !== initialData.adminId &&
@@ -256,7 +261,7 @@ export default function EditCampaignModal({
     }
 
     return (
-        <div className="ecm-backdrop" onClick={onClose}>
+        <div className="ecm-backdrop">
             <div className="ecm-modal" onClick={(e) => e.stopPropagation()}>
                 {/* ── Header ──────────────────────────────── */}
                 <div className="ecm-header">
@@ -500,6 +505,23 @@ export default function EditCampaignModal({
                                         setPlayerAmountLimit(Number(e.target.value))
                                     }
                                 />
+                            </label>
+
+                            <label className="ecm-checkbox-field">
+                                <span className="font-S-bold ecm-field-label">
+                                    Habilitar Loja
+                                </span>
+                                <div className="ecm-checkbox-row">
+                                    <input
+                                        type="checkbox"
+                                        className="ecm-checkbox"
+                                        checked={shopOn}
+                                        onChange={(e) => setShopOn(e.target.checked)}
+                                    />
+                                    <span className="font-XS-regular ecm-field-hint">
+                                        Permite que a campanha use a loja de equipamentos.
+                                    </span>
+                                </div>
                             </label>
 
                             {/* Age restriction */}

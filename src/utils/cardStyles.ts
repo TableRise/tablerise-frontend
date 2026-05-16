@@ -22,6 +22,7 @@ export function resolveCardStyles(options: CardStyleOptions): CardStyles {
     if (size === 'straight') cardSize.w = '21.8rem';
     if (size === 'medium-large') cardSize.w = '40rem';
     if (size === 'large') cardSize.w = '44.5rem';
+    if (size === 'large-plus') cardSize.w = '46.5rem';
     if (textColor === 'white') textColorCSS = 'text-color-greyScale/50';
     if (buttonColor === 'white') {
         buttonColorCSS = 'button-white-default';

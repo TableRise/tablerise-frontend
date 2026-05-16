@@ -6,57 +6,21 @@ import {
     getDnd5eSpellsByLevel,
     getDnd5eSpellById,
 } from '@/server/dungeons&dragons5e/system';
-
-interface HigherLevel {
-    homebrew: boolean;
-    level: string;
-    damage: string[];
-    buffs: string[];
-    debuffs: string[];
-}
-
-interface SpellLocale {
-    homebrew: boolean;
-    name: string;
-    description: string;
-    type: string;
-    level: number;
-    higherLevels: HigherLevel[];
-    damage: string[];
-    castingTime: string;
-    duration: string;
-    range: string;
-    components: string;
-    buffs: string[];
-    debuffs: string[];
-}
+import { getLevelingSnapshot, type LevelingSpecs } from '@/utils/characterLeveling';
 
 interface Spell {
     active: boolean;
     spellId: string;
-    homebrew: boolean;
     name: string;
     description: string;
     type: string;
+    class: string[];
     level: number;
-    higherLevels: HigherLevel[];
-    damage: string[];
+    higherLevels: string;
     castingTime: string;
     duration: string;
     range: string;
     components: string;
-    buffs: string[];
-    debuffs: string[];
-}
-
-interface LevelingSpecs {
-    cantripsKnown: { isValidToThisClass: boolean; amount: number[] };
-    spellsKnown: { isValidToThisClass: boolean; amount: number[] };
-    spellSlotsPerSpellLevel: {
-        isValidToThisClass: boolean;
-        spellLevel: number[];
-        spellSpaces: number[][];
-    };
 }
 
 const SPELL_LEVELS = [
@@ -82,6 +46,7 @@ interface SheetMagiasProps {
     spellCd?: number;
     spellAttackBonus?: number;
     levelingSpecs?: LevelingSpecs;
+    currentLevel?: number;
     initialSpellNames?: Record<number, { name: string; spellId: string }[]>;
     initialSlotTotals?: Record<number, number>;
     initialSlotsExpended?: Record<number, number>;
@@ -104,34 +69,32 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
         spellCd = 0,
         spellAttackBonus = 0,
         levelingSpecs,
+        currentLevel,
         initialSpellNames,
         initialSlotTotals,
         initialSlotsExpended: initialSlotsExpendedProp,
     },
     ref
 ) {
+    const progressionSnapshot = levelingSpecs
+        ? getLevelingSnapshot(levelingSpecs, currentLevel ?? 1)
+        : null;
+
     const getActiveSlots = (spellLevel: number): number => {
         if (!levelingSpecs) return SPELLS_PER_LEVEL;
         if (spellLevel === 0) {
-            return levelingSpecs.cantripsKnown.isValidToThisClass
-                ? levelingSpecs.cantripsKnown.amount[0] ?? 0
-                : 0;
+            return progressionSnapshot?.cantripsKnown ?? 0;
         }
-        const slotCount = levelingSpecs.spellSlotsPerSpellLevel.isValidToThisClass
-            ? levelingSpecs.spellSlotsPerSpellLevel.spellSpaces[0]?.[spellLevel - 1] ?? 0
-            : 0;
+        const slotCount = progressionSnapshot?.slotTotals[spellLevel] ?? 0;
         if (slotCount === 0) return 0;
         return levelingSpecs.spellsKnown.isValidToThisClass
-            ? levelingSpecs.spellsKnown.amount[0] ?? slotCount
+            ? progressionSnapshot?.spellsKnown ?? slotCount
             : slotCount;
     };
 
     const getSlotTotal = (spellLevel: number): number => {
-        if (levelingSpecs?.spellSlotsPerSpellLevel.isValidToThisClass) {
-            return (
-                levelingSpecs.spellSlotsPerSpellLevel.spellSpaces[0]?.[spellLevel - 1] ??
-                0
-            );
+        if (levelingSpecs) {
+            return progressionSnapshot?.slotTotals[spellLevel] ?? 0;
         }
         return initialSlotTotals?.[spellLevel] ?? 0;
     };
@@ -202,9 +165,6 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
         });
     };
 
-    const formatBadges = (list: string[], sentinel: string) =>
-        list.filter((v) => v !== sentinel);
-
     useImperativeHandle(ref, () => ({
         getData: () => {
             const slotTotals: Record<number, number> = {};
@@ -216,14 +176,24 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
         },
     }));
 
-    const filteredSpells = pickerSpells.filter((s) =>
-        s.name.toLowerCase().includes(pickerSearch.toLowerCase())
-    );
+    const spellsKnownLimit = levelingSpecs?.spellsKnown?.isValidToThisClass
+        ? progressionSnapshot?.spellsKnown ?? Infinity
+        : Infinity;
 
-    const detailBuffs = detailSpell ? formatBadges(detailSpell.buffs, 'no-buff') : [];
-    const detailDebuffs = detailSpell
-        ? formatBadges(detailSpell.debuffs, 'no-debuffs')
-        : [];
+    const totalFilledNonCantrip = [1, 2, 3, 4, 5, 6, 7, 8, 9].reduce((sum, level) => {
+        const active = getActiveSlots(level);
+        return (
+            sum + spellNames[level].slice(0, active).filter((e) => e.name !== '').length
+        );
+    }, 0);
+
+    const filteredSpells = pickerSpells.filter((s) => {
+        const matchesSearch = s.name.toLowerCase().includes(pickerSearch.toLowerCase());
+        const matchesClass =
+            !spellClassName ||
+            s.class.some((c) => c.toLowerCase() === spellClassName.toLowerCase());
+        return matchesSearch && matchesClass;
+    });
 
     return (
         <>
@@ -272,55 +242,47 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                 {SPELL_LEVELS.map((sl) => (
                     <div key={sl.level} className="cs-spell-level-box">
                         <div className="cs-spell-level-header">
-                            {(() => {
-                                const activeSlots = getActiveSlots(sl.level);
-                                const filledSlots = spellNames[sl.level]
-                                    .slice(0, activeSlots)
-                                    .filter((e) => e.name !== '').length;
-                                const bookDisabled =
-                                    activeSlots === 0 || filledSlots >= activeSlots;
-                                return (
-                                    <Image
-                                        src={Book.src}
-                                        alt="search"
-                                        width={32}
-                                        height={32}
-                                        className={`transition-opacity ${
-                                            bookDisabled
-                                                ? 'opacity-30 pointer-events-none'
-                                                : 'cursor-pointer hover:opacity-70'
-                                        }`}
-                                        onClick={() =>
-                                            !bookDisabled && handleOpenPicker(sl.level)
-                                        }
-                                    />
-                                );
-                            })()}
-                            <div className="cs-spell-level-badge">
-                                {sl.level === 0 ? 'T' : sl.level}
+                            <div className="cs-spell-level-header-book">
+                                {(() => {
+                                    const activeSlots = getActiveSlots(sl.level);
+                                    const filledSlots = spellNames[sl.level]
+                                        .slice(0, activeSlots)
+                                        .filter((e) => e.name !== '').length;
+                                    const isGlobalCap =
+                                        sl.level > 0 &&
+                                        !!levelingSpecs?.spellsKnown?.isValidToThisClass;
+                                    const bookDisabled =
+                                        activeSlots === 0 ||
+                                        (isGlobalCap
+                                            ? totalFilledNonCantrip >= spellsKnownLimit
+                                            : filledSlots >= activeSlots);
+                                    return (
+                                        <Image
+                                            src={Book.src}
+                                            alt="search"
+                                            width={32}
+                                            height={32}
+                                            className={`transition-opacity ${
+                                                bookDisabled
+                                                    ? 'opacity-30 pointer-events-none'
+                                                    : 'cursor-pointer hover:opacity-70'
+                                            }`}
+                                            onClick={() =>
+                                                !bookDisabled &&
+                                                handleOpenPicker(sl.level)
+                                            }
+                                        />
+                                    );
+                                })()}
+                                <div className="cs-spell-level-badge ml-2">
+                                    {sl.level === 0 ? 'T' : sl.level}
+                                </div>
                             </div>
                             {sl.slots && (
                                 <div className="cs-spell-slots">
-                                    <span>Total</span>
-                                    <input
-                                        className="cs-spell-slot-input"
-                                        value={getSlotTotal(sl.level) || ''}
-                                        placeholder="0"
-                                        readOnly
-                                    />
-                                    <span>Usados</span>
-                                    <input
-                                        className="cs-spell-slot-input"
-                                        type="number"
-                                        placeholder="0"
-                                        value={slotsExpended[sl.level] || ''}
-                                        onChange={(e) =>
-                                            setSlotsExpended((prev) => ({
-                                                ...prev,
-                                                [sl.level]: Number(e.target.value),
-                                            }))
-                                        }
-                                    />
+                                    <span>
+                                        Espaços de Magia: {getSlotTotal(sl.level)}
+                                    </span>
                                 </div>
                             )}
                         </div>
@@ -330,21 +292,6 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                 const inactive = idx >= activeSlots;
                                 return (
                                     <div key={idx} className="cs-spell-row">
-                                        {sl.level > 0 && (
-                                            <input
-                                                type="checkbox"
-                                                className="cs-spell-check"
-                                                disabled={inactive}
-                                                style={
-                                                    inactive
-                                                        ? {
-                                                              opacity: 0.3,
-                                                              pointerEvents: 'none',
-                                                          }
-                                                        : {}
-                                                }
-                                            />
-                                        )}
                                         <input
                                             className={`cs-spell-name-input${
                                                 inactive
@@ -432,14 +379,6 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                             {!pickerLoading &&
                                 filteredSpells.map((spell, idx) => {
                                     const isOpen = openSpellIdx === idx;
-                                    const realDebuffs = formatBadges(
-                                        spell.debuffs,
-                                        'no-debuffs'
-                                    );
-                                    const realBuffs = formatBadges(
-                                        spell.buffs,
-                                        'no-buff'
-                                    );
                                     return (
                                         <div
                                             key={idx}
@@ -509,52 +448,13 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                                 {spell.components}
                                                             </span>
                                                         </div>
-                                                        {spell.damage.length > 0 && (
-                                                            <div className="cs-spell-accordion-field">
-                                                                <span className="cs-spell-accordion-field-label">
-                                                                    Dano
-                                                                </span>
-                                                                <span className="cs-spell-accordion-field-value">
-                                                                    {spell.damage.join(
-                                                                        ', '
-                                                                    )}
-                                                                </span>
-                                                            </div>
-                                                        )}
-                                                        {realBuffs.length > 0 && (
-                                                            <div className="cs-spell-accordion-field">
-                                                                <span className="cs-spell-accordion-field-label">
-                                                                    Benefícios
-                                                                </span>
-                                                                <span className="cs-spell-accordion-field-value">
-                                                                    {realBuffs.join(', ')}
-                                                                </span>
-                                                            </div>
-                                                        )}
-                                                        {realDebuffs.length > 0 && (
-                                                            <div className="cs-spell-accordion-field">
-                                                                <span className="cs-spell-accordion-field-label">
-                                                                    Penalidades
-                                                                </span>
-                                                                <span className="cs-spell-accordion-field-value">
-                                                                    {realDebuffs.join(
-                                                                        ', '
-                                                                    )}
-                                                                </span>
-                                                            </div>
-                                                        )}
-                                                        {spell.higherLevels.length >
-                                                            0 && (
+                                                        {spell.higherLevels && (
                                                             <div className="cs-spell-accordion-field cs-spell-accordion-field--full">
                                                                 <span className="cs-spell-accordion-field-label">
                                                                     Em Níveis Superiores
                                                                 </span>
                                                                 <span className="cs-spell-accordion-field-value">
-                                                                    {
-                                                                        spell
-                                                                            .higherLevels[0]
-                                                                            .level
-                                                                    }
+                                                                    {spell.higherLevels}
                                                                 </span>
                                                             </div>
                                                         )}
@@ -652,43 +552,13 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                 {detailSpell.components}
                                             </span>
                                         </div>
-                                        {detailSpell.damage.length > 0 && (
-                                            <div className="cs-spell-accordion-field">
-                                                <span className="cs-spell-accordion-field-label">
-                                                    Dano
-                                                </span>
-                                                <span className="cs-spell-accordion-field-value">
-                                                    {detailSpell.damage.join(', ')}
-                                                </span>
-                                            </div>
-                                        )}
-                                        {detailBuffs.length > 0 && (
-                                            <div className="cs-spell-accordion-field">
-                                                <span className="cs-spell-accordion-field-label">
-                                                    Benefícios
-                                                </span>
-                                                <span className="cs-spell-accordion-field-value">
-                                                    {detailBuffs.join(', ')}
-                                                </span>
-                                            </div>
-                                        )}
-                                        {detailDebuffs.length > 0 && (
-                                            <div className="cs-spell-accordion-field">
-                                                <span className="cs-spell-accordion-field-label">
-                                                    Penalidades
-                                                </span>
-                                                <span className="cs-spell-accordion-field-value">
-                                                    {detailDebuffs.join(', ')}
-                                                </span>
-                                            </div>
-                                        )}
-                                        {detailSpell.higherLevels.length > 0 && (
+                                        {detailSpell.higherLevels && (
                                             <div className="cs-spell-accordion-field cs-spell-accordion-field--full">
                                                 <span className="cs-spell-accordion-field-label">
                                                     Em Níveis Superiores
                                                 </span>
                                                 <span className="cs-spell-accordion-field-value">
-                                                    {detailSpell.higherLevels[0].level}
+                                                    {detailSpell.higherLevels}
                                                 </span>
                                             </div>
                                         )}

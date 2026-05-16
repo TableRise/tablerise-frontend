@@ -163,7 +163,7 @@ export default function CreatePostModal({
     };
 
     return (
-        <div className="cpm-overlay" onClick={onClose}>
+        <div className="cpm-overlay">
             <div className="cpm-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="cpm-header">
                     <h2 className="font-L-bold cpm-title">

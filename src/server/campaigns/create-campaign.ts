@@ -22,6 +22,10 @@ export interface CreateCampaignPayload {
     nextMatchDate: string[];
     playerAmountLimit: number;
     socialMedia: { discord?: string; twitter?: string; youtube?: string };
+    configurations: {
+        xpSystem: boolean;
+        shopSystem: boolean;
+    };
 }
 
 export const createCampaign = async (payload: CreateCampaignPayload) => {
@@ -35,6 +39,7 @@ export const createCampaign = async (payload: CreateCampaignPayload) => {
         formData.append('musics', JSON.stringify(payload.musics));
         formData.append('lore', payload.lore);
         formData.append('playerAmountLimit', String(payload.playerAmountLimit));
+        formData.append('configurations', JSON.stringify(payload.configurations));
         if (payload.password) formData.append('password', payload.password);
         if (payload.coverImage) formData.append('cover', payload.coverImage);
         if (payload.nextMatchDate.length > 0) {

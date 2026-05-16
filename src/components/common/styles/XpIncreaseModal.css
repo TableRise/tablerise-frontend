@@ -58,4 +58,16 @@
     .xpm-cancel {
         @apply bg-transparent text-color-greyScale/500 transition-colors hover:text-color-primary/default_900;
     }
+
+    .xpm-hp-section {
+        @apply flex flex-col gap-2;
+    }
+
+    .xpm-hp-options {
+        @apply flex flex-col gap-2 rounded-xl border border-color-greyScale/200 bg-color-greyScale/100 px-4 py-3;
+    }
+
+    .xpm-hp-option {
+        @apply flex items-center gap-2 cursor-pointer;
+    }
 }

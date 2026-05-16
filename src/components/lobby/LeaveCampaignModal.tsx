@@ -1,9 +1,14 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { leaveCampaign, transferDungeonMaster } from '@/server/campaigns/join-campaign';
+import {
+    deleteCampaign,
+    leaveCampaign,
+    transferDungeonMaster,
+} from '@/server/campaigns/join-campaign';
 import { getCampaignPlayers } from '@/server/campaigns/get-campaign-players';
 import { getUser } from '@/server/users/get-user';
+import '@/components/lobby/styles/EditCampaignModal.css';
 
 interface Props {
     campaignId: string;
@@ -28,6 +33,9 @@ export default function LeaveCampaignModal({
     const [transferring, setTransferring] = useState(false);
     const [transferred, setTransferred] = useState(false);
     const [transferError, setTransferError] = useState('');
+    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState('');
 
     useEffect(() => {
         if (!isMaster) return;
@@ -81,8 +89,20 @@ export default function LeaveCampaignModal({
         }
     }
 
+    async function handleDeleteCampaign() {
+        setDeleteError('');
+        setDeleting(true);
+        try {
+            await deleteCampaign(campaignId);
+            router.push('/');
+        } catch (err: any) {
+            setDeleteError(err.message ?? 'Erro ao deletar campanha');
+            setDeleting(false);
+        }
+    }
+
     return (
-        <div className="ecm-backdrop" onClick={onClose}>
+        <div className="ecm-backdrop">
             <div
                 className="ecm-modal"
                 style={{ maxWidth: '28rem' }}
@@ -192,7 +212,7 @@ export default function LeaveCampaignModal({
                         type="button"
                         className="font-S-bold ecm-btn-ghost"
                         onClick={onClose}
-                        disabled={leaving}
+                        disabled={leaving || deleting}
                     >
                         Cancelar
                     </button>
@@ -205,13 +225,75 @@ export default function LeaveCampaignModal({
                         }`}
                         onClick={handleLeave}
                         disabled={
-                            (isMaster && players.length > 0 && !transferred) || leaving
+                            (isMaster && players.length > 0 && !transferred) ||
+                            leaving ||
+                            deleting
                         }
                     >
                         {leaving ? 'Saindo...' : 'Sair da Campanha'}
                     </button>
                 </div>
+                {isMaster && (
+                    <div className="ecm-delete-row">
+                        <button
+                            type="button"
+                            className="font-S-bold ecm-delete-btn"
+                            onClick={() => {
+                                setDeleteError('');
+                                setDeleteConfirmOpen(true);
+                            }}
+                            disabled={leaving || deleting}
+                        >
+                            Deletar campanha
+                        </button>
+                    </div>
+                )}
+                {deleteError && (
+                    <p className="font-XXS-regular ecm-error ecm-error--inline">
+                        {deleteError}
+                    </p>
+                )}
             </div>
+            {deleteConfirmOpen && (
+                <div
+                    className="ecm-confirm-overlay"
+                    onClick={() => {
+                        if (deleting) return;
+                        setDeleteConfirmOpen(false);
+                    }}
+                >
+                    <div
+                        className="ecm-confirm-modal"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h3 className="font-M-semibold ecm-confirm-title">
+                            Deletar campanha
+                        </h3>
+                        <p className="font-XS-regular ecm-confirm-body">
+                            Tem certeza que deseja deletar esta campanha? Esta ação não
+                            pode ser desfeita.
+                        </p>
+                        <div className="ecm-confirm-actions">
+                            <button
+                                type="button"
+                                className="ecm-confirm-cancel"
+                                onClick={() => setDeleteConfirmOpen(false)}
+                                disabled={deleting}
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="button"
+                                className="ecm-confirm-ok"
+                                onClick={handleDeleteCampaign}
+                                disabled={deleting}
+                            >
+                                {deleting ? 'Deletando...' : 'Confirmar'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

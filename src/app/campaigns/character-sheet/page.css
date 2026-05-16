@@ -402,6 +402,10 @@
         @apply flex items-center justify-between mb-3 pb-2 border-b border-color-greyScale/200;
     }
 
+    .cs-spell-level-header-book {
+        @apply flex;
+    }
+
     .cs-spell-level-badge {
         @apply w-8 h-8 rounded-full border-2 border-color-primary/default_900 bg-color-greyScale/50
             flex items-center justify-center text-xs font-bold text-color-primary/default_900 shadow-sm;

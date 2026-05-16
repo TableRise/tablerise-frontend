@@ -2,23 +2,24 @@ import { AxiosResponse, AxiosError } from 'axios';
 import { apiCall, dndBaseUrl } from '../wrapper';
 import type {
     Class as DatabaseDndClass,
-    HigherLevels as DatabaseDndHigherLevels,
     Race as DatabaseDndRace,
-    Spell as DatabaseDndSpell,
 } from '@tablerise/database-management/dist/src/interfaces/DungeonsAndDragons5e';
 
 export type DndClassRecord = DatabaseDndClass & { classId: string };
 export type DndRaceRecord = DatabaseDndRace & { raceId: string };
-export type DndSpellHigherLevelRecord = Omit<DatabaseDndHigherLevels, 'damage'> & {
-    homebrew: boolean;
-    damage: string[];
-};
-export type DndSpellRecord = Omit<DatabaseDndSpell, 'damage' | 'higherLevels'> & {
+export type DndSpellRecord = {
     active: boolean;
-    homebrew: boolean;
     spellId: string;
-    damage: string[];
-    higherLevels: DndSpellHigherLevelRecord[];
+    name: string;
+    description: string;
+    type: string;
+    class: string[];
+    level: number;
+    higherLevels: string;
+    castingTime: string;
+    duration: string;
+    range: string;
+    components: string;
 };
 
 function normalizeLocalizedEntity<T>(entity: any): T {

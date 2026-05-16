@@ -7,7 +7,11 @@ interface MatchAvatarSelectionModalProps {
     characters: CampaignCharacter[];
     searchValue: string;
     visibleCharacterIds: string[];
+    disableRemoveAllAvatars: boolean;
+    disableRemoveAllClones: boolean;
     onClose: () => void;
+    onRemoveAllAvatars: () => void | Promise<void>;
+    onRemoveAllClones: () => void | Promise<void>;
     onSearchChange: (value: string) => void;
     onToggleCharacter: (characterId: string) => void;
 }
@@ -16,12 +20,16 @@ export default function MatchAvatarSelectionModal({
     characters,
     searchValue,
     visibleCharacterIds,
+    disableRemoveAllAvatars,
+    disableRemoveAllClones,
     onClose,
+    onRemoveAllAvatars,
+    onRemoveAllClones,
     onSearchChange,
     onToggleCharacter,
 }: MatchAvatarSelectionModalProps): JSX.Element {
     return (
-        <div className="masm-overlay" onClick={onClose}>
+        <div className="masm-overlay">
             <div className="masm-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="masm-header">
                     <div>
@@ -59,6 +67,25 @@ export default function MatchAvatarSelectionModal({
                             onChange={(e) => onSearchChange(e.target.value)}
                             placeholder="Buscar personagem por nome"
                         />
+                    </div>
+
+                    <div className="masm-actions">
+                        <button
+                            type="button"
+                            className="masm-action-btn font-XS-bold"
+                            onClick={onRemoveAllAvatars}
+                            disabled={disableRemoveAllAvatars}
+                        >
+                            Remover todos os avatares
+                        </button>
+                        <button
+                            type="button"
+                            className="masm-action-btn font-XS-bold"
+                            onClick={onRemoveAllClones}
+                            disabled={disableRemoveAllClones}
+                        >
+                            Remover todos os clones
+                        </button>
                     </div>
 
                     <div className="masm-list">

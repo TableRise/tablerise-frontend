@@ -202,7 +202,7 @@ export default function MatchNotesModal({
     const selectedTimestamp = selectedNote?.updatedAt ?? selectedNote?.createdAt;
 
     return (
-        <div className="mnm-overlay" onClick={onClose}>
+        <div className="mnm-overlay">
             <div className="mnm-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="mnm-header">
                     <div className="mnm-header-left">

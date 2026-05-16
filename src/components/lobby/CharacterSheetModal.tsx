@@ -17,6 +17,7 @@ interface CharacterSheetModalProps {
     userId: string;
     isPlayer: boolean;
     isMaster: boolean;
+    xpSystem: boolean;
     onClose: () => void;
 }
 
@@ -33,6 +34,7 @@ export default function CharacterSheetModal({
     userId,
     isPlayer,
     isMaster,
+    xpSystem,
     onClose,
 }: CharacterSheetModalProps): JSX.Element {
     const router = useRouter();
@@ -91,7 +93,7 @@ export default function CharacterSheetModal({
 
     return (
         <>
-            <div className="csm-overlay" onClick={onClose}>
+            <div className="csm-overlay">
                 <div className="csm-modal" onClick={(e) => e.stopPropagation()}>
                     <h2 className="font-L-semibold csm-title">Gerenciamento de Fichas</h2>
 
@@ -214,6 +216,7 @@ export default function CharacterSheetModal({
                     characterId={selectedCharId}
                     campaignId={campaignId}
                     isMaster={isMaster}
+                    xpSystem={xpSystem}
                     onBack={() => setSelectedCharId(null)}
                 />
             )}

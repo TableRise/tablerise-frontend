@@ -438,6 +438,31 @@
         @apply flex items-center justify-center w-16 h-16 bg-white bg-opacity-90 rounded-2xl shadow-md transition-transform hover:scale-110;
     }
 
+    /* ── Spell / ability usage tracking ──────────────────── */
+    .match-spell-list {
+        @apply flex flex-col gap-0.5 mt-0.5;
+    }
+
+    .match-spell-item {
+        @apply cursor-pointer transition-colors w-fit hover:text-color-primary/800;
+    }
+
+    .match-spell-item--used {
+        @apply line-through text-color-greyScale/300;
+    }
+
+    .match-spell-item--blocked {
+        @apply opacity-40 cursor-not-allowed pointer-events-none;
+    }
+
+    .match-spell-reset-btn {
+        @apply text-color-primary/800 underline cursor-pointer mb-2 block;
+    }
+
+    .match-spell-use-btn {
+        @apply mt-4 w-full py-2 px-4 bg-color-primary/default_900 text-white rounded-lg transition-opacity hover:opacity-80;
+    }
+
     /* ── Full-screen dice throw overlay ──────────────────── */
     .match-dice-layer {
         @apply absolute inset-0 z-50 cursor-pointer;

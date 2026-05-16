@@ -28,7 +28,7 @@ export default function UserPlayerCampaigns({
             key={uuid()}
             title={campaign.title}
             nextMatchDate={campaign.infos.nextMatchDate}
-            image={campaigns[0].cover?.link}
+            image={campaign.cover?.link}
             fogColor="#0A358A"
             textColor="white"
             size="straight"

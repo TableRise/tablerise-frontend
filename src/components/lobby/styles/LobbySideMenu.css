@@ -45,4 +45,12 @@
     .lobby-menu-item-danger:hover {
         @apply bg-red-50;
     }
+
+    .lobby-menu-item-disabled {
+        @apply cursor-not-allowed opacity-40;
+    }
+
+    .lobby-menu-item-disabled:hover {
+        @apply shadow-none bg-transparent;
+    }
 }

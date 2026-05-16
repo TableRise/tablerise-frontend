@@ -103,7 +103,7 @@ export default function JournalPostModal({
     const lines = normalizePostContent(post.content);
 
     return (
-        <div className="jpm-overlay" onClick={onClose}>
+        <div className="jpm-overlay">
             <div className="jpm-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="jpm-header">
                     <div className="jpm-header-left">

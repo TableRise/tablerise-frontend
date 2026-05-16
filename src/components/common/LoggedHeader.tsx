@@ -89,19 +89,6 @@ export default function LoggedHeader(): JSX.Element {
                             <span className="font-S-regular">Perfil</span>
                         </Link>
                         <Link
-                            href="/settings"
-                            className="logged-header-dropdown-item"
-                            onClick={() => setOpen(false)}
-                        >
-                            <Image
-                                src={SettingsIcon}
-                                alt="configurações"
-                                width={20}
-                                height={20}
-                            />
-                            <span className="font-S-regular">Configurações</span>
-                        </Link>
-                        <Link
                             href="/support"
                             className="logged-header-dropdown-item"
                             onClick={() => setOpen(false)}

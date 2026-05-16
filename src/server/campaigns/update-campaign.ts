@@ -10,6 +10,9 @@ export interface UpdateCampaignPayload {
     visibility?: string;
     ageRestriction?: string;
     playerAmountLimit?: number;
+    configurations?: {
+        shopOn: boolean;
+    };
     adminId?: string;
 }
 

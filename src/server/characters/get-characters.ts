@@ -46,6 +46,7 @@ export interface FullCharacterDnd {
             };
             characteristics: {
                 alignment?: string;
+                background?: string;
                 backstory?: string;
                 personalityTraits?: string;
                 ideals?: string;
@@ -58,13 +59,18 @@ export interface FullCharacterDnd {
                     eyes?: string;
                     skin?: string;
                     hair?: string;
+                    description?: string;
                     picture?: {
                         link: string;
                     };
                 };
                 alliesAndOrgs?: string;
                 treasure?: string;
-                other?: { proficiencies?: string; extraCharacteristics?: string };
+                other?: {
+                    languagesAndProficiencies?: string;
+                    characteristicsAndAbilities?: string;
+                    characteristicsAndAdditionalAbilities?: string;
+                };
             };
         };
         stats: {
@@ -96,7 +102,34 @@ export interface FullCharacterDnd {
             };
         };
         attacks: { name: string; atkBonus: string; damage: string }[];
-        equipments?: string;
+        equipments?:
+            | string
+            | Array<{
+                  equipmentId: string;
+                  name: string;
+                  type: string;
+                  price: Array<number | string>;
+                  armorClass?: Array<number | string>;
+                  strength?: string;
+                  stealth?: string;
+                  weight: string;
+                  damage?: string;
+                  properties?: string;
+              }>;
+        inventory?:
+            | string
+            | Array<{
+                  equipmentId: string;
+                  name: string;
+                  type: string;
+                  price: Array<number | string>;
+                  armorClass?: Array<number | string>;
+                  strength?: string;
+                  stealth?: string;
+                  weight: string;
+                  damage?: string;
+                  properties?: string;
+              }>;
         money?: { cp: number; sp: number; ep: number; gp: number; pp: number };
         features?: string;
         spells?: any;

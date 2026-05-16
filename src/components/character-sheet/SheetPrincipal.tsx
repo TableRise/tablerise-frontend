@@ -16,7 +16,9 @@ import {
 import GenerateScoresModal from '@/components/character-sheet/GenerateScoresModal';
 import XpIncreaseModal from '@/components/common/XpIncreaseModal';
 import { applyXpGain } from '@/utils/characterXp';
-import { generateAbilityScores } from '@/utils/rollAbilityScore';
+import { type LevelingSpecs } from '@/utils/characterLeveling';
+import { generateAbilityScores, rollStartingWealth } from '@/utils/rollAbilityScore';
+import MoneyModal from '@/components/character-sheet/MoneyModal';
 
 const ABILITIES = [
     { key: 'str', label: 'Força' },
@@ -71,12 +73,21 @@ const SKILLS = [
     { key: 'survival', label: 'Sobrevivência', ability: 'Sab' },
 ] as const;
 
+const CURRENCY_LABELS: Record<'cp' | 'sp' | 'ep' | 'gp' | 'pp', string> = {
+    cp: 'PC',
+    sp: 'PP',
+    ep: 'PE',
+    gp: 'PO',
+    pp: 'PL',
+};
+
 export interface SheetPrincipalHandle {
     getData: () => {
         characterName: string;
         selectedClassId: string;
         selectedRaceId: string;
         alignment: string;
+        background: string;
         personalityTraits: string;
         ideals: string;
         bonds: string;
@@ -106,26 +117,19 @@ interface SheetPrincipalProps {
     campaignId: string;
     characterId: string;
     isMaster: boolean;
+    xpSystem: boolean;
     onSpellDataChange?: (data: {
         spellClassName: string;
         spellAbilityLabel: string;
         spellCd: number;
         spellAttackBonus: number;
-        levelingSpecs?: {
-            cantripsKnown: { isValidToThisClass: boolean; amount: number[] };
-            spellsKnown: { isValidToThisClass: boolean; amount: number[] };
-            spellSlotsPerSpellLevel: {
-                isValidToThisClass: boolean;
-                spellLevel: number[];
-                spellSpaces: number[][];
-            };
-        };
+        levelingSpecs?: LevelingSpecs;
     }) => void;
 }
 
 const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
     function SheetPrincipal(
-        { campaignId, characterId, isMaster, onSpellDataChange },
+        { campaignId, characterId, isMaster, xpSystem, onSpellDataChange },
         ref
     ) {
         const [classes, setClasses] = useState<{ classId: string; name: string }[]>([]);
@@ -135,7 +139,8 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
         const [hpTotal, setHpTotal] = useState(0);
         const [spellAbilityLabel, setSpellAbilityLabel] = useState('');
         const [spellAbilityKey, setSpellAbilityKey] = useState('');
-        const [classLevelingSpecs, setClassLevelingSpecs] = useState<any>(null);
+        const [classLevelingSpecs, setClassLevelingSpecs] =
+            useState<LevelingSpecs | null>(null);
         const [races, setRaces] = useState<{ raceId: string; name: string }[]>([]);
         const [selectedRaceId, setSelectedRaceId] = useState('');
         const [raceSpeed, setRaceSpeed] = useState(0);
@@ -158,6 +163,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
         );
         const [characterName, setCharacterName] = useState('');
         const [alignment, setAlignment] = useState('');
+        const [background, setBackground] = useState('');
         const [personalityTraits, setPersonalityTraits] = useState('');
         const [ideals, setIdeals] = useState('');
         const [bonds, setBonds] = useState('');
@@ -172,6 +178,9 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
             { name: '', atkBonus: '', damageRaw: '' },
         ]);
         const [money, setMoney] = useState({ cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 });
+        const [moneyModalKey, setMoneyModalKey] = useState<
+            'cp' | 'sp' | 'ep' | 'gp' | 'pp' | null
+        >(null);
         const [proficienciesText, setProficienciesText] = useState('');
         const [extraCharacteristics, setExtraCharacteristics] = useState('');
         const [inventory, setInventory] = useState('');
@@ -212,6 +221,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                     selectedClassId,
                     selectedRaceId,
                     alignment,
+                    background,
                     personalityTraits,
                     ideals,
                     bonds,
@@ -368,13 +378,19 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                 setSpellAbilityLabel('');
                 setSpellAbilityKey('');
                 setClassLevelingSpecs(null);
+                if (!characterId) {
+                    setMoney((prev) => ({ ...prev, gp: 0 }));
+                }
                 return;
             }
             const cls = await getDnd5eClassById(classId);
             if (!cls?.hitPoints?.hitPointsAtFirstLevel) return;
             setClassBaseHp(Number(cls.hitPoints.hitPointsAtFirstLevel));
-            setHitDice(cls.hitPoints.hitDice?.[0] ?? '');
+            setHitDice((cls.hitPoints.hitDice as unknown as string) ?? '');
             setClassLevelingSpecs(cls.levelingSpecs ?? null);
+            if (!characterId) {
+                setMoney((prev) => ({ ...prev, gp: rollStartingWealth(cls.name ?? '') }));
+            }
             const MAGIC_CLASS_PT: Record<string, string> = {
                 strength: 'Força',
                 dexterity: 'Destreza',
@@ -503,15 +519,27 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                     </div>
                     <div className="cs-field">
                         <input
-                            className="cs-field-input cs-field-input--readonly"
+                            className={`cs-field-input${
+                                xpSystem ? ' cs-field-input--readonly' : ''
+                            }`}
                             placeholder="1"
                             value={level}
-                            readOnly
+                            type="number"
+                            min="1"
+                            onChange={(e) =>
+                                setLevel(Math.max(1, Number(e.target.value) || 1))
+                            }
+                            readOnly={xpSystem}
                         />
                         <span className="cs-field-label">Nível</span>
                     </div>
                     <div className="cs-field">
-                        <input className="cs-field-input" placeholder="Antecedente" />
+                        <input
+                            className="cs-field-input"
+                            placeholder="Antecedente"
+                            value={background}
+                            onChange={(e) => setBackground(e.target.value)}
+                        />
                         <span className="cs-field-label">Antecedente</span>
                     </div>
                     <div className="cs-field">
@@ -919,25 +947,19 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                         <div className="cs-equipment-box">
                             <div className="cs-inventory-currency-row">
                                 {(['cp', 'sp', 'ep', 'gp', 'pp'] as const).map((key) => (
-                                    <label
+                                    <button
                                         key={key}
-                                        className="cs-inventory-currency-item"
+                                        type="button"
+                                        className="cs-inventory-currency-item cursor-pointer"
+                                        onClick={() => setMoneyModalKey(key)}
                                     >
                                         <span className="cs-inventory-currency-label">
-                                            {key.toUpperCase()}
+                                            {CURRENCY_LABELS[key]}
                                         </span>
-                                        <input
-                                            className="cs-inventory-currency-input"
-                                            type="number"
-                                            value={money[key] || ''}
-                                            onChange={(e) =>
-                                                setMoney((prev) => ({
-                                                    ...prev,
-                                                    [key]: Number(e.target.value),
-                                                }))
-                                            }
-                                        />
-                                    </label>
+                                        <span className="cs-inventory-currency-input cs-field-input--readonly flex items-center justify-center">
+                                            {money[key]}
+                                        </span>
+                                    </button>
                                 ))}
                             </div>
                             <div className="cs-inventory-panel">
@@ -954,15 +976,6 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
 
                     {/* ─ Right: Personality ─ */}
                     <div className="cs-right-col">
-                        {isMaster && (
-                            <button
-                                type="button"
-                                className="button-L-fill font-S-bold bg-color-primary/default_900 text-color-greyScale/50 w-full text-sm"
-                                onClick={() => setXpModalOpen(true)}
-                            >
-                                {'Aumentar XP'}
-                            </button>
-                        )}
                         <div className="cs-trait-box">
                             <textarea
                                 className="cs-field-textarea w-full h-16"
@@ -1028,14 +1041,34 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                     </div>
                 </div>
 
+                {moneyModalKey !== null && (
+                    <MoneyModal
+                        currencyLabel={CURRENCY_LABELS[moneyModalKey]}
+                        currentAmount={money[moneyModalKey]}
+                        onConfirm={(delta) => {
+                            setMoney((prev) => ({
+                                ...prev,
+                                [moneyModalKey]: Math.max(0, prev[moneyModalKey] + delta),
+                            }));
+                            setMoneyModalKey(null);
+                        }}
+                        onClose={() => setMoneyModalKey(null)}
+                    />
+                )}
+
                 {xpModalOpen && (
                     <XpIncreaseModal
                         currentXp={xp}
+                        xpSystemEnabled={xpSystem}
                         onClose={() => setXpModalOpen(false)}
                         onConfirm={(addedXp) => {
-                            const nextProgression = applyXpGain(xp, addedXp);
-                            setXp(nextProgression.xp);
-                            setLevel(nextProgression.level);
+                            if (xpSystem) {
+                                const nextProgression = applyXpGain(xp, addedXp);
+                                setXp(nextProgression.xp);
+                                setLevel(nextProgression.level);
+                            } else {
+                                setXp((currentXp) => currentXp + addedXp);
+                            }
                             setXpModalOpen(false);
                         }}
                     />

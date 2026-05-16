@@ -153,7 +153,7 @@ export default function ParticipantsModal({
                     </div>
                 </div>
             )}
-            <div className="pm-overlay" onClick={onClose}>
+            <div className="pm-overlay">
                 <div className="pm-modal" onClick={(e) => e.stopPropagation()}>
                     {/* ── Header ───────────────────────────── */}
                     <div className="pm-header">

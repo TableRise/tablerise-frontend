@@ -109,6 +109,14 @@ const SKILL_LABELS: Record<string, string> = {
     persuasion: 'Persuasão',
 };
 
+const CURRENCY_LABELS: Record<'cp' | 'sp' | 'ep' | 'gp' | 'pp', string> = {
+    cp: 'PC',
+    sp: 'PP',
+    ep: 'PE',
+    gp: 'PO',
+    pp: 'PL',
+};
+
 const MIN_TOKEN_WIDTH_PCT = 4.5;
 const DEFAULT_TOKEN_WIDTH_PCT = MIN_TOKEN_WIDTH_PCT;
 const MAX_TOKEN_WIDTH_PCT = 14;
@@ -311,6 +319,7 @@ export default function MatchPage(): JSX.Element {
     const [isMaster, setIsMaster] = useState(false);
     const [isAdminPlayer, setIsAdminPlayer] = useState(false);
     const [isPlayer, setIsPlayer] = useState(false);
+    const [xpSystem, setXpSystem] = useState(true);
     const [gridVisible, setGridVisible] = useState(true);
     const [diceTrayOpen, setDiceTrayOpen] = useState(false);
     const [mediaModalOpen, setMediaModalOpen] = useState(false);
@@ -358,6 +367,22 @@ export default function MatchPage(): JSX.Element {
     const [className, setClassName] = useState('');
     const [raceName, setRaceName] = useState('');
     const [spellNameMap, setSpellNameMap] = useState<Record<string, string>>({});
+    const [spellUsed, setSpellUsed] = useState<Record<string, boolean>>({});
+    const [spellSlotsUsed, setSpellSlotsUsed] = useState<Record<number, number>>({});
+    const [panelDetailSpell, setPanelDetailSpell] = useState<{
+        name: string;
+        description: string;
+        type: string;
+        castingTime: string;
+        duration: string;
+        range: string;
+        components: string;
+        higherLevels: string;
+    } | null>(null);
+    const [panelDetailLoading, setPanelDetailLoading] = useState(false);
+    const [panelDetailKey, setPanelDetailKey] = useState<string | null>(null);
+    const [abilityUsed, setAbilityUsed] = useState<Record<string, boolean>>({});
+    const [abilitySlotsUsed, setAbilitySlotsUsed] = useState<Record<number, number>>({});
     const [journalPostsLoading, setJournalPostsLoading] = useState(false);
     const [journalHighlightLoading, setJournalHighlightLoading] = useState(false);
     const [journalHighlightSaving, setJournalHighlightSaving] = useState(false);
@@ -396,6 +421,69 @@ export default function MatchPage(): JSX.Element {
         diceRollSessionIdRef.current += 1;
         diceBoxRef.current?.clearDice();
         setDiceRollSession(createIdleDiceRollSession());
+    };
+
+    const openSpellDetail = async (level: number, spellId: string) => {
+        setPanelDetailKey(`${level}-${spellId}`);
+        setPanelDetailLoading(true);
+        setPanelDetailSpell(null);
+        const result = await getDnd5eSpellById(spellId);
+        setPanelDetailSpell(result as any);
+        setPanelDetailLoading(false);
+    };
+
+    const closeSpellDetail = () => {
+        setPanelDetailSpell(null);
+        setPanelDetailLoading(false);
+        setPanelDetailKey(null);
+    };
+
+    const handleUseSpell = () => {
+        if (!panelDetailKey) return;
+        const [levelStr] = panelDetailKey.split('-');
+        const level = Number(levelStr);
+        setSpellUsed((prev) => ({ ...prev, [panelDetailKey]: true }));
+        setSpellSlotsUsed((prev) => ({ ...prev, [level]: (prev[level] ?? 0) + 1 }));
+        closeSpellDetail();
+    };
+
+    const handleSpellClick = (level: number, spellId: string, maxSlots: number) => {
+        const key = `${level}-${spellId}`;
+        if (spellUsed[key]) {
+            setSpellUsed((prev) => ({ ...prev, [key]: false }));
+            setSpellSlotsUsed((prev) => ({
+                ...prev,
+                [level]: Math.max(0, (prev[level] ?? 0) - 1),
+            }));
+            return;
+        }
+        if (maxSlots > 0 && (spellSlotsUsed[level] ?? 0) >= maxSlots) return;
+        openSpellDetail(level, spellId);
+    };
+
+    const resetSpellMarks = () => {
+        setSpellUsed({});
+        setSpellSlotsUsed({});
+    };
+
+    const handleAbilityClick = (level: number, abilityName: string, maxSlots: number) => {
+        const key = `${level}-${abilityName}`;
+        if (abilityUsed[key]) {
+            setAbilityUsed((prev) => ({ ...prev, [key]: false }));
+            setAbilitySlotsUsed((prev) => ({
+                ...prev,
+                [level]: Math.max(0, (prev[level] ?? 0) - 1),
+            }));
+            return;
+        }
+        if (maxSlots > 0 && (abilitySlotsUsed[level] ?? 0) >= maxSlots) return;
+        setAbilityUsed((prev) => ({ ...prev, [key]: true }));
+        setAbilitySlotsUsed((prev) => ({ ...prev, [level]: (prev[level] ?? 0) + 1 }));
+    };
+
+    const resetAbilityMarks = () => {
+        setAbilityUsed({});
+        setAbilitySlotsUsed({});
     };
 
     const handleDiceLayerClick = () => {
@@ -501,6 +589,7 @@ export default function MatchPage(): JSX.Element {
 
         try {
             if (areJournalPostsEqual(highlightedJournalPost, post)) {
+                const removedPostTitle = post.title;
                 setHighlightedJournalPost(null);
                 setJournalHighlightReaderOpen(false);
                 await setCampaignHighlightedJournalPost(campaignId, {
@@ -649,6 +738,10 @@ export default function MatchPage(): JSX.Element {
         typeof window !== 'undefined'
             ? JSON.parse(localStorage.getItem('userLogged') as string)
             : null;
+
+    const handleLeaveMatch = (target: string) => {
+        router.push(target);
+    };
 
     const getMapLinkById = (mapId: string | null): string => {
         if (!mapId) return SideImageBackground.src;
@@ -898,6 +991,10 @@ export default function MatchPage(): JSX.Element {
     const playResolvedDiceRoll = async (payload: DiceRollResolvedPayload) => {
         const sessionId = diceRollSessionIdRef.current + 1;
         diceRollSessionIdRef.current = sessionId;
+        const forcedNotation =
+            payload.rolls.length > 0
+                ? `${payload.notation}@${payload.rolls.join(',')}`
+                : payload.notation;
 
         setDicePickerState(null);
         setDiceRollSession({
@@ -911,7 +1008,7 @@ export default function MatchPage(): JSX.Element {
 
         try {
             const diceBox = await ensureDiceBox();
-            await diceBox.roll(payload.notation);
+            await diceBox.roll(forcedNotation);
 
             if (diceRollSessionIdRef.current !== sessionId) return;
 
@@ -1206,6 +1303,7 @@ export default function MatchPage(): JSX.Element {
         emitCampaignSocketAck(socket, 'campaign:join', { campaignId }).then((ack) => {
             if (!ack.ok) {
                 reportSocketIssue(ack.error.message);
+                return;
             }
         });
 
@@ -1254,6 +1352,7 @@ export default function MatchPage(): JSX.Element {
             }
             setMusics(data?.musics ?? []);
             setMapImages(data?.matchData?.mapImages ?? []);
+            setXpSystem(data?.configurations?.xpSystem ?? true);
             if (data && userInfo?.userId) {
                 const role = data.campaignPlayers?.find(
                     (p: { userId: string; role: string }) => p.userId === userInfo.userId
@@ -1525,14 +1624,21 @@ export default function MatchPage(): JSX.Element {
     const deathSaves = stats?.deathSaves;
     const money = selectedCharacter?.data?.money;
 
-    const spellsByLevel: Array<{ label: string; items: string[]; slots?: string }> = [
-        { label: 'Truques', items: spellData?.cantrips ?? [] },
+    const spellsByLevel: Array<{
+        label: string;
+        items: string[];
+        slots?: string;
+        slotsTotal: number;
+    }> = [
+        { label: 'Truques', items: spellData?.cantrips ?? [], slotsTotal: 0 },
         ...Array.from({ length: 9 }, (_, i) => {
             const level = i + 1;
             const levelData = spellData?.[level];
             return {
                 label: `${level}º Círculo`,
                 items: levelData?.spellIds ?? [],
+                slotsTotal:
+                    typeof levelData?.slotsTotal === 'number' ? levelData.slotsTotal : 0,
                 slots:
                     typeof levelData?.slotsTotal === 'number'
                         ? `${levelData.slotsExpended ?? 0}/${levelData.slotsTotal}`
@@ -1542,14 +1648,21 @@ export default function MatchPage(): JSX.Element {
     ];
 
     const abilitiesData = (selectedCharacter?.data?.extraAbilities as any) ?? null;
-    const abilitiesByLevel: Array<{ label: string; items: string[]; slots?: string }> = [
-        { label: 'Truques', items: abilitiesData?.cantrips ?? [] },
+    const abilitiesByLevel: Array<{
+        label: string;
+        items: string[];
+        slots?: string;
+        slotsTotal: number;
+    }> = [
+        { label: 'Truques', items: abilitiesData?.cantrips ?? [], slotsTotal: 0 },
         ...Array.from({ length: 9 }, (_, i) => {
             const level = i + 1;
             const levelData = abilitiesData?.[level];
             return {
                 label: `${level}º Nível`,
                 items: levelData?.extraAbilityNames ?? [],
+                slotsTotal:
+                    typeof levelData?.slotsTotal === 'number' ? levelData.slotsTotal : 0,
                 slots:
                     typeof levelData?.slotsTotal === 'number'
                         ? `${levelData.slotsExpended ?? 0}/${levelData.slotsTotal}`
@@ -1769,34 +1882,61 @@ export default function MatchPage(): JSX.Element {
         });
     };
 
-    const handleDeleteCloneToken = (token: MapTokenInstance) => {
-        if (!token.isClone) return;
-
+    const deleteCloneTokenById = async (tokenId: string) => {
         const socket = campaignSocketRef.current;
         if (!socket) return;
 
-        emitCampaignSocketAck(socket, 'token:delete', {
+        const ack = await emitCampaignSocketAck(socket, 'token:delete', {
             campaignId,
-            tokenId: token.tokenId,
-        }).then((ack) => {
-            if (!ack.ok) {
-                reportSocketIssue(ack.error.message);
-                return;
+            tokenId,
+        });
+
+        if (!ack.ok) {
+            reportSocketIssue(ack.error.message);
+            return;
+        }
+
+        setClonedMapTokens((current) =>
+            current.filter((entry) => entry.tokenId !== tokenId)
+        );
+        setMapTokenLayoutById((current) => {
+            if (!current[tokenId]) {
+                return current;
             }
 
-            setClonedMapTokens((current) =>
-                current.filter((entry) => entry.tokenId !== token.tokenId)
-            );
-            setMapTokenLayoutById((current) => {
-                if (!current[token.tokenId]) {
-                    return current;
-                }
-
-                const nextLayouts = { ...current };
-                delete nextLayouts[token.tokenId];
-                return nextLayouts;
-            });
+            const nextLayouts = { ...current };
+            delete nextLayouts[tokenId];
+            return nextLayouts;
         });
+    };
+
+    const handleDeleteCloneToken = (token: MapTokenInstance) => {
+        if (!token.isClone) return;
+
+        void deleteCloneTokenById(token.tokenId);
+    };
+
+    const handleRemoveAllClones = async () => {
+        if (clonedMapTokens.length === 0) return;
+
+        await Promise.all(
+            clonedMapTokens.map((token) => deleteCloneTokenById(token.tokenId))
+        );
+    };
+
+    const handleRemoveAllAvatars = async () => {
+        if (visibleMapCharacterIds.length === 0 && clonedMapTokens.length === 0) return;
+
+        const hasVisibleAvatars = visibleMapCharacterIds.length > 0;
+        const didClearVisibleAvatars = hasVisibleAvatars
+            ? await handleVisibleCharacterIdsChange([])
+            : true;
+
+        if (!didClearVisibleAvatars) {
+            return;
+        }
+
+        await handleRemoveAllClones();
     };
 
     const handleGridToggle = async () => {
@@ -1875,7 +2015,7 @@ export default function MatchPage(): JSX.Element {
 
     const handleVisibleCharacterIdsChange = async (nextIds: string[]) => {
         const socket = campaignSocketRef.current;
-        if (!socket) return;
+        if (!socket) return false;
 
         const previousIds = visibleMapCharacterIds;
         setVisibleMapCharacterIds(nextIds);
@@ -1887,7 +2027,10 @@ export default function MatchPage(): JSX.Element {
 
         if (!ack.ok) {
             setVisibleMapCharacterIds(previousIds);
+            return false;
         }
+
+        return true;
     };
 
     return (
@@ -1909,7 +2052,7 @@ export default function MatchPage(): JSX.Element {
             {/* Top-left: Tablerise logo */}
             <div
                 className="match-logo-badge cursor-pointer"
-                onClick={() => router.push('/')}
+                onClick={() => handleLeaveMatch('/')}
             >
                 <Image
                     src={LogoSVG.src}
@@ -2189,7 +2332,20 @@ export default function MatchPage(): JSX.Element {
                                             <b>{deathSaves?.failures ?? 0}</b>
                                         </span>
                                         <span className="font-XXS-regular">
-                                            Dinheiro: <b>{money?.gp ?? 0} PO</b>
+                                            Dinheiro:{' '}
+                                            {(['cp', 'sp', 'ep', 'gp', 'pp'] as const)
+                                                .filter((key) => (money?.[key] ?? 0) > 0)
+                                                .map((key) => (
+                                                    <b key={key}>
+                                                        {money![key]}{' '}
+                                                        {CURRENCY_LABELS[key]}{' '}
+                                                    </b>
+                                                ))}
+                                            {(
+                                                ['cp', 'sp', 'ep', 'gp', 'pp'] as const
+                                            ).every(
+                                                (key) => (money?.[key] ?? 0) === 0
+                                            ) && <b>0 PO</b>}
                                         </span>
                                         <span className="font-XXS-regular">
                                             Bonus de proficiência:{' '}
@@ -2258,28 +2414,68 @@ export default function MatchPage(): JSX.Element {
 
                             {charPanelTab === 'magias' && (
                                 <div className="match-char-content">
-                                    {spellsByLevel.map((level) => (
+                                    {Object.values(spellUsed).some(Boolean) && (
+                                        <button
+                                            className="match-spell-reset-btn font-XXS-bold"
+                                            onClick={resetSpellMarks}
+                                        >
+                                            Resetar marcações de magias
+                                        </button>
+                                    )}
+                                    {spellsByLevel.map((level, levelIdx) => (
                                         <div
                                             key={level.label}
                                             className="match-char-section"
                                         >
                                             <p className="font-XXS-bold">
                                                 {level.label}
-                                                {level.slots
-                                                    ? ` • Slots ${level.slots}`
+                                                {level.slotsTotal > 0
+                                                    ? ` • Slots ${
+                                                          spellSlotsUsed[levelIdx] ?? 0
+                                                      }/${level.slotsTotal}`
                                                     : ''}
                                             </p>
-                                            <p className="font-XXS-regular">
-                                                {level.items.length > 0
-                                                    ? level.items
-                                                          .map(
-                                                              (spellId) =>
-                                                                  spellNameMap[spellId] ||
-                                                                  spellId
-                                                          )
-                                                          .join(', ')
-                                                    : 'Sem magias'}
-                                            </p>
+                                            {level.items.length > 0 ? (
+                                                <div className="match-spell-list">
+                                                    {level.items.map((spellId) => {
+                                                        const key = `${levelIdx}-${spellId}`;
+                                                        const used = spellUsed[key];
+                                                        const blocked =
+                                                            !used &&
+                                                            level.slotsTotal > 0 &&
+                                                            (spellSlotsUsed[levelIdx] ??
+                                                                0) >= level.slotsTotal;
+                                                        return (
+                                                            <span
+                                                                key={spellId}
+                                                                className={`match-spell-item font-XXS-regular${
+                                                                    used
+                                                                        ? ' match-spell-item--used'
+                                                                        : ''
+                                                                }${
+                                                                    blocked
+                                                                        ? ' match-spell-item--blocked'
+                                                                        : ''
+                                                                }`}
+                                                                onClick={() =>
+                                                                    handleSpellClick(
+                                                                        levelIdx,
+                                                                        spellId,
+                                                                        level.slotsTotal
+                                                                    )
+                                                                }
+                                                            >
+                                                                {spellNameMap[spellId] ||
+                                                                    spellId}
+                                                            </span>
+                                                        );
+                                                    })}
+                                                </div>
+                                            ) : (
+                                                <p className="font-XXS-regular">
+                                                    Sem magias
+                                                </p>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
@@ -2287,22 +2483,67 @@ export default function MatchPage(): JSX.Element {
 
                             {charPanelTab === 'habilidades' && (
                                 <div className="match-char-content">
-                                    {abilitiesByLevel.map((level) => (
+                                    {Object.values(abilityUsed).some(Boolean) && (
+                                        <button
+                                            className="match-spell-reset-btn"
+                                            onClick={resetAbilityMarks}
+                                        >
+                                            Resetar marcações de habilidades
+                                        </button>
+                                    )}
+                                    {abilitiesByLevel.map((level, levelIdx) => (
                                         <div
                                             key={level.label}
                                             className="match-char-section"
                                         >
                                             <p className="font-XXS-bold">
                                                 {level.label}
-                                                {level.slots
-                                                    ? ` • Slots ${level.slots}`
+                                                {level.slotsTotal > 0
+                                                    ? ` • Slots ${
+                                                          abilitySlotsUsed[levelIdx] ?? 0
+                                                      }/${level.slotsTotal}`
                                                     : ''}
                                             </p>
-                                            <p className="font-XXS-regular">
-                                                {level.items.length > 0
-                                                    ? level.items.join(', ')
-                                                    : 'Sem habilidades'}
-                                            </p>
+                                            {level.items.length > 0 ? (
+                                                <div className="match-spell-list">
+                                                    {level.items.map((abilityName) => {
+                                                        const key = `${levelIdx}-${abilityName}`;
+                                                        const used = abilityUsed[key];
+                                                        const blocked =
+                                                            !used &&
+                                                            level.slotsTotal > 0 &&
+                                                            (abilitySlotsUsed[levelIdx] ??
+                                                                0) >= level.slotsTotal;
+                                                        return (
+                                                            <span
+                                                                key={abilityName}
+                                                                className={`match-spell-item${
+                                                                    used
+                                                                        ? ' match-spell-item--used'
+                                                                        : ''
+                                                                }${
+                                                                    blocked
+                                                                        ? ' match-spell-item--blocked'
+                                                                        : ''
+                                                                }`}
+                                                                onClick={() =>
+                                                                    handleAbilityClick(
+                                                                        levelIdx,
+                                                                        abilityName,
+                                                                        level.slotsTotal
+                                                                    )
+                                                                }
+                                                            >
+                                                                {abilityName}
+                                                            </span>
+                                                        );
+                                                    })}
+                                                </div>
+                                            ) : (
+                                                <p className="font-XXS-regular">
+                                                    Sem habilidades
+                                                </p>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
@@ -2517,7 +2758,7 @@ export default function MatchPage(): JSX.Element {
                     className="match-bottom-bar-item match-bottom-bar-item--danger"
                     title="Sair da Partida"
                     onClick={() =>
-                        router.push(`/campaigns/lobby?campaignId=${campaignId}`)
+                        handleLeaveMatch(`/campaigns/lobby?campaignId=${campaignId}`)
                     }
                 >
                     <Image src={ExitRedSVG.src} alt="Sair" width={28} height={28} />
@@ -2688,8 +2929,104 @@ export default function MatchPage(): JSX.Element {
                     userId={userInfo.userId}
                     isPlayer={isPlayer}
                     isMaster={isMaster}
+                    xpSystem={xpSystem}
                     onClose={() => setSheetModalOpen(false)}
                 />
+            )}
+
+            {(panelDetailSpell !== null || panelDetailLoading) && (
+                <div className="cs-spell-picker-overlay" onClick={closeSpellDetail}>
+                    <div
+                        className="cs-spell-picker-modal"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="cs-spell-picker-header">
+                            <h2 className="font-S-bold text-base">
+                                {panelDetailLoading
+                                    ? 'Carregando...'
+                                    : panelDetailSpell?.name}
+                            </h2>
+                            <button
+                                type="button"
+                                className="cs-spell-picker-close"
+                                onClick={closeSpellDetail}
+                            >
+                                ✕
+                            </button>
+                        </div>
+                        <div className="cs-spell-picker-list">
+                            {panelDetailLoading && (
+                                <p className="text-center text-sm py-8">Carregando...</p>
+                            )}
+                            {!panelDetailLoading && panelDetailSpell && (
+                                <div className="cs-spell-accordion-body border-none px-0">
+                                    <p className="text-xs leading-relaxed mb-3">
+                                        {panelDetailSpell.description}
+                                    </p>
+                                    <div className="cs-spell-accordion-fields">
+                                        <div className="cs-spell-accordion-field">
+                                            <span className="cs-spell-accordion-field-label">
+                                                Tipo
+                                            </span>
+                                            <span className="cs-spell-accordion-field-value">
+                                                {panelDetailSpell.type}
+                                            </span>
+                                        </div>
+                                        <div className="cs-spell-accordion-field">
+                                            <span className="cs-spell-accordion-field-label">
+                                                Tempo de Conjuração
+                                            </span>
+                                            <span className="cs-spell-accordion-field-value">
+                                                {panelDetailSpell.castingTime}
+                                            </span>
+                                        </div>
+                                        <div className="cs-spell-accordion-field">
+                                            <span className="cs-spell-accordion-field-label">
+                                                Duração
+                                            </span>
+                                            <span className="cs-spell-accordion-field-value">
+                                                {panelDetailSpell.duration}
+                                            </span>
+                                        </div>
+                                        <div className="cs-spell-accordion-field">
+                                            <span className="cs-spell-accordion-field-label">
+                                                Alcance
+                                            </span>
+                                            <span className="cs-spell-accordion-field-value">
+                                                {panelDetailSpell.range}
+                                            </span>
+                                        </div>
+                                        <div className="cs-spell-accordion-field">
+                                            <span className="cs-spell-accordion-field-label">
+                                                Componentes
+                                            </span>
+                                            <span className="cs-spell-accordion-field-value">
+                                                {panelDetailSpell.components}
+                                            </span>
+                                        </div>
+                                        {panelDetailSpell.higherLevels && (
+                                            <div className="cs-spell-accordion-field cs-spell-accordion-field--full">
+                                                <span className="cs-spell-accordion-field-label">
+                                                    Em Níveis Superiores
+                                                </span>
+                                                <span className="cs-spell-accordion-field-value">
+                                                    {panelDetailSpell.higherLevels}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className="match-spell-use-btn font-XS-bold"
+                                        onClick={handleUseSpell}
+                                    >
+                                        Usar Magia
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
             )}
 
             {selectedMapCharacterId && campaignId && (
@@ -2698,6 +3035,7 @@ export default function MatchPage(): JSX.Element {
                     characterId={selectedMapCharacterId}
                     campaignId={campaignId}
                     isMaster={isMaster}
+                    xpSystem={xpSystem}
                     onBack={() => setSelectedMapCharacterId(null)}
                 />
             )}
@@ -2734,7 +3072,14 @@ export default function MatchPage(): JSX.Element {
                     characters={searchedCampaignCharacters}
                     searchValue={avatarSearch}
                     visibleCharacterIds={visibleMapCharacterIds}
+                    disableRemoveAllAvatars={
+                        visibleMapCharacterIds.length === 0 &&
+                        clonedMapTokens.length === 0
+                    }
+                    disableRemoveAllClones={clonedMapTokens.length === 0}
                     onClose={() => setAvatarSelectionModalOpen(false)}
+                    onRemoveAllAvatars={handleRemoveAllAvatars}
+                    onRemoveAllClones={handleRemoveAllClones}
                     onSearchChange={setAvatarSearch}
                     onToggleCharacter={(characterId) =>
                         handleVisibleCharacterIdsChange(

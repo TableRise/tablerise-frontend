@@ -48,6 +48,18 @@
             focus:border-color-primary/default_900;
     }
 
+    .masm-actions {
+        @apply flex flex-col gap-2;
+    }
+
+    .masm-action-btn {
+        @apply w-full py-2.5 rounded-lg border border-color-greyScale/200
+            bg-color-greyScale/50 text-color-greyScale/800 cursor-pointer
+            transition-colors hover:border-color-primary/default_900 hover:bg-white
+            disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-color-greyScale/200
+            disabled:hover:bg-color-greyScale/50;
+    }
+
     .masm-list {
         @apply flex flex-col gap-3;
     }

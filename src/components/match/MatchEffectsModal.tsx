@@ -20,7 +20,7 @@ export default function MatchEffectsModal({
     };
 
     return (
-        <div className="mem-overlay" onClick={onClose}>
+        <div className="mem-overlay">
             <div className="mem-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="mem-header">
                     <div>

@@ -88,6 +88,43 @@
     }
 
     /* ── Sections ─────────────────────────── */
+    .cdm-levelup-banner {
+        @apply flex items-start justify-between gap-4 rounded-2xl border
+            bg-color-primary/default_900 px-4 py-3;
+    }
+
+    .cdm-levelup-copy {
+        @apply flex flex-col gap-1;
+    }
+
+    .cdm-levelup-kicker {
+        @apply uppercase tracking-wide text-color-greyScale/50;
+    }
+
+    .cdm-levelup-text {
+        @apply text-color-greyScale/50 leading-relaxed;
+    }
+
+    .cdm-levelup-actions {
+        @apply flex items-center gap-2 self-stretch;
+    }
+
+    .cdm-levelup-progress {
+        @apply text-color-greyScale/50 whitespace-nowrap;
+    }
+
+    .cdm-levelup-nav {
+        @apply flex h-9 w-9 items-center justify-center rounded-full border border-color-greyScale/50
+            bg-color-greyScale/50 transition-opacity hover:opacity-80 disabled:cursor-not-allowed
+            disabled:opacity-40;
+    }
+
+    .cdm-levelup-close {
+        @apply flex h-9 w-9 items-center justify-center rounded-full border border-color-greyScale/50
+            text-color-greyScale/50  text-lg leading-none transition-opacity hover:opacity-80
+            disabled:cursor-not-allowed disabled:opacity-30;
+    }
+
     .cdm-section {
         @apply flex flex-col gap-4;
     }
@@ -173,6 +210,76 @@
         @apply grid grid-cols-5 gap-3 mt-2;
     }
 
+    /* ── Bought items table ───────────────── */
+    .cdm-inventory-wrapper {
+        @apply flex flex-col gap-1;
+    }
+
+    .cdm-inventory-table-wrapper {
+        @apply overflow-auto rounded-lg border border-color-greyScale/200 max-h-48;
+    }
+
+    .cdm-inventory-table {
+        @apply w-full text-xs border-collapse;
+    }
+
+    .cdm-inventory-table thead {
+        @apply bg-color-greyScale/200 sticky top-0 z-10;
+    }
+
+    .cdm-inventory-table th {
+        @apply px-2 py-1.5 text-left font-bold text-color-greyScale/700 whitespace-nowrap;
+    }
+
+    .cdm-inventory-table tbody tr {
+        @apply border-t border-color-greyScale/200 even:bg-color-greyScale/50;
+    }
+
+    .cdm-inventory-table td {
+        @apply px-2 py-1.5 text-color-greyScale/700 whitespace-nowrap;
+    }
+
+    .cdm-inventory-row--clickable {
+        @apply cursor-pointer hover:bg-color-greyScale/100 transition-colors;
+    }
+
+    .cdm-inventory-row--selected {
+        @apply !bg-color-primary/default_900/10 cursor-pointer;
+    }
+
+    .cdm-sell-btn {
+        @apply px-3 py-2 rounded-lg !bg-red-500 text-white font-bold text-xs cursor-pointer
+            transition-opacity hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed;
+    }
+
+    /* ── Sell confirmation modal ──────────── */
+    .cdm-sell-confirm-modal {
+        @apply rounded-2xl shadow-2xl p-6 flex flex-col gap-4
+            w-full max-w-sm mx-4 bg-color-greyScale/50;
+    }
+
+    .cdm-sell-confirm-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .cdm-sell-confirm-body {
+        @apply text-color-greyScale/700;
+    }
+
+    .cdm-sell-confirm-actions {
+        @apply flex justify-end gap-3;
+    }
+
+    .cdm-sell-confirm-cancel {
+        @apply px-4 py-2 rounded-lg border border-color-greyScale/200 text-color-greyScale/700
+            font-bold text-xs cursor-pointer transition-opacity hover:opacity-70;
+    }
+
+    .cdm-sell-confirm-ok {
+        @apply px-4 py-2 rounded-lg !bg-red-500 text-white font-bold text-xs cursor-pointer
+            transition-opacity hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed;
+    }
+
     /* ── Edit inputs ──────────────────────── */
     .cdm-edit-number {
         @apply w-full text-center border-b-2 border-color-greyScale/200 bg-transparent outline-none
@@ -187,5 +294,15 @@
     .cdm-edit-textarea {
         @apply w-full border-2 border-color-greyScale/200 rounded-lg px-3 py-2 bg-transparent
             outline-none resize-none focus:border-color-primary/default_900 transition-colors;
+    }
+
+    @media (max-width: 768px) {
+        .cdm-levelup-banner {
+            @apply flex-col;
+        }
+
+        .cdm-levelup-actions {
+            @apply w-full justify-end;
+        }
     }
 }

@@ -17,6 +17,7 @@ export default function LoginRedirectParams(): JSX.Element {
         const userToStorage = {
             userId: data.userId,
             providerId: data.providerId,
+            nickname: data.nickname,
             username: `${data.nickname}${data.tag}`,
             picture: data.picture?.link,
         };

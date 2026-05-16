@@ -5,11 +5,25 @@ import CampaignCard from '@/components/common/CampaignCard';
 import CampaignPasswordModal from '@/components/home/CampaignPasswordModal';
 import ErrorModal from '@/components/home/ErrorModal';
 import { searchCampaigns } from '@/server/campaigns/search-campaigns';
+import { getCampaignById } from '@/server/campaigns/join-campaign';
 import { useJoinCampaign } from '@/components/home/helpers/useJoinCampaign';
 import '@/components/home/styles/JoinCampaignModal.css';
 
 interface Props {
     onClose: () => void;
+}
+
+function getCampaignNextMatchDate(campaign: any): string {
+    const nextMatchDate = campaign.infos?.nextMatchDate ?? campaign.nextMatchDate;
+    return nextMatchDate ? nextMatchDate : 'no-date';
+}
+
+function getCampaignPlayers(campaign: any): any[] {
+    return campaign.campaignPlayers ?? campaign.players ?? [];
+}
+
+function getCampaignPlayerAmountLimit(campaign: any): number {
+    return campaign.infos?.playerAmountLimit ?? campaign.playerAmountLimit ?? 0;
 }
 
 export default function JoinCampaignModal({ onClose }: Props): JSX.Element {
@@ -44,8 +58,23 @@ export default function JoinCampaignModal({ onClose }: Props): JSX.Element {
             if (code) params.code = code;
 
             const data = await searchCampaigns(params);
-            const all = Array.isArray(data) ? data : [];
-            setResults(all.slice(0, 20));
+            const all = Array.isArray(data) ? data.slice(0, 20) : [];
+            const campaignDetails = await Promise.all(
+                all.map(async (campaign) => {
+                    const campaignId = campaign?.campaignId;
+
+                    if (!campaignId) return campaign;
+
+                    try {
+                        const fullCampaign = await getCampaignById(campaignId);
+                        return fullCampaign ? { ...campaign, ...fullCampaign } : campaign;
+                    } catch {
+                        return campaign;
+                    }
+                })
+            );
+
+            setResults(campaignDetails);
         } catch {
             setResults([]);
         } finally {
@@ -96,9 +125,7 @@ export default function JoinCampaignModal({ onClose }: Props): JSX.Element {
                                     <CampaignCard
                                         key={uuid()}
                                         title={campaign.title}
-                                        nextMatchDate={
-                                            campaign.infos?.nextMatchDate ?? 'no-date'
-                                        }
+                                        nextMatchDate={getCampaignNextMatchDate(campaign)}
                                         fogColor="#0A358A"
                                         image={campaign.cover?.link}
                                         textColor="white"
@@ -107,13 +134,15 @@ export default function JoinCampaignModal({ onClose }: Props): JSX.Element {
                                         buttonTitle="Entrar no Jogo"
                                         system={campaign.system}
                                         ageRestriction={campaign.ageRestriction}
-                                        campaignPlayers={campaign.campaignPlayers ?? []}
-                                        playerAmountLimit={campaign.playerAmountLimit}
+                                        campaignPlayers={getCampaignPlayers(campaign)}
+                                        playerAmountLimit={getCampaignPlayerAmountLimit(
+                                            campaign
+                                        )}
                                         campaignId={campaign.campaignId}
                                         onButtonClick={() =>
                                             handleJoinClick(
                                                 campaign.campaignId,
-                                                campaign.campaignPlayers ?? []
+                                                getCampaignPlayers(campaign)
                                             )
                                         }
                                     />

@@ -50,6 +50,18 @@
         @apply flex flex-col gap-1;
     }
 
+    .ecm-checkbox-field {
+        @apply flex flex-col gap-2;
+    }
+
+    .ecm-checkbox-row {
+        @apply flex items-center gap-3;
+    }
+
+    .ecm-checkbox {
+        @apply h-4 w-4 cursor-pointer accent-color-primary/default_900;
+    }
+
     .ecm-field-label {
         @apply text-color-greyScale/950;
     }
@@ -277,6 +289,67 @@
 
     .ecm-btn-save {
         @apply w-full;
+    }
+
+    .ecm-delete-row {
+        @apply w-full px-8 pb-5 flex justify-end;
+    }
+
+    .ecm-delete-btn {
+        @apply w-full text-red-600 transition-colors;
+    }
+
+    .ecm-delete-btn:hover:not(:disabled) {
+        @apply text-red-700;
+    }
+
+    .ecm-delete-btn:disabled {
+        @apply cursor-not-allowed opacity-50;
+    }
+
+    .ecm-error--inline {
+        @apply px-8 pb-5;
+    }
+
+    .ecm-confirm-overlay {
+        @apply fixed inset-0 z-[210] flex items-center justify-center bg-black/50;
+    }
+
+    .ecm-confirm-modal {
+        @apply bg-white rounded-2xl p-6 w-[28rem] max-w-[90vw] shadow-xl flex flex-col gap-4;
+    }
+
+    .ecm-confirm-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .ecm-confirm-body {
+        @apply text-color-greyScale/700 leading-relaxed;
+    }
+
+    .ecm-confirm-actions {
+        @apply flex items-center justify-end gap-3;
+    }
+
+    .ecm-confirm-cancel {
+        @apply text-color-greyScale/700 transition-colors;
+    }
+
+    .ecm-confirm-cancel:hover:not(:disabled) {
+        @apply text-color-greyScale/950;
+    }
+
+    .ecm-confirm-ok {
+        @apply px-4 py-2 rounded-lg !bg-red-600 text-white transition-opacity;
+    }
+
+    .ecm-confirm-ok:hover:not(:disabled) {
+        @apply opacity-90;
+    }
+
+    .ecm-confirm-cancel:disabled,
+    .ecm-confirm-ok:disabled {
+        @apply cursor-not-allowed opacity-60;
     }
 
     .ecm-tab-content {

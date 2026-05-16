@@ -14,7 +14,7 @@ export const getUser = async (
 
         return data;
     } catch ({ response }: AxiosError | any) {
-        if (response.status == 404) throw new Error('UsuÃ¡rio nÃ£o encontrado');
+        if (response.status == 404) throw new Error('UsuÃ¡rio não encontrado');
         if (response.status == 500) throw new Error('Erro no servidor');
         return null;
     }

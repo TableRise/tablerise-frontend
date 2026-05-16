@@ -53,6 +53,8 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
     const [discordLink, setDiscordLink] = useState('');
     const [twitterLink, setTwitterLink] = useState('');
     const [youtubeLink, setYoutubeLink] = useState('');
+    const [xpSystem, setXpSystem] = useState(true);
+    const [shopSystem, setShopSystem] = useState(true);
 
     /* ── step 3 fields ── */
     const [lore, setLore] = useState('');
@@ -126,6 +128,10 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
                     ...(discordLink ? { discord: discordLink } : {}),
                     ...(twitterLink ? { twitter: twitterLink } : {}),
                     ...(youtubeLink ? { youtube: youtubeLink } : {}),
+                },
+                configurations: {
+                    xpSystem,
+                    shopSystem,
                 },
             });
             onSuccess();
@@ -235,6 +241,10 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
                             setTwitterLink={setTwitterLink}
                             youtubeLink={youtubeLink}
                             setYoutubeLink={setYoutubeLink}
+                            xpSystem={xpSystem}
+                            setXpSystem={setXpSystem}
+                            shopSystem={shopSystem}
+                            setShopSystem={setShopSystem}
                         />
                     )}
                     {step === 2 && <Step3 lore={lore} setLore={setLore} />}

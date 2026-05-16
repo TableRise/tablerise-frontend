@@ -46,9 +46,9 @@ const SheetHabilidades = forwardRef<SheetHabilidadesHandle, SheetHabilidadesProp
         },
         ref
     ) {
-        const [abilityKey, setAbilityKey] = useState('');
-        const [saveDc, setSaveDc] = useState('');
-        const [attackBonus, setAttackBonus] = useState('');
+        const [abilityKey, setAbilityKey] = useState('N/A');
+        const [saveDc, setSaveDc] = useState('0');
+        const [attackBonus, setAttackBonus] = useState('+0');
         const [abilityNames, setAbilityNames] = useState<Record<number, string[]>>(
             () =>
                 initialAbilityNames ??
@@ -135,31 +135,20 @@ const SheetHabilidades = forwardRef<SheetHabilidadesHandle, SheetHabilidadesProp
                                 </div>
                                 {sl.slots && (
                                     <div className="cs-spell-slots">
-                                        <span>Total</span>
-                                        <input
-                                            className="cs-spell-slot-input"
-                                            value={slotsTotal[sl.level] || ''}
-                                            placeholder="0"
-                                            onChange={(e) =>
-                                                setSlotsTotal((prev) => ({
-                                                    ...prev,
-                                                    [sl.level]: e.target.value,
-                                                }))
-                                            }
-                                        />
-                                        <span>Usados</span>
-                                        <input
-                                            className="cs-spell-slot-input"
-                                            type="number"
-                                            placeholder="0"
-                                            value={slotsExpended[sl.level] || ''}
-                                            onChange={(e) =>
-                                                setSlotsExpended((prev) => ({
-                                                    ...prev,
-                                                    [sl.level]: Number(e.target.value),
-                                                }))
-                                            }
-                                        />
+                                        <span>
+                                            Espaços de Magia:{' '}
+                                            <input
+                                                className="cs-spell-slot-input"
+                                                value={slotsTotal[sl.level] || ''}
+                                                placeholder="0"
+                                                onChange={(e) =>
+                                                    setSlotsTotal((prev) => ({
+                                                        ...prev,
+                                                        [sl.level]: e.target.value,
+                                                    }))
+                                                }
+                                            />
+                                        </span>
                                     </div>
                                 )}
                             </div>
@@ -167,12 +156,6 @@ const SheetHabilidades = forwardRef<SheetHabilidadesHandle, SheetHabilidadesProp
                                 {Array.from({ length: ABILITIES_PER_LEVEL }).map(
                                     (_, idx) => (
                                         <div key={idx} className="cs-spell-row">
-                                            {sl.level > 0 && (
-                                                <input
-                                                    type="checkbox"
-                                                    className="cs-spell-check"
-                                                />
-                                            )}
                                             <input
                                                 className="cs-spell-name-input"
                                                 value={abilityNames[sl.level][idx]}

@@ -36,6 +36,14 @@ export const addPlayerToCampaign = async (campaignId: string, password?: string)
         return data;
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
+        const message =
+            error?.response?.data?.message ??
+            error?.response?.data?.error ??
+            error?.response?.data;
+
+        if (message === 'The campaign reached the limit of players') {
+            throw new Error('Campanha já atingiu o limite de Jogadores');
+        }
         if (status === 401) throw new Error('Senha incorreta');
         if (status === 404) throw new Error('Campanha não encontrada');
         if (status === 409) throw new Error('Você já está nesta campanha');
@@ -74,6 +82,21 @@ export const leaveCampaign = async (campaignId: string): Promise<void> => {
         if (status === 404) throw new Error('Campanha não encontrada');
         if (status === 500) throw new Error('Erro no servidor');
         throw new Error('Erro ao sair da campanha');
+    }
+};
+
+export const deleteCampaign = async (campaignId: string): Promise<void> => {
+    try {
+        await apiCall({
+            baseUrl: campaignsBaseUrl,
+            endpoint: `${campaignId}/delete`,
+            method: 'DELETE',
+        });
+    } catch (error: AxiosError | any) {
+        const status = error?.response?.status;
+        if (status === 404) throw new Error('Campanha não encontrada');
+        if (status === 500) throw new Error('Erro no servidor');
+        throw new Error('Erro ao deletar campanha');
     }
 };
 

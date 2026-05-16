@@ -21,6 +21,7 @@ import {
 import { getCampaignById } from '@/server/campaigns/join-campaign';
 import '@/app/campaigns/character-sheet/page.css';
 import Footer from '@/components/common/Footer';
+import { type LevelingSpecs } from '@/utils/characterLeveling';
 
 const TABS = ['Principal', 'Características', 'Magias', 'Habilidades'] as const;
 
@@ -43,15 +44,7 @@ export default function CharacterSheetPage(): JSX.Element {
         spellAbilityLabel: string;
         spellCd: number;
         spellAttackBonus: number;
-        levelingSpecs?: {
-            cantripsKnown: { isValidToThisClass: boolean; amount: number[] };
-            spellsKnown: { isValidToThisClass: boolean; amount: number[] };
-            spellSlotsPerSpellLevel: {
-                isValidToThisClass: boolean;
-                spellLevel: number[];
-                spellSpaces: number[][];
-            };
-        };
+        levelingSpecs?: LevelingSpecs;
     }>({
         spellClassName: '',
         spellAbilityLabel: '',
@@ -61,6 +54,7 @@ export default function CharacterSheetPage(): JSX.Element {
     const [showSpellModal, setShowSpellModal] = useState(false);
     const [spellModalDismissed, setSpellModalDismissed] = useState(false);
     const [isMaster, setIsMaster] = useState(false);
+    const [xpSystem, setXpSystem] = useState(true);
     const userInfo =
         typeof window !== 'undefined'
             ? JSON.parse(localStorage.getItem('userLogged') ?? 'null')
@@ -78,6 +72,7 @@ export default function CharacterSheetPage(): JSX.Element {
                     player.userId === userInfo.userId
             )?.role;
             setIsMaster(role === 'dungeon_master');
+            setXpSystem(data?.configurations?.xpSystem ?? true);
         });
     }, [campaignId, userInfo?.userId]);
 
@@ -126,6 +121,7 @@ export default function CharacterSheetPage(): JSX.Element {
                     xp: p.xp,
                     characteristics: {
                         alignment: p.alignment,
+                        background: p.background,
                         backstory: c.backstory,
                         personalityTraits: p.personalityTraits,
                         ideals: p.ideals,
@@ -135,8 +131,10 @@ export default function CharacterSheetPage(): JSX.Element {
                         alliesAndOrgs: c.alliesAndOrgs,
                         treasure: c.treasure,
                         other: {
-                            proficiencies: p.proficienciesText,
-                            extraCharacteristics: c.extraCharacteristicsDetail,
+                            languagesAndProficiencies: p.proficienciesText,
+                            characteristicsAndAbilities: p.extraCharacteristics,
+                            characteristicsAndAdditionalAbilities:
+                                c.extraCharacteristicsDetail,
                         },
                     },
                 },
@@ -170,7 +168,6 @@ export default function CharacterSheetPage(): JSX.Element {
                 })),
                 equipments: p.inventory,
                 money: p.money,
-                features: p.extraCharacteristics,
                 ...(hasSpells && {
                     spells: {
                         cantrips: (m.spellNames[0] ?? [])
@@ -257,6 +254,7 @@ export default function CharacterSheetPage(): JSX.Element {
                             campaignId={campaignId}
                             characterId={characterId}
                             isMaster={isMaster}
+                            xpSystem={xpSystem}
                             onSpellDataChange={setSpellData}
                         />
                     </div>

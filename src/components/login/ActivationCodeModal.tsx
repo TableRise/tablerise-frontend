@@ -65,7 +65,7 @@ export default function ActivationCodeModal({
     };
 
     return (
-        <div className="activation-modal-overlay" onClick={onClose}>
+        <div className="activation-modal-overlay">
             <div className="activation-modal-card" onClick={(e) => e.stopPropagation()}>
                 <h1 className="activation-modal-title font-L-semibold">
                     Ative sua conta

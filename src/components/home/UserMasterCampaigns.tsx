@@ -80,7 +80,7 @@ export default function UserMasterCampaigns({
                         title={campaigns[1].title}
                         nextMatchDate={campaigns[1].infos.nextMatchDate}
                         fogColor="#0A358A"
-                        image={campaigns[0].cover?.link}
+                        image={campaigns[1].cover?.link}
                         textColor="white"
                         buttonColor="white"
                         buttonTitle="Entrar no Jogo"

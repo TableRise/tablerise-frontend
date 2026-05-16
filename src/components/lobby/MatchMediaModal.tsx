@@ -25,7 +25,7 @@ export default function MatchMediaModal({
     const [activeTab, setActiveTab] = useState<'musics' | 'maps'>('musics');
 
     return (
-        <div className="mmm-backdrop" onClick={onClose}>
+        <div className="mmm-backdrop">
             <div className="mmm-modal" onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
                 <div className="mmm-header">

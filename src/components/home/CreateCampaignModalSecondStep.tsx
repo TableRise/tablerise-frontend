@@ -1,9 +1,19 @@
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import Image from 'next/image';
 import UploadSVG from '../../../assets/icons/sys/upload-gray.svg?url';
+import HelpSVG from '../../../assets/icons/sys/help-blue.svg?url';
 import type { CampaignMusic } from '@/server/campaigns/create-campaign';
 import { AGE_RATINGS } from '@/components/home/helpers/CreateCampaignModalHelpers';
 import SoundtrackUI from '@/components/common/SoundtrackUI';
+
+const SYSTEM_TOOLTIPS = {
+    xpSystem: `Sistema de gerenciamento de XP:
+
+Mestre decide a forma de distribuir XP aos players mas o nível é calculado automaticamente pelo sistema, sendo exclusivamente adicionado pelo mestre na ficha de cada personagem. (Este sistema segue a tabela oficial do D&D para progressão de nível).`,
+    shopSystem: `Sistema de loja de itens:
+
+Itens dispoínveis no livro do jogador (pg. 145) estarão disponíveis na campanha para compra, ou seja, os jogadores terão uma loja especializada para compra de itens na campanha, calculo de dinheiro do jogador automático e sistema de conversão de moeda (ex. gp -> pl) incluído (cofre).`,
+} as const;
 
 export default function CreateCampaignModalSecondStep({
     system,
@@ -27,6 +37,10 @@ export default function CreateCampaignModalSecondStep({
     setTwitterLink,
     youtubeLink,
     setYoutubeLink,
+    xpSystem,
+    setXpSystem,
+    shopSystem,
+    setShopSystem,
 }: any) {
     const mapInputRef = useRef<HTMLInputElement>(null);
 
@@ -115,6 +129,73 @@ export default function CreateCampaignModalSecondStep({
                     onChange={(e) => setPlayerAmountLimit(Number(e.target.value))}
                 />
             </label>
+
+            <div className="ccm-field">
+                <span className="font-S-bold ccm-field-label">Sistemas da campanha</span>
+                <div className="ccm-system-options">
+                    <div className="ccm-system-option">
+                        <label className="ccm-system-option-main">
+                            <input
+                                type="checkbox"
+                                className="ccm-system-checkbox"
+                                checked={xpSystem}
+                                onChange={(e) => setXpSystem(e.target.checked)}
+                            />
+                            <span className="font-S-regular">
+                                Sistema de gerenciamento de XP
+                            </span>
+                        </label>
+                        <div className="ccm-system-help">
+                            <button
+                                type="button"
+                                className="ccm-system-help-trigger"
+                                aria-label="Ajuda sobre sistema de gerenciamento de XP"
+                            >
+                                <Image
+                                    src={HelpSVG.src}
+                                    alt="Ajuda sobre sistema de gerenciamento de XP"
+                                    width={18}
+                                    height={18}
+                                />
+                            </button>
+                            <div className="ccm-system-tooltip font-XXS-regular">
+                                {SYSTEM_TOOLTIPS.xpSystem}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="ccm-system-option">
+                        <label className="ccm-system-option-main">
+                            <input
+                                type="checkbox"
+                                className="ccm-system-checkbox"
+                                checked={shopSystem}
+                                onChange={(e) => setShopSystem(e.target.checked)}
+                            />
+                            <span className="font-S-regular">
+                                Sistema de Loja de Itens
+                            </span>
+                        </label>
+                        <div className="ccm-system-help">
+                            <button
+                                type="button"
+                                className="ccm-system-help-trigger"
+                                aria-label="Ajuda sobre sistema de loja de itens"
+                            >
+                                <Image
+                                    src={HelpSVG.src}
+                                    alt="Ajuda sobre sistema de loja de itens"
+                                    width={18}
+                                    height={18}
+                                />
+                            </button>
+                            <div className="ccm-system-tooltip font-XXS-regular">
+                                {SYSTEM_TOOLTIPS.shopSystem}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div className="ccm-field">
                 <span className="font-S-bold ccm-field-label">Trilha sonora</span>
@@ -215,7 +296,7 @@ export default function CreateCampaignModalSecondStep({
             </div>
 
             {/* Redes sociais */}
-            <div className="ccm-field">
+            <div className="ccm-field mb-4">
                 <span className="font-S-bold ccm-field-label">Redes sociais</span>
                 <span className="font-XXS-regular ccm-field-hint">
                     Adicione links para as redes sociais da campanha (opcional)

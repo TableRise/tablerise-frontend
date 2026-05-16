@@ -2,6 +2,8 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import EditIcon from '@assets/icons/sys/edit.svg?url';
+import ArrowBackIcon from '@assets/icons/nav/arrow-back.svg?url';
+import ArrowRightIcon from '@assets/icons/nav/arrow-right.svg?url';
 import {
     getCharacterById,
     type FullCharacterDnd,
@@ -10,6 +12,7 @@ import {
     getDnd5eClassById,
     getDnd5eRaceById,
     getDnd5eSpellById,
+    type DndClassRecord,
 } from '@/server/dungeons&dragons5e/system';
 import '@/components/lobby/styles/CharacterDetailModal.css';
 import '@/app/campaigns/character-sheet/page.css';
@@ -19,15 +22,27 @@ import SheetMagias, {
 import SheetHabilidades, {
     type SheetHabilidadesHandle,
 } from '@/components/character-sheet/SheetHabilidades';
-import { updateCharacter } from '@/server/characters/update-character';
+import {
+    updateCharacter,
+    removeCharacterEquipment,
+    updateCharacterMoney,
+} from '@/server/characters/update-character';
 import { uploadCharacterPicture } from '@/server/characters/upload-character-picture';
 import XpIncreaseModal from '@/components/common/XpIncreaseModal';
+import MoneyModal from '@/components/character-sheet/MoneyModal';
 import { applyXpGain } from '@/utils/characterXp';
+import {
+    buildLevelUpNotifications,
+    getLevelingSnapshot,
+    hasAnySpellProgression,
+    type LevelUpNotification,
+} from '@/utils/characterLeveling';
 
 interface CharacterDetailModalProps {
     characterId: string;
     campaignId: string;
     isMaster?: boolean;
+    xpSystem?: boolean;
     onBack: () => void;
 }
 
@@ -92,6 +107,38 @@ const SKILL_TO_ABILITY: Record<string, string> = {
     survival: 'wis',
 };
 
+const CURRENCY_LABELS: Record<'cp' | 'sp' | 'ep' | 'gp' | 'pp', string> = {
+    cp: 'PC',
+    sp: 'PP',
+    ep: 'PE',
+    gp: 'PO',
+    pp: 'PL',
+};
+
+const MAGIC_CLASS_PT: Record<string, string> = {
+    strength: 'ForÃ§a',
+    dexterity: 'Destreza',
+    constitution: 'ConstituiÃ§Ã£o',
+    intelligence: 'InteligÃªncia',
+    wisdom: 'Sabedoria',
+    charisma: 'Carisma',
+};
+
+const ABILITY_KEY_MAP: Record<string, string> = {
+    strength: 'str',
+    dexterity: 'dex',
+    constitution: 'con',
+    intelligence: 'int',
+    wisdom: 'wis',
+    charisma: 'cha',
+    forca: 'str',
+    destreza: 'dex',
+    constituicao: 'con',
+    inteligencia: 'int',
+    sabedoria: 'wis',
+    carisma: 'cha',
+};
+
 function modifier(value: number): string {
     const mod = Math.floor((value - 10) / 2);
     return mod >= 0 ? `+${mod}` : `${mod}`;
@@ -99,6 +146,24 @@ function modifier(value: number): string {
 
 function signed(value: number): string {
     return value >= 0 ? `+${value}` : `${value}`;
+}
+
+function normalizeAbilityName(value: string): string {
+    return value
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+}
+
+function getAbilityKeyFromLabel(value?: string | null): string {
+    if (!value) return '';
+    return ABILITY_KEY_MAP[normalizeAbilityName(value)] ?? '';
+}
+
+function getLocalizedAbilityLabel(value?: string | null): string {
+    if (!value) return '';
+    const normalized = normalizeAbilityName(value);
+    return MAGIC_CLASS_PT[normalized] ?? value;
 }
 
 const SPELL_LEVELS = [
@@ -135,10 +200,12 @@ export default function CharacterDetailModal({
     characterId,
     campaignId,
     isMaster = false,
+    xpSystem = true,
     onBack,
 }: CharacterDetailModalProps): JSX.Element {
     const [char, setChar] = useState<FullCharacterDnd | null>(null);
     const [loading, setLoading] = useState(true);
+    const [classRecord, setClassRecord] = useState<DndClassRecord | null>(null);
     const [className, setClassName] = useState('');
     const [raceName, setRaceName] = useState('');
     const [isEditing, setIsEditing] = useState(false);
@@ -146,6 +213,10 @@ export default function CharacterDetailModal({
     const [xpModalOpen, setXpModalOpen] = useState(false);
     const [xpUpdateSaving, setXpUpdateSaving] = useState(false);
     const [xpUpdateError, setXpUpdateError] = useState('');
+    const [levelUpNotifications, setLevelUpNotifications] = useState<
+        LevelUpNotification[]
+    >([]);
+    const [activeNotificationIndex, setActiveNotificationIndex] = useState(0);
     const editMagiasRef = useRef<SheetMagiasHandle>(null);
     const editHabilidadesRef = useRef<SheetHabilidadesHandle>(null);
     const pictureInputRef = useRef<HTMLInputElement>(null);
@@ -163,6 +234,7 @@ export default function CharacterDetailModal({
         hitPointsCurrent: 0,
         hitPointsTemp: 0,
     });
+    const [editBackground, setEditBackground] = useState('');
     const [editPersonality, setEditPersonality] = useState({
         personalityTraits: '',
         ideals: '',
@@ -176,15 +248,96 @@ export default function CharacterDetailModal({
         eyes: '',
         skin: '',
         hair: '',
+        description: '',
     });
     const [editEquipments, setEditEquipments] = useState('');
     const [editMoney, setEditMoney] = useState({ cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 });
+    const [editLevel, setEditLevel] = useState(1);
+    const [moneyModalKey, setMoneyModalKey] = useState<
+        'cp' | 'sp' | 'ep' | 'gp' | 'pp' | null
+    >(null);
+    const [moneyUpdating, setMoneyUpdating] = useState(false);
     const [editHistorico, setEditHistorico] = useState({
         backstory: '',
         alliesAndOrgs: '',
         treasure: '',
     });
+    const [editOther, setEditOther] = useState({
+        languagesAndProficiencies: '',
+        characteristicsAndAbilities: '',
+        characteristicsAndAdditionalAbilities: '',
+    });
     const [editSkillProfs, setEditSkillProfs] = useState<Record<string, boolean>>({});
+    const [selectedInventoryItemId, setSelectedInventoryItemId] = useState<string | null>(
+        null
+    );
+    const [selling, setSelling] = useState(false);
+    const [sellConfirmItem, setSellConfirmItem] = useState<{
+        equipmentId: string;
+        name: string;
+        type: string;
+        price: Array<number | string>;
+        armorClass?: Array<number | string>;
+        strength?: string;
+        stealth?: string;
+        weight: string;
+        damage?: string;
+        properties?: string;
+    } | null>(null);
+    const [activeTab, setActiveTab] = useState<
+        'principal' | 'magias' | 'habilidades' | 'inventario'
+    >('principal');
+    const [spellNameMap, setSpellNameMap] = useState<Record<string, string>>({});
+
+    const loadSpellNameMap = async (
+        targetCharacter: FullCharacterDnd | null
+    ): Promise<Record<string, string>> => {
+        const spellsData = (targetCharacter?.data?.spells as any) ?? null;
+        if (!spellsData) return {};
+
+        const ids: string[] = [];
+        if (Array.isArray(spellsData.cantrips)) ids.push(...spellsData.cantrips);
+        for (let level = 1; level <= 9; level++) {
+            const levelData = spellsData[level];
+            if (Array.isArray(levelData?.spellIds)) ids.push(...levelData.spellIds);
+        }
+
+        const uniqueIds = Array.from(new Set(ids.filter(Boolean)));
+        if (uniqueIds.length === 0) return {};
+
+        const results = await Promise.all(uniqueIds.map((id) => getDnd5eSpellById(id)));
+        const nextMap: Record<string, string> = {};
+        results.forEach((result, index) => {
+            if (result?.name) nextMap[uniqueIds[index]] = result.name;
+        });
+        return nextMap;
+    };
+
+    const loadCharacterModalData = async (): Promise<FullCharacterDnd | null> => {
+        const result = await getCharacterById(characterId);
+        setChar(result);
+
+        if (result?.data?.profile) {
+            const { class: classId, race: raceId } = result.data.profile;
+            const [loadedClassRecord, raceData, nextSpellNameMap] = await Promise.all([
+                classId ? getDnd5eClassById(classId) : Promise.resolve(null),
+                raceId ? getDnd5eRaceById(raceId) : Promise.resolve(null),
+                loadSpellNameMap(result),
+            ]);
+
+            setClassRecord(loadedClassRecord);
+            setClassName(loadedClassRecord?.name ?? '');
+            setRaceName(raceData?.name ?? '');
+            setSpellNameMap(nextSpellNameMap);
+            return result;
+        }
+
+        setClassRecord(null);
+        setClassName('');
+        setRaceName('');
+        setSpellNameMap({});
+        return result;
+    };
 
     const handleStartEdit = () => {
         if (!char || !profile || !stats) return;
@@ -198,6 +351,7 @@ export default function CharacterDetailModal({
             hitPointsCurrent: stats.hitPoints.currentPoints,
             hitPointsTemp: stats.hitPoints.tempPoints,
         });
+        setEditBackground(profile.characteristics?.background ?? '');
         setEditPersonality({
             personalityTraits: profile.characteristics?.personalityTraits ?? '',
             ideals: profile.characteristics?.ideals ?? '',
@@ -212,13 +366,26 @@ export default function CharacterDetailModal({
             eyes: app?.eyes ?? '',
             skin: app?.skin ?? '',
             hair: app?.hair ?? '',
+            description: app?.description ?? '',
         });
-        setEditEquipments(char.data.equipments ?? '');
+        setEditEquipments(
+            typeof char.data.inventory === 'string' ? char.data.inventory : ''
+        );
         setEditMoney(char.data.money ?? { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 });
+        setEditLevel(Number(profile.level ?? 1));
         setEditHistorico({
             backstory: profile.characteristics?.backstory ?? '',
             alliesAndOrgs: profile.characteristics?.alliesAndOrgs ?? '',
             treasure: profile.characteristics?.treasure ?? '',
+        });
+        setEditOther({
+            languagesAndProficiencies:
+                profile.characteristics?.other?.languagesAndProficiencies ?? '',
+            characteristicsAndAbilities:
+                profile.characteristics?.other?.characteristicsAndAbilities ?? '',
+            characteristicsAndAdditionalAbilities:
+                profile.characteristics?.other?.characteristicsAndAdditionalAbilities ??
+                '',
         });
         // initialize per-skill proficiency from stored array
         const skillProfsInit: Record<string, boolean> = {};
@@ -226,17 +393,154 @@ export default function CharacterDetailModal({
             skillProfsInit[sk.name] = sk.checked;
         }
         setEditSkillProfs(skillProfsInit);
+        setSelectedInventoryItemId(null);
         setIsEditing(true);
+    };
+
+    const handleSell = async (item: {
+        equipmentId: string;
+        name: string;
+        type: string;
+        price: Array<number | string>;
+        armorClass?: Array<number | string>;
+        strength?: string;
+        stealth?: string;
+        weight: string;
+        damage?: string;
+        properties?: string;
+    }) => {
+        setSelling(true);
+        const success = await removeCharacterEquipment(characterId, item.equipmentId);
+        if (success) {
+            await loadCharacterModalData();
+        }
+        setSelectedInventoryItemId(null);
+        setSelling(false);
     };
 
     const handlePictureClick = () => {
         pictureInputRef.current?.click();
     };
 
-    const handleXpIncrease = async (addedXp: number) => {
-        if (!char) return;
+    const handleXpIncrease = async (addedXp: number, hpGain: number) => {
+        if (!char || !profile || !stats) return;
+
+        if (!xpSystem) {
+            setXpUpdateSaving(true);
+            setXpUpdateError('');
+
+            const success = await updateCharacter(characterId, {
+                data: {
+                    profile: {
+                        xp: Number(profile.xp ?? 0) + addedXp,
+                    },
+                },
+            });
+
+            if (!success) {
+                setXpUpdateSaving(false);
+                setXpUpdateError('Falha ao atualizar XP.');
+                return;
+            }
+
+            await loadCharacterModalData();
+            setLevelUpNotifications([]);
+            setActiveNotificationIndex(0);
+            setXpUpdateSaving(false);
+            setXpModalOpen(false);
+            return;
+        }
 
         const nextProgression = applyXpGain(profile?.xp ?? 0, addedXp);
+        const currentLevel = Number(profile.level ?? 1);
+        const nextLevel = Number(nextProgression.level ?? currentLevel);
+        const levelsGained = Math.max(0, nextLevel - currentLevel);
+        const nextProficiencyBonus = 2 + Math.floor((Math.max(1, nextLevel) - 1) / 4);
+        const levelingSpecs = classRecord?.levelingSpecs;
+        const nextHitPointTotal = Number(stats.hitPoints.points ?? 0) + hpGain;
+        const nextLevelSnapshot =
+            levelingSpecs && hasAnySpellProgression(levelingSpecs)
+                ? getLevelingSnapshot(levelingSpecs, nextLevel)
+                : null;
+        const nextNotifications =
+            nextLevel > currentLevel && levelingSpecs
+                ? buildLevelUpNotifications(levelingSpecs, currentLevel, nextLevel)
+                : [];
+
+        const nextSkills = (stats.skills ?? [])
+            .filter((skill) => skill.checked)
+            .map((skill) => {
+                const abilityKey = SKILL_TO_ABILITY[skill.name];
+                const abilityScore =
+                    stats.abilityScores.find((ability) => ability.ability === abilityKey)
+                        ?.value ?? 10;
+                const rawModifier = Math.floor((abilityScore - 10) / 2);
+                return {
+                    name: skill.name,
+                    value: rawModifier + nextProficiencyBonus,
+                    checked: true,
+                };
+            });
+
+        const spellAbilitySource =
+            classRecord?.magicClass ?? stats.spellCasting?.ability ?? '';
+        const spellAbilityKey = getAbilityKeyFromLabel(spellAbilitySource);
+        const spellAbilityScore =
+            stats.abilityScores.find((ability) => ability.ability === spellAbilityKey)
+                ?.value ?? 0;
+        const spellAbilityModifier = Math.max(
+            0,
+            Math.floor((spellAbilityScore - 10) / 2)
+        );
+        const shouldPersistSpellcasting = Boolean(stats.spellCasting || spellAbilityKey);
+        const nextSpellCasting = shouldPersistSpellcasting
+            ? {
+                  class: stats.spellCasting?.class ?? classRecord?.name ?? className,
+                  ability:
+                      stats.spellCasting?.ability ??
+                      getLocalizedAbilityLabel(classRecord?.magicClass ?? ''),
+                  saveDc: spellAbilityKey
+                      ? 8 + nextProficiencyBonus + spellAbilityModifier
+                      : 0,
+                  attackBonus: spellAbilityKey
+                      ? nextProficiencyBonus + spellAbilityModifier
+                      : 0,
+              }
+            : undefined;
+
+        const currentSpellsData = (char.data.spells as any) ?? {};
+        const shouldPersistSpells = Boolean(nextLevelSnapshot);
+        const nextSpellsPayload = shouldPersistSpells
+            ? {
+                  cantrips: Array.isArray(currentSpellsData.cantrips)
+                      ? currentSpellsData.cantrips
+                      : [],
+                  ...Object.fromEntries(
+                      Array.from({ length: 9 }, (_, index) => {
+                          const spellLevel = index + 1;
+                          const currentLevelData = currentSpellsData[spellLevel] ?? {};
+                          const nextSlotsTotal =
+                              nextLevelSnapshot?.slotTotals[spellLevel] ?? 0;
+                          const currentSlotsExpended = Number(
+                              currentLevelData?.slotsExpended ?? 0
+                          );
+                          return [
+                              spellLevel,
+                              {
+                                  spellIds: Array.isArray(currentLevelData?.spellIds)
+                                      ? currentLevelData.spellIds
+                                      : [],
+                                  slotsTotal: nextSlotsTotal,
+                                  slotsExpended: Math.min(
+                                      currentSlotsExpended,
+                                      nextSlotsTotal
+                                  ),
+                              },
+                          ];
+                      })
+                  ),
+              }
+            : undefined;
 
         setXpUpdateSaving(true);
         setXpUpdateError('');
@@ -247,6 +551,26 @@ export default function CharacterDetailModal({
                     xp: nextProgression.xp,
                     level: nextProgression.level,
                 },
+                stats: {
+                    abilityScores: stats.abilityScores,
+                    skills: nextSkills,
+                    proficiencyBonus: nextProficiencyBonus,
+                    inspiration: stats.inspiration,
+                    passiveWisdom: stats.passiveWisdom,
+                    speed: stats.speed,
+                    initiative: stats.initiative,
+                    armorClass: stats.armorClass,
+                    hitPoints: {
+                        ...stats.hitPoints,
+                        points: nextHitPointTotal,
+                        currentPoints: nextHitPointTotal,
+                    },
+                    deathSaves: stats.deathSaves,
+                    ...((nextSpellCasting || stats.spellCasting) && {
+                        spellCasting: nextSpellCasting ?? stats.spellCasting,
+                    }),
+                },
+                ...(nextSpellsPayload && { spells: nextSpellsPayload }),
             },
         });
 
@@ -256,9 +580,10 @@ export default function CharacterDetailModal({
             return;
         }
 
-        const updated = await getCharacterById(characterId);
+        const updated = await loadCharacterModalData();
         if (updated) {
-            setChar(updated);
+            setLevelUpNotifications(nextNotifications);
+            setActiveNotificationIndex(0);
         }
 
         setXpUpdateSaving(false);
@@ -270,8 +595,7 @@ export default function CharacterDetailModal({
         if (!file) return;
         const success = await uploadCharacterPicture(characterId, file);
         if (success) {
-            const updated = await getCharacterById(characterId);
-            if (updated) setChar(updated);
+            await loadCharacterModalData();
         }
         e.target.value = '';
     };
@@ -297,7 +621,9 @@ export default function CharacterDetailModal({
         const payload = {
             data: {
                 profile: {
+                    ...(!xpSystem && isMaster && { level: editLevel }),
                     characteristics: {
+                        background: editBackground,
                         personalityTraits: editPersonality.personalityTraits,
                         ideals: editPersonality.ideals,
                         bonds: editPersonality.bonds,
@@ -306,7 +632,14 @@ export default function CharacterDetailModal({
                         backstory: editHistorico.backstory,
                         alliesAndOrgs: editHistorico.alliesAndOrgs,
                         treasure: editHistorico.treasure,
-                        other: char.data.profile.characteristics?.other ?? {},
+                        other: {
+                            languagesAndProficiencies:
+                                editOther.languagesAndProficiencies,
+                            characteristicsAndAbilities:
+                                editOther.characteristicsAndAbilities,
+                            characteristicsAndAdditionalAbilities:
+                                editOther.characteristicsAndAdditionalAbilities,
+                        },
                     },
                 },
                 stats: {
@@ -346,7 +679,7 @@ export default function CharacterDetailModal({
                     })(),
                 },
                 money: editMoney,
-                equipments: editEquipments,
+                inventory: editEquipments,
                 ...(m && {
                     spells: {
                         cantrips: (m.spellNames[0] ?? [])
@@ -384,53 +717,25 @@ export default function CharacterDetailModal({
             payload as Record<string, any>
         );
         if (success) {
-            const updated = await getCharacterById(characterId);
-            if (updated) setChar(updated);
+            await loadCharacterModalData();
             setIsEditing(false);
+            setSelectedInventoryItemId(null);
         }
         setSaving(false);
     };
-    const [activeTab, setActiveTab] = useState<'principal' | 'magias' | 'habilidades'>(
-        'principal'
-    );
-    const [spellNameMap, setSpellNameMap] = useState<Record<string, string>>({});
 
     useEffect(() => {
-        getCharacterById(characterId)
-            .then(async (result) => {
-                setChar(result);
-                if (result?.data?.profile) {
-                    const { class: classId, race: raceId } = result.data.profile;
-                    const [classData, raceData] = await Promise.all([
-                        classId ? getDnd5eClassById(classId) : null,
-                        raceId ? getDnd5eRaceById(raceId) : null,
-                    ]);
-                    if (classData?.name) setClassName(classData.name);
-                    if (raceData?.name) setRaceName(raceData.name);
-                }
-                const spellsData = (result?.data?.spells as any) ?? null;
-                if (spellsData) {
-                    const ids: string[] = [];
-                    if (Array.isArray(spellsData.cantrips))
-                        ids.push(...spellsData.cantrips);
-                    for (let l = 1; l <= 9; l++) {
-                        const lvl = spellsData[l];
-                        if (Array.isArray(lvl?.spellIds)) ids.push(...lvl.spellIds);
-                    }
-                    if (ids.length > 0) {
-                        const results = await Promise.all(
-                            ids.map((id: string) => getDnd5eSpellById(id))
-                        );
-                        const map: Record<string, string> = {};
-                        results.forEach((r: any, i: number) => {
-                            if (r?.name) map[ids[i]] = r.name;
-                        });
-                        setSpellNameMap(map);
-                    }
-                }
-            })
-            .finally(() => setLoading(false));
+        setLoading(true);
+        loadCharacterModalData().finally(() => setLoading(false));
+        // We intentionally reload this modal only when the selected character changes.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [characterId]);
+
+    useEffect(() => {
+        if (xpSystem) return;
+        setLevelUpNotifications([]);
+        setActiveNotificationIndex(0);
+    }, [xpSystem]);
 
     const profile = char?.data?.profile;
     const stats = char?.data?.stats;
@@ -453,10 +758,40 @@ export default function CharacterDetailModal({
             : null;
     const isAuthor = !!loggedUserId && loggedUserId === char?.author?.userId;
     const canEdit = isAuthor || isMaster;
+    const activeNotification = levelUpNotifications[activeNotificationIndex] ?? null;
+    const canCloseNotifications =
+        levelUpNotifications.length > 0 &&
+        activeNotificationIndex === levelUpNotifications.length - 1;
+
+    const inventoryItems: Array<{
+        equipmentId: string;
+        name: string;
+        type: string;
+        price: Array<number | string>;
+        armorClass?: Array<number | string>;
+        strength?: string;
+        stealth?: string;
+        weight: string;
+        damage?: string;
+        properties?: string;
+    }> = Array.isArray(char?.data?.equipments)
+        ? (char!.data.equipments as Array<{
+              equipmentId: string;
+              name: string;
+              type: string;
+              price: Array<number | string>;
+              armorClass?: Array<number | string>;
+              strength?: string;
+              stealth?: string;
+              weight: string;
+              damage?: string;
+              properties?: string;
+          }>)
+        : [];
 
     return (
         <>
-            <div className="cdm-overlay" onClick={onBack}>
+            <div className="cdm-overlay">
                 <div className="cdm-modal" onClick={(e) => e.stopPropagation()}>
                     <button
                         type="button"
@@ -524,7 +859,11 @@ export default function CharacterDetailModal({
                                                         ? handleSave()
                                                         : handleStartEdit()
                                                 }
-                                                disabled={saving}
+                                                disabled={
+                                                    saving ||
+                                                    (!isEditing &&
+                                                        activeTab === 'inventario')
+                                                }
                                             >
                                                 {isEditing
                                                     ? saving
@@ -545,6 +884,28 @@ export default function CharacterDetailModal({
                                             {raceName || profile.race}
                                         </span>
                                     </div>
+                                    {!xpSystem && isEditing && isMaster && (
+                                        <div className="cdm-header-meta">
+                                            <span className="font-XS-regular">
+                                                <span className="cdm-label">NÃ­vel:</span>{' '}
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    className="cdm-edit-number w-20"
+                                                    value={editLevel}
+                                                    onChange={(e) =>
+                                                        setEditLevel(
+                                                            Math.max(
+                                                                1,
+                                                                Number(e.target.value) ||
+                                                                    1
+                                                            )
+                                                        )
+                                                    }
+                                                />
+                                            </span>
+                                        </div>
+                                    )}
                                     <div className="cdm-header-meta">
                                         <span className="font-XS-regular">
                                             <span className="cdm-label">Tendência:</span>{' '}
@@ -554,7 +915,7 @@ export default function CharacterDetailModal({
                                             <span className="cdm-label">
                                                 Antecedente:
                                             </span>{' '}
-                                            —
+                                            {profile.characteristics?.background ?? '—'}
                                         </span>
                                         <span className="font-XS-regular">
                                             <span className="cdm-label">XP:</span>{' '}
@@ -568,6 +929,75 @@ export default function CharacterDetailModal({
                                 </div>
                             </div>
                             {/* ── Tabs ─────────────────────── */}
+                            {xpSystem && activeNotification && (
+                                <div className="cdm-levelup-banner">
+                                    <div className="cdm-levelup-copy">
+                                        <span className="font-XXS-bold cdm-levelup-kicker">
+                                            Nível {activeNotification.level}
+                                        </span>
+                                        <p className="font-XS-regular cdm-levelup-text">
+                                            {activeNotification.message}
+                                        </p>
+                                    </div>
+                                    <div className="cdm-levelup-actions">
+                                        <span className="font-XXS-regular cdm-levelup-progress">
+                                            {activeNotificationIndex + 1} /{' '}
+                                            {levelUpNotifications.length}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            className="cdm-levelup-nav"
+                                            onClick={() =>
+                                                setActiveNotificationIndex((current) =>
+                                                    Math.max(0, current - 1)
+                                                )
+                                            }
+                                            disabled={activeNotificationIndex === 0}
+                                        >
+                                            <Image
+                                                src={ArrowBackIcon}
+                                                alt="Anterior"
+                                                width={18}
+                                                height={18}
+                                            />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="cdm-levelup-nav"
+                                            onClick={() =>
+                                                setActiveNotificationIndex((current) =>
+                                                    Math.min(
+                                                        levelUpNotifications.length - 1,
+                                                        current + 1
+                                                    )
+                                                )
+                                            }
+                                            disabled={
+                                                activeNotificationIndex ===
+                                                levelUpNotifications.length - 1
+                                            }
+                                        >
+                                            <Image
+                                                src={ArrowRightIcon}
+                                                alt="PrÃ³xima"
+                                                width={18}
+                                                height={18}
+                                            />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="cdm-levelup-close"
+                                            onClick={() => {
+                                                setLevelUpNotifications([]);
+                                                setActiveNotificationIndex(0);
+                                            }}
+                                            disabled={!canCloseNotifications}
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                             <div className="cdm-tabs">
                                 {(['principal', 'magias', 'habilidades'] as const).map(
                                     (tab) => (
@@ -589,15 +1019,42 @@ export default function CharacterDetailModal({
                                         </button>
                                     )
                                 )}
+                                <button
+                                    type="button"
+                                    className={`cdm-tab font-XS-bold${
+                                        activeTab === 'inventario'
+                                            ? ' cdm-tab--active'
+                                            : ''
+                                    }`}
+                                    disabled={isEditing || saving}
+                                    onClick={() => setActiveTab('inventario')}
+                                >
+                                    Inventário
+                                </button>
                             </div>
                             {/* ── Principal tab ─────────────── */}
                             {activeTab === 'principal' && (
                                 <>
                                     {/* ── Atributos ──────────────────── */}
                                     <div className="cdm-section">
-                                        <h3 className="font-M-semibold cdm-section-title">
-                                            Atributos
-                                        </h3>
+                                        <div className="cdm-section-header">
+                                            <h3 className="font-M-semibold cdm-section-title">
+                                                Atributos
+                                            </h3>
+                                            {isMaster && (
+                                                <button
+                                                    type="button"
+                                                    className="button-L-fill font-XS-bold bg-color-primary/default_900 text-color-greyScale/50"
+                                                    onClick={() => {
+                                                        setXpUpdateError('');
+                                                        setXpModalOpen(true);
+                                                    }}
+                                                    disabled={xpUpdateSaving}
+                                                >
+                                                    {'Aumentar XP'}
+                                                </button>
+                                            )}
+                                        </div>
                                         <div className="cdm-attributes-grid">
                                             {(isEditing
                                                 ? editAbilityScores
@@ -937,27 +1394,99 @@ export default function CharacterDetailModal({
                                         </div>
                                     </div>
 
+                                    {/* ── Proficiências & Habilidades ─── */}
+                                    {(isEditing ||
+                                        profile.characteristics?.other
+                                            ?.languagesAndProficiencies ||
+                                        profile.characteristics?.other
+                                            ?.characteristicsAndAbilities ||
+                                        profile.characteristics?.other
+                                            ?.characteristicsAndAdditionalAbilities) && (
+                                        <div className="cdm-section">
+                                            <h3 className="font-M-semibold cdm-section-title">
+                                                Proficiências &amp; Habilidades
+                                            </h3>
+                                            <div className="cdm-text-grid">
+                                                {(
+                                                    [
+                                                        'languagesAndProficiencies',
+                                                        'characteristicsAndAbilities',
+                                                        'characteristicsAndAdditionalAbilities',
+                                                    ] as const
+                                                ).map((field) => {
+                                                    const labels: Record<string, string> =
+                                                        {
+                                                            languagesAndProficiencies:
+                                                                'Idiomas e Outras Proficiências',
+                                                            characteristicsAndAbilities:
+                                                                'Características e Habilidades',
+                                                            characteristicsAndAdditionalAbilities:
+                                                                'Características e Habilidades Adicionais',
+                                                        };
+                                                    const other =
+                                                        profile.characteristics?.other;
+                                                    const viewVals: Record<
+                                                        typeof field,
+                                                        string
+                                                    > = {
+                                                        languagesAndProficiencies:
+                                                            other?.languagesAndProficiencies ??
+                                                            '',
+                                                        characteristicsAndAbilities:
+                                                            other?.characteristicsAndAbilities ??
+                                                            '',
+                                                        characteristicsAndAdditionalAbilities:
+                                                            other?.characteristicsAndAdditionalAbilities ??
+                                                            '',
+                                                    };
+                                                    const val = isEditing
+                                                        ? editOther[field]
+                                                        : viewVals[field];
+                                                    return (
+                                                        <div
+                                                            key={field}
+                                                            className="cdm-text-block"
+                                                        >
+                                                            <span className="font-XS-bold cdm-label">
+                                                                {labels[field]}
+                                                            </span>
+                                                            {isEditing ? (
+                                                                <textarea
+                                                                    className="cdm-edit-textarea font-XS-regular"
+                                                                    rows={4}
+                                                                    value={
+                                                                        editOther[field]
+                                                                    }
+                                                                    onChange={(e) =>
+                                                                        setEditOther(
+                                                                            (prev) => ({
+                                                                                ...prev,
+                                                                                [field]:
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                            })
+                                                                        )
+                                                                    }
+                                                                />
+                                                            ) : (
+                                                                <p className="font-XS-regular cdm-text-content cdm-text-scrollable">
+                                                                    {val || '—'}
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {/* ── Personalidade ──────────────── */}
                                     {(isMaster || hasPersonalityInfo) && (
                                         <div className="cdm-section">
-                                            <div className="cdm-section-header">
-                                                <h3 className="font-M-semibold cdm-section-title">
-                                                    Personalidade
-                                                </h3>
-                                                {isMaster && (
-                                                    <button
-                                                        type="button"
-                                                        className="button-L-fill font-XS-bold bg-color-primary/default_900 text-color-greyScale/50"
-                                                        onClick={() => {
-                                                            setXpUpdateError('');
-                                                            setXpModalOpen(true);
-                                                        }}
-                                                        disabled={xpUpdateSaving}
-                                                    >
-                                                        {'Aumentar XP'}
-                                                    </button>
-                                                )}
-                                            </div>
+                                            <h3 className="font-M-semibold cdm-section-title">
+                                                Personalidade
+                                            </h3>
                                             {hasPersonalityInfo && (
                                                 <div className="cdm-text-grid">
                                                     {profile.characteristics
@@ -1097,6 +1626,36 @@ export default function CharacterDetailModal({
                                                     );
                                                 })}
                                             </div>
+                                            {(isEditing || appearance?.description) && (
+                                                <div className="cdm-text-block">
+                                                    <span className="font-XS-bold cdm-label">
+                                                        Aparência do Personagem
+                                                    </span>
+                                                    {isEditing ? (
+                                                        <textarea
+                                                            className="cdm-edit-textarea font-XS-regular"
+                                                            rows={4}
+                                                            value={
+                                                                editAppearance.description
+                                                            }
+                                                            onChange={(e) =>
+                                                                setEditAppearance(
+                                                                    (p) => ({
+                                                                        ...p,
+                                                                        description:
+                                                                            e.target
+                                                                                .value,
+                                                                    })
+                                                                )
+                                                            }
+                                                        />
+                                                    ) : (
+                                                        <p className="font-XS-regular cdm-text-content">
+                                                            {appearance?.description}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                     )}
 
@@ -1132,81 +1691,6 @@ export default function CharacterDetailModal({
                                                         <span className="font-XS-regular">
                                                             {atk.damage || '—'}
                                                         </span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* ── Equipamentos & Dinheiro ────── */}
-                                    {(isEditing ||
-                                        char.data.equipments ||
-                                        char.data.money) && (
-                                        <div className="cdm-section">
-                                            <h3 className="font-M-semibold cdm-section-title">
-                                                Equipamentos &amp; Dinheiro
-                                            </h3>
-                                            <div className="cdm-text-block">
-                                                <span className="font-XS-bold cdm-label">
-                                                    Inventário
-                                                </span>
-                                                {isEditing ? (
-                                                    <textarea
-                                                        className="cdm-edit-textarea font-XS-regular"
-                                                        rows={4}
-                                                        value={editEquipments}
-                                                        onChange={(e) =>
-                                                            setEditEquipments(
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                    />
-                                                ) : (
-                                                    char.data.equipments && (
-                                                        <p className="font-XS-regular cdm-text-content">
-                                                            {char.data.equipments}
-                                                        </p>
-                                                    )
-                                                )}
-                                            </div>
-                                            <div className="cdm-money-grid">
-                                                {(
-                                                    [
-                                                        'cp',
-                                                        'sp',
-                                                        'ep',
-                                                        'gp',
-                                                        'pp',
-                                                    ] as const
-                                                ).map((coin) => (
-                                                    <div
-                                                        key={coin}
-                                                        className="cdm-info-box"
-                                                    >
-                                                        <span className="font-XXS-regular cdm-info-label">
-                                                            {coin.toUpperCase()}
-                                                        </span>
-                                                        {isEditing ? (
-                                                            <input
-                                                                type="number"
-                                                                className="cdm-edit-number font-S-bold"
-                                                                value={editMoney[coin]}
-                                                                onChange={(e) =>
-                                                                    setEditMoney((p) => ({
-                                                                        ...p,
-                                                                        [coin]: Number(
-                                                                            e.target.value
-                                                                        ),
-                                                                    }))
-                                                                }
-                                                            />
-                                                        ) : (
-                                                            <span className="font-S-bold">
-                                                                {char.data.money?.[
-                                                                    coin
-                                                                ] ?? 0}
-                                                            </span>
-                                                        )}
                                                     </div>
                                                 ))}
                                             </div>
@@ -1284,9 +1768,237 @@ export default function CharacterDetailModal({
                                             </div>
                                         </div>
                                     )}
+
+                                    {/* ── Proficiências & Habilidades ─── */}
+                                    {(isEditing ||
+                                        profile.characteristics?.other
+                                            ?.languagesAndProficiencies ||
+                                        profile.characteristics?.other
+                                            ?.characteristicsAndAbilities ||
+                                        profile.characteristics?.other
+                                            ?.characteristicsAndAdditionalAbilities) && (
+                                        <div className="cdm-section">
+                                            <h3 className="font-M-semibold cdm-section-title">
+                                                Proficiências &amp; Habilidades
+                                            </h3>
+                                            <div className="cdm-text-grid">
+                                                {(
+                                                    [
+                                                        'languagesAndProficiencies',
+                                                        'characteristicsAndAbilities',
+                                                        'characteristicsAndAdditionalAbilities',
+                                                    ] as const
+                                                ).map((field) => {
+                                                    const labels: Record<string, string> =
+                                                        {
+                                                            languagesAndProficiencies:
+                                                                'Idiomas e Outras Proficiências',
+                                                            characteristicsAndAbilities:
+                                                                'Características e Habilidades',
+                                                            characteristicsAndAdditionalAbilities:
+                                                                'Características e Habilidades Adicionais',
+                                                        };
+                                                    const other =
+                                                        profile.characteristics?.other;
+                                                    const viewVals: Record<
+                                                        typeof field,
+                                                        string
+                                                    > = {
+                                                        languagesAndProficiencies:
+                                                            other?.languagesAndProficiencies ??
+                                                            '',
+                                                        characteristicsAndAbilities:
+                                                            other?.characteristicsAndAbilities ??
+                                                            '',
+                                                        characteristicsAndAdditionalAbilities:
+                                                            other?.characteristicsAndAdditionalAbilities ??
+                                                            '',
+                                                    };
+                                                    const val = isEditing
+                                                        ? editOther[field]
+                                                        : viewVals[field];
+                                                    return (
+                                                        <div
+                                                            key={field}
+                                                            className="cdm-text-block"
+                                                        >
+                                                            <span className="font-XS-bold cdm-label">
+                                                                {labels[field]}
+                                                            </span>
+                                                            {isEditing ? (
+                                                                <textarea
+                                                                    className="cdm-edit-textarea font-XS-regular"
+                                                                    rows={4}
+                                                                    value={
+                                                                        editOther[field]
+                                                                    }
+                                                                    onChange={(e) =>
+                                                                        setEditOther(
+                                                                            (prev) => ({
+                                                                                ...prev,
+                                                                                [field]:
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
+                                                                            })
+                                                                        )
+                                                                    }
+                                                                />
+                                                            ) : (
+                                                                <p className="font-XS-regular cdm-text-content cdm-text-scrollable">
+                                                                    {val || '—'}
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
                                 </>
                             )}{' '}
                             {/* end principal tab */}
+                            {/* ── Inventário tab ──────────────────────── */}
+                            {activeTab === 'inventario' && (
+                                <div className="cdm-tab-content">
+                                    <div className="cdm-section">
+                                        <h3 className="font-M-semibold cdm-section-title">
+                                            Equipamentos &amp; Dinheiro
+                                        </h3>
+                                        <div className="cdm-text-block">
+                                            <span className="font-XS-bold cdm-label">
+                                                Inventário
+                                            </span>
+                                            {typeof char.data.inventory === 'string' &&
+                                                char.data.inventory && (
+                                                    <p className="font-XS-regular cdm-text-content">
+                                                        {char.data.inventory as string}
+                                                    </p>
+                                                )}
+                                        </div>
+                                        {inventoryItems.length > 0 && (
+                                            <div className="cdm-inventory-wrapper">
+                                                <span className="font-XS-bold cdm-label">
+                                                    Itens Comprados
+                                                </span>
+                                                <div className="cdm-inventory-table-wrapper">
+                                                    <table className="cdm-inventory-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Nome</th>
+                                                                <th>Tipo</th>
+                                                                <th>CA</th>
+                                                                <th>Peso</th>
+                                                                <th>Dano</th>
+                                                                <th>Propriedades</th>
+                                                                <th />
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {inventoryItems.map(
+                                                                (item) => {
+                                                                    const isSelected =
+                                                                        selectedInventoryItemId ===
+                                                                        item.equipmentId;
+                                                                    return (
+                                                                        <tr
+                                                                            key={
+                                                                                item.equipmentId
+                                                                            }
+                                                                            className={
+                                                                                isSelected
+                                                                                    ? 'cdm-inventory-row--selected'
+                                                                                    : 'cdm-inventory-row--clickable'
+                                                                            }
+                                                                            onClick={() =>
+                                                                                setSelectedInventoryItemId(
+                                                                                    isSelected
+                                                                                        ? null
+                                                                                        : item.equipmentId
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <td className="font-semibold">
+                                                                                {
+                                                                                    item.name
+                                                                                }
+                                                                            </td>
+                                                                            <td>
+                                                                                {item.type ||
+                                                                                    '—'}
+                                                                            </td>
+                                                                            <td>
+                                                                                {item.armorClass?.join(
+                                                                                    ' '
+                                                                                ) || '—'}
+                                                                            </td>
+                                                                            <td>
+                                                                                {item.weight ||
+                                                                                    '—'}
+                                                                            </td>
+                                                                            <td>
+                                                                                {item.damage ||
+                                                                                    '—'}
+                                                                            </td>
+                                                                            <td>
+                                                                                {item.properties ||
+                                                                                    '—'}
+                                                                            </td>
+                                                                            <td>
+                                                                                {isSelected && (
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        className="cdm-sell-btn"
+                                                                                        disabled={
+                                                                                            selling
+                                                                                        }
+                                                                                        onClick={(
+                                                                                            e
+                                                                                        ) => {
+                                                                                            e.stopPropagation();
+                                                                                            setSellConfirmItem(
+                                                                                                item
+                                                                                            );
+                                                                                        }}
+                                                                                    >
+                                                                                        {selling
+                                                                                            ? '...'
+                                                                                            : 'Vender'}
+                                                                                    </button>
+                                                                                )}
+                                                                            </td>
+                                                                        </tr>
+                                                                    );
+                                                                }
+                                                            )}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        )}
+                                        <div className="cdm-money-grid">
+                                            {(
+                                                ['cp', 'sp', 'ep', 'gp', 'pp'] as const
+                                            ).map((coin) => (
+                                                <button
+                                                    key={coin}
+                                                    type="button"
+                                                    className="cdm-info-box cursor-pointer"
+                                                    disabled={moneyUpdating}
+                                                    onClick={() => setMoneyModalKey(coin)}
+                                                >
+                                                    <span className="font-XXS-regular cdm-info-label">
+                                                        {CURRENCY_LABELS[coin]}
+                                                    </span>
+                                                    <span className="font-S-bold">
+                                                        {char.data.money?.[coin] ?? 0}
+                                                    </span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                             {/* ── Magias tab ──────────────────────────── */}
                             {activeTab === 'magias' && !isEditing && (
                                 <div className="cdm-tab-content">
@@ -1376,26 +2088,11 @@ export default function CharacterDetailModal({
                                                         </div>
                                                         {sl.slots && (
                                                             <div className="cs-spell-slots">
-                                                                <span>Total</span>
-                                                                <input
-                                                                    readOnly
-                                                                    value={
-                                                                        levelData.slotsTotal ||
-                                                                        ''
-                                                                    }
-                                                                    className="cs-spell-slot-input"
-                                                                    placeholder="0"
-                                                                />
-                                                                <span>Usados</span>
-                                                                <input
-                                                                    readOnly
-                                                                    value={
-                                                                        levelData.slotsExpended ||
-                                                                        ''
-                                                                    }
-                                                                    className="cs-spell-slot-input"
-                                                                    placeholder="0"
-                                                                />
+                                                                <span>
+                                                                    Espaços de Magia:{' '}
+                                                                    {levelData.slotsTotal ||
+                                                                        0}
+                                                                </span>
                                                             </div>
                                                         )}
                                                     </div>
@@ -1410,14 +2107,6 @@ export default function CharacterDetailModal({
                                                                     key={idx}
                                                                     className="cs-spell-row"
                                                                 >
-                                                                    {sl.level > 0 && (
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            className="cs-spell-check"
-                                                                            readOnly
-                                                                            disabled
-                                                                        />
-                                                                    )}
                                                                     <input
                                                                         readOnly
                                                                         className="cs-spell-name-input"
@@ -1523,6 +2212,8 @@ export default function CharacterDetailModal({
                                                 initialSpellNames={initSpellNames}
                                                 initialSlotTotals={initSlotTotals}
                                                 initialSlotsExpended={initSlotsExp}
+                                                levelingSpecs={classRecord?.levelingSpecs}
+                                                currentLevel={profile.level}
                                             />
                                         </div>
                                     );
@@ -1584,26 +2275,11 @@ export default function CharacterDetailModal({
                                                         </div>
                                                         {sl.slots && (
                                                             <div className="cs-spell-slots">
-                                                                <span>Total</span>
-                                                                <input
-                                                                    readOnly
-                                                                    value={
-                                                                        levelData.slotsTotal ||
-                                                                        ''
-                                                                    }
-                                                                    className="cs-spell-slot-input"
-                                                                    placeholder="0"
-                                                                />
-                                                                <span>Usados</span>
-                                                                <input
-                                                                    readOnly
-                                                                    value={
-                                                                        levelData.slotsExpended ||
-                                                                        ''
-                                                                    }
-                                                                    className="cs-spell-slot-input"
-                                                                    placeholder="0"
-                                                                />
+                                                                <span>
+                                                                    Espaços de Magia:{' '}
+                                                                    {levelData.slotsTotal ||
+                                                                        0}
+                                                                </span>
                                                             </div>
                                                         )}
                                                     </div>
@@ -1615,14 +2291,6 @@ export default function CharacterDetailModal({
                                                                 key={idx}
                                                                 className="cs-spell-row"
                                                             >
-                                                                {sl.level > 0 && (
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        className="cs-spell-check"
-                                                                        readOnly
-                                                                        disabled
-                                                                    />
-                                                                )}
                                                                 <input
                                                                     readOnly
                                                                     className="cs-spell-name-input"
@@ -1722,11 +2390,98 @@ export default function CharacterDetailModal({
                 </div>
             </div>
 
+            {sellConfirmItem !== null &&
+                (() => {
+                    const rawAmount = Number(sellConfirmItem.price[0]);
+                    const unit = String(sellConfirmItem.price[1] ?? '');
+                    const sellAmount = Math.floor(rawAmount * 0.9);
+                    return (
+                        <div
+                            className="cdm-overlay"
+                            onClick={() => setSellConfirmItem(null)}
+                        >
+                            <div
+                                className="cdm-sell-confirm-modal"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <h3 className="font-M-semibold cdm-sell-confirm-title">
+                                    Confirmar Venda
+                                </h3>
+                                <p className="font-XS-regular cdm-sell-confirm-body">
+                                    Vender{' '}
+                                    <span className="font-XS-bold">
+                                        {sellConfirmItem.name}
+                                    </span>{' '}
+                                    por{' '}
+                                    <span className="font-XS-bold">
+                                        {sellAmount} {unit}
+                                    </span>{' '}
+                                    (−10%)
+                                </p>
+                                <div className="cdm-sell-confirm-actions">
+                                    <button
+                                        type="button"
+                                        className="cdm-sell-confirm-cancel"
+                                        onClick={() => setSellConfirmItem(null)}
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="cdm-sell-confirm-ok"
+                                        disabled={selling}
+                                        onClick={async () => {
+                                            const item = sellConfirmItem;
+                                            setSellConfirmItem(null);
+                                            await handleSell(item);
+                                        }}
+                                    >
+                                        {selling ? '...' : 'Confirmar'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })()}
+
+            {moneyModalKey !== null && char && (
+                <MoneyModal
+                    currencyLabel={CURRENCY_LABELS[moneyModalKey]}
+                    currentAmount={char.data.money?.[moneyModalKey] ?? 0}
+                    onConfirm={async (delta) => {
+                        const key = moneyModalKey;
+                        setMoneyModalKey(null);
+                        setMoneyUpdating(true);
+                        await updateCharacterMoney(characterId, {
+                            operation: delta > 0 ? 'add' : 'subtract',
+                            money: Math.abs(delta),
+                            moneyType: CURRENCY_LABELS[key],
+                        });
+                        await loadCharacterModalData();
+                        setMoneyUpdating(false);
+                    }}
+                    onClose={() => setMoneyModalKey(null)}
+                />
+            )}
+
             {xpModalOpen && profile && (
                 <XpIncreaseModal
                     currentXp={profile.xp ?? 0}
                     submitting={xpUpdateSaving}
                     errorMessage={xpUpdateError}
+                    xpSystemEnabled={xpSystem}
+                    hitDice={
+                        (classRecord?.hitPoints?.hitDice as unknown as string) ??
+                        stats?.hitPoints?.dicePoints ??
+                        ''
+                    }
+                    constitutionModifier={Math.floor(
+                        ((stats?.abilityScores?.find((a) => a.ability === 'con')?.value ??
+                            10) -
+                            10) /
+                            2
+                    )}
+                    currentLevel={Number(profile.level ?? 1)}
                     onClose={() => {
                         if (xpUpdateSaving) return;
                         setXpUpdateError('');

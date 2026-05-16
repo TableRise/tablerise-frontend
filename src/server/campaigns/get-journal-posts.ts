@@ -149,7 +149,7 @@ export const deleteCampaignJournalPost = async (
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
         if (status === 400) throw new Error('Dados invÃ¡lidos');
-        if (status === 404) throw new Error('PublicaÃ§Ã£o nÃ£o encontrada');
+        if (status === 404) throw new Error('Publicação não encontrada');
         if (status === 500) throw new Error('Erro no servidor');
         throw new Error('Erro ao excluir post');
     }
@@ -177,7 +177,7 @@ export const updateCampaignJournalPost = async (
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
         if (status === 400) throw new Error('Dados invÃ¡lidos');
-        if (status === 404) throw new Error('PublicaÃ§Ã£o nÃ£o encontrada');
+        if (status === 404) throw new Error('Publicação não encontrada');
         if (status === 500) throw new Error('Erro no servidor');
         throw new Error('Erro ao atualizar post');
     }
@@ -198,7 +198,7 @@ export const setCampaignHighlightedJournalPost = async (
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
         if (status === 400) throw new Error('Dados invÃ¡lidos');
-        if (status === 404) throw new Error('PublicaÃ§Ã£o nÃ£o encontrada');
+        if (status === 404) throw new Error('Publicação não encontrada');
         if (status === 500) throw new Error('Erro no servidor');
         throw new Error('Erro ao atualizar destaque do jornal');
     }

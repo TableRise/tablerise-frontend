@@ -2,6 +2,7 @@
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
+import CopyBlueSVG from '@assets/icons/sys/copy-blue.svg?url';
 import TableriseContext from '@/context/TableriseContext';
 import LoggedHeader from '@/components/common/LoggedHeader';
 import LobbySideMenu from '@/components/lobby/LobbySideMenu';
@@ -14,6 +15,8 @@ import JournalPostModal from '@/components/lobby/JournalPostModal';
 import CreatePostModal from '@/components/lobby/CreatePostModal';
 import EditCampaignModal from '@/components/lobby/EditCampaignModal';
 import LeaveCampaignModal from '@/components/lobby/LeaveCampaignModal';
+import ShopModal from '@/components/lobby/ShopModal';
+import CampaignHistoryModal from '@/components/lobby/CampaignHistoryModal';
 import type { CampaignMusic } from '@/server/campaigns/create-campaign';
 import {
     deleteCampaignJournalPost,
@@ -21,17 +24,7 @@ import {
     getCampaignHighlightedJournalPost,
     type JournalPost,
 } from '@/server/campaigns/get-journal-posts';
-import {
-    disconnectCampaignSocket,
-    emitCampaignSocketAck,
-    getCampaignSocket,
-} from '@/utils/campaignSocket';
-import type {
-    CampaignSyncPayload,
-    SocketJournal,
-    SocketPlayer,
-    SocketPresenceUser,
-} from '@/types/shared/socket';
+import type { SocketPlayer, SocketPresenceUser } from '@/types/shared/socket';
 import {
     getCharactersByCampaignLobby,
     type CampaignCharacter,
@@ -42,6 +35,7 @@ import Footer from '@/components/common/Footer';
 
 interface CampaignData {
     campaignId: string;
+    code: string;
     title: string;
     cover: { link: string };
     description: string;
@@ -55,7 +49,10 @@ interface CampaignData {
     ageRestriction: string;
     nextSessionResume: string;
     playerAmountLimit: number;
+    xpSystem: boolean;
+    shopSystem: boolean;
     mapImages: ImageObject[];
+    logs: { loggedAt: string; content: string }[];
     musics: CampaignMusic[];
 }
 
@@ -63,12 +60,6 @@ interface ConfirmedPlayerInfo {
     userId: string;
     name: string;
     picture: string;
-}
-
-function normalizeHighlightedJournalPostPayload(payload: {
-    highlightedJournalPost?: JournalPost | null;
-}): JournalPost | null {
-    return payload.highlightedJournalPost ?? null;
 }
 
 function normalizeConfirmedPlayers(
@@ -109,6 +100,7 @@ function areJournalPostsEqual(
 function mapCampaignData(data: any): CampaignData {
     return {
         campaignId: data.campaignId,
+        code: data.code ?? '',
         title: data.title,
         cover: { link: data.cover?.link },
         description: data.description,
@@ -119,11 +111,15 @@ function mapCampaignData(data: any): CampaignData {
         socialMedia: data.infos?.socialMedia ?? {},
         confirmedPlayers: normalizeConfirmedPlayers(data.matchData?.confirmedPlayers),
         mapImages: data.matchData?.mapImages ?? [],
+        logs: data.matchData?.logs ?? [],
         musics: data.musics ?? [],
         visibility: data.visibility ?? '',
         ageRestriction: data.ageRestriction ?? '',
         nextSessionResume: data.matchData?.nextSessionResume ?? '',
         playerAmountLimit: data.infos?.playerAmountLimit ?? 1,
+        xpSystem: data.configurations?.xpSystem ?? true,
+        shopSystem:
+            data.configurations?.shopSystem ?? data.configurations?.shopOn ?? false,
     };
 }
 
@@ -141,9 +137,11 @@ export default function CampaignLobby(): JSX.Element {
     >([]);
     const [sheetModalOpen, setSheetModalOpen] = useState(false);
     const [participantsModalOpen, setParticipantsModalOpen] = useState(false);
+    const [historyModalOpen, setHistoryModalOpen] = useState(false);
     const [createPostModalOpen, setCreatePostModalOpen] = useState(false);
     const [editSettingsModalOpen, setEditSettingsModalOpen] = useState(false);
     const [leaveCampaignModalOpen, setLeaveCampaignModalOpen] = useState(false);
+    const [shopModalOpen, setShopModalOpen] = useState(false);
     const [lobbyCharacters, setLobbyCharacters] = useState<CampaignCharacter[]>([]);
     const [journalPosts, setJournalPosts] = useState<JournalPost[]>([]);
     const [highlightedJournalPost, setHighlightedJournalPost] =
@@ -255,248 +253,6 @@ export default function CampaignLobby(): JSX.Element {
     }, [campaign?.confirmedPlayers]);
 
     useEffect(() => {
-        if (!campaignId || !userInfo?.userId) return;
-
-        const socket = getCampaignSocket();
-
-        const handleCampaignSync = (payload: CampaignSyncPayload) => {
-            if (payload.campaignId !== campaignId) return;
-
-            setCampaign((current) =>
-                current
-                    ? {
-                          ...current,
-                          confirmedPlayers: payload.presence.confirmedPlayers,
-                      }
-                    : current
-            );
-            setHighlightedJournalPost(
-                normalizeHighlightedJournalPostPayload(payload.match)
-            );
-        };
-
-        const handlePresenceJoined = (
-            payload: SocketPresenceUser & { campaignId?: string }
-        ) => {
-            if (
-                (payload as any).campaignId &&
-                (payload as any).campaignId !== campaignId
-            ) {
-                return;
-            }
-        };
-
-        const handlePresenceLeft = (
-            payload: SocketPresenceUser & { campaignId?: string }
-        ) => {
-            if (
-                (payload as any).campaignId &&
-                (payload as any).campaignId !== campaignId
-            ) {
-                return;
-            }
-        };
-
-        const handleConfirmedPlayersUpdated = (payload: {
-            campaignId: string;
-            confirmedPlayers: SocketPresenceUser[];
-        }) => {
-            if (payload.campaignId !== campaignId) return;
-
-            setCampaign((current) =>
-                current
-                    ? { ...current, confirmedPlayers: payload.confirmedPlayers }
-                    : current
-            );
-        };
-
-        const handleJournalPostCreated = (payload: {
-            campaignId: string;
-            post: SocketJournal;
-        }) => {
-            if (payload.campaignId !== campaignId) return;
-
-            setJournalPosts((current) =>
-                current.some(
-                    (post) =>
-                        post.title === payload.post.title &&
-                        (post.postId
-                            ? post.postId === payload.post.postId
-                            : post.timestamp === payload.post.timestamp)
-                )
-                    ? current
-                    : [payload.post, ...current]
-            );
-        };
-
-        const handleHighlightChanged = (payload: {
-            campaignId: string;
-            highlightedJournalPost?: SocketJournal | null;
-        }) => {
-            if (payload.campaignId !== campaignId) return;
-            setHighlightedJournalPost(normalizeHighlightedJournalPostPayload(payload));
-        };
-
-        const handlePlayerJoined = (payload: {
-            campaignId: string;
-            player: SocketPlayer;
-        }) => {
-            if (payload.campaignId !== campaignId) return;
-
-            setCampaign((current) =>
-                current
-                    ? {
-                          ...current,
-                          campaignPlayers: current.campaignPlayers.some(
-                              (player) => player.userId === payload.player.userId
-                          )
-                              ? current.campaignPlayers.map((player) =>
-                                    player.userId === payload.player.userId
-                                        ? payload.player
-                                        : player
-                                )
-                              : [...current.campaignPlayers, payload.player],
-                      }
-                    : current
-            );
-        };
-
-        const handlePlayerLeft = (payload: { campaignId: string; userId: string }) => {
-            if (payload.campaignId !== campaignId) return;
-
-            setCampaign((current) =>
-                current
-                    ? {
-                          ...current,
-                          campaignPlayers: current.campaignPlayers.filter(
-                              (player) => player.userId !== payload.userId
-                          ),
-                      }
-                    : current
-            );
-        };
-
-        const handleMapsUpdated = (payload: {
-            campaignId: string;
-            mapImages: ImageObject[];
-        }) => {
-            if (payload.campaignId !== campaignId) return;
-
-            setCampaign((current) =>
-                current ? { ...current, mapImages: payload.mapImages } : current
-            );
-        };
-
-        const handleMusicsUpdated = (payload: {
-            campaignId: string;
-            musics: CampaignMusic[];
-        }) => {
-            if (payload.campaignId !== campaignId) return;
-
-            setCampaign((current) =>
-                current ? { ...current, musics: payload.musics } : current
-            );
-        };
-
-        const handleSettingsUpdated = (payload: {
-            campaignId: string;
-            title?: string;
-            description?: string;
-            mainHistory?: string | null;
-            visibility?: string;
-            ageRestriction?: string;
-            nextMatchDate?: string | null;
-            nextSessionResume?: string | null;
-            playerAmountLimit?: number;
-            socialMedia?: {
-                discord?: string;
-                twitter?: string;
-                youtube?: string;
-            };
-        }) => {
-            if (payload.campaignId !== campaignId) return;
-
-            setCampaign((current) =>
-                current
-                    ? {
-                          ...current,
-                          title: payload.title ?? current.title,
-                          description: payload.description ?? current.description,
-                          mainHistory: payload.mainHistory ?? current.mainHistory,
-                          visibility: payload.visibility ?? current.visibility,
-                          ageRestriction:
-                              payload.ageRestriction ?? current.ageRestriction,
-                          nextMatchDate: payload.nextMatchDate ?? current.nextMatchDate,
-                          nextSessionResume:
-                              payload.nextSessionResume ?? current.nextSessionResume,
-                          playerAmountLimit:
-                              payload.playerAmountLimit ?? current.playerAmountLimit,
-                          socialMedia: payload.socialMedia ?? current.socialMedia,
-                      }
-                    : current
-            );
-        };
-
-        const handleDungeonMasterTransferred = (payload: { campaignId: string }) => {
-            if (payload.campaignId !== campaignId) return;
-            refreshCampaign();
-        };
-
-        const handleSocketError = (payload: { message: string }) => {
-            reportSocketIssue(payload.message);
-        };
-
-        socket.on('campaign:sync', handleCampaignSync);
-        socket.on('presence:user_joined', handlePresenceJoined as never);
-        socket.on('presence:user_left', handlePresenceLeft as never);
-        socket.on(
-            'presence:confirmed_players_updated',
-            handleConfirmedPlayersUpdated as never
-        );
-        socket.on('journal:post_created', handleJournalPostCreated as never);
-        socket.on('journal:highlight_changed', handleHighlightChanged as never);
-        socket.on('campaign:player_joined', handlePlayerJoined as never);
-        socket.on('campaign:player_left', handlePlayerLeft as never);
-        socket.on('campaign:maps_updated', handleMapsUpdated as never);
-        socket.on('campaign:musics_updated', handleMusicsUpdated as never);
-        socket.on('campaign:settings_updated', handleSettingsUpdated as never);
-        socket.on(
-            'campaign:dungeon_master_transferred',
-            handleDungeonMasterTransferred as never
-        );
-        socket.on('campaign:error', handleSocketError as never);
-
-        emitCampaignSocketAck(socket, 'campaign:join', { campaignId }).then((ack) => {
-            if (!ack.ok) {
-                reportSocketIssue(ack.error.message);
-            }
-        });
-
-        return () => {
-            socket.off('campaign:sync', handleCampaignSync);
-            socket.off('presence:user_joined', handlePresenceJoined as never);
-            socket.off('presence:user_left', handlePresenceLeft as never);
-            socket.off(
-                'presence:confirmed_players_updated',
-                handleConfirmedPlayersUpdated as never
-            );
-            socket.off('journal:post_created', handleJournalPostCreated as never);
-            socket.off('journal:highlight_changed', handleHighlightChanged as never);
-            socket.off('campaign:player_joined', handlePlayerJoined as never);
-            socket.off('campaign:player_left', handlePlayerLeft as never);
-            socket.off('campaign:maps_updated', handleMapsUpdated as never);
-            socket.off('campaign:musics_updated', handleMusicsUpdated as never);
-            socket.off('campaign:settings_updated', handleSettingsUpdated as never);
-            socket.off(
-                'campaign:dungeon_master_transferred',
-                handleDungeonMasterTransferred as never
-            );
-            socket.off('campaign:error', handleSocketError as never);
-            disconnectCampaignSocket();
-        };
-    }, [campaignId, refreshCampaign, userInfo?.userId]);
-
-    useEffect(() => {
         if (!campaign?.confirmedPlayers?.length || !userInfo?.userId) {
             setPresenceConfirmed(false);
             return;
@@ -517,6 +273,15 @@ export default function CampaignLobby(): JSX.Element {
     const isPlayer = userRole === 'player' || userRole === 'admin_player';
     const isMaster = userRole === 'dungeon_master' || isMasterCampaign;
     const isAdminPlayer = userRole === 'admin_player';
+    const handleCopyCampaignCode = useCallback(async () => {
+        if (!campaign?.code) return;
+
+        try {
+            await navigator.clipboard.writeText(campaign.code);
+        } catch {
+            // silently ignore clipboard errors
+        }
+    }, [campaign?.code]);
     const isSelectedPostAuthor =
         !!selectedPost?.author?.userId && selectedPost.author.userId === userInfo?.userId;
     const canDeleteSelectedPost =
@@ -636,7 +401,10 @@ export default function CampaignLobby(): JSX.Element {
                             {Object.entries(campaign.socialMedia)
                                 .filter(([name, link]) => name !== '_id' && link)
                                 .map(([name, link]) => (
-                                    <div key={name} className="lobby-info-item">
+                                    <div
+                                        key={name}
+                                        className="lobby-info-item lobby-social-item"
+                                    >
                                         <span className="font-XS-bold">
                                             {name.charAt(0).toUpperCase() + name.slice(1)}
                                             :
@@ -645,12 +413,34 @@ export default function CampaignLobby(): JSX.Element {
                                             href={link}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="lobby-info-link font-XS-regular"
+                                            className="lobby-info-link lobby-info-link--truncate font-XS-regular"
                                         >
                                             {link}
                                         </a>
                                     </div>
                                 ))}
+                        </div>
+                        <div className="lobby-info-bar-row">
+                            <div className="lobby-info-item lobby-code-item">
+                                <span className="font-XS-bold">Código da campanha:</span>
+                                <span className="font-XS-regular">
+                                    {campaign.code || '-'}
+                                </span>
+                                <button
+                                    type="button"
+                                    className="lobby-copy-btn"
+                                    onClick={handleCopyCampaignCode}
+                                    disabled={!campaign.code}
+                                    aria-label="Copiar Código da campanha"
+                                >
+                                    <Image
+                                        src={CopyBlueSVG.src}
+                                        alt="Copiar Código da campanha"
+                                        width={18}
+                                        height={18}
+                                    />
+                                </button>
+                            </div>
                         </div>
                         <button
                             className={`lobby-confirm-presence font-XS-bold ${
@@ -688,10 +478,7 @@ export default function CampaignLobby(): JSX.Element {
                         </button>
                     </div>
                     {sessionPreviewOpen && (
-                        <div
-                            className="lobby-session-modal-overlay"
-                            onClick={() => setSessionPreviewOpen(false)}
-                        >
+                        <div className="lobby-session-modal-overlay">
                             <div
                                 className="lobby-session-modal"
                                 onClick={(e) => e.stopPropagation()}
@@ -715,10 +502,7 @@ export default function CampaignLobby(): JSX.Element {
                         </div>
                     )}
                     {campaignHistoryOpen && (
-                        <div
-                            className="lobby-session-modal-overlay"
-                            onClick={() => setCampaignHistoryOpen(false)}
-                        >
+                        <div className="lobby-session-modal-overlay">
                             <div
                                 className="lobby-session-modal"
                                 onClick={(e) => e.stopPropagation()}
@@ -880,14 +664,17 @@ export default function CampaignLobby(): JSX.Element {
                 <LobbySideMenu
                     isPlayer={isPlayer}
                     isMaster={isMaster}
+                    shopEnabled={campaign.shopSystem}
                     onMenuAction={(key) => {
                         if (key === 'play-match')
                             router.push(`/campaigns/match?campaignId=${campaignId}`);
                         if (key === 'create-sheet') setSheetModalOpen(true);
                         if (key === 'participants') setParticipantsModalOpen(true);
+                        if (key === 'history') setHistoryModalOpen(true);
                         if (key === 'new-post') setCreatePostModalOpen(true);
                         if (key === 'edit-settings') setEditSettingsModalOpen(true);
                         if (key === 'leave') setLeaveCampaignModalOpen(true);
+                        if (key === 'shop' && campaign.shopSystem) setShopModalOpen(true);
                     }}
                 />
             </div>
@@ -947,12 +734,19 @@ export default function CampaignLobby(): JSX.Element {
                     onClose={() => setParticipantsModalOpen(false)}
                 />
             )}
+            {historyModalOpen && campaign && (
+                <CampaignHistoryModal
+                    logs={campaign.logs}
+                    onClose={() => setHistoryModalOpen(false)}
+                />
+            )}
             {sheetModalOpen && campaign && (
                 <CharacterSheetModal
                     campaignId={campaign.campaignId}
                     userId={userInfo?.userId ?? ''}
                     isPlayer={isPlayer}
                     isMaster={isMaster}
+                    xpSystem={campaign.xpSystem}
                     onClose={() => setSheetModalOpen(false)}
                 />
             )}
@@ -961,6 +755,17 @@ export default function CampaignLobby(): JSX.Element {
                     campaignId={campaign.campaignId}
                     isMaster={isMaster}
                     onClose={() => setLeaveCampaignModalOpen(false)}
+                />
+            )}
+            {shopModalOpen && (
+                <ShopModal
+                    campaignId={campaignId}
+                    userId={userInfo?.userId ?? ''}
+                    userNickname={userInfo?.nickname ?? userInfo?.username ?? ''}
+                    lobbyCharacters={lobbyCharacters}
+                    isMaster={isMaster}
+                    isAdminPlayer={isAdminPlayer}
+                    onClose={() => setShopModalOpen(false)}
                 />
             )}
             {editSettingsModalOpen && campaign && (
@@ -975,6 +780,7 @@ export default function CampaignLobby(): JSX.Element {
                         visibility: campaign.visibility,
                         ageRestriction: campaign.ageRestriction,
                         playerAmountLimit: campaign.playerAmountLimit,
+                        shopOn: campaign.shopSystem,
                         adminId:
                             campaign.campaignPlayers.find(
                                 (p) => p.role === 'admin_player'

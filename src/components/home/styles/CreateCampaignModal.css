@@ -342,6 +342,64 @@
     }
 
     /* ── Playlist ─────────────────────────────────────────── */
+    .ccm-system-options {
+        @apply mt-1 flex flex-col gap-3;
+    }
+
+    .ccm-system-option {
+        @apply flex items-center justify-between gap-3 rounded-lg border border-color-greyScale/200
+               bg-color-greyScale/50 px-4 py-3;
+    }
+
+    .ccm-system-option-main {
+        @apply flex items-center gap-3 text-color-greyScale/950;
+    }
+
+    .ccm-system-checkbox {
+        @apply h-4 w-4 cursor-pointer;
+        accent-color: #0a358a;
+    }
+
+    .ccm-system-help {
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .ccm-system-help-trigger {
+        @apply flex h-6 w-6 items-center justify-center rounded-full transition-opacity;
+    }
+
+    .ccm-system-help-trigger:hover {
+        opacity: 0.8;
+    }
+
+    .ccm-system-tooltip {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 0.5rem);
+        z-index: 20;
+        width: 18rem;
+        border-radius: 0.75rem;
+        background: #0a358a;
+        color: #ffffff;
+        padding: 0.75rem;
+        line-height: 1.5;
+        white-space: pre-line;
+        box-shadow: 0 12px 30px rgba(10, 53, 138, 0.22);
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-0.25rem);
+        transition:
+            opacity 0.2s ease,
+            transform 0.2s ease;
+    }
+
+    .ccm-system-help:hover .ccm-system-tooltip,
+    .ccm-system-help-trigger:focus-visible + .ccm-system-tooltip {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
     .ccm-playlist {
         @apply bg-color-greyScale/100 rounded-xl flex flex-col gap-3;
         min-height: 8rem;
