@@ -40,9 +40,10 @@ import {
 
 interface CharacterDetailModalProps {
     characterId: string;
-    campaignId: string;
+    campaignId?: string;
     isMaster?: boolean;
     xpSystem?: boolean;
+    hideInventoryTab?: boolean;
     onBack: () => void;
 }
 
@@ -116,7 +117,7 @@ const CURRENCY_LABELS: Record<'cp' | 'sp' | 'ep' | 'gp' | 'pp', string> = {
 };
 
 const MAGIC_CLASS_PT: Record<string, string> = {
-    strength: 'ForÃ§a',
+    strength: 'Força',
     dexterity: 'Destreza',
     constitution: 'ConstituiÃ§Ã£o',
     intelligence: 'InteligÃªncia',
@@ -198,9 +199,10 @@ const ABILITIES_PER_LEVEL = 8;
 
 export default function CharacterDetailModal({
     characterId,
-    campaignId,
+    campaignId = '',
     isMaster = false,
     xpSystem = true,
+    hideInventoryTab = false,
     onBack,
 }: CharacterDetailModalProps): JSX.Element {
     const [char, setChar] = useState<FullCharacterDnd | null>(null);
@@ -288,6 +290,12 @@ export default function CharacterDetailModal({
         'principal' | 'magias' | 'habilidades' | 'inventario'
     >('principal');
     const [spellNameMap, setSpellNameMap] = useState<Record<string, string>>({});
+
+    useEffect(() => {
+        if (hideInventoryTab && activeTab === 'inventario') {
+            setActiveTab('principal');
+        }
+    }, [activeTab, hideInventoryTab]);
 
     const loadSpellNameMap = async (
         targetCharacter: FullCharacterDnd | null
@@ -757,7 +765,7 @@ export default function CharacterDetailModal({
             ? JSON.parse(localStorage.getItem('userLogged') ?? 'null')?.userId
             : null;
     const isAuthor = !!loggedUserId && loggedUserId === char?.author?.userId;
-    const canEdit = isAuthor || isMaster;
+    const canEdit = hideInventoryTab ? isAuthor : isAuthor || isMaster;
     const activeNotification = levelUpNotifications[activeNotificationIndex] ?? null;
     const canCloseNotifications =
         levelUpNotifications.length > 0 &&
@@ -979,7 +987,7 @@ export default function CharacterDetailModal({
                                         >
                                             <Image
                                                 src={ArrowRightIcon}
-                                                alt="PrÃ³xima"
+                                                alt="próxima"
                                                 width={18}
                                                 height={18}
                                             />
@@ -1019,18 +1027,20 @@ export default function CharacterDetailModal({
                                         </button>
                                     )
                                 )}
-                                <button
-                                    type="button"
-                                    className={`cdm-tab font-XS-bold${
-                                        activeTab === 'inventario'
-                                            ? ' cdm-tab--active'
-                                            : ''
-                                    }`}
-                                    disabled={isEditing || saving}
-                                    onClick={() => setActiveTab('inventario')}
-                                >
-                                    Inventário
-                                </button>
+                                {!hideInventoryTab && (
+                                    <button
+                                        type="button"
+                                        className={`cdm-tab font-XS-bold${
+                                            activeTab === 'inventario'
+                                                ? ' cdm-tab--active'
+                                                : ''
+                                        }`}
+                                        disabled={isEditing || saving}
+                                        onClick={() => setActiveTab('inventario')}
+                                    >
+                                        Inventário
+                                    </button>
+                                )}
                             </div>
                             {/* ── Principal tab ─────────────── */}
                             {activeTab === 'principal' && (
@@ -1859,7 +1869,7 @@ export default function CharacterDetailModal({
                             )}{' '}
                             {/* end principal tab */}
                             {/* ── Inventário tab ──────────────────────── */}
-                            {activeTab === 'inventario' && (
+                            {!hideInventoryTab && activeTab === 'inventario' && (
                                 <div className="cdm-tab-content">
                                     <div className="cdm-section">
                                         <h3 className="font-M-semibold cdm-section-title">

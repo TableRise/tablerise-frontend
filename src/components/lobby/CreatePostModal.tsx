@@ -130,7 +130,7 @@ export default function CreatePostModal({
         try {
             if (isEditMode) {
                 if (!userId) {
-                    throw new Error('UsuÃ¡rio invÃ¡lido para editar o post.');
+                    throw new Error('Usuário invÃ¡lido para editar o post.');
                 }
 
                 await updateCampaignJournalPost(campaignId, userId, {

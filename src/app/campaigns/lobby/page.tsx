@@ -18,6 +18,7 @@ import LeaveCampaignModal from '@/components/lobby/LeaveCampaignModal';
 import ShopModal from '@/components/lobby/ShopModal';
 import CampaignHistoryModal from '@/components/lobby/CampaignHistoryModal';
 import type { CampaignMusic } from '@/server/campaigns/create-campaign';
+import type { DatabaseCampaignBuyRecord } from '@/types/shared/entities';
 import {
     deleteCampaignJournalPost,
     getCampaignJournalPosts,
@@ -54,6 +55,7 @@ interface CampaignData {
     mapImages: ImageObject[];
     logs: { loggedAt: string; content: string }[];
     musics: CampaignMusic[];
+    buys: DatabaseCampaignBuyRecord[];
 }
 
 interface ConfirmedPlayerInfo {
@@ -113,6 +115,7 @@ function mapCampaignData(data: any): CampaignData {
         mapImages: data.matchData?.mapImages ?? [],
         logs: data.matchData?.logs ?? [],
         musics: data.musics ?? [],
+        buys: Array.isArray(data.buys) ? data.buys : [],
         visibility: data.visibility ?? '',
         ageRestriction: data.ageRestriction ?? '',
         nextSessionResume: data.matchData?.nextSessionResume ?? '',
@@ -296,8 +299,8 @@ export default function CampaignLobby(): JSX.Element {
         'characters-players': 'Personagens (Jogadores)',
         'characters-master': 'Personagens (Mestre)',
         environment: 'Ambiente',
-        'world-news': 'Notícias do Mundo',
-        announcements: 'Anúncios',
+        'world-news': 'NotÃ­cias do Mundo',
+        announcements: 'AnÃºncios',
     };
 
     const postFilters = Object.keys(CATEGORY_LABEL);
@@ -390,12 +393,12 @@ export default function CampaignLobby(): JSX.Element {
                     <div className="lobby-info-bar">
                         <div className="lobby-info-bar-row">
                             <div className="lobby-info-item">
-                                <span className="font-XS-bold">Próxima sessão:</span>
+                                <span className="font-XS-bold">próxima sessão:</span>
                                 <span className="font-XS-regular">
                                     {campaign.nextMatchDate &&
                                     campaign.nextMatchDate !== 'no-date'
                                         ? formatDate(campaign.nextMatchDate)
-                                        : 'Não agendado'}
+                                        : 'NÃ£o agendado'}
                                 </span>
                             </div>
                             {Object.entries(campaign.socialMedia)
@@ -422,7 +425,7 @@ export default function CampaignLobby(): JSX.Element {
                         </div>
                         <div className="lobby-info-bar-row">
                             <div className="lobby-info-item lobby-code-item">
-                                <span className="font-XS-bold">Código da campanha:</span>
+                                <span className="font-XS-bold">CÃ³digo da campanha:</span>
                                 <span className="font-XS-regular">
                                     {campaign.code || '-'}
                                 </span>
@@ -431,11 +434,11 @@ export default function CampaignLobby(): JSX.Element {
                                     className="lobby-copy-btn"
                                     onClick={handleCopyCampaignCode}
                                     disabled={!campaign.code}
-                                    aria-label="Copiar Código da campanha"
+                                    aria-label="Copiar CÃ³digo da campanha"
                                 >
                                     <Image
                                         src={CopyBlueSVG.src}
-                                        alt="Copiar Código da campanha"
+                                        alt="Copiar CÃ³digo da campanha"
                                         width={18}
                                         height={18}
                                     />
@@ -461,7 +464,7 @@ export default function CampaignLobby(): JSX.Element {
                             }}
                         >
                             {presenceConfirmed
-                                ? '✔ Presença confirmada'
+                                ? 'âœ” presença confirmada'
                                 : 'Clique aqui para confirmar a presença na próxima sessão'}
                         </button>
                         <button
@@ -491,12 +494,12 @@ export default function CampaignLobby(): JSX.Element {
                                         className="lobby-session-modal-close font-M-semibold"
                                         onClick={() => setSessionPreviewOpen(false)}
                                     >
-                                        ×
+                                        x
                                     </button>
                                 </div>
                                 <p className="font-S-regular lobby-session-modal-text">
                                     {campaign.nextSessionResume ||
-                                        'Sem resumo disponível para a próxima sessão.'}
+                                        'Sem resumo disponÃ­vel para a próxima sessão.'}
                                 </p>
                             </div>
                         </div>
@@ -526,7 +529,7 @@ export default function CampaignLobby(): JSX.Element {
                         </div>
                     )}
                     <div className="lobby-characters">
-                        <h2 className="font-L-semibold">Confirmados Próxima Sessão</h2>
+                        <h2 className="font-L-semibold">Confirmados próxima sessão</h2>
                         <div className="lobby-characters-slider">
                             {confirmedPlayersInfo.length > 0 ? (
                                 confirmedPlayersInfo.map((player) => (
@@ -654,7 +657,7 @@ export default function CampaignLobby(): JSX.Element {
                                     ))
                                 ) : (
                                     <span className="font-XS-regular lobby-articles-empty">
-                                        Nenhuma publicação nesta categoria.
+                                        Nenhuma publicaÃ§Ã£o nesta categoria.
                                     </span>
                                 )}
                             </div>
@@ -763,8 +766,10 @@ export default function CampaignLobby(): JSX.Element {
                     userId={userInfo?.userId ?? ''}
                     userNickname={userInfo?.nickname ?? userInfo?.username ?? ''}
                     lobbyCharacters={lobbyCharacters}
+                    buys={campaign.buys}
                     isMaster={isMaster}
                     isAdminPlayer={isAdminPlayer}
+                    refreshCampaign={refreshCampaign}
                     onClose={() => setShopModalOpen(false)}
                 />
             )}

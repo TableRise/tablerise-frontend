@@ -18,7 +18,7 @@
         "@3d-dice/dice-box-threejs": "0.0.12",
         "@hookform/resolvers": "3.9.1",
         "@sentry/nextjs": "10.48.0",
-        "@tablerise/database-management": "^6.0.1",
+        "@tablerise/database-management": "6.0.1",
         "@tsparticles/engine": "3.9.1",
         "@tsparticles/react": "3.0.0",
         "@tsparticles/slim": "3.9.1",

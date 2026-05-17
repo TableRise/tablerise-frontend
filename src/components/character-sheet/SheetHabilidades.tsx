@@ -17,7 +17,7 @@ const ABILITY_LEVELS = [
 const ABILITIES_PER_LEVEL = 8;
 
 interface SheetHabilidadesProps {
-    campaignId: string;
+    campaignId?: string;
     characterId: string;
     spellClassName?: string;
     initialAbilityNames?: Record<number, string[]>;

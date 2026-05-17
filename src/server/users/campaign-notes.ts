@@ -1,10 +1,6 @@
 import { AxiosError } from 'axios';
 import { apiCall, usersBaseUrl } from '../wrapper';
-import { getUser } from './get-user';
-import type {
-    DatabaseUserCampaignInfo,
-    DatabaseUserWithDetails,
-} from '@/types/shared/entities';
+import { getCampaignById } from '@/server/campaigns/join-campaign';
 
 export interface CampaignNote {
     id?: string;
@@ -17,20 +13,6 @@ export interface CampaignNote {
 interface CreateCampaignNotePayload {
     title: string;
     content: string;
-}
-
-function getCampaignsFromUser(
-    userData: DatabaseUserWithDetails | null
-): DatabaseUserCampaignInfo[] {
-    if (Array.isArray(userData?.result?.details?.gameInfo?.campaigns)) {
-        return userData.result.details.gameInfo.campaigns;
-    }
-
-    if (Array.isArray(userData?.details?.gameInfo?.campaigns)) {
-        return userData.details.gameInfo.campaigns;
-    }
-
-    return [];
 }
 
 function normalizeNote(note: any): CampaignNote | null {
@@ -51,15 +33,17 @@ export const getUserCampaignNotes = async (
     campaignId: string
 ): Promise<CampaignNote[]> => {
     try {
-        const userData = await getUser(userId);
-        const campaigns = getCampaignsFromUser(userData);
-        const currentCampaign = campaigns.find(
-            (campaign: any) => campaign?.campaignId === campaignId
+        const campaign = await getCampaignById(campaignId);
+
+        if (!campaign) return [];
+
+        const player = (campaign.campaignPlayers ?? []).find(
+            (entry: any) => entry?.userId === userId
         );
 
-        if (!Array.isArray(currentCampaign?.notes)) return [];
+        if (!Array.isArray(player?.notes)) return [];
 
-        return currentCampaign.notes
+        return player.notes
             .map(normalizeNote)
             .filter((note): note is CampaignNote => note !== null);
     } catch (error) {

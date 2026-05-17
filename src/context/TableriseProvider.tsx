@@ -51,6 +51,7 @@ export default function TableriseProvider({
                         socialMedia: campaign.infos.socialMedia ?? {},
                         nextSessionResume: campaign.matchData?.nextSessionResume ?? '',
                     },
+                    buys: campaign.buys ?? [],
                     matchData: {
                         confirmedPlayers: campaign.matchData?.confirmedPlayers ?? [],
                         mapImages: campaign.matchData?.mapImages ?? [],
@@ -77,6 +78,7 @@ export default function TableriseProvider({
                         socialMedia: campaign.infos.socialMedia ?? {},
                         nextSessionResume: campaign.matchData?.nextSessionResume ?? '',
                     },
+                    buys: campaign.buys ?? [],
                     matchData: {
                         confirmedPlayers: campaign.matchData?.confirmedPlayers ?? [],
                         mapImages: campaign.matchData?.mapImages ?? [],

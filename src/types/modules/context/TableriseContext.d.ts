@@ -29,6 +29,7 @@ export type UserCampaign = Omit<
         socialMedia?: DatabaseCampaign['infos']['socialMedia'];
         nextSessionResume?: DatabaseCampaign['matchData']['nextSessionResume'];
     };
+    buys?: DatabaseCampaign['buys'];
     matchData?: {
         confirmedPlayers?: Array<string | Pick<CampaignPlayer, 'userId' | 'role'>>;
         mapImages?: ImageObject[];

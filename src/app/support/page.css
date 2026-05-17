@@ -4,7 +4,7 @@
 
 @layer base {
     .support-page {
-        @apply w-full px-6 pb-10 flex justify-center;
+        @apply w-full px-6 pb-10 flex justify-start;
     }
 
     .support-inside-container {

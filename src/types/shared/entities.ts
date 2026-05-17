@@ -1,8 +1,5 @@
 import type User from '@tablerise/database-management/dist/src/interfaces/User';
-import type {
-    GameInfoCampaigns,
-    UserDetail,
-} from '@tablerise/database-management/dist/src/interfaces/User';
+import type { UserDetail } from '@tablerise/database-management/dist/src/interfaces/User';
 import type Campaign from '@tablerise/database-management/dist/src/interfaces/Campaigns';
 import type {
     Infos as CampaignInfos,
@@ -24,8 +21,12 @@ import type {
 } from '@tablerise/database-management/dist/src/interfaces/Common';
 
 export type DatabaseUser = User;
-export type DatabaseUserDetail = UserDetail;
-export type DatabaseUserCampaignInfo = GameInfoCampaigns;
+export type DatabaseUserDetail = Omit<UserDetail, 'gameInfo'> & {
+    gameInfo: Omit<UserDetail['gameInfo'], 'campaigns'> & {
+        campaigns: string[];
+    };
+};
+export type DatabaseUserCampaignInfo = string;
 export type DatabaseUserWithDetails = DatabaseUser & {
     username?: string;
     details?: DatabaseUserDetail;
@@ -34,7 +35,17 @@ export type DatabaseUserWithDetails = DatabaseUser & {
     };
 };
 
-export type DatabaseCampaign = Campaign;
+export interface DatabaseCampaignBuyRecord {
+    name: string;
+    cost: string;
+    character: string;
+    user: string;
+    date: string;
+}
+
+export type DatabaseCampaign = Campaign & {
+    buys?: DatabaseCampaignBuyRecord[];
+};
 export type DatabaseCampaignInfos = CampaignInfos;
 export type DatabaseCampaignPlayer = CampaignPlayer;
 export type DatabaseCampaignMatchData = MatchData;

@@ -14,9 +14,11 @@ import {
     updateCharacter,
     addCharacterEquipment,
 } from '@/server/characters/update-character';
+import { createCampaignBuy } from '@/server/campaigns/create-campaign-buy';
+import type { DatabaseCampaignBuyRecord } from '@/types/shared/entities';
 import '@/components/lobby/styles/ShopModal.css';
 
-// ── Currency helpers ──────────────────────────────────────────────────────────
+// â”€â”€ Currency helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type MoneyKey = 'cp' | 'sp' | 'ep' | 'gp' | 'pp';
 
@@ -73,37 +75,33 @@ function calcConversion(
     return { gross, tax, net };
 }
 
-// ── Purchase history ─────────────────────────────────────────────────────────
+// â”€â”€ Purchase history â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-interface PurchaseRecord {
-    itemName: string;
-    price: string;
-    characterName: string;
-    userNickname: string;
-    date: string;
-}
-
-// ── Props ─────────────────────────────────────────────────────────────────────
+// â”€â”€ Props â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface ShopModalProps {
     campaignId: string;
     userId: string;
     userNickname: string;
     lobbyCharacters: CampaignCharacter[];
+    buys: DatabaseCampaignBuyRecord[];
     isMaster: boolean;
     isAdminPlayer: boolean;
+    refreshCampaign: () => void;
     onClose: () => void;
 }
 
-// ── Component ─────────────────────────────────────────────────────────────────
+// â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export default function ShopModal({
-    campaignId: _campaignId,
+    campaignId,
     userId,
     userNickname,
     lobbyCharacters,
+    buys,
     isMaster,
     isAdminPlayer,
+    refreshCampaign,
     onClose,
 }: ShopModalProps): JSX.Element {
     const userChars = useMemo(
@@ -111,7 +109,7 @@ export default function ShopModal({
         [lobbyCharacters, userId]
     );
 
-    // ── Character selection ───────────────────────────────────────────────────
+    // â”€â”€ Character selection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const [selectedCharId, setSelectedCharId] = useState<string | null>(null);
     const [selectedChar, setSelectedChar] = useState<FullCharacterDnd | null>(null);
     const [charLoading, setCharLoading] = useState(false);
@@ -142,7 +140,7 @@ export default function ShopModal({
         [selectedChar]
     );
 
-    // ── Equipment data ────────────────────────────────────────────────────────
+    // â”€â”€ Equipment data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const [equipment, setEquipment] = useState<DndEquipmentRecord[]>([]);
     const [equipLoading, setEquipLoading] = useState(true);
 
@@ -152,16 +150,22 @@ export default function ShopModal({
             .finally(() => setEquipLoading(false));
     }, []);
 
-    // ── Shop tab state ────────────────────────────────────────────────────────
+    // â”€â”€ Shop tab state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const [activeTab, setActiveTab] = useState<'shop' | 'vault' | 'history'>('shop');
     const [searchQuery, setSearchQuery] = useState('');
     const [typeFilter, setTypeFilter] = useState('all');
     const [buyWarning, setBuyWarning] = useState('');
     const [selectedItem, setSelectedItem] = useState<DndEquipmentRecord | null>(null);
     const [buying, setBuying] = useState(false);
-    const [purchaseHistory, setPurchaseHistory] = useState<PurchaseRecord[]>([]);
 
     const canSeeHistory = isMaster || isAdminPlayer;
+    const purchaseHistory = buys ?? [];
+
+    useEffect(() => {
+        if (userChars.length === 0 && canSeeHistory) {
+            setActiveTab('history');
+        }
+    }, [canSeeHistory, userChars.length]);
 
     const uniqueTypes = useMemo(() => {
         const types = new Set(equipment.map((e) => e.type).filter(Boolean));
@@ -189,7 +193,9 @@ export default function ShopModal({
         const currentAmount = currentMoney[priceKey] ?? 0;
 
         if (currentAmount < amount) {
-            setBuyWarning('O personagem selecionado não possuí dinheiro para este item.');
+            setBuyWarning(
+                'O personagem selecionado nÃ£o possuÃ­ dinheiro para este item.'
+            );
             return;
         }
 
@@ -200,42 +206,59 @@ export default function ShopModal({
             ...currentMoney,
             [priceKey]: currentAmount - amount,
         };
+        const cost = `${selectedItem.price[0]} ${selectedItem.price[1]}`;
+        const character = selectedChar.data?.profile?.name ?? selectedChar.characterId;
+        const date = new Date().toLocaleString('pt-BR');
 
-        const success = await updateCharacter(selectedChar.characterId, {
-            data: { money: newMoney },
-        });
+        try {
+            const success = await updateCharacter(selectedChar.characterId, {
+                data: { money: newMoney },
+            });
 
-        if (success && selectedCharId) {
+            if (!success || !selectedCharId) {
+                setBuyWarning('Erro ao concluir compra.');
+                return;
+            }
+
             await addCharacterEquipment(
                 selectedChar.characterId,
                 selectedItem.equipmentId
             );
             await loadChar(selectedCharId);
-            setPurchaseHistory((prev) => [
-                {
-                    itemName: selectedItem.name,
-                    price: `${selectedItem.price[0]} ${selectedItem.price[1]}`,
-                    characterName:
-                        selectedChar.data?.profile?.name ?? selectedChar.characterId,
-                    userNickname,
-                    date: new Date().toLocaleString('pt-BR'),
-                },
-                ...prev,
-            ]);
-        }
 
-        setBuying(false);
-        setSelectedItem(null);
+            try {
+                await createCampaignBuy(campaignId, {
+                    name: selectedItem.name,
+                    cost,
+                    character,
+                    user: userNickname,
+                    date,
+                });
+                refreshCampaign();
+            } catch (error: any) {
+                setBuyWarning(
+                    error?.message ??
+                        'A compra foi concluÃ­da, mas nÃ£o foi possÃ­vel salvar no histÃ³rico.'
+                );
+            }
+        } catch (error: any) {
+            setBuyWarning(error?.message ?? 'Erro ao concluir compra.');
+        } finally {
+            setBuying(false);
+            setSelectedItem(null);
+        }
     }, [
+        campaignId,
         selectedChar,
         selectedItem,
         currentMoney,
         selectedCharId,
         loadChar,
+        refreshCampaign,
         userNickname,
     ]);
 
-    // ── Vault tab state ───────────────────────────────────────────────────────
+    // â”€â”€ Vault tab state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const [fromCurrency, setFromCurrency] = useState<MoneyKey>('gp');
     const [toCurrency, setToCurrency] = useState<MoneyKey>('sp');
     const [convertAmount, setConvertAmount] = useState('');
@@ -265,12 +288,12 @@ export default function ShopModal({
         if (!selectedChar || !conversionPreview || !canConvert) return;
 
         if (conversionPreview.net <= 0) {
-            setVaultWarning('Conversão insuficiente para cobrir a taxa.');
+            setVaultWarning('ConversÃ£o insuficiente para cobrir a taxa.');
             return;
         }
 
         if ((currentMoney[fromCurrency] ?? 0) < parsedConvertAmount) {
-            setVaultWarning('Saldo insuficiente para realizar a conversão.');
+            setVaultWarning('Saldo insuficiente para realizar a conversÃ£o.');
             return;
         }
 
@@ -305,7 +328,7 @@ export default function ShopModal({
         loadChar,
     ]);
 
-    // ── Render helpers ────────────────────────────────────────────────────────
+    // â”€â”€ Render helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     const renderMoneyBar = () => (
         <div className="sm-money-bar">
@@ -386,7 +409,7 @@ export default function ShopModal({
             {selectedItem && (
                 <div className="sm-buy-bar">
                     <span className="sm-buy-bar-label">
-                        {selectedItem.name} — {selectedItem.price[0]}{' '}
+                        {selectedItem.name} - {selectedItem.price[0]}{' '}
                         {selectedItem.price[1]}
                     </span>
                     <button
@@ -441,7 +464,7 @@ export default function ShopModal({
                                 const priceDisplay = `${item.price[0]} ${item.price[1]}`;
                                 const caDisplay = item.armorClass
                                     ? item.armorClass.join(' ')
-                                    : '—';
+                                    : '-';
 
                                 return (
                                     <tr
@@ -453,18 +476,18 @@ export default function ShopModal({
                                         }}
                                     >
                                         <td className="font-semibold">{item.name}</td>
-                                        <td>{item.type || '—'}</td>
+                                        <td>{item.type || '-'}</td>
                                         <td>{priceDisplay}</td>
                                         <td>{caDisplay}</td>
-                                        <td>{item.strength || '—'}</td>
-                                        <td>{item.stealth || '—'}</td>
-                                        <td>{item.weight || '—'}</td>
-                                        <td>{item.damage || '—'}</td>
+                                        <td>{item.strength || '-'}</td>
+                                        <td>{item.stealth || '-'}</td>
+                                        <td>{item.weight || '-'}</td>
+                                        <td>{item.damage || '-'}</td>
                                         <td
                                             className="max-w-[12rem] truncate"
                                             title={item.properties}
                                         >
-                                            {item.properties || '—'}
+                                            {item.properties || '-'}
                                         </td>
                                     </tr>
                                 );
@@ -479,7 +502,7 @@ export default function ShopModal({
     const renderHistoryTab = () => (
         <div className="flex flex-col gap-4">
             {purchaseHistory.length === 0 ? (
-                <p className="sm-loading">Nenhuma compra realizada nesta sessão.</p>
+                <p className="sm-loading">Nenhuma compra registrada nesta campanha.</p>
             ) : (
                 <div className="sm-table-wrapper">
                     <table className="sm-table sm-history-table">
@@ -495,10 +518,10 @@ export default function ShopModal({
                         <tbody>
                             {purchaseHistory.map((record, i) => (
                                 <tr key={i}>
-                                    <td className="font-semibold">{record.itemName}</td>
-                                    <td>{record.price}</td>
-                                    <td>{record.characterName}</td>
-                                    <td>{record.userNickname}</td>
+                                    <td className="font-semibold">{record.name}</td>
+                                    <td>{record.cost}</td>
+                                    <td>{record.character}</td>
+                                    <td>{record.user}</td>
                                     <td className="sm-history-date">{record.date}</td>
                                 </tr>
                             ))}
@@ -558,7 +581,7 @@ export default function ShopModal({
                         }}
                     />
 
-                    <span className="text-color-greyScale/500 font-semibold">→</span>
+                    <span className="text-color-greyScale/500 font-semibold">></span>
 
                     <select
                         className="sm-vault-select"
@@ -590,11 +613,13 @@ export default function ShopModal({
                         <div className="sm-vault-preview-item">
                             <span className="sm-vault-preview-label">Taxa (5%)</span>
                             <span className="sm-vault-preview-value--tax">
-                                − {conversionPreview.tax} {CURRENCY_LABELS[toCurrency]}
+                                {conversionPreview.tax} {CURRENCY_LABELS[toCurrency]}
                             </span>
                         </div>
                         <div className="sm-vault-preview-item">
-                            <span className="sm-vault-preview-label">Você receberá</span>
+                            <span className="sm-vault-preview-label">
+                                Você receberá
+                            </span>
                             <span className="sm-vault-preview-value">
                                 {Math.max(0, conversionPreview.net)}{' '}
                                 {CURRENCY_LABELS[toCurrency]}
@@ -623,7 +648,7 @@ export default function ShopModal({
         </div>
     );
 
-    // ── Main render ───────────────────────────────────────────────────────────
+    // â”€â”€ Main render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     return (
         <div className="sm-overlay">
@@ -635,7 +660,7 @@ export default function ShopModal({
                         {selectedChar && !showPicker && (
                             <div className="flex items-center gap-3 flex-wrap">
                                 <span className="sm-char-name font-XS-bold">
-                                    {selectedChar.data?.profile?.name ?? '—'}
+                                    {selectedChar.data?.profile?.name ?? '-'}
                                 </span>
                                 {userChars.length > 1 && (
                                     <button
@@ -659,14 +684,14 @@ export default function ShopModal({
                         className="sm-close-btn font-M-semibold"
                         onClick={onClose}
                     >
-                        ×
+                        x
                     </button>
                 </div>
 
                 {/* No characters */}
                 {userChars.length === 0 && (
                     <p className="sm-picker-empty">
-                        Você não possui personagens nesta campanha.
+                        VocÃª nÃ£o possui personagens nesta campanha.
                     </p>
                 )}
 
@@ -683,63 +708,86 @@ export default function ShopModal({
                 )}
 
                 {/* Main content: tabs */}
-                {!showPicker && selectedCharId && (
-                    <>
-                        {charLoading ? (
-                            <p className="sm-loading">Carregando personagem...</p>
-                        ) : (
-                            <>
-                                {/* Tabs */}
-                                <div className="sm-tabs">
-                                    <button
-                                        type="button"
-                                        className={`sm-tab${
-                                            activeTab === 'shop' ? ' sm-tab--active' : ''
-                                        }`}
-                                        onClick={() => {
-                                            setActiveTab('shop');
-                                            setBuyWarning('');
-                                            setSelectedItem(null);
-                                        }}
-                                    >
-                                        Loja
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className={`sm-tab${
-                                            activeTab === 'vault' ? ' sm-tab--active' : ''
-                                        }`}
-                                        onClick={() => {
-                                            setActiveTab('vault');
-                                            setVaultWarning('');
-                                        }}
-                                    >
-                                        Cofre
-                                    </button>
-                                    {canSeeHistory && (
+                {!showPicker &&
+                    (selectedCharId || (canSeeHistory && userChars.length === 0)) && (
+                        <>
+                            {selectedCharId && charLoading ? (
+                                <p className="sm-loading">Carregando personagem...</p>
+                            ) : (
+                                <>
+                                    {/* Tabs */}
+                                    <div className="sm-tabs">
                                         <button
                                             type="button"
                                             className={`sm-tab${
-                                                activeTab === 'history'
+                                                activeTab === 'shop'
                                                     ? ' sm-tab--active'
                                                     : ''
                                             }`}
-                                            onClick={() => setActiveTab('history')}
+                                            disabled={!selectedCharId}
+                                            onClick={() => {
+                                                setActiveTab('shop');
+                                                setBuyWarning('');
+                                                setSelectedItem(null);
+                                            }}
                                         >
-                                            Histórico de Compras
+                                            Loja
                                         </button>
-                                    )}
-                                </div>
+                                        <button
+                                            type="button"
+                                            className={`sm-tab${
+                                                activeTab === 'vault'
+                                                    ? ' sm-tab--active'
+                                                    : ''
+                                            }`}
+                                            disabled={!selectedCharId}
+                                            onClick={() => {
+                                                setActiveTab('vault');
+                                                setVaultWarning('');
+                                            }}
+                                        >
+                                            Cofre
+                                        </button>
+                                        {canSeeHistory && (
+                                            <button
+                                                type="button"
+                                                className={`sm-tab${
+                                                    activeTab === 'history'
+                                                        ? ' sm-tab--active'
+                                                        : ''
+                                                }`}
+                                                onClick={() => setActiveTab('history')}
+                                            >
+                                                Histórico de Compras
+                                            </button>
+                                        )}
+                                    </div>
 
-                                {activeTab === 'shop' && renderShopTab()}
-                                {activeTab === 'vault' && renderVaultTab()}
-                                {activeTab === 'history' &&
-                                    canSeeHistory &&
-                                    renderHistoryTab()}
-                            </>
-                        )}
-                    </>
-                )}
+                                    {activeTab === 'shop' &&
+                                        (selectedCharId ? (
+                                            renderShopTab()
+                                        ) : (
+                                            <p className="sm-loading">
+                                                Selecione um personagem para comprar
+                                                itens.
+                                            </p>
+                                        ))}
+                                    {activeTab === 'vault' &&
+                                        (selectedCharId ? (
+                                            renderVaultTab()
+                                        ) : (
+                                            <p className="sm-loading">
+                                                Selecione um personagem para acessar o
+                                                cofre.
+                                            </p>
+                                        ))}
+                                    {activeTab === 'history' &&
+                                        canSeeHistory &&
+                                        renderHistoryTab()}
+                                </>
+                            )}
+                        </>
+                    )}
             </div>
         </div>
     );

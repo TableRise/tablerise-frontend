@@ -39,7 +39,7 @@ const SPELL_LEVELS = [
 const SPELLS_PER_LEVEL = 8;
 
 interface SheetMagiasProps {
-    campaignId: string;
+    campaignId?: string;
     characterId: string;
     spellClassName?: string;
     spellAbilityLabel?: string;
@@ -62,7 +62,6 @@ export interface SheetMagiasHandle {
 
 const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function SheetMagias(
     {
-        campaignId,
         characterId,
         spellClassName = '',
         spellAbilityLabel = '',
