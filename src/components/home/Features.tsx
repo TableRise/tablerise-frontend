@@ -10,19 +10,19 @@ export default function Features(): JSX.Element {
     const cardInfo: Elements[] = [
         {
             image: MapIconHome,
-            text: 'Escolha o seu tabuleiro',
+            text: 'Gerenciamento de mapas',
         },
         {
             image: MusicIcon,
-            text: 'Escolha sua trilha sonora preferida para a campanha',
+            text: 'Trilha sonora personalizada',
         },
         {
             image: AddCharInfoIcon,
-            text: 'Dê vida aos personagens adicionando fotos',
+            text: 'Criação de Fichas',
         },
         {
             image: DiceIcon,
-            text: 'Personalize seu dado de acordo com sua necessidade',
+            text: 'Ferramentas para RPG',
         },
     ];
 

@@ -82,7 +82,7 @@ export default function Footer(): JSX.Element {
                     <ul>
                         <h5>Outros</h5>
                         <li>
-                            <Link href="/">Termos de serviço</Link>
+                            <Link href="/terms">Termos de serviço</Link>
                         </li>
                         <li>
                             <Link href="/">Políticas de privacidade</Link>

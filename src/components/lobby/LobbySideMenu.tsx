@@ -37,24 +37,22 @@ export default function LobbySideMenu({
     shopEnabled = true,
     onMenuAction,
 }: LobbySideMenuProps): JSX.Element {
-    const baseItems = playerMenuItems.filter((item) => {
-        if (item.key === 'leave') return false;
-        if (item.key === 'shop' && !shopEnabled) return false;
-        return true;
-    });
+    const baseItems = playerMenuItems.filter((item) => item.key !== 'leave');
     const leaveItem = playerMenuItems.find((item) => item.key === 'leave')!;
 
     let menuItems: typeof playerMenuItems = [];
     if (isMaster) {
         menuItems = [...baseItems, ...masterExtraItems, leaveItem];
     } else if (isPlayer) {
-        menuItems = playerMenuItems;
+        menuItems = [...baseItems, leaveItem];
     }
 
     return (
         <aside className="lobby-side-menu">
             <nav className="lobby-side-menu-nav">
                 {menuItems.map((item) => {
+                    const isDisabled = item.key === 'shop' && !shopEnabled;
+
                     return (
                         <div key={item.key} className="lobby-menu-item-wrapper">
                             <span
@@ -67,8 +65,12 @@ export default function LobbySideMenu({
                             <button
                                 className={`lobby-menu-item ${
                                     item.danger ? 'lobby-menu-item-danger' : ''
-                                }`}
-                                onClick={() => onMenuAction?.(item.key)}
+                                } ${isDisabled ? 'lobby-menu-item-disabled' : ''}`}
+                                onClick={() => {
+                                    if (isDisabled) return;
+                                    onMenuAction?.(item.key);
+                                }}
+                                disabled={isDisabled}
                             >
                                 <Image
                                     src={item.icon}

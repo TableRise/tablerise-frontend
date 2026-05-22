@@ -167,6 +167,25 @@ function getLocalizedAbilityLabel(value?: string | null): string {
     return MAGIC_CLASS_PT[normalized] ?? value;
 }
 
+type CharacterOtherFields =
+    FullCharacterDnd['data']['profile']['characteristics']['other'];
+
+function getOtherProficiencies(other?: CharacterOtherFields | null): string {
+    return other?.proficiencies ?? '';
+}
+
+function getOtherExtraCharacteristics(other?: CharacterOtherFields | null): string {
+    return other?.extraCharacteristics ?? '';
+}
+
+function hasOtherSectionContent(other?: CharacterOtherFields | null): boolean {
+    return Boolean(
+        getOtherProficiencies(other) ||
+            other?.characteristicsAndAbilities ||
+            getOtherExtraCharacteristics(other)
+    );
+}
+
 const SPELL_LEVELS = [
     { level: 0, label: 'Truques', slots: false },
     { level: 1, label: '1', slots: true },
@@ -387,13 +406,14 @@ export default function CharacterDetailModal({
             treasure: profile.characteristics?.treasure ?? '',
         });
         setEditOther({
-            languagesAndProficiencies:
-                profile.characteristics?.other?.languagesAndProficiencies ?? '',
+            languagesAndProficiencies: getOtherProficiencies(
+                profile.characteristics?.other
+            ),
             characteristicsAndAbilities:
                 profile.characteristics?.other?.characteristicsAndAbilities ?? '',
-            characteristicsAndAdditionalAbilities:
-                profile.characteristics?.other?.characteristicsAndAdditionalAbilities ??
-                '',
+            characteristicsAndAdditionalAbilities: getOtherExtraCharacteristics(
+                profile.characteristics?.other
+            ),
         });
         // initialize per-skill proficiency from stored array
         const skillProfsInit: Record<string, boolean> = {};
@@ -641,11 +661,10 @@ export default function CharacterDetailModal({
                         alliesAndOrgs: editHistorico.alliesAndOrgs,
                         treasure: editHistorico.treasure,
                         other: {
-                            languagesAndProficiencies:
-                                editOther.languagesAndProficiencies,
+                            proficiencies: editOther.languagesAndProficiencies,
                             characteristicsAndAbilities:
                                 editOther.characteristicsAndAbilities,
-                            characteristicsAndAdditionalAbilities:
+                            extraCharacteristics:
                                 editOther.characteristicsAndAdditionalAbilities,
                         },
                     },
@@ -770,6 +789,8 @@ export default function CharacterDetailModal({
     const canCloseNotifications =
         levelUpNotifications.length > 0 &&
         activeNotificationIndex === levelUpNotifications.length - 1;
+    const inventoryText =
+        typeof char?.data?.inventory === 'string' ? char.data.inventory : '';
 
     const inventoryItems: Array<{
         equipmentId: string;
@@ -782,8 +803,8 @@ export default function CharacterDetailModal({
         weight: string;
         damage?: string;
         properties?: string;
-    }> = Array.isArray(char?.data?.equipments)
-        ? (char!.data.equipments as Array<{
+    }> = Array.isArray(char?.data?.inventory)
+        ? (char!.data.inventory as Array<{
               equipmentId: string;
               name: string;
               type: string;
@@ -1406,12 +1427,9 @@ export default function CharacterDetailModal({
 
                                     {/* ── Proficiências & Habilidades ─── */}
                                     {(isEditing ||
-                                        profile.characteristics?.other
-                                            ?.languagesAndProficiencies ||
-                                        profile.characteristics?.other
-                                            ?.characteristicsAndAbilities ||
-                                        profile.characteristics?.other
-                                            ?.characteristicsAndAdditionalAbilities) && (
+                                        hasOtherSectionContent(
+                                            profile.characteristics?.other
+                                        )) && (
                                         <div className="cdm-section">
                                             <h3 className="font-M-semibold cdm-section-title">
                                                 Proficiências &amp; Habilidades
@@ -1440,14 +1458,14 @@ export default function CharacterDetailModal({
                                                         string
                                                     > = {
                                                         languagesAndProficiencies:
-                                                            other?.languagesAndProficiencies ??
-                                                            '',
+                                                            getOtherProficiencies(other),
                                                         characteristicsAndAbilities:
                                                             other?.characteristicsAndAbilities ??
                                                             '',
                                                         characteristicsAndAdditionalAbilities:
-                                                            other?.characteristicsAndAdditionalAbilities ??
-                                                            '',
+                                                            getOtherExtraCharacteristics(
+                                                                other
+                                                            ),
                                                     };
                                                     const val = isEditing
                                                         ? editOther[field]
@@ -1781,12 +1799,9 @@ export default function CharacterDetailModal({
 
                                     {/* ── Proficiências & Habilidades ─── */}
                                     {(isEditing ||
-                                        profile.characteristics?.other
-                                            ?.languagesAndProficiencies ||
-                                        profile.characteristics?.other
-                                            ?.characteristicsAndAbilities ||
-                                        profile.characteristics?.other
-                                            ?.characteristicsAndAdditionalAbilities) && (
+                                        hasOtherSectionContent(
+                                            profile.characteristics?.other
+                                        )) && (
                                         <div className="cdm-section">
                                             <h3 className="font-M-semibold cdm-section-title">
                                                 Proficiências &amp; Habilidades
@@ -1815,14 +1830,14 @@ export default function CharacterDetailModal({
                                                         string
                                                     > = {
                                                         languagesAndProficiencies:
-                                                            other?.languagesAndProficiencies ??
-                                                            '',
+                                                            getOtherProficiencies(other),
                                                         characteristicsAndAbilities:
                                                             other?.characteristicsAndAbilities ??
                                                             '',
                                                         characteristicsAndAdditionalAbilities:
-                                                            other?.characteristicsAndAdditionalAbilities ??
-                                                            '',
+                                                            getOtherExtraCharacteristics(
+                                                                other
+                                                            ),
                                                     };
                                                     const val = isEditing
                                                         ? editOther[field]
@@ -1879,12 +1894,11 @@ export default function CharacterDetailModal({
                                             <span className="font-XS-bold cdm-label">
                                                 Inventário
                                             </span>
-                                            {typeof char.data.inventory === 'string' &&
-                                                char.data.inventory && (
-                                                    <p className="font-XS-regular cdm-text-content">
-                                                        {char.data.inventory as string}
-                                                    </p>
-                                                )}
+                                            {inventoryText && (
+                                                <p className="font-XS-regular cdm-text-content">
+                                                    {inventoryText}
+                                                </p>
+                                            )}
                                         </div>
                                         {inventoryItems.length > 0 && (
                                             <div className="cdm-inventory-wrapper">

@@ -13,8 +13,11 @@ if (typeof window !== 'undefined') {
         async (error) => {
             const is401 = error?.response?.status === 401;
             const isLogoutUrl = error?.config?.url?.includes('/logout');
+            const isLoginUrl = error?.config?.url?.includes('/login');
+            const isAuthenticationFlowUrl =
+                error?.config?.url?.includes('/authenticate/');
 
-            if (is401 && !isLogoutUrl) {
+            if (is401 && !isLogoutUrl && !isLoginUrl && !isAuthenticationFlowUrl) {
                 try {
                     await axios.get(`${usersBaseUrl}/logout`, {
                         withCredentials: true,

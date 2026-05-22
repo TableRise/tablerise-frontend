@@ -8,7 +8,22 @@
     }
 
     .header-home {
-        @apply w-full flex flex-col items-center bg-gradient-to-r from-[#0A358A] to-[#0C255F];
+        @apply relative isolate flex min-h-[47rem] w-full flex-col items-center overflow-hidden px-4;
+        background:
+            linear-gradient(90deg, rgba(7, 23, 63, 0.86) 0%, rgba(8, 29, 78, 0.72) 34%, rgba(8, 29, 78, 0.38) 58%, rgba(8, 29, 78, 0.55) 100%),
+            linear-gradient(180deg, rgba(10, 53, 138, 0.5) 0%, rgba(12, 37, 95, 0.74) 100%),
+            url('../../assets/images/image_dnd_5e_01.jpg');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    .header-home::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top left, rgba(58, 104, 203, 0.24) 0%, rgba(58, 104, 203, 0) 42%);
+        pointer-events: none;
     }
 
     .content-home {
@@ -21,5 +36,24 @@
 
     .main-logged-page h2 {
         @apply text-color-primary/default_900 mb-6;
+    }
+
+    @media (max-width: 960px) {
+        .header-home {
+            @apply min-h-[42rem];
+            background-position: 68% center;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .header-home {
+            @apply min-h-[36rem] px-3;
+            background:
+                linear-gradient(180deg, rgba(7, 23, 63, 0.78) 0%, rgba(8, 29, 78, 0.56) 42%, rgba(8, 29, 78, 0.84) 100%),
+                url('../../assets/images/image_dnd_5e_01.jpg');
+            background-position: 72% center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
     }
 }

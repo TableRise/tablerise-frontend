@@ -50,9 +50,36 @@
         @apply relative z-[1] flex items-start gap-6 p-8;
     }
 
+    .profile-hero__media {
+        @apply flex flex-col gap-3;
+    }
+
     .profile-hero__avatar {
-        @apply relative w-48 h-48 rounded-3xl overflow-hidden border border-white/25 flex-shrink-0;
-        box-shadow: 0 18px 32px rgba(12, 37, 95, 0.22);
+        @apply relative w-48 h-48 flex-shrink-0;
+    }
+
+    .profile-hero__avatar--editable {
+        @apply cursor-pointer;
+    }
+
+    .profile-hero__avatar-overlay {
+        @apply absolute flex items-center justify-center bg-black/0 opacity-0 transition-all duration-300;
+        inset: 0;
+        z-index: 3;
+        border-radius: 9999px;
+    }
+
+    .profile-hero__avatar--editable:hover .profile-hero__avatar-overlay,
+    .profile-hero__avatar--editable:focus-within .profile-hero__avatar-overlay {
+        @apply bg-black/60 opacity-100;
+    }
+
+    .profile-hero__avatar-overlay:disabled {
+        @apply cursor-not-allowed bg-black/60 opacity-100;
+    }
+
+    .profile-hero__avatar-feedback {
+        @apply max-w-48 text-color-support/alert;
     }
 
     .profile-hero__copy {
@@ -67,8 +94,28 @@
         @apply text-color-primary/default_900;
     }
 
+    .profile-hero__email {
+        @apply text-color-primary/default_900;
+    }
+
     .profile-hero__handle {
         @apply text-color-greyScale/500;
+    }
+
+    .profile-hero__actions {
+        @apply flex flex-wrap items-center gap-2 text-color-primary/default_900;
+    }
+
+    .profile-hero__action {
+        @apply bg-transparent p-0 text-left text-color-primary/default_900 transition-opacity duration-150;
+    }
+
+    .profile-hero__action:hover {
+        opacity: 0.72;
+    }
+
+    .profile-hero__actions-separator {
+        @apply text-color-greyScale/300;
     }
 
     .profile-hero__meta {
@@ -84,7 +131,7 @@
     }
 
     .profile-hero__badge {
-        @apply relative w-[4.75rem] h-[4.75rem] rounded-2xl bg-color-primary/950 p-2 overflow-hidden;
+        @apply relative w-[4.75rem] h-[4.75rem] rounded-2xl p-2 overflow-hidden;
         box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
     }
 
@@ -289,6 +336,10 @@
 
         .profile-hero__avatar {
             @apply w-36 h-36;
+        }
+
+        .profile-hero__avatar-feedback {
+            @apply max-w-36;
         }
 
         .profile-hero__copy {

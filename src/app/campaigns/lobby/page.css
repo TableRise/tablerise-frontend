@@ -131,8 +131,12 @@
         @apply flex flex-col items-center gap-1 flex-shrink-0 cursor-pointer;
     }
 
+    .lobby-confirmed-player-avatar {
+        @apply relative h-[8rem] w-[8rem] flex-shrink-0;
+    }
+
     .lobby-character-avatar {
-        @apply relative w-[8rem] h-[8rem] rounded-full overflow-hidden border-2 border-color-primary/default_900;
+        @apply relative h-[8rem] w-[8rem] flex-shrink-0;
     }
 
     .lobby-character span {

@@ -131,10 +131,9 @@ export default function CharacterSheetPage(): JSX.Element {
                         alliesAndOrgs: c.alliesAndOrgs,
                         treasure: c.treasure,
                         other: {
-                            languagesAndProficiencies: p.proficienciesText,
+                            proficiencies: p.proficienciesText,
                             characteristicsAndAbilities: p.extraCharacteristics,
-                            characteristicsAndAdditionalAbilities:
-                                c.extraCharacteristicsDetail,
+                            extraCharacteristics: c.extraCharacteristicsDetail,
                         },
                     },
                 },
@@ -166,7 +165,7 @@ export default function CharacterSheetPage(): JSX.Element {
                     atkBonus: a.atkBonus,
                     damage: a.damageRaw,
                 })),
-                equipments: p.inventory,
+                inventory: p.inventory,
                 money: p.money,
                 ...(hasSpells && {
                     spells: {

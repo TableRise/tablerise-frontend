@@ -194,7 +194,7 @@ export default function ShopModal({
 
         if (currentAmount < amount) {
             setBuyWarning(
-                'O personagem selecionado nÃ£o possuÃ­ dinheiro para este item.'
+                'O personagem selecionado não possuÃ­ dinheiro para este item.'
             );
             return;
         }
@@ -238,7 +238,7 @@ export default function ShopModal({
             } catch (error: any) {
                 setBuyWarning(
                     error?.message ??
-                        'A compra foi concluÃ­da, mas nÃ£o foi possÃ­vel salvar no histÃ³rico.'
+                        'A compra foi concluÃ­da, mas não foi possível salvar no histÃ³rico.'
                 );
             }
         } catch (error: any) {
@@ -691,7 +691,7 @@ export default function ShopModal({
                 {/* No characters */}
                 {userChars.length === 0 && (
                     <p className="sm-picker-empty">
-                        VocÃª nÃ£o possui personagens nesta campanha.
+                        Você não possui personagens nesta campanha.
                     </p>
                 )}
 

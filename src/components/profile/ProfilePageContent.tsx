@@ -1,9 +1,10 @@
 'use client';
 
-import { KeyboardEvent, useContext, useEffect, useMemo, useState } from 'react';
+import { KeyboardEvent, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import badgesCatalog from '@assets/badges.js';
+import EditIcon from '@assets/icons/sys/edit.svg?url';
 import { getUser } from '@/server/users/get-user';
 import { getCampaignsByUserId } from '@/server/campaigns/get-campaigns';
 import formatDate from '@/utils/formatDate';
@@ -20,6 +21,15 @@ import type {
 import TableriseContext from '@/context/TableriseContext';
 import CharacterDetailModal from '@/components/lobby/CharacterDetailModal';
 import ProfileCarousel from '@/components/profile/ProfileCarousel';
+import CompleteUserModal from '@/components/login/CompleteUserModal';
+import RankedAvatarFrame from '@/components/common/RankedAvatarFrame';
+import ProfileTwoFactorActivationModal from '@/components/profile/ProfileTwoFactorActivationModal';
+import ProfileTwoFactorDisableModal from '@/components/profile/ProfileTwoFactorDisableModal';
+import ProfileFlowWarningModal from '@/components/profile/ProfileFlowWarningModal';
+import ProfileBiographyModal from '@/components/profile/ProfileBiographyModal';
+import ProfileEmailUpdateModal from '@/components/profile/ProfileEmailUpdateModal';
+import ProfilePasswordUpdateModal from '@/components/profile/ProfilePasswordUpdateModal';
+import { updateUserPicture } from '@/server/users/update-user-picture';
 
 type ProfilePageContentProps = {
     userId: string;
@@ -57,7 +67,16 @@ const defaultProfileImage = '/images/SideImageBackground.svg';
 
 type StoredUser = {
     userId?: string;
+    result?: {
+        userId?: string;
+    };
+    user?: {
+        userId?: string;
+    };
 };
+
+type ProfileGateStep = 'none' | 'complete-profile' | 'activate-two-factor';
+type PendingProfileFlowWarning = 'update-email' | 'update-password' | 'enable-two-factor';
 
 function normalizeUserDetails(
     user: DatabaseUserWithDetails | null
@@ -66,20 +85,25 @@ function normalizeUserDetails(
 }
 
 function formatBirthday(dateString?: string): string {
-    if (!dateString) return 'Não informado';
+    if (!dateString) return 'não informado';
 
     const normalizedDate = dateString.includes('T')
         ? dateString
         : `${dateString}T00:00:00`;
     const parsedDate = new Date(normalizedDate);
 
-    if (Number.isNaN(parsedDate.getTime())) return 'Não informado';
+    if (Number.isNaN(parsedDate.getTime())) return 'não informado';
 
     return new Intl.DateTimeFormat('pt-BR', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
     }).format(parsedDate);
+}
+
+function normalizeBirthdayInput(dateString?: string): string {
+    if (!dateString) return '';
+    return dateString.includes('T') ? dateString.split('T')[0] : dateString;
 }
 
 function formatAccountStatus(status?: string): string {
@@ -167,6 +191,17 @@ function handleCardKeyDown(event: KeyboardEvent<HTMLElement>, handler: () => voi
     handler();
 }
 
+function normalizeStoredUserId(storedUser: StoredUser | null): string {
+    const rawUserId =
+        storedUser?.userId ?? storedUser?.result?.userId ?? storedUser?.user?.userId;
+
+    return typeof rawUserId === 'string' ? rawUserId.trim() : '';
+}
+
+function hasValidTwoFactorSecret(user: DatabaseUserWithDetails | null): boolean {
+    return Boolean(user?.twoFactorSecret?.secret?.trim());
+}
+
 export default function ProfilePageContent({
     userId,
 }: ProfilePageContentProps): JSX.Element {
@@ -179,6 +214,22 @@ export default function ProfilePageContent({
     const [characters, setCharacters] = useState<ProfileCharacter[]>([]);
     const [currentUserId, setCurrentUserId] = useState('');
     const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
+    const [gateStep, setGateStep] = useState<ProfileGateStep>('none');
+    const [twoFactorGateLocked, setTwoFactorGateLocked] = useState(false);
+    const [biographyModalOpen, setBiographyModalOpen] = useState(false);
+    const [emailModalOpen, setEmailModalOpen] = useState(false);
+    const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+    const [disableTwoFactorModalOpen, setDisableTwoFactorModalOpen] = useState(false);
+    const [manualTwoFactorActivationOpen, setManualTwoFactorActivationOpen] =
+        useState(false);
+    const [pendingFlowWarning, setPendingFlowWarning] =
+        useState<PendingProfileFlowWarning | null>(null);
+    const [pictureUploading, setPictureUploading] = useState(false);
+    const [pictureFeedback, setPictureFeedback] = useState('');
+    const pictureInputRef = useRef<HTMLInputElement>(null);
+    const isOwnProfile =
+        Boolean(currentUserId) &&
+        (currentUserId === userId || currentUserId === (user?.userId ?? '').trim());
 
     useEffect(() => {
         try {
@@ -186,7 +237,7 @@ export default function ProfilePageContent({
             const storedUser = storedUserRaw
                 ? (JSON.parse(storedUserRaw) as StoredUser | null)
                 : null;
-            setCurrentUserId(storedUser?.userId ?? '');
+            setCurrentUserId(normalizeStoredUserId(storedUser));
         } catch {
             setCurrentUserId('');
         }
@@ -254,7 +305,7 @@ export default function ProfilePageContent({
                     setCampaigns([]);
                     setCharacters([]);
                 } else {
-                    setFetchError('Não foi possível carregar este perfil no momento.');
+                    setFetchError('não foi possível carregar este perfil no momento.');
                 }
             } finally {
                 if (mounted) {
@@ -288,6 +339,47 @@ export default function ProfilePageContent({
     }, [userDetails]);
 
     const badgeKeySet = useMemo(() => new Set(earnedBadgeKeys), [earnedBadgeKeys]);
+
+    const handleProfilePictureClick = () => {
+        if (pictureUploading) return;
+        pictureInputRef.current?.click();
+    };
+
+    const refreshProfileUser = async (): Promise<DatabaseUserWithDetails | null> => {
+        const refreshedUser = await getUser(userId);
+
+        if (refreshedUser) {
+            setUser(refreshedUser);
+        }
+
+        return refreshedUser;
+    };
+
+    useEffect(() => {
+        if (!isOwnProfile || !userDetails || !user) {
+            setGateStep('none');
+            setTwoFactorGateLocked(false);
+            return;
+        }
+
+        if (!(userDetails.firstName ?? '').trim()) {
+            setGateStep('complete-profile');
+            return;
+        }
+
+        if (twoFactorGateLocked) {
+            setGateStep('activate-two-factor');
+            return;
+        }
+
+        if (!user.twoFactorSecret?.active && !hasValidTwoFactorSecret(user)) {
+            setTwoFactorGateLocked(true);
+            setGateStep('activate-two-factor');
+            return;
+        }
+
+        setGateStep('none');
+    }, [isOwnProfile, twoFactorGateLocked, user, userDetails]);
 
     if (loading) {
         return (
@@ -329,7 +421,6 @@ export default function ProfilePageContent({
     }`.trim();
     const profileHandle = `${user.nickname ?? ''}${user.tag ?? ''}`;
     const biography = userDetails.biography?.trim();
-    const isOwnProfile = Boolean(currentUserId) && currentUserId === userId;
     const accountStatus = formatAccountStatus(user.inProgress?.status);
     const accountStatusClass =
         user.inProgress?.status === 'done'
@@ -377,7 +468,7 @@ export default function ProfilePageContent({
                     {campaign.title}
                 </h3>
                 <p className="font-XS-regular profile-campaign-card__description">
-                    {campaign.description || 'Sem descrição disponível.'}
+                    {campaign.description || 'Sem descriÃƒÂ§ÃƒÂ£o disponível.'}
                 </p>
                 <div className="profile-campaign-card__meta">
                     <span className="font-XXS-bold">
@@ -390,7 +481,7 @@ export default function ProfilePageContent({
                     </span>
                 </div>
                 <span className="font-XXS-regular profile-campaign-card__date">
-                    Próxima sessão: {formatCampaignDate(campaign.nextMatchDate)}
+                    Próxima sessÃƒÂ£o: {formatCampaignDate(campaign.nextMatchDate)}
                 </span>
             </div>
         </article>
@@ -461,20 +552,82 @@ export default function ProfilePageContent({
             </article>
         );
     });
+    const warningFlowLabel =
+        pendingFlowWarning === 'update-email'
+            ? 'Atualizar email'
+            : pendingFlowWarning === 'update-password'
+            ? 'Atualizar senha'
+            : 'Habilitar dois fatores';
 
     return (
         <div className="profile-content">
             <section className="profile-hero">
                 <div className="profile-hero__cover" />
                 <div className="profile-hero__panel">
-                    <div className="profile-hero__avatar">
-                        <Image
-                            src={user.picture?.link ?? defaultProfileImage}
-                            alt={profileName || user.nickname}
-                            fill
-                            sizes="(max-width: 768px) 10rem, 12rem"
-                            style={{ objectFit: 'cover' }}
-                        />
+                    <div className="profile-hero__media">
+                        <div
+                            className={`profile-hero__avatar${
+                                isOwnProfile ? ' profile-hero__avatar--editable' : ''
+                            }`}
+                        >
+                            <RankedAvatarFrame
+                                image={user.picture?.link ?? defaultProfileImage}
+                                alt={profileName || user.nickname}
+                                rank={user.details?.rank}
+                                variant="profile"
+                                sizes="(max-width: 768px) 14rem, 16rem"
+                            />
+                            {isOwnProfile ? (
+                                <>
+                                    <button
+                                        type="button"
+                                        className="profile-hero__avatar-overlay"
+                                        onClick={handleProfilePictureClick}
+                                        disabled={pictureUploading}
+                                        aria-label="Editar foto do perfil"
+                                    >
+                                        <Image
+                                            src={EditIcon}
+                                            alt=""
+                                            width={32}
+                                            height={32}
+                                        />
+                                    </button>
+                                    <input
+                                        ref={pictureInputRef}
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={async (event) => {
+                                            const file = event.target.files?.[0];
+
+                                            if (!file) return;
+
+                                            setPictureUploading(true);
+                                            setPictureFeedback('');
+
+                                            try {
+                                                await updateUserPicture(userId, file);
+                                                await refreshProfileUser();
+                                            } catch (error: Error | any) {
+                                                setPictureFeedback(
+                                                    error?.message ??
+                                                        'Nao foi possivel atualizar a foto do perfil.'
+                                                );
+                                            } finally {
+                                                setPictureUploading(false);
+                                                event.target.value = '';
+                                            }
+                                        }}
+                                    />
+                                </>
+                            ) : null}
+                        </div>
+                        {isOwnProfile && pictureFeedback ? (
+                            <p className="font-XXS-regular profile-hero__avatar-feedback">
+                                {pictureFeedback}
+                            </p>
+                        ) : null}
                     </div>
 
                     <div className="profile-hero__copy">
@@ -482,7 +635,75 @@ export default function ProfilePageContent({
                             <h1 className="font-L-bold profile-hero__name">
                                 {profileName || 'Aventureiro sem nome'}
                             </h1>
-                            <p className="font-S-bold profile-hero__handle">
+                            {user.email ? (
+                                <p className="font-XS-regular profile-hero__email">
+                                    {user.email}
+                                </p>
+                            ) : null}
+                            {isOwnProfile ? (
+                                <div className="profile-hero__actions">
+                                    <button
+                                        type="button"
+                                        className="font-XS-regular profile-hero__action"
+                                        onClick={() => setBiographyModalOpen(true)}
+                                    >
+                                        Atualizar biografia e nome
+                                    </button>
+                                    <span
+                                        className="font-XS-regular profile-hero__actions-separator"
+                                        aria-hidden="true"
+                                    >
+                                        |
+                                    </span>
+                                    <button
+                                        type="button"
+                                        className="font-XS-regular profile-hero__action"
+                                        onClick={() =>
+                                            setPendingFlowWarning('update-email')
+                                        }
+                                    >
+                                        Atualizar email
+                                    </button>
+                                    <span
+                                        className="font-XS-regular profile-hero__actions-separator"
+                                        aria-hidden="true"
+                                    >
+                                        |
+                                    </span>
+                                    <button
+                                        type="button"
+                                        className="font-XS-regular profile-hero__action"
+                                        onClick={() =>
+                                            setPendingFlowWarning('update-password')
+                                        }
+                                    >
+                                        Atualizar senha
+                                    </button>
+                                    <span
+                                        className="font-XS-regular profile-hero__actions-separator"
+                                        aria-hidden="true"
+                                    >
+                                        |
+                                    </span>
+                                    <button
+                                        type="button"
+                                        className="font-XS-regular profile-hero__action"
+                                        onClick={() => {
+                                            if (user.twoFactorSecret?.active) {
+                                                setDisableTwoFactorModalOpen(true);
+                                                return;
+                                            }
+
+                                            setPendingFlowWarning('enable-two-factor');
+                                        }}
+                                    >
+                                        {user.twoFactorSecret?.active
+                                            ? 'Desabilitar dois fatores'
+                                            : 'Habilitar dois fatores'}
+                                    </button>
+                                </div>
+                            ) : null}
+                            <p className="font-XS-bold profile-hero__handle">
                                 {profileHandle || 'Sem nickname'}
                             </p>
                             <p className="font-XS-regular">
@@ -598,6 +819,116 @@ export default function ProfilePageContent({
                     onBack={() => setSelectedCharacterId(null)}
                 />
             )}
+
+            {gateStep === 'complete-profile' && (
+                <CompleteUserModal
+                    userId={userId}
+                    mode="profile-complete"
+                    defaultValues={{
+                        firstName: userDetails.firstName ?? '',
+                        lastName: userDetails.lastName ?? '',
+                        birthday: normalizeBirthdayInput(userDetails.birthday),
+                    }}
+                    onSuccess={async () => {
+                        await refreshProfileUser();
+                    }}
+                    onCancel={() => router.push('/')}
+                />
+            )}
+
+            {gateStep === 'activate-two-factor' && (
+                <ProfileTwoFactorActivationModal
+                    user={user}
+                    onRefreshUser={refreshProfileUser}
+                    onCancel={() => {
+                        setTwoFactorGateLocked(false);
+                        router.push('/');
+                    }}
+                    onCompleted={() => {
+                        setTwoFactorGateLocked(false);
+                        setGateStep('none');
+                    }}
+                />
+            )}
+
+            {pendingFlowWarning ? (
+                <ProfileFlowWarningModal
+                    flowLabel={warningFlowLabel}
+                    onClose={() => setPendingFlowWarning(null)}
+                    onConfirm={() => {
+                        if (pendingFlowWarning === 'update-email') {
+                            setEmailModalOpen(true);
+                        } else if (pendingFlowWarning === 'update-password') {
+                            setPasswordModalOpen(true);
+                        } else {
+                            setManualTwoFactorActivationOpen(true);
+                        }
+
+                        setPendingFlowWarning(null);
+                    }}
+                />
+            ) : null}
+
+            {manualTwoFactorActivationOpen ? (
+                <ProfileTwoFactorActivationModal
+                    user={user}
+                    onRefreshUser={refreshProfileUser}
+                    onCancel={() => {
+                        setManualTwoFactorActivationOpen(false);
+                    }}
+                    onCompleted={() => {
+                        setManualTwoFactorActivationOpen(false);
+                    }}
+                />
+            ) : null}
+
+            {biographyModalOpen ? (
+                <ProfileBiographyModal
+                    userId={userId}
+                    firstName={userDetails.firstName ?? ''}
+                    lastName={userDetails.lastName ?? ''}
+                    biography={biography ?? ''}
+                    onClose={() => setBiographyModalOpen(false)}
+                    onSaved={async () => {
+                        await refreshProfileUser();
+                        setBiographyModalOpen(false);
+                    }}
+                />
+            ) : null}
+
+            {emailModalOpen ? (
+                <ProfileEmailUpdateModal
+                    userId={userId}
+                    email={user.email}
+                    onClose={() => setEmailModalOpen(false)}
+                    onSaved={async () => {
+                        await refreshProfileUser();
+                        setEmailModalOpen(false);
+                    }}
+                />
+            ) : null}
+
+            {passwordModalOpen ? (
+                <ProfilePasswordUpdateModal
+                    email={user.email}
+                    onClose={() => setPasswordModalOpen(false)}
+                    onSaved={async () => {
+                        setPasswordModalOpen(false);
+                    }}
+                />
+            ) : null}
+
+            {disableTwoFactorModalOpen ? (
+                <ProfileTwoFactorDisableModal
+                    userId={user.userId}
+                    email={user.email}
+                    onClose={() => setDisableTwoFactorModalOpen(false)}
+                    onSaved={async () => {
+                        await refreshProfileUser();
+                        setDisableTwoFactorModalOpen(false);
+                    }}
+                />
+            ) : null}
         </div>
     );
 }

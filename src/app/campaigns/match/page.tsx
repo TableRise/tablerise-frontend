@@ -6,7 +6,9 @@ import DiceBoxThreejs from '@3d-dice/dice-box-threejs';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import RankedAvatarFrame from '@/components/common/RankedAvatarFrame';
 import { getCampaignById } from '@/server/campaigns/join-campaign';
+import { getUser } from '@/server/users/get-user';
 import {
     getCampaignHighlightedJournalPost,
     getCampaignJournalPosts,
@@ -120,10 +122,16 @@ const CURRENCY_LABELS: Record<'cp' | 'sp' | 'ep' | 'gp' | 'pp', string> = {
 const MIN_TOKEN_WIDTH_PCT = 4.5;
 const DEFAULT_TOKEN_WIDTH_PCT = MIN_TOKEN_WIDTH_PCT;
 const MAX_TOKEN_WIDTH_PCT = 14;
-const TOKEN_SHELL_ASPECT_RATIO = 58 / 52;
+const TOKEN_SHELL_ASPECT_RATIO = 56 / 52;
 const TOKEN_INFO_HEIGHT_PX = 44;
 const DRAG_CLICK_THRESHOLD_PX = 6;
 const MATCH_DICE_BOX_HOST_ID = 'match-dice-box-host';
+
+function getUserRank(user: any): string | undefined {
+    const rank = user?.details?.rank ?? user?.result?.details?.rank;
+
+    return typeof rank === 'string' ? rank : undefined;
+}
 
 type DiceRollStatus = 'idle' | 'rolling' | 'settled';
 
@@ -344,6 +352,9 @@ export default function MatchPage(): JSX.Element {
     const [campaignCharacters, setCampaignCharacters] = useState<CampaignCharacter[]>([]);
     const [campaignCharacterSummaries, setCampaignCharacterSummaries] = useState<
         Record<string, MapTokenSummary>
+    >({});
+    const [characterAuthorRanksByUserId, setCharacterAuthorRanksByUserId] = useState<
+        Record<string, string>
     >({});
     const [mapTokenLayoutById, setMapTokenLayoutById] = useState<
         Record<string, MapTokenLayout>
@@ -1372,6 +1383,36 @@ export default function MatchPage(): JSX.Element {
     }, [campaignId]);
 
     useEffect(() => {
+        if (campaignCharacters.length === 0) {
+            setCharacterAuthorRanksByUserId({});
+            return;
+        }
+
+        const authorIds = Array.from(
+            new Set(
+                campaignCharacters
+                    .map((character) => character.authorUserId)
+                    .filter((authorUserId) => authorUserId.trim() !== '')
+            )
+        );
+
+        Promise.all(
+            authorIds.map(async (authorUserId) => {
+                try {
+                    const user = await getUser(authorUserId);
+                    return [authorUserId, getUserRank(user) ?? ''] as const;
+                } catch {
+                    return [authorUserId, ''] as const;
+                }
+            })
+        ).then((entries) => {
+            setCharacterAuthorRanksByUserId(
+                Object.fromEntries(entries.filter(([, rank]) => rank.trim() !== ''))
+            );
+        });
+    }, [campaignCharacters]);
+
+    useEffect(() => {
         if (!campaignId) return;
 
         loadHighlightedJournalPost({
@@ -2142,17 +2183,20 @@ export default function MatchPage(): JSX.Element {
                                         </button>
                                     )}
                                     <div className="match-map-token-frame">
-                                        <div className="match-map-token-image">
-                                            <Image
-                                                src={
-                                                    character.image ||
-                                                    SideImageBackground.src
-                                                }
-                                                alt={character.name}
-                                                fill
-                                                style={{ objectFit: 'cover' }}
-                                            />
-                                        </div>
+                                        <RankedAvatarFrame
+                                            image={
+                                                character.image || SideImageBackground.src
+                                            }
+                                            alt={character.name}
+                                            rank={
+                                                characterAuthorRanksByUserId[
+                                                    character.authorUserId
+                                                ]
+                                            }
+                                            variant="avatar"
+                                            className="match-map-token-ranked-avatar"
+                                            sizes="(max-width: 768px) 6rem, 7rem"
+                                        />
                                     </div>
                                     {isMaster && resizeModeOpen && (
                                         <button

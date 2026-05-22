@@ -73,7 +73,7 @@
 
     .match-map-token-shell {
         @apply relative w-full;
-        aspect-ratio: 52 / 58;
+        aspect-ratio: 52 / 54;
     }
 
     .match-map-token-clone-handle {
@@ -93,18 +93,11 @@
     }
 
     .match-map-token-frame {
-        @apply relative w-full h-full p-[4px];
-        background: linear-gradient(180deg, #f5f7fa 0%, #c9d1db 45%, #8c98a6 100%);
-        clip-path: polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0 50%);
-        box-shadow:
-            0 12px 24px rgba(12, 16, 24, 0.28),
-            inset 0 0 0 1px rgba(255, 255, 255, 0.65);
+        @apply relative w-full h-full;
     }
 
-    .match-map-token-image {
-        @apply relative w-full h-full overflow-hidden;
-        background: rgba(238, 241, 245, 0.96);
-        clip-path: polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0 50%);
+    .match-map-token-ranked-avatar {
+        @apply h-full w-full;
     }
 
     .match-map-token-name {

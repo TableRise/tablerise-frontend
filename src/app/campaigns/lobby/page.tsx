@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import CopyBlueSVG from '@assets/icons/sys/copy-blue.svg?url';
 import TableriseContext from '@/context/TableriseContext';
+import RankedAvatarFrame from '@/components/common/RankedAvatarFrame';
 import LoggedHeader from '@/components/common/LoggedHeader';
 import LobbySideMenu from '@/components/lobby/LobbySideMenu';
 import { getCampaignById, confirmPlayerPresence } from '@/server/campaigns/join-campaign';
@@ -62,6 +63,13 @@ interface ConfirmedPlayerInfo {
     userId: string;
     name: string;
     picture: string;
+    rank?: string;
+}
+
+function getUserRank(user: any): string | undefined {
+    const rank = user?.details?.rank ?? user?.result?.details?.rank;
+
+    return typeof rank === 'string' ? rank : undefined;
 }
 
 function normalizeConfirmedPlayers(
@@ -122,7 +130,7 @@ function mapCampaignData(data: any): CampaignData {
         playerAmountLimit: data.infos?.playerAmountLimit ?? 1,
         xpSystem: data.configurations?.xpSystem ?? true,
         shopSystem:
-            data.configurations?.shopSystem ?? data.configurations?.shopOn ?? false,
+            data.configurations?.shopOn ?? data.configurations?.shopSystem ?? false,
     };
 }
 
@@ -146,6 +154,9 @@ export default function CampaignLobby(): JSX.Element {
     const [leaveCampaignModalOpen, setLeaveCampaignModalOpen] = useState(false);
     const [shopModalOpen, setShopModalOpen] = useState(false);
     const [lobbyCharacters, setLobbyCharacters] = useState<CampaignCharacter[]>([]);
+    const [characterAuthorRanksByUserId, setCharacterAuthorRanksByUserId] = useState<
+        Record<string, string>
+    >({});
     const [journalPosts, setJournalPosts] = useState<JournalPost[]>([]);
     const [highlightedJournalPost, setHighlightedJournalPost] =
         useState<JournalPost | null>(null);
@@ -243,6 +254,7 @@ export default function CampaignLobby(): JSX.Element {
                         userId,
                         name: user?.nickname ?? user?.username ?? userId,
                         picture: user?.picture?.link ?? '/images/SideImageBackground.svg',
+                        rank: getUserRank(user),
                     };
                 } catch {
                     return {
@@ -254,6 +266,36 @@ export default function CampaignLobby(): JSX.Element {
             })
         ).then(setConfirmedPlayersInfo);
     }, [campaign?.confirmedPlayers]);
+
+    useEffect(() => {
+        if (!lobbyCharacters.length) {
+            setCharacterAuthorRanksByUserId({});
+            return;
+        }
+
+        const authorIds = Array.from(
+            new Set(
+                lobbyCharacters
+                    .map((character) => character.authorUserId)
+                    .filter((authorUserId) => authorUserId.trim() !== '')
+            )
+        );
+
+        Promise.all(
+            authorIds.map(async (authorUserId) => {
+                try {
+                    const user = await getUser(authorUserId);
+                    return [authorUserId, getUserRank(user) ?? ''] as const;
+                } catch {
+                    return [authorUserId, ''] as const;
+                }
+            })
+        ).then((entries) => {
+            setCharacterAuthorRanksByUserId(
+                Object.fromEntries(entries.filter(([, rank]) => rank.trim() !== ''))
+            );
+        });
+    }, [lobbyCharacters]);
 
     useEffect(() => {
         if (!campaign?.confirmedPlayers?.length || !userInfo?.userId) {
@@ -299,8 +341,8 @@ export default function CampaignLobby(): JSX.Element {
         'characters-players': 'Personagens (Jogadores)',
         'characters-master': 'Personagens (Mestre)',
         environment: 'Ambiente',
-        'world-news': 'NotÃ­cias do Mundo',
-        announcements: 'AnÃºncios',
+        'world-news': 'Notícias do Mundo',
+        announcements: 'Anuncios',
     };
 
     const postFilters = Object.keys(CATEGORY_LABEL);
@@ -398,7 +440,7 @@ export default function CampaignLobby(): JSX.Element {
                                     {campaign.nextMatchDate &&
                                     campaign.nextMatchDate !== 'no-date'
                                         ? formatDate(campaign.nextMatchDate)
-                                        : 'NÃ£o agendado'}
+                                        : 'não agendado'}
                                 </span>
                             </div>
                             {Object.entries(campaign.socialMedia)
@@ -425,7 +467,7 @@ export default function CampaignLobby(): JSX.Element {
                         </div>
                         <div className="lobby-info-bar-row">
                             <div className="lobby-info-item lobby-code-item">
-                                <span className="font-XS-bold">CÃ³digo da campanha:</span>
+                                <span className="font-XS-bold">Código da campanha:</span>
                                 <span className="font-XS-regular">
                                     {campaign.code || '-'}
                                 </span>
@@ -434,11 +476,11 @@ export default function CampaignLobby(): JSX.Element {
                                     className="lobby-copy-btn"
                                     onClick={handleCopyCampaignCode}
                                     disabled={!campaign.code}
-                                    aria-label="Copiar CÃ³digo da campanha"
+                                    aria-label="Copiar Código da campanha"
                                 >
                                     <Image
                                         src={CopyBlueSVG.src}
-                                        alt="Copiar CÃ³digo da campanha"
+                                        alt="Copiar Código da campanha"
                                         width={18}
                                         height={18}
                                     />
@@ -464,7 +506,7 @@ export default function CampaignLobby(): JSX.Element {
                             }}
                         >
                             {presenceConfirmed
-                                ? 'âœ” presença confirmada'
+                                ? '✓ Presença Confirmada'
                                 : 'Clique aqui para confirmar a presença na próxima sessão'}
                         </button>
                         <button
@@ -534,12 +576,13 @@ export default function CampaignLobby(): JSX.Element {
                             {confirmedPlayersInfo.length > 0 ? (
                                 confirmedPlayersInfo.map((player) => (
                                     <div key={player.userId} className="lobby-character">
-                                        <div className="lobby-character-avatar">
-                                            <Image
-                                                src={player.picture}
+                                        <div className="lobby-confirmed-player-avatar">
+                                            <RankedAvatarFrame
+                                                image={player.picture}
                                                 alt={player.name}
-                                                fill
-                                                style={{ objectFit: 'cover' }}
+                                                rank={player.rank}
+                                                variant="profile"
+                                                sizes="8rem"
                                             />
                                         </div>
                                         <span className="font-XXS-regular">
@@ -561,11 +604,16 @@ export default function CampaignLobby(): JSX.Element {
                                 lobbyCharacters.map((char) => (
                                     <div key={char.id} className="lobby-character">
                                         <div className="lobby-character-avatar">
-                                            <Image
-                                                src={char.image}
+                                            <RankedAvatarFrame
+                                                image={char.image}
                                                 alt={char.name}
-                                                fill
-                                                style={{ objectFit: 'cover' }}
+                                                rank={
+                                                    characterAuthorRanksByUserId[
+                                                        char.authorUserId
+                                                    ]
+                                                }
+                                                variant="avatar"
+                                                sizes="8rem"
                                             />
                                         </div>
                                         <span className="font-XXS-regular">
@@ -657,7 +705,7 @@ export default function CampaignLobby(): JSX.Element {
                                     ))
                                 ) : (
                                     <span className="font-XS-regular lobby-articles-empty">
-                                        Nenhuma publicaÃ§Ã£o nesta categoria.
+                                        Nenhuma publicação nesta categoria.
                                     </span>
                                 )}
                             </div>

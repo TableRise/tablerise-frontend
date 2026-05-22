@@ -67,9 +67,9 @@ export interface FullCharacterDnd {
                 alliesAndOrgs?: string;
                 treasure?: string;
                 other?: {
-                    languagesAndProficiencies?: string;
+                    proficiencies?: string;
                     characteristicsAndAbilities?: string;
-                    characteristicsAndAdditionalAbilities?: string;
+                    extraCharacteristics?: string;
                 };
             };
         };
