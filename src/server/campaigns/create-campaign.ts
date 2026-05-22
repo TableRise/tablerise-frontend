@@ -2,6 +2,8 @@ import { AxiosError, AxiosResponse } from 'axios';
 import axios from 'axios';
 import { campaignsBaseUrl } from '../wrapper';
 
+const CAMPAIGN_DESCRIPTION_MAX_LENGTH = 240;
+
 export interface CampaignMusic {
     id: string;
     title: string;
@@ -18,7 +20,7 @@ export interface CreateCampaignPayload {
     musics: CampaignMusic[];
     coverImage?: File | null;
     mapImages: File[];
-    lore: string;
+    mainHistory: string;
     nextMatchDate: string[];
     playerAmountLimit: number;
     socialMedia: { discord?: string; twitter?: string; youtube?: string };
@@ -32,12 +34,15 @@ export const createCampaign = async (payload: CreateCampaignPayload) => {
     try {
         const formData = new FormData();
         formData.append('title', payload.title);
-        formData.append('description', payload.description);
+        formData.append(
+            'description',
+            payload.description.slice(0, CAMPAIGN_DESCRIPTION_MAX_LENGTH)
+        );
         formData.append('system', payload.system);
         formData.append('ageRestriction', payload.ageRestriction);
         formData.append('visibility', payload.visibility);
         formData.append('musics', JSON.stringify(payload.musics));
-        formData.append('lore', payload.lore);
+        formData.append('mainHistory', payload.mainHistory);
         formData.append('playerAmountLimit', String(payload.playerAmountLimit));
         formData.append('configurations', JSON.stringify(payload.configurations));
         if (payload.password) formData.append('password', payload.password);

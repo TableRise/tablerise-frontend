@@ -21,6 +21,8 @@ import type {
 import TableriseContext from '@/context/TableriseContext';
 import CharacterDetailModal from '@/components/lobby/CharacterDetailModal';
 import ProfileCarousel from '@/components/profile/ProfileCarousel';
+import ProfileBadgePopover from '@/components/profile/ProfileBadgePopover';
+import ImageCropModal from '@/components/common/ImageCropModal';
 import CompleteUserModal from '@/components/login/CompleteUserModal';
 import RankedAvatarFrame from '@/components/common/RankedAvatarFrame';
 import ProfileTwoFactorActivationModal from '@/components/profile/ProfileTwoFactorActivationModal';
@@ -30,6 +32,7 @@ import ProfileBiographyModal from '@/components/profile/ProfileBiographyModal';
 import ProfileEmailUpdateModal from '@/components/profile/ProfileEmailUpdateModal';
 import ProfilePasswordUpdateModal from '@/components/profile/ProfilePasswordUpdateModal';
 import { updateUserPicture } from '@/server/users/update-user-picture';
+import type { ImageUploadIntent } from '@/utils/imageCrop';
 
 type ProfilePageContentProps = {
     userId: string;
@@ -38,6 +41,7 @@ type ProfilePageContentProps = {
 type BadgeVariant = {
     colorful: string;
     blackandwhite: string;
+    description: string;
 };
 
 type ProfileCampaign = {
@@ -226,6 +230,11 @@ export default function ProfilePageContent({
         useState<PendingProfileFlowWarning | null>(null);
     const [pictureUploading, setPictureUploading] = useState(false);
     const [pictureFeedback, setPictureFeedback] = useState('');
+    const [pendingImageCrop, setPendingImageCrop] = useState<{
+        file: File;
+        intent: ImageUploadIntent;
+    } | null>(null);
+    const [openBadgePopoverId, setOpenBadgePopoverId] = useState<string | null>(null);
     const pictureInputRef = useRef<HTMLInputElement>(null);
     const isOwnProfile =
         Boolean(currentUserId) &&
@@ -242,6 +251,25 @@ export default function ProfilePageContent({
             setCurrentUserId('');
         }
     }, []);
+
+    useEffect(() => {
+        if (!openBadgePopoverId) return;
+
+        function handlePointerDown(event: PointerEvent) {
+            const target = event.target;
+
+            if (!(target instanceof Element)) return;
+            if (target.closest('.profile-badge-popover')) return;
+
+            setOpenBadgePopoverId(null);
+        }
+
+        document.addEventListener('pointerdown', handlePointerDown);
+
+        return () => {
+            document.removeEventListener('pointerdown', handlePointerDown);
+        };
+    }, [openBadgePopoverId]);
 
     useEffect(() => {
         let mounted = true;
@@ -340,9 +368,30 @@ export default function ProfilePageContent({
 
     const badgeKeySet = useMemo(() => new Set(earnedBadgeKeys), [earnedBadgeKeys]);
 
+    const buildBadgePopoverId = (scope: 'hero' | 'catalog', badgeKey: string): string =>
+        `${scope}:${badgeKey}`;
+
     const handleProfilePictureClick = () => {
         if (pictureUploading) return;
         pictureInputRef.current?.click();
+    };
+
+    const handleProfilePictureUpload = async (file: File) => {
+        setPictureUploading(true);
+        setPictureFeedback('');
+
+        try {
+            await updateUserPicture(userId, file);
+            await refreshProfileUser();
+            setPendingImageCrop(null);
+        } catch (error: Error | any) {
+            setPictureFeedback(
+                error?.message ?? 'Nao foi possivel atualizar a foto do perfil.'
+            );
+            throw error;
+        } finally {
+            setPictureUploading(false);
+        }
     };
 
     const refreshProfileUser = async (): Promise<DatabaseUserWithDetails | null> => {
@@ -534,22 +583,20 @@ export default function ProfilePageContent({
     const badgeItems = badgeEntries.map(([badgeKey, badgeVariant]) => {
         const earned = badgeKeySet.has(badgeKey);
         const badgeSource = earned ? badgeVariant.colorful : badgeVariant.blackandwhite;
+        const popoverId = buildBadgePopoverId('catalog', badgeKey);
 
         return (
-            <article key={badgeKey} className="profile-badge-card">
-                <div className="profile-badge-card__image">
-                    <Image
-                        src={badgeSource}
-                        alt={formatBadgeName(badgeKey)}
-                        fill
-                        sizes="(max-width: 768px) 10rem, 11rem"
-                        style={{ objectFit: 'contain' }}
-                    />
-                </div>
-                <span className="font-XXS-bold profile-badge-card__label">
-                    {formatBadgeName(badgeKey)}
-                </span>
-            </article>
+            <ProfileBadgePopover
+                key={badgeKey}
+                popoverId={popoverId}
+                label={formatBadgeName(badgeKey)}
+                imageSrc={badgeSource}
+                description={badgeVariant.description}
+                variant="card"
+                isOpen={openBadgePopoverId === popoverId}
+                onOpen={setOpenBadgePopoverId}
+                onClose={() => setOpenBadgePopoverId(null)}
+            />
         );
     });
     const warningFlowLabel =
@@ -598,26 +645,15 @@ export default function ProfilePageContent({
                                         type="file"
                                         accept="image/*"
                                         className="hidden"
-                                        onChange={async (event) => {
+                                        onChange={(event) => {
                                             const file = event.target.files?.[0];
 
                                             if (!file) return;
-
-                                            setPictureUploading(true);
-                                            setPictureFeedback('');
-
-                                            try {
-                                                await updateUserPicture(userId, file);
-                                                await refreshProfileUser();
-                                            } catch (error: Error | any) {
-                                                setPictureFeedback(
-                                                    error?.message ??
-                                                        'Nao foi possivel atualizar a foto do perfil.'
-                                                );
-                                            } finally {
-                                                setPictureUploading(false);
-                                                event.target.value = '';
-                                            }
+                                            setPendingImageCrop({
+                                                file,
+                                                intent: 'profile-avatar',
+                                            });
+                                            event.target.value = '';
                                         }}
                                     />
                                 </>
@@ -724,15 +760,20 @@ export default function ProfilePageContent({
                                 aria-label="Badges ativas"
                             >
                                 {earnedBadgeKeys.map((badgeKey) => (
-                                    <div key={badgeKey} className="profile-hero__badge">
-                                        <Image
-                                            src={badgeMap[badgeKey].colorful}
-                                            alt={formatBadgeName(badgeKey)}
-                                            fill
-                                            sizes="4.5rem"
-                                            style={{ objectFit: 'contain' }}
-                                        />
-                                    </div>
+                                    <ProfileBadgePopover
+                                        key={badgeKey}
+                                        popoverId={buildBadgePopoverId('hero', badgeKey)}
+                                        label={formatBadgeName(badgeKey)}
+                                        imageSrc={badgeMap[badgeKey].colorful}
+                                        description={badgeMap[badgeKey].description}
+                                        variant="hero"
+                                        isOpen={
+                                            openBadgePopoverId ===
+                                            buildBadgePopoverId('hero', badgeKey)
+                                        }
+                                        onOpen={setOpenBadgePopoverId}
+                                        onClose={() => setOpenBadgePopoverId(null)}
+                                    />
                                 ))}
                             </div>
                         ) : (
@@ -927,6 +968,16 @@ export default function ProfilePageContent({
                         await refreshProfileUser();
                         setDisableTwoFactorModalOpen(false);
                     }}
+                />
+            ) : null}
+
+            {pendingImageCrop ? (
+                <ImageCropModal
+                    file={pendingImageCrop.file}
+                    intent={pendingImageCrop.intent}
+                    onConfirm={handleProfilePictureUpload}
+                    onUseOriginal={handleProfilePictureUpload}
+                    onClose={() => setPendingImageCrop(null)}
                 />
             ) : null}
         </div>

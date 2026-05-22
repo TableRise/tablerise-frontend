@@ -15,7 +15,9 @@ import {
 import { AGE_RATINGS } from '@/components/home/helpers/CreateCampaignModalHelpers';
 import { getCampaignPlayers } from '@/server/campaigns/get-campaign-players';
 import { getUser } from '@/server/users/get-user';
+import ImageCropModal from '@/components/common/ImageCropModal';
 import '@/components/lobby/styles/EditCampaignModal.css';
+import type { ImageUploadIntent } from '@/utils/imageCrop';
 
 interface InitialData {
     title: string;
@@ -86,6 +88,11 @@ export default function EditCampaignModal({
     >([]);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
+    const [pendingImageCrop, setPendingImageCrop] = useState<{
+        file: File;
+        intent: ImageUploadIntent;
+        target: 'cover' | 'map';
+    } | null>(null);
 
     useEffect(() => {
         (async () => {
@@ -115,6 +122,35 @@ export default function EditCampaignModal({
     const datePickerRef = useRef<HTMLInputElement>(null);
     const coverInputRef = useRef<HTMLInputElement>(null);
     const mapInputRef = useRef<HTMLInputElement>(null);
+
+    function handleCoverImageSelected(file: File) {
+        setPendingImageCrop({
+            file,
+            intent: 'campaign-cover',
+            target: 'cover',
+        });
+    }
+
+    function handleMapImageSelected(file: File) {
+        setPendingImageCrop({
+            file,
+            intent: 'campaign-map',
+            target: 'map',
+        });
+    }
+
+    async function handleCroppedImageResolved(file: File) {
+        if (!pendingImageCrop) return;
+
+        if (pendingImageCrop.target === 'cover') {
+            setCoverFile(file);
+            setCoverRemoved(false);
+        } else {
+            setNewMapFiles((prev) => [...prev, file]);
+        }
+
+        setPendingImageCrop(null);
+    }
 
     async function handleSave() {
         if (!title.trim()) {
@@ -598,7 +634,7 @@ export default function EditCampaignModal({
                                         className="hidden"
                                         onChange={(e) => {
                                             const file = e.target.files?.[0] ?? null;
-                                            setCoverFile(file);
+                                            if (file) handleCoverImageSelected(file);
                                             if (coverInputRef.current)
                                                 coverInputRef.current.value = '';
                                         }}
@@ -676,7 +712,7 @@ export default function EditCampaignModal({
                                         onChange={(e) => {
                                             const file = e.target.files?.[0];
                                             if (file) {
-                                                setNewMapFiles((prev) => [...prev, file]);
+                                                handleMapImageSelected(file);
                                             }
                                             if (mapInputRef.current)
                                                 mapInputRef.current.value = '';
@@ -825,6 +861,16 @@ export default function EditCampaignModal({
                     </button>
                 </div>
             </div>
+
+            {pendingImageCrop ? (
+                <ImageCropModal
+                    file={pendingImageCrop.file}
+                    intent={pendingImageCrop.intent}
+                    onConfirm={handleCroppedImageResolved}
+                    onUseOriginal={handleCroppedImageResolved}
+                    onClose={() => setPendingImageCrop(null)}
+                />
+            ) : null}
         </div>
     );
 }

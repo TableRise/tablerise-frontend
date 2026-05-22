@@ -1,6 +1,8 @@
 export const STEPS = ['Informações básicas', 'Predefinições', 'História'] as const;
 export type Step = 0 | 1 | 2;
 
+export const CAMPAIGN_DESCRIPTION_MAX_LENGTH = 240;
+
 export const AGE_RATINGS = [
     { label: 'L', color: '#12AD00' },
     { label: '10', color: '#1B8BFF' },
@@ -47,6 +49,9 @@ export function validateStep1Fields({ title, description, password }: Step1Field
     }
     if (!description.trim()) {
         errors.descError = 'Descrição é obrigatória';
+        valid = false;
+    } else if (description.length > CAMPAIGN_DESCRIPTION_MAX_LENGTH) {
+        errors.descError = `Descrição deve ter no máximo ${CAMPAIGN_DESCRIPTION_MAX_LENGTH} caracteres`;
         valid = false;
     }
     if (password.trim() && !/^[a-zA-Z0-9]{4}$/.test(password)) {

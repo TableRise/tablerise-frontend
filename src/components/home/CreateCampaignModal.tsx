@@ -15,7 +15,9 @@ import {
 import Step1 from '@/components/home/CreateCampaignModalFirstStep';
 import Step2 from '@/components/home/CreateCampaignModalSecondStep';
 import Step3 from '@/components/home/CreateCampaignModalThirdStep';
+import ImageCropModal from '@/components/common/ImageCropModal';
 import '@/components/home/styles/CreateCampaignModal.css';
+import type { ImageUploadIntent } from '@/utils/imageCrop';
 
 interface Props {
     onClose: () => void;
@@ -26,6 +28,11 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
     const [step, setStep] = useState<Step>(0);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
+    const [pendingImageCrop, setPendingImageCrop] = useState<{
+        file: File;
+        intent: ImageUploadIntent;
+        target: 'cover' | 'map';
+    } | null>(null);
 
     useEffect(() => {
         document.body.style.overflow = 'hidden';
@@ -57,7 +64,7 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
     const [shopSystem, setShopSystem] = useState(true);
 
     /* ── step 3 fields ── */
-    const [lore, setLore] = useState('');
+    const [mainHistory, setMainHistory] = useState('');
 
     /* ── validation states ── */
     const [titleError, setTitleError] = useState('');
@@ -99,8 +106,42 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
         setStep((s) => (s - 1) as Step);
     }
 
+    function handleCoverImageSelected(file: File) {
+        setPendingImageCrop({
+            file,
+            intent: 'campaign-cover',
+            target: 'cover',
+        });
+    }
+
+    function handleMapImageSelected(file: File) {
+        if (mapImages.length >= 3) return;
+
+        setPendingImageCrop({
+            file,
+            intent: 'campaign-map',
+            target: 'map',
+        });
+    }
+
+    async function handleCroppedImageResolved(file: File) {
+        if (!pendingImageCrop) return;
+
+        if (pendingImageCrop.target === 'cover') {
+            setCoverImage(file);
+        } else {
+            setMapImages((prev) => (prev.length >= 3 ? prev : [...prev, file]));
+        }
+
+        setPendingImageCrop(null);
+    }
+
     async function handleSubmit() {
         setError('');
+        if (!validateStep1()) {
+            setStep(0);
+            return;
+        }
         if (!validateStep2()) {
             setStep(1);
             return;
@@ -121,7 +162,7 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
                 musics,
                 coverImage,
                 mapImages,
-                lore,
+                mainHistory,
                 playerAmountLimit,
                 nextMatchDate: filledDates.length > 0 ? filledDates : [],
                 socialMedia: {
@@ -213,7 +254,7 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
                             setPassword={setPassword}
                             passwordError={passwordError}
                             coverImage={coverImage}
-                            setCoverImage={setCoverImage}
+                            onSelectCoverImage={handleCoverImageSelected}
                             agendaRows={agendaRows}
                             setAgendaRows={setAgendaRows}
                         />
@@ -235,6 +276,7 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
                             setMusics={setMusics}
                             mapImages={mapImages}
                             setMapImages={setMapImages}
+                            onSelectMapImage={handleMapImageSelected}
                             discordLink={discordLink}
                             setDiscordLink={setDiscordLink}
                             twitterLink={twitterLink}
@@ -247,7 +289,12 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
                             setShopSystem={setShopSystem}
                         />
                     )}
-                    {step === 2 && <Step3 lore={lore} setLore={setLore} />}
+                    {step === 2 && (
+                        <Step3
+                            mainHistory={mainHistory}
+                            setMainHistory={setMainHistory}
+                        />
+                    )}
                 </div>
 
                 {/* ── error ───────────────────────────────── */}
@@ -293,6 +340,16 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
                     )}
                 </div>
             </div>
+
+            {pendingImageCrop ? (
+                <ImageCropModal
+                    file={pendingImageCrop.file}
+                    intent={pendingImageCrop.intent}
+                    onConfirm={handleCroppedImageResolved}
+                    onUseOriginal={handleCroppedImageResolved}
+                    onClose={() => setPendingImageCrop(null)}
+                />
+            ) : null}
         </div>
     );
 }

@@ -30,6 +30,7 @@ import {
 import { uploadCharacterPicture } from '@/server/characters/upload-character-picture';
 import XpIncreaseModal from '@/components/common/XpIncreaseModal';
 import MoneyModal from '@/components/character-sheet/MoneyModal';
+import ImageCropModal from '@/components/common/ImageCropModal';
 import { applyXpGain } from '@/utils/characterXp';
 import {
     buildLevelUpNotifications,
@@ -37,6 +38,7 @@ import {
     hasAnySpellProgression,
     type LevelUpNotification,
 } from '@/utils/characterLeveling';
+import type { ImageUploadIntent } from '@/utils/imageCrop';
 
 interface CharacterDetailModalProps {
     characterId: string;
@@ -241,6 +243,10 @@ export default function CharacterDetailModal({
     const editMagiasRef = useRef<SheetMagiasHandle>(null);
     const editHabilidadesRef = useRef<SheetHabilidadesHandle>(null);
     const pictureInputRef = useRef<HTMLInputElement>(null);
+    const [pendingImageCrop, setPendingImageCrop] = useState<{
+        file: File;
+        intent: ImageUploadIntent;
+    } | null>(null);
 
     // Edit form states
     const [editAbilityScores, setEditAbilityScores] = useState<
@@ -450,6 +456,18 @@ export default function CharacterDetailModal({
         pictureInputRef.current?.click();
     };
 
+    const handleCharacterPictureUpload = async (file: File) => {
+        const success = await uploadCharacterPicture(characterId, file);
+
+        if (success) {
+            await loadCharacterModalData();
+            setPendingImageCrop(null);
+            return;
+        }
+
+        throw new Error('Nao foi possivel atualizar a imagem do personagem.');
+    };
+
     const handleXpIncrease = async (addedXp: number, hpGain: number) => {
         if (!char || !profile || !stats) return;
 
@@ -621,10 +639,10 @@ export default function CharacterDetailModal({
     const handlePictureChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        const success = await uploadCharacterPicture(characterId, file);
-        if (success) {
-            await loadCharacterModalData();
-        }
+        setPendingImageCrop({
+            file,
+            intent: 'character-portrait',
+        });
         e.target.value = '';
     };
 
@@ -2514,6 +2532,16 @@ export default function CharacterDetailModal({
                     onConfirm={handleXpIncrease}
                 />
             )}
+
+            {pendingImageCrop ? (
+                <ImageCropModal
+                    file={pendingImageCrop.file}
+                    intent={pendingImageCrop.intent}
+                    onConfirm={handleCharacterPictureUpload}
+                    onUseOriginal={handleCharacterPictureUpload}
+                    onClose={() => setPendingImageCrop(null)}
+                />
+            ) : null}
         </>
     );
 }

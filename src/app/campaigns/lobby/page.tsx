@@ -435,7 +435,7 @@ export default function CampaignLobby(): JSX.Element {
                     <div className="lobby-info-bar">
                         <div className="lobby-info-bar-row">
                             <div className="lobby-info-item">
-                                <span className="font-XS-bold">próxima sessão:</span>
+                                <span className="font-XS-bold">Próxima sessão:</span>
                                 <span className="font-XS-regular">
                                     {campaign.nextMatchDate &&
                                     campaign.nextMatchDate !== 'no-date'
@@ -541,7 +541,7 @@ export default function CampaignLobby(): JSX.Element {
                                 </div>
                                 <p className="font-S-regular lobby-session-modal-text">
                                     {campaign.nextSessionResume ||
-                                        'Sem resumo disponÃ­vel para a próxima sessão.'}
+                                        'Sem resumo disponível para a próxima sessão.'}
                                 </p>
                             </div>
                         </div>

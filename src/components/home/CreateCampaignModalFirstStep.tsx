@@ -3,7 +3,10 @@ import Image from 'next/image';
 import UploadSVG from '../../../assets/icons/sys/upload-gray.svg?url';
 import CalendarSVG from '../../../assets/icons/sys/calendar-gray.svg?url';
 import AddSVG from '../../../assets/icons/nav/add-16.svg?url';
-import { formatDateDisplay } from '@/components/home/helpers/CreateCampaignModalHelpers';
+import {
+    CAMPAIGN_DESCRIPTION_MAX_LENGTH,
+    formatDateDisplay,
+} from '@/components/home/helpers/CreateCampaignModalHelpers';
 
 export default function CreateCampaignModalFirstStep({
     title,
@@ -16,7 +19,7 @@ export default function CreateCampaignModalFirstStep({
     setPassword,
     passwordError,
     coverImage,
-    setCoverImage,
+    onSelectCoverImage,
     agendaRows,
     setAgendaRows,
 }: any) {
@@ -54,12 +57,16 @@ export default function CreateCampaignModalFirstStep({
                         }`}
                         placeholder="Insira a descrição da campanha"
                         value={description}
-                        maxLength={250}
+                        maxLength={CAMPAIGN_DESCRIPTION_MAX_LENGTH}
                         rows={4}
-                        onChange={(e) => setDescription(e.target.value)}
+                        onChange={(e) =>
+                            setDescription(
+                                e.target.value.slice(0, CAMPAIGN_DESCRIPTION_MAX_LENGTH)
+                            )
+                        }
                     />
                     <span className="font-XXS-regular ccm-char-count">
-                        {description.length}/250
+                        {description.length}/{CAMPAIGN_DESCRIPTION_MAX_LENGTH}
                     </span>
                 </div>
                 {descError && (
@@ -100,7 +107,8 @@ export default function CreateCampaignModalFirstStep({
                         className="hidden"
                         onChange={(e) => {
                             const file = e.target.files?.[0] ?? null;
-                            setCoverImage(file);
+                            if (file) onSelectCoverImage(file);
+                            if (coverInputRef.current) coverInputRef.current.value = '';
                         }}
                     />
                     {coverImage ? (

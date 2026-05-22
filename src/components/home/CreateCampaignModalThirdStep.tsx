@@ -1,7 +1,10 @@
 import Image from 'next/image';
 import CloseSVG from '../../../assets/icons/nav/close.svg?url';
 
-export default function CreateCampaignModalThirdStep({ lore, setLore }: any) {
+export default function CreateCampaignModalThirdStep({
+    mainHistory,
+    setMainHistory,
+}: any) {
     return (
         <div className="ccm-step-content">
             <div className="ccm-field">
@@ -43,13 +46,13 @@ export default function CreateCampaignModalThirdStep({ lore, setLore }: any) {
                     <textarea
                         className="ccm-richtext-area"
                         placeholder="Insira o texto"
-                        value={lore}
+                        value={mainHistory}
                         maxLength={2500}
                         rows={8}
-                        onChange={(e) => setLore(e.target.value)}
+                        onChange={(e) => setMainHistory(e.target.value)}
                     />
                     <span className="font-XXS-regular ccm-char-count ccm-char-count--richtext">
-                        {lore.length}/2500
+                        {mainHistory.length}/2500
                     </span>
                 </div>
             </div>

@@ -29,6 +29,7 @@
         "react": "18",
         "react-dom": "18",
         "react-hook-form": "7.54.0",
+        "react-image-crop": "^11.0.10",
         "rpg-dice-roller": "5.0.0",
         "sharp": "0.33.5",
         "socket.io-client": "4.8.3",

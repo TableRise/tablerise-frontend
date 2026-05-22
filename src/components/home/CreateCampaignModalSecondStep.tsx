@@ -31,6 +31,7 @@ export default function CreateCampaignModalSecondStep({
     setMusics,
     mapImages,
     setMapImages,
+    onSelectMapImage,
     discordLink,
     setDiscordLink,
     twitterLink,
@@ -219,7 +220,7 @@ export default function CreateCampaignModalSecondStep({
                         onChange={(e) => {
                             const file = e.target.files?.[0];
                             if (file && mapImages.length < 3) {
-                                setMapImages((prev: File[]) => [...prev, file]);
+                                onSelectMapImage(file);
                             }
                             if (mapInputRef.current) mapInputRef.current.value = '';
                         }}
