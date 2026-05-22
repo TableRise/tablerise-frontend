@@ -8,7 +8,7 @@ import Link from 'next/link';
 
 export default function Register(): JSX.Element {
     return (
-        <section className="section">
+        <section className="register-page">
             <div className="side-image-container">
                 <SideImage />
             </div>

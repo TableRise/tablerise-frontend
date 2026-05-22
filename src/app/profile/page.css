@@ -20,7 +20,8 @@
     }
 
     .profile-inside-container {
-        @apply w-[70.5rem];
+        @apply w-full;
+        max-width: 70.5rem;
     }
 
     .profile-content {
@@ -527,6 +528,23 @@
 
         .profile-carousel__controls {
             @apply justify-between;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .profile-page {
+            @apply px-3 pb-6;
+        }
+
+        .profile-hero__panel,
+        .profile-bio__card,
+        .profile-showcase,
+        .profile-state-card {
+            @apply p-4;
+        }
+
+        .profile-carousel__arrow {
+            @apply h-10 w-10;
         }
     }
 }

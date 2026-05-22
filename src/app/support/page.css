@@ -8,7 +8,8 @@
     }
 
     .support-inside-container {
-        @apply w-[70.5rem];
+        @apply w-full;
+        max-width: 70.5rem;
     }
 
     .support-page-title {
@@ -84,6 +85,12 @@
 
         .support-form-submit {
             @apply w-full;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .support-page {
+            @apply px-3 py-5;
         }
     }
 }

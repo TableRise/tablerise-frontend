@@ -3,11 +3,21 @@
 @tailwind utilities;
 
 @layer base {
-    section {
-        @apply flex w-screen h-screen;
+    .login-page {
+        @apply flex min-h-screen w-full;
     }
 
-    section .login-form-container {
+    .login-page .login-form-container {
         @apply absolute;
+    }
+
+    @media (max-width: 768px) {
+        .login-page {
+            @apply flex-col;
+        }
+
+        .login-page .login-form-container {
+            @apply relative;
+        }
     }
 }

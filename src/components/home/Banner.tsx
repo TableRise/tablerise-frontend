@@ -6,10 +6,9 @@ export default function Banner(): JSX.Element {
         <section className="banner-home">
             <div className="banner-home-content">
                 <div className="main-text">
-                    <p className="font-XXL-bold">
+                    <p className="font-XL-bold">
                         Bem vindos ao TableRise!
-                        <br />
-                        Sua ferramenta favorita para
+                        <br /> Sua ferramenta favorita para
                         <br /> jogar RPG de Mesa
                     </p>
                     <p className="font-M-regular">

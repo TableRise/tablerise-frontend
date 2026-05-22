@@ -76,6 +76,7 @@ import D10SVG from '../../../../assets/icons/dice/d10.svg?url';
 import D12SVG from '../../../../assets/icons/dice/d12.svg?url';
 import D20SVG from '../../../../assets/icons/dice/d20.svg?url';
 import ExitRedSVG from '../../../../assets/icons/sys/exit-red.svg?url';
+import WhiteRotateSVG from '../../../../assets/icons/sys/white-rotate.svg?url';
 import GridOffSVG from '../../../../assets/icons/nav/grid-off-blue.svg?url';
 import GridOnSVG from '../../../../assets/icons/nav/grind-on-blue.svg?url';
 import SideImageBackground from '../../../../public/images/SideImageBackground.svg?url';
@@ -323,6 +324,13 @@ export default function MatchPage(): JSX.Element {
     const [backgroundImage, setBackgroundImage] = useState<string>(
         SideImageBackground.src
     );
+    const [isLandscapeViewport, setIsLandscapeViewport] = useState<boolean>(() => {
+        if (typeof window === 'undefined') {
+            return true;
+        }
+
+        return window.innerWidth >= window.innerHeight;
+    });
     const [sheetModalOpen, setSheetModalOpen] = useState(false);
     const [isMaster, setIsMaster] = useState(false);
     const [isAdminPlayer, setIsAdminPlayer] = useState(false);
@@ -404,6 +412,21 @@ export default function MatchPage(): JSX.Element {
         tokenId: string;
         type: TokenInteractionType;
     } | null>(null);
+
+    useEffect(() => {
+        function syncViewportOrientation() {
+            setIsLandscapeViewport(window.innerWidth >= window.innerHeight);
+        }
+
+        syncViewportOrientation();
+        window.addEventListener('resize', syncViewportOrientation);
+        window.addEventListener('orientationchange', syncViewportOrientation);
+
+        return () => {
+            window.removeEventListener('resize', syncViewportOrientation);
+            window.removeEventListener('orientationchange', syncViewportOrientation);
+        };
+    }, []);
 
     const diceOptions = [
         { label: 'D20', icon: D20SVG, sides: 20 },
@@ -2083,6 +2106,22 @@ export default function MatchPage(): JSX.Element {
                 backgroundSize: 'cover',
             }}
         >
+            {!isLandscapeViewport && (
+                <div className="match-orientation-overlay">
+                    <div className="match-orientation-overlay-content">
+                        <Image
+                            src={WhiteRotateSVG.src}
+                            alt=""
+                            width={WhiteRotateSVG.width}
+                            height={WhiteRotateSVG.height}
+                            aria-hidden="true"
+                        />
+                        <p className="font-M-semibold match-orientation-overlay-text">
+                            Por favor rotacione a tela para acessar o mapa
+                        </p>
+                    </div>
+                </div>
+            )}
             {/* Grid overlay */}
             {gridVisible && <div className="match-grid" />}
             {(activeEffect === 'dark' || activeEffect === 'light') && (

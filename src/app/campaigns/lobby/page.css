@@ -240,4 +240,64 @@
     .lobby-articles-empty {
         @apply text-color-greyScale/500 py-4 text-center;
     }
+
+    @media (max-width: 1024px) {
+        .lobby-wrapper {
+            @apply gap-4 px-4;
+        }
+
+        .lobby-content {
+            @apply w-full;
+            max-width: 58rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .lobby-wrapper {
+            @apply mt-[7.25rem] flex-col px-3 py-6;
+        }
+
+        .lobby-content {
+            @apply p-5;
+        }
+
+        .lobby-cover {
+            @apply h-[13rem];
+        }
+
+        .lobby-info-bar-row {
+            @apply gap-3;
+        }
+
+        .lobby-info-link--truncate {
+            @apply max-w-full;
+        }
+
+        .lobby-character-avatar,
+        .lobby-confirmed-player-avatar {
+            @apply h-[6.5rem] w-[6.5rem];
+        }
+
+        .lobby-session-modal {
+            @apply p-5;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .lobby-wrapper {
+            @apply mt-[6.5rem] px-2 pb-5;
+        }
+
+        .lobby-content {
+            @apply rounded-[1rem] p-4;
+        }
+
+        .lobby-cover {
+            @apply h-[11rem];
+        }
+
+        .lobby-article {
+            @apply gap-3 px-0;
+        }
+    }
 }

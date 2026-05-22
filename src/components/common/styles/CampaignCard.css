@@ -4,7 +4,9 @@
 
 @layer base {
     .campaign-card {
-        @apply flex flex-col items-start justify-end bg-cover rounded-xl relative;
+        @apply relative flex flex-col items-start justify-end rounded-xl bg-cover;
+        width: min(100%, var(--campaign-card-width));
+        height: var(--campaign-card-height);
     }
 
     .campaign-card .card-system-logo {
@@ -50,5 +52,31 @@
 
     .campaign-card .card-infos .card-buttons .card-menu {
         @apply flex justify-center items-center w-10 h-10 border border-color-greyScale/300 rounded-lg cursor-pointer;
+    }
+
+    @media (max-width: 640px) {
+        .campaign-card {
+            height: min(22rem, var(--campaign-card-height));
+        }
+
+        .campaign-card .card-infos {
+            @apply px-3 pb-3;
+        }
+
+        .campaign-card .card-infos > span {
+            @apply text-center;
+        }
+
+        .campaign-card .card-infos .card-buttons {
+            @apply flex-col items-stretch gap-2;
+        }
+
+        .campaign-card .card-infos .card-buttons button {
+            @apply w-full;
+        }
+
+        .campaign-card .card-infos .card-buttons .card-player-limit {
+            @apply ml-0 w-full justify-start;
+        }
     }
 }

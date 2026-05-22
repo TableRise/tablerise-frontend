@@ -4,7 +4,8 @@
 
 @layer base {
     .user-master-campaigns {
-        @apply w-[70.5rem] p-6 flex flex-col items-start justify-center bg-color-greyScale/50 rounded-xl;
+        @apply flex w-full flex-col items-start justify-center rounded-xl bg-color-greyScale/50 p-6;
+        max-width: 70.5rem;
     }
 
     .user-master-campaigns .user-master-campaigns-header {
@@ -58,6 +59,57 @@
     }
 
     .user-master-campaigns .user-master-campaigns-cards {
-        @apply w-[67.5rem] flex flex-wrap justify-between mt-6;
+        @apply mt-6 flex w-full flex-wrap justify-between;
+    }
+
+    @media (max-width: 768px) {
+        .user-master-campaigns {
+            @apply items-center p-5;
+        }
+
+        .user-master-campaigns .user-master-campaigns-cards {
+            @apply gap-4;
+        }
+
+        .user-master-campaigns .user-master-campaigns-header {
+            @apply flex-col items-start gap-4 text-center;
+        }
+
+        .user-master-campaigns
+            .user-master-campaigns-header
+            .user-master-campaigns-created-label {
+            @apply flex-col items-stretch gap-3;
+        }
+
+        .user-master-campaigns
+            .user-master-campaigns-header
+            .user-master-campaigns-created-label
+            .creation-limits {
+            @apply w-full text-center;
+        }
+
+        .user-master-campaigns .user-master-campaigns-header .user-master-campaigns-buttons {
+            @apply w-full flex-wrap justify-center gap-3;
+        }
+
+        .user-master-campaigns
+            .user-master-campaigns-header
+            .user-master-campaigns-buttons
+            button {
+            @apply w-full;
+        }
+
+        .user-master-campaigns
+            .user-master-campaigns-header
+            .user-master-campaigns-buttons
+            img {
+            @apply ml-0;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .user-master-campaigns {
+            @apply p-4;
+        }
     }
 }

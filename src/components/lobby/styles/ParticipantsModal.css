@@ -133,4 +133,24 @@
             bg-red-600 text-white cursor-pointer
             transition-opacity hover:opacity-80;
     }
+
+    @media (max-width: 768px) {
+        .pm-modal {
+            @apply w-[calc(100vw-1.5rem)];
+        }
+
+        .pm-grid {
+            @apply grid-cols-2 p-5;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .pm-modal {
+            @apply w-[calc(100vw-1rem)] rounded-[1.25rem];
+        }
+
+        .pm-grid {
+            @apply grid-cols-1 p-4;
+        }
+    }
 }

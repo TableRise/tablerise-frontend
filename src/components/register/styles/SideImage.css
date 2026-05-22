@@ -18,4 +18,14 @@
     article .logo-container .image-logo {
         @apply absolute w-96 m-auto left-0 right-0 top-0 bottom-0;
     }
+
+    @media (max-width: 768px) {
+        article .logo-container {
+            @apply w-full;
+        }
+
+        article .logo-container .image-logo {
+            @apply w-56;
+        }
+    }
 }

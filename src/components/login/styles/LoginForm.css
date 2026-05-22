@@ -3,27 +3,63 @@
 @tailwind utilities;
 
 @layer base {
-    section .login-form-container {
-        @apply flex flex-col justify-center items-center py-0 px-28 w-[38.8rem] h-full right-0 top-0 bg-color-greyScale/100 rounded-s-xl;
+    .login-form-container {
+        @apply right-0 top-0 flex h-full w-[38.8rem] flex-col items-center justify-center bg-color-greyScale/100 px-28 py-0;
+        border-radius: 1rem 0 0 1rem;
     }
 
-    section .login-form-container .login-form-content {
+    .login-form-container .login-form-content {
         @apply flex flex-col justify-center items-center w-full;
     }
 
-    section a:nth-child(2) {
+    .login-form-content a:nth-child(2) {
         @apply text-color-primary/800 ml-1 underline;
     }
 
-    section .login-form-container .social-container {
+    .login-form-container .social-container {
         @apply self-start w-[24rem];
     }
 
-    section .login-form-container .buttons-container {
+    .login-form-container .buttons-container {
         @apply w-[24rem];
     }
 
-    section .login-form-container .social-button {
+    .login-form-container .social-button {
         @apply w-[11.6rem];
+    }
+
+    @media (max-width: 1024px) {
+        .login-form-container {
+            @apply w-[34rem] px-12;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .login-form-container {
+            @apply relative h-auto w-full px-5 py-8;
+            border-radius: 1.5rem 1.5rem 0 0;
+            margin-top: -1.5rem;
+        }
+
+        .login-form-container .login-form-content {
+            @apply mx-auto;
+            max-width: 30rem;
+        }
+
+        .login-form-container .social-container,
+        .login-form-container .buttons-container {
+            @apply w-full self-auto;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .login-form-container {
+            @apply px-4 py-6;
+            border-radius: 1.25rem 1.25rem 0 0;
+        }
+
+        .login-form-container .social-button {
+            @apply w-full;
+        }
     }
 }

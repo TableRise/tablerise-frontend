@@ -3,55 +3,98 @@
 @tailwind utilities;
 
 @layer base {
-    section {
-        @apply flex w-screen h-screen;
+    .register-page {
+        @apply flex min-h-screen w-full;
     }
 
-    section .side-image-container {
+    .register-page .side-image-container {
         @apply w-[55%];
     }
 
-    section .side-image-container .logo-container {
+    .register-page .side-image-container .logo-container {
         @apply flex justify-center;
     }
 
-    section .side-image-container .logo-container .image-logo {
+    .register-page .side-image-container .logo-container .image-logo {
         @apply w-[28rem];
     }
 
-    section .side-form-container {
-        @apply flex flex-col justify-center items-center py-0 px-28 absolute w-[38.8rem] h-full right-0 top-0 bg-color-greyScale/100 rounded-s-xl;
+    .register-page .side-form-container {
+        @apply absolute right-0 top-0 flex h-full w-[38.8rem] flex-col items-center justify-center bg-color-greyScale/100 px-28 py-0;
+        border-radius: 1rem 0 0 1rem;
     }
 
-    section .form-container {
+    .register-page .form-container {
         @apply flex flex-col justify-center items-center w-full;
     }
 
-    section .title-container {
+    .register-page .title-container {
         @apply flex flex-col w-full mb-6;
     }
 
-    section .title-container .title-text {
+    .register-page .title-container .title-text {
         @apply text-color-primary/default_900 mb-1;
     }
 
-    section .title-container .subtitle-text {
+    .register-page .title-container .subtitle-text {
         @apply text-color-greyScale/950;
     }
 
-    section .divider-container {
+    .register-page .divider-container {
         @apply flex justify-center items-center w-full mb-3 gap-2;
     }
 
-    section .divider-line {
+    .register-page .divider-line {
         @apply flex-grow border-t-2 border-color-greyScale/300;
     }
 
-    section .divider-content {
+    .register-page .divider-content {
         @apply px-2 py-0 text-color-greyScale/950;
     }
 
-    section .button-container .social-button {
+    .register-page .button-container .social-button {
         @apply w-48;
+    }
+
+    @media (max-width: 1024px) {
+        .register-page .side-form-container {
+            @apply w-[34rem] px-12;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .register-page {
+            @apply flex-col;
+        }
+
+        .register-page .side-image-container {
+            @apply relative min-h-[16rem] w-full;
+        }
+
+        .register-page .side-form-container {
+            @apply relative h-auto w-full px-5 py-8;
+            border-radius: 1.5rem 1.5rem 0 0;
+            margin-top: -1.5rem;
+        }
+
+        .register-page .form-container {
+            @apply mx-auto;
+            max-width: 30rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .register-page .side-image-container {
+            @apply min-h-[12rem];
+        }
+
+        .register-page .side-form-container {
+            @apply px-4 py-6;
+            border-radius: 1.25rem 1.25rem 0 0;
+        }
+
+        .register-page .button-container .social-button {
+            @apply w-full;
+        }
     }
 }

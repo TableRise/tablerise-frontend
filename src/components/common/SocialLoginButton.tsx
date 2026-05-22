@@ -12,7 +12,10 @@ export default function SocialLoginButton({
 }: SocialLoginButtonProps): JSX.Element {
     return (
         <div className="button-container">
-            <Link href={`${process.env.API_OAUTH}/${socialType}`}>
+            <Link
+                href={`${process.env.API_OAUTH}/${socialType}`}
+                className="social-button-link"
+            >
                 <button className="social-button button-M-outline-il" type="button">
                     {socialType === 'discord' && (
                         <DiscordLogo style={{ color: '#464646' }} />

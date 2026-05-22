@@ -4,11 +4,12 @@
 
 @layer base {
     .tutorial-detail-page {
-        @apply flex justify-center;
+        @apply flex justify-center px-4 pb-12;
     }
 
     .tutorial-detail-container {
-        @apply w-[70.5rem] flex gap-8 items-start;
+        @apply flex w-full gap-8 items-start;
+        max-width: 70.5rem;
     }
 
     /* ----------- Sidebar ----------- */
@@ -71,5 +72,37 @@
 
     .tutorial-detail-topic {
         @apply flex flex-col gap-3;
+    }
+
+    @media (max-width: 768px) {
+        .tutorial-detail-page {
+            @apply px-3 pb-10;
+        }
+
+        .tutorial-detail-container {
+            @apply flex-col gap-5;
+        }
+
+        .tutorial-detail-sidebar {
+            @apply w-full;
+        }
+
+        .tutorial-detail-sidebar-list {
+            @apply flex-row flex-wrap gap-2;
+        }
+
+        .tutorial-detail-hero {
+            @apply h-56;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .tutorial-detail-page {
+            @apply px-2 pb-8;
+        }
+
+        .tutorial-detail-hero {
+            @apply h-44;
+        }
     }
 }

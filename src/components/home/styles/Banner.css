@@ -4,11 +4,12 @@
 
 @layer base {
     .banner-home {
-        @apply relative z-10 mt-[8.6rem] mb-[8.3rem] flex min-h-[30rem] w-full max-w-[70.5rem] items-center px-6 py-10;
+        @apply relative z-10 mt-[8.6rem] mb-[8.3rem] flex min-h-[30rem] w-full items-center px-6 py-10;
+        max-width: 70.5rem;
     }
 
     .banner-home-content {
-        @apply flex w-full;
+        @apply flex w-full items-center justify-between gap-10;
     }
 
     .main-text {
@@ -33,14 +34,34 @@
             @apply mt-[7.5rem] min-h-[28rem] px-5 py-8;
         }
 
+        .banner-home-content {
+            @apply gap-6;
+        }
+
         .main-text p:nth-child(2) {
             @apply max-w-full;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .banner-home {
+            @apply mb-16;
+            max-width: min(calc(100% - 1.5rem), 70.5rem);
+        }
+
+        .banner-home-content {
+            @apply flex-col items-start;
+        }
+
+        .banner-home-cta {
+            @apply h-12;
         }
     }
 
     @media (max-width: 640px) {
         .banner-home {
             @apply mt-[6.75rem] min-h-[24rem] px-4 py-6;
+            max-width: min(calc(100% - 1rem), 70.5rem);
         }
 
         .main-text {

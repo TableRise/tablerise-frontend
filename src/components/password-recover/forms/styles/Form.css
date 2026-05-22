@@ -16,7 +16,7 @@
     }
 
     .form-opt-input {
-        @apply flex text-center w-[15%] h-12 items-center justify-center bg-white text-color-greyScale/500 uppercase;
+        @apply flex h-12 min-w-[3rem] flex-1 items-center justify-center bg-white text-center uppercase text-color-greyScale/500;
     }
 
     .form-opts-inputs {
@@ -33,5 +33,11 @@
 
     .form-button-cancel {
         @apply w-full h-10 text-color-greyScale/500;
+    }
+
+    @media (max-width: 480px) {
+        .form-opts-inputs {
+            @apply gap-1.5;
+        }
     }
 }

@@ -5,7 +5,8 @@
 @layer base {
     /* ── Shared container ────────────────────────────────────── */
     .about-container {
-        @apply w-[70.5rem] mx-auto;
+        @apply mx-auto;
+        width: min(calc(100% - 2rem), 70.5rem);
     }
 
     /* ── Hey! ─────────────────────────────────────────────────── */
@@ -137,5 +138,50 @@
 
     .about-team-link-btn:hover {
         @apply bg-color-greyScale/100;
+    }
+
+    @media (max-width: 1024px) {
+        .about-container {
+            width: min(calc(100% - 2rem), 64rem);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .about-container {
+            width: min(calc(100% - 1.5rem), 70.5rem);
+        }
+
+        .about-hey-section,
+        .about-team-section,
+        .about-timeline-section {
+            @apply py-12;
+        }
+
+        .about-timeline-columns {
+            @apply grid-cols-2 gap-5;
+        }
+
+        .about-team-grid {
+            @apply grid-cols-2 gap-5;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .about-container {
+            width: min(calc(100% - 1rem), 70.5rem);
+        }
+
+        .about-timeline-line {
+            display: none;
+        }
+
+        .about-timeline-columns,
+        .about-team-grid {
+            @apply grid-cols-1;
+        }
+
+        .about-team-card {
+            @apply p-5;
+        }
     }
 }

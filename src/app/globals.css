@@ -2,14 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+    overflow-x: hidden;
+}
+
+:root {
+    --app-max-width: 70.5rem;
+    --app-panel-width: 64rem;
+    --app-side-width: 38.8rem;
+    --app-shell-padding: 1.5rem;
+    --app-header-offset: 8.6rem;
+    --app-header-offset-compact: 6.75rem;
+}
+
 * {
     padding: 0;
     margin: 0;
     scroll-behavior: smooth;
+    box-sizing: border-box;
 }
 
 body {
     background-color: #efefef;
+    min-height: 100vh;
+    overflow-x: clip;
 }
 
 svg {
@@ -24,7 +40,54 @@ a {
     color: inherit;
 }
 
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button {
+    touch-action: manipulation;
+}
+
+main,
+section,
+article,
+aside,
+nav,
+header,
+footer {
+    min-width: 0;
+}
+
 @layer base {
+    .page-shell {
+        width: min(
+            calc(100% - (var(--app-shell-padding) * 2)),
+            var(--app-max-width)
+        );
+        margin-inline: auto;
+    }
+
+    .page-panel {
+        width: min(
+            calc(100% - (var(--app-shell-padding) * 2)),
+            var(--app-panel-width)
+        );
+        margin-inline: auto;
+    }
+
+    .mobile-dialog {
+        width: min(100vw - 1.5rem, 42rem);
+        max-height: min(92vh, 48rem);
+    }
+
     /* ----------- Font Patterns ----------- */
     .font-XXL-bold {
         font-family: var('--dm-sans-base');
@@ -325,6 +388,65 @@ a {
     }
 
     /* ----------- Media queries ----------- */
+    @media (max-width: 1024px) {
+        :root {
+            --app-shell-padding: 1.25rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        :root {
+            --app-shell-padding: 1rem;
+            --app-header-offset: 7.25rem;
+        }
+
+        .font-XXL-bold {
+            font-size: 2.2rem;
+            line-height: 2.35rem;
+        }
+
+        .font-XL-bold {
+            font-size: 1.7rem;
+            line-height: 1.95rem;
+        }
+
+        .font-L-bold,
+        .font-L-semibold {
+            font-size: 1.3rem;
+            line-height: 1.45rem;
+        }
+
+        .font-M-semibold,
+        .font-M-regular {
+            font-size: 1.05rem;
+            line-height: 1.4rem;
+        }
+    }
+
+    @media (max-width: 640px) {
+        :root {
+            --app-shell-padding: 0.875rem;
+            --app-header-offset: 6.5rem;
+        }
+
+        .font-XXL-bold {
+            font-size: 1.95rem;
+            line-height: 2.15rem;
+        }
+
+        .font-XL-bold {
+            font-size: 1.5rem;
+            line-height: 1.75rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        :root {
+            --app-shell-padding: 0.75rem;
+            --app-header-offset: 6rem;
+        }
+    }
+
     @media (min-width: 1920px) {
         .font-XXL-bold {
             font-size: 2.8rem;

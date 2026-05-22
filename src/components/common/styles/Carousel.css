@@ -47,4 +47,15 @@
             0px 0px 1px 0px rgba(12, 37, 95, 0.1),
             4px 6px 12px -6px rgba(12, 37, 95, 0.08);
     }
+
+    @media (max-width: 768px) {
+        .embla__controls {
+            @apply static mt-4 translate-y-0 justify-end gap-3;
+        }
+
+        .carousel-arrow-prev,
+        .carousel-arrow-next {
+            @apply h-11 w-11;
+        }
+    }
 }

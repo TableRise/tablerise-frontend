@@ -1,4 +1,5 @@
 'use client';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import SheetSVG from '../../../assets/icons/menu-panel-lobby/sheet.svg?url';
 import ParticipantsSVG from '../../../assets/icons/menu-panel-lobby/participants.svg?url';
@@ -8,6 +9,7 @@ import HistorySVG from '../../../assets/icons/menu-panel-lobby/history.svg?url';
 import SettingsSVG from '../../../assets/icons/menu-panel-lobby/settings.svg?url';
 import PlaySVG from '../../../assets/icons/menu-panel-lobby/play.svg?url';
 import ShoppingBlueSVG from '../../../assets/icons/menu-panel-lobby/shopping-blue.svg?url';
+import ArrowRightBlueSVG from '../../../assets/icons/nav/arrow-right-blue.svg?url';
 import '@/components/lobby/styles/LobbySideMenu.css';
 
 interface LobbySideMenuProps {
@@ -37,6 +39,7 @@ export default function LobbySideMenu({
     shopEnabled = true,
     onMenuAction,
 }: LobbySideMenuProps): JSX.Element {
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const baseItems = playerMenuItems.filter((item) => item.key !== 'leave');
     const leaveItem = playerMenuItems.find((item) => item.key === 'leave')!;
 
@@ -47,9 +50,45 @@ export default function LobbySideMenu({
         menuItems = [...baseItems, leaveItem];
     }
 
+    useEffect(() => {
+        function handleResize() {
+            if (window.innerWidth > 768) {
+                setIsMobileMenuOpen(false);
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     return (
-        <aside className="lobby-side-menu">
-            <nav className="lobby-side-menu-nav">
+        <aside
+            className={`lobby-side-menu${
+                isMobileMenuOpen ? ' lobby-side-menu--mobile-open' : ''
+            }`}
+        >
+            <button
+                type="button"
+                className="lobby-side-menu-mobile-toggle"
+                aria-label={isMobileMenuOpen ? 'Fechar menu da campanha' : 'Abrir menu da campanha'}
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="lobby-side-menu-nav"
+                onClick={() => setIsMobileMenuOpen((current) => !current)}
+            >
+                <Image
+                    src={ArrowRightBlueSVG}
+                    alt=""
+                    className={`lobby-side-menu-mobile-toggle-icon${
+                        isMobileMenuOpen
+                            ? ' lobby-side-menu-mobile-toggle-icon--open'
+                            : ''
+                    }`}
+                    width={24}
+                    height={24}
+                    aria-hidden="true"
+                />
+            </button>
+            <nav className="lobby-side-menu-nav" id="lobby-side-menu-nav">
                 {menuItems.map((item) => {
                     const isDisabled = item.key === 'shop' && !shopEnabled;
 
@@ -63,12 +102,14 @@ export default function LobbySideMenu({
                                 {item.label}
                             </span>
                             <button
+                                type="button"
                                 className={`lobby-menu-item ${
                                     item.danger ? 'lobby-menu-item-danger' : ''
                                 } ${isDisabled ? 'lobby-menu-item-disabled' : ''}`}
                                 onClick={() => {
                                     if (isDisabled) return;
                                     onMenuAction?.(item.key);
+                                    setIsMobileMenuOpen(false);
                                 }}
                                 disabled={isDisabled}
                             >
@@ -78,6 +119,15 @@ export default function LobbySideMenu({
                                     width={32}
                                     height={32}
                                 />
+                                <span
+                                    className={`lobby-menu-item-mobile-label font-XS-bold ${
+                                        item.danger
+                                            ? 'lobby-menu-item-mobile-label-danger'
+                                            : ''
+                                    }`}
+                                >
+                                    {item.label}
+                                </span>
                             </button>
                         </div>
                     );

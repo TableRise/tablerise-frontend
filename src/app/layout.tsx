@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { DM_Sans } from 'next/font/google';
 import TableriseProvider from '@/context/TableriseProvider';
 import { cookies } from 'next/headers';
@@ -23,6 +23,12 @@ export const metadata: Metadata = {
             },
         ],
     },
+};
+
+export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    viewportFit: 'cover',
 };
 
 export default function RootLayout({

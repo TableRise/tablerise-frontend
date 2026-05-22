@@ -26,8 +26,8 @@ export default function MainCard(cardProps: MainCardProps): JSX.Element {
             className="main-card"
             style={{
                 backgroundImage: `url(${image})`,
-                width: cardSize.w,
-                height: cardSize.h,
+                ['--main-card-width' as string]: cardSize.w,
+                ['--main-card-height' as string]: cardSize.h,
             }}
         >
             <div

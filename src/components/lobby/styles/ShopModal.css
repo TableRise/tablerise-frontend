@@ -219,4 +219,41 @@
     .sm-history-date {
         @apply text-color-greyScale/500 text-xs whitespace-nowrap;
     }
+
+    @media (max-width: 768px) {
+        .sm-modal {
+            @apply w-[calc(100vw-1.5rem)] p-5;
+        }
+
+        .sm-buy-bar,
+        .sm-picker-grid,
+        .sm-vault-money-grid {
+            @apply grid-cols-1;
+        }
+
+        .sm-picker-grid {
+            display: grid;
+        }
+
+        .sm-buy-bar,
+        .sm-vault-form-row {
+            @apply flex-col items-stretch;
+        }
+
+        .sm-vault-label,
+        .sm-vault-amount-input,
+        .sm-vault-select {
+            @apply w-full;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .sm-modal {
+            @apply w-[calc(100vw-1rem)] rounded-[1.25rem] p-4;
+        }
+
+        .sm-tabs {
+            @apply overflow-x-auto;
+        }
+    }
 }

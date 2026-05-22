@@ -4,9 +4,15 @@
 
 @layer base {
     .buttons-container {
-        @apply flex flex-row w-full items-center justify-center gap-3;
+        @apply flex w-full flex-row items-center justify-center gap-3;
     }
     .social-container {
-        @apply flex flex-col w-full items-center justify-center gap-3;
+        @apply flex w-full flex-col items-center justify-center gap-3;
+    }
+
+    @media (max-width: 480px) {
+        .buttons-container {
+            @apply flex-col items-stretch;
+        }
     }
 }

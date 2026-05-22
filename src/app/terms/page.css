@@ -8,7 +8,8 @@
     }
 
     .terms-inside-container {
-        @apply mx-auto flex w-[70.5rem] flex-col gap-6;
+        @apply mx-auto flex w-full flex-col gap-6;
+        max-width: 70.5rem;
     }
 
     .terms-hero {
@@ -79,6 +80,16 @@
 
         .terms-card {
             @apply rounded-[1.25rem] p-5;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .terms-page {
+            @apply px-3;
+        }
+
+        .terms-card {
+            @apply gap-6 p-4;
         }
     }
 }

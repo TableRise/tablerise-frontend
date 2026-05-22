@@ -4,7 +4,9 @@
 
 @layer base {
     .main-card {
-        @apply flex flex-col items-start justify-end bg-cover rounded-xl;
+        @apply flex flex-col items-start justify-end rounded-xl bg-cover;
+        width: min(100%, var(--main-card-width));
+        height: var(--main-card-height);
     }
 
     .main-card .card-fog {
@@ -22,5 +24,11 @@
         font-style: normal;
         font-size: 1rem;
         line-height: 1.2rem;
+    }
+
+    @media (max-width: 480px) {
+        .main-card {
+            height: min(22rem, var(--main-card-height));
+        }
     }
 }

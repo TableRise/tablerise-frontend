@@ -14,4 +14,20 @@
     .checkered-background-container .article .logo-container .image-logo {
         @apply w-[28rem];
     }
+
+    @media (max-width: 768px) {
+        .checkered-background-container {
+            @apply relative min-h-[16rem] w-full;
+        }
+
+        .checkered-background-container .article .logo-container .image-logo {
+            @apply w-56;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .checkered-background-container {
+            @apply min-h-[12rem];
+        }
+    }
 }

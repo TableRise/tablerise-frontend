@@ -599,4 +599,54 @@
     .ccm-social-field span {
         @apply text-color-primary/default_900;
     }
+
+    @media (max-width: 768px) {
+        .ccm-modal {
+            width: min(100vw - 1.5rem, 45rem);
+            max-height: 92vh;
+        }
+
+        .ccm-modal-header,
+        .ccm-body,
+        .ccm-footer,
+        .ccm-error {
+            @apply px-5;
+        }
+
+        .ccm-stepper {
+            @apply overflow-x-auto pb-5;
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
+        }
+
+        .ccm-map-images-grid,
+        .ccm-agenda-header,
+        .ccm-agenda-row,
+        .ccm-playlist-input-row {
+            @apply flex-col items-stretch;
+        }
+
+        .ccm-agenda-input,
+        .ccm-agenda-time,
+        .ccm-btn-primary {
+            @apply w-full;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .ccm-modal {
+            width: min(100vw - 1rem, 45rem);
+        }
+
+        .ccm-modal-header,
+        .ccm-body,
+        .ccm-footer,
+        .ccm-error {
+            @apply px-4;
+        }
+
+        .ccm-footer {
+            @apply flex-col items-stretch gap-3;
+        }
+    }
 }

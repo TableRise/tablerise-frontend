@@ -581,7 +581,7 @@ export default function ShopModal({
                         }}
                     />
 
-                    <span className="text-color-greyScale/500 font-semibold">></span>
+                    <span className="text-color-greyScale/500 font-semibold">&gt;</span>
 
                     <select
                         className="sm-vault-select"
@@ -617,9 +617,7 @@ export default function ShopModal({
                             </span>
                         </div>
                         <div className="sm-vault-preview-item">
-                            <span className="sm-vault-preview-label">
-                                Você receberá
-                            </span>
+                            <span className="sm-vault-preview-label">Você receberá</span>
                             <span className="sm-vault-preview-value">
                                 {Math.max(0, conversionPreview.net)}{' '}
                                 {CURRENCY_LABELS[toCurrency]}

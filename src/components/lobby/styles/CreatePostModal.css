@@ -105,4 +105,28 @@
         @apply w-full py-2 text-color-greyScale/700 bg-transparent
             cursor-pointer transition-opacity hover:opacity-70;
     }
+
+    @media (max-width: 768px) {
+        .cpm-modal {
+            @apply w-[calc(100vw-1.5rem)] rounded-[1.25rem];
+        }
+
+        .cpm-header,
+        .cpm-body,
+        .cpm-footer {
+            @apply px-5;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .cpm-modal {
+            @apply w-[calc(100vw-1rem)];
+        }
+
+        .cpm-header,
+        .cpm-body,
+        .cpm-footer {
+            @apply px-4;
+        }
+    }
 }

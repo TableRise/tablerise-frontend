@@ -367,4 +367,50 @@
     .ecm-section-hint {
         @apply text-color-greyScale/500;
     }
+
+    @media (max-width: 768px) {
+        .ecm-modal {
+            width: min(100vw - 1.5rem, 45rem);
+            max-height: 92vh;
+        }
+
+        .ecm-header,
+        .ecm-body,
+        .ecm-tabs,
+        .ecm-tab-content,
+        .ecm-footer,
+        .ecm-delete-row,
+        .ecm-error,
+        .ecm-error--inline {
+            @apply px-5;
+        }
+
+        .ecm-date-row,
+        .ecm-footer {
+            @apply flex-col items-stretch gap-3;
+        }
+
+        .ecm-date-input,
+        .ecm-input--narrow,
+        .ecm-btn-ghost {
+            @apply w-full;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .ecm-modal {
+            width: min(100vw - 1rem, 45rem);
+        }
+
+        .ecm-header,
+        .ecm-body,
+        .ecm-tabs,
+        .ecm-tab-content,
+        .ecm-footer,
+        .ecm-delete-row,
+        .ecm-error,
+        .ecm-error--inline {
+            @apply px-4;
+        }
+    }
 }

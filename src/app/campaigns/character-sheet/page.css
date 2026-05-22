@@ -529,4 +529,117 @@
             !bg-color-primary/default_900 text-color-greyScale/50 cursor-pointer
             hover:opacity-90 transition-opacity border-none;
     }
+
+    @media (max-width: 1024px) {
+        .cs-wrapper {
+            @apply px-4;
+        }
+
+        .cs-sheet,
+        .cs-footer-bar {
+            max-width: min(calc(100% - 0rem), 64rem);
+            width: 100%;
+        }
+
+        .cs-body {
+            grid-template-columns: 7.5rem 1fr 13rem;
+        }
+
+        .cs-spell-grid {
+            @apply grid-cols-2;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .cs-wrapper {
+            @apply mt-[7.25rem] gap-4 px-3 pb-8;
+        }
+
+        .cs-tabs {
+            @apply w-full overflow-x-auto;
+        }
+
+        .cs-tab {
+            @apply whitespace-nowrap px-5 py-2;
+        }
+
+        .cs-sheet,
+        .cs-footer-bar {
+            @apply p-5;
+        }
+
+        .cs-header,
+        .cs-char-header {
+            @apply grid-cols-2;
+        }
+
+        .cs-body,
+        .cs-char-body,
+        .cs-char-bottom,
+        .cs-spell-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .cs-char-header-row2,
+        .cs-bottom-row,
+        .cs-spell-accordion-fields {
+            @apply grid-cols-2;
+        }
+
+        .cs-header-name {
+            @apply col-span-2 row-span-1;
+        }
+
+        .cs-ability-col,
+        .cs-middle-col,
+        .cs-right-col,
+        .cs-char-right-bottom {
+            @apply gap-4;
+        }
+
+        .cs-combat-row,
+        .cs-spell-header {
+            @apply flex-wrap;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .cs-wrapper {
+            @apply mt-[6.5rem] px-2 pb-6;
+        }
+
+        .cs-sheet,
+        .cs-footer-bar,
+        .cs-spell-picker-header,
+        .cs-spell-picker-list,
+        .cs-spell-picker-search {
+            @apply px-4;
+        }
+
+        .cs-sheet,
+        .cs-footer-bar {
+            @apply rounded-[1rem] py-4;
+        }
+
+        .cs-header,
+        .cs-char-header,
+        .cs-char-header-row2,
+        .cs-bottom-row,
+        .cs-spell-accordion-fields {
+            @apply grid-cols-1;
+        }
+
+        .cs-header-name,
+        .cs-spell-accordion-field--full {
+            @apply col-span-1;
+        }
+
+        .cs-inventory-currency-row {
+            @apply grid-cols-2;
+        }
+
+        .cs-spell-header-box {
+            @apply min-w-0 w-full;
+        }
+    }
 }

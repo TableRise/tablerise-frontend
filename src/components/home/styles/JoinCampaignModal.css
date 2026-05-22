@@ -66,4 +66,23 @@
     .jcm-cancel-btn:hover {
         @apply underline;
     }
+
+    @media (max-width: 640px) {
+        .jcm-search-row {
+            @apply flex-wrap;
+        }
+
+        .jcm-input-title {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+
+        .jcm-input-code {
+            @apply flex-shrink-0;
+        }
+
+        .jcm-search-btn {
+            @apply w-full;
+        }
+    }
 }

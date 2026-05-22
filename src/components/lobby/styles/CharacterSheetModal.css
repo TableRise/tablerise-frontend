@@ -103,4 +103,32 @@
         @apply px-5 py-2.5 rounded-lg bg-red-600 text-white cursor-pointer
             transition-opacity hover:opacity-80;
     }
+
+    @media (max-width: 768px) {
+        .csm-modal {
+            @apply w-[calc(100vw-1.5rem)] rounded-[1.25rem] p-5;
+        }
+
+        .csm-tabs {
+            @apply overflow-x-auto;
+        }
+
+        .csm-card {
+            @apply items-start gap-3;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .csm-modal {
+            @apply w-[calc(100vw-1rem)] p-4;
+        }
+
+        .csm-card {
+            @apply flex-col;
+        }
+
+        .csm-confirm-modal {
+            @apply w-[calc(100vw-1rem)] p-5;
+        }
+    }
 }

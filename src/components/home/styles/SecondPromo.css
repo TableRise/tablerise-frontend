@@ -4,11 +4,12 @@
 
 @layer base {
     .second-promo-section {
-        @apply my-20 p-6 flex justify-center items-center w-[70.5rem] rounded-xl bg-color-greyScale/50;
+        @apply my-20 flex w-full items-center justify-center rounded-xl bg-color-greyScale/50 p-6;
+        max-width: 70.5rem;
     }
 
     .second-promo-image {
-        @apply mr-6 w-[40.8rem] h-80 rounded-xl;
+        @apply mr-6 h-80 w-[40.8rem] rounded-xl object-cover;
     }
 
     .second-promo-text h2 {
@@ -17,5 +18,36 @@
 
     .second-promo-text p {
         @apply w-[80%] mb-2 text-color-greyScale/950;
+    }
+
+    @media (max-width: 1024px) {
+        .second-promo-image {
+            @apply w-[32rem];
+        }
+    }
+
+    @media (max-width: 768px) {
+        .second-promo-section {
+            @apply my-14 flex-col items-start gap-5 p-5;
+            max-width: min(calc(100% - 1.5rem), 70.5rem);
+        }
+
+        .second-promo-image {
+            @apply mr-0 h-[16rem] w-full;
+        }
+
+        .second-promo-text p {
+            @apply w-full;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .second-promo-section {
+            max-width: min(calc(100% - 1rem), 70.5rem);
+        }
+
+        .second-promo-image {
+            @apply h-[13rem];
+        }
     }
 }

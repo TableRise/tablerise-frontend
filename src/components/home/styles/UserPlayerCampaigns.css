@@ -4,7 +4,8 @@
 
 @layer base {
     .user-player-campaigns {
-        @apply w-[70.5rem] mt-6 p-6 flex flex-col items-start justify-center bg-color-greyScale/50 rounded-xl;
+        @apply mt-6 flex w-full flex-col items-start justify-center rounded-xl bg-color-greyScale/50 p-6;
+        max-width: 70.5rem;
     }
 
     .user-player-campaigns .user-player-campaigns-header {
@@ -28,7 +29,7 @@
         .user-player-campaigns-header
         .user-player-campaigns-created-label
         .creation-limits {
-        @apply px-3 py-2 bg-color-greyScale/100 rounded-lg;
+        @apply px-3 py-2 w-full bg-color-greyScale/100 rounded-lg;
     }
 
     .user-player-campaigns .user-player-campaigns-header .user-player-campaigns-buttons {
@@ -58,7 +59,7 @@
     }
 
     .user-player-campaigns .user-player-campaigns-cards {
-        @apply w-[67.5rem] flex flex-wrap justify-between mt-6 select-none;
+        @apply mt-6 flex w-full flex-wrap gap-4 select-none;
     }
 
     .user-player-campaigns .embla__viewport {
@@ -82,5 +83,45 @@
 
     .embla__container {
         border: 2px solid transparent;
+    }
+
+    @media (max-width: 768px) {
+        .user-player-campaigns {
+            @apply items-center p-5;
+        }
+
+        .user-player-campaigns .user-player-campaigns-header {
+            @apply flex-col items-start gap-4 text-center;
+        }
+
+        .user-player-campaigns
+            .user-player-campaigns-header
+            .user-player-campaigns-created-label {
+            @apply flex-col items-start gap-3;
+        }
+
+        .user-player-campaigns .user-player-campaigns-header .user-player-campaigns-buttons {
+            @apply w-full flex-wrap justify-center gap-3;
+        }
+
+        .user-player-campaigns
+            .user-player-campaigns-header
+            .user-player-campaigns-buttons
+            button {
+            @apply w-full;
+        }
+
+        .user-player-campaigns
+            .user-player-campaigns-header
+            .user-player-campaigns-buttons
+            img {
+            @apply ml-0;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .user-player-campaigns {
+            @apply p-4;
+        }
     }
 }

@@ -4,7 +4,7 @@
 
 @layer base {
     main {
-        @apply flex flex-col items-center;
+        @apply flex w-full flex-col items-center;
     }
 
     .header-home {
@@ -40,15 +40,22 @@
     }
 
     .content-home {
-        @apply w-full flex flex-col items-center bg-color-greyScale/100;
+        @apply flex w-full flex-col items-center bg-color-greyScale/100;
     }
 
     .main-logged-page {
-        @apply mt-[8.6rem];
+        @apply mt-[8.6rem] flex w-full flex-col;
+        width: min(calc(100% - 2rem), 70.5rem);
     }
 
     .main-logged-page h2 {
         @apply text-color-primary/default_900 mb-6;
+    }
+
+    @media (max-width: 1024px) {
+        .main-logged-page {
+            width: min(calc(100% - 2rem), 64rem);
+        }
     }
 
     @media (max-width: 960px) {
@@ -71,6 +78,11 @@
             background-position: 72% center;
             background-repeat: no-repeat;
             background-size: cover;
+        }
+
+        .main-logged-page {
+            @apply mt-[6.75rem];
+            width: min(calc(100% - 1rem), 70.5rem);
         }
     }
 }

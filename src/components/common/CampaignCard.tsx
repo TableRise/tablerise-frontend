@@ -58,8 +58,8 @@ export default function CampaignCard(cardProps: CampaignCardProps): JSX.Element 
             className={`campaign-card ${className}`}
             style={{
                 backgroundImage: `url(${image})`,
-                width: cardSize.w,
-                height: cardSize.h,
+                ['--campaign-card-width' as string]: cardSize.w,
+                ['--campaign-card-height' as string]: cardSize.h,
             }}
         >
             {systemLogo && (

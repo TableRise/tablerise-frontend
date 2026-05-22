@@ -12,7 +12,7 @@
         @apply absolute inset-0 pointer-events-none;
         background-image: linear-gradient(rgba(255, 255, 255, 0.3) 1px, transparent 1px),
             linear-gradient(90deg, rgba(255, 255, 255, 0.3) 1px, transparent 1px);
-        background-size: 4% 4%;
+        background-size: 8% 8%;
     }
 
     .match-fog-overlay {
@@ -228,7 +228,7 @@
 
     /* ── Middle-left character panel ─────────────────────── */
     .match-char-panel-anchor {
-        @apply absolute left-4 top-1/2 z-10;
+        @apply absolute left-4 top-1/2 z-20;
         transform: translateY(-50%);
     }
 
@@ -239,7 +239,7 @@
     }
 
     .match-char-panel {
-        @apply absolute left-[calc(100%+0.5rem)] top-1/2 bg-white bg-opacity-95 rounded-xl shadow-lg overflow-hidden;
+        @apply absolute left-[calc(100%+0.5rem)] top-1/2 z-20 bg-white bg-opacity-95 rounded-xl shadow-lg overflow-hidden;
         width: 22rem;
         opacity: 0;
         transform: translateY(-50%) translateX(-0.5rem) scale(0.98);
@@ -548,5 +548,145 @@
         color: rgba(255, 255, 255, 0.76);
         letter-spacing: 0.14em;
         text-transform: uppercase;
+    }
+
+    @media (max-width: 1024px) {
+        .match-top-bar,
+        .match-bottom-bar,
+        .match-dice-wrapper {
+            @apply gap-2;
+        }
+
+        .match-char-panel {
+            width: 19rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .match-logo-badge {
+            @apply top-3 left-3 px-2.5 py-2;
+        }
+
+        .match-top-bar {
+            @apply left-3 right-3 top-3 w-auto overflow-x-auto px-2 py-2;
+            justify-content: flex-start;
+        }
+
+        .match-char-panel-anchor {
+            @apply left-3 top-[5.5rem];
+            transform: none;
+        }
+
+        .match-char-panel {
+            @apply fixed left-3 right-3 top-auto rounded-[1.25rem];
+            bottom: 8.75rem;
+            width: auto;
+            max-height: 48vh;
+            transform: translateY(1rem) scale(0.98);
+        }
+
+        .match-char-panel--open {
+            transform: translateY(0) scale(1);
+        }
+
+        .match-bottom-bar {
+            @apply left-3 right-3 bottom-3 flex-row items-center justify-start overflow-x-auto px-2 py-2;
+        }
+
+        .match-volume-panel {
+            @apply fixed left-3 right-3 top-auto min-w-0;
+            bottom: 4.75rem;
+            transform: none;
+        }
+
+        .match-dice-wrapper {
+            @apply bottom-[5.5rem] right-3 flex-col-reverse items-end;
+        }
+
+        .match-dice-controls {
+            @apply flex-row items-center;
+        }
+
+        .match-dice-picker {
+            min-width: 0;
+            width: min(18rem, calc(100vw - 1.5rem));
+        }
+
+        .match-dice-btn,
+        .match-dice-tray-item {
+            @apply h-14 w-14;
+        }
+
+        .match-throw-card {
+            @apply px-5 py-5;
+            min-width: min(18rem, calc(100vw - 2rem));
+        }
+
+        .match-throw-result {
+            font-size: 2.75rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .match-map-token {
+            min-width: 3.8rem;
+        }
+
+        .match-top-bar,
+        .match-bottom-bar,
+        .match-char-panel,
+        .match-volume-panel {
+            @apply left-2 right-2;
+        }
+
+        .match-char-panel {
+            bottom: 8rem;
+        }
+
+        .match-bottom-bar {
+            bottom: 2.75rem;
+        }
+
+        .match-dice-wrapper {
+            @apply bottom-[7rem] right-2;
+        }
+
+        .match-dice-controls {
+            @apply gap-2;
+        }
+
+        .match-dice-btn,
+        .match-dice-tray-item {
+            @apply h-12 w-12;
+        }
+
+        .match-throw-result {
+            font-size: 2.3rem;
+        }
+    }
+
+    @media (hover: none) and (pointer: coarse) and (orientation: landscape) {
+        .match-char-panel-anchor {
+            @apply left-4 top-auto;
+            bottom: 14.5rem;
+            transform: none;
+        }
+    }
+
+    .match-orientation-overlay {
+        @apply fixed inset-0 z-[200] flex items-center justify-center bg-black/75 px-6;
+        backdrop-filter: blur(4px);
+    }
+
+    .match-orientation-overlay-content {
+        @apply flex max-w-[18rem] flex-col items-center gap-5 text-center;
+    }
+
+    .match-orientation-overlay-content img {
+        @apply h-16 w-16;
+    }
+
+    .match-orientation-overlay-text {
+        @apply text-color-greyScale/50;
     }
 }
