@@ -100,7 +100,9 @@
             @apply flex-col items-start gap-3;
         }
 
-        .user-player-campaigns .user-player-campaigns-header .user-player-campaigns-buttons {
+        .user-player-campaigns
+            .user-player-campaigns-header
+            .user-player-campaigns-buttons {
             @apply w-full flex-wrap justify-center gap-3;
         }
 

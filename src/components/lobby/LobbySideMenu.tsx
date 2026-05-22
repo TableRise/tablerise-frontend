@@ -70,7 +70,11 @@ export default function LobbySideMenu({
             <button
                 type="button"
                 className="lobby-side-menu-mobile-toggle"
-                aria-label={isMobileMenuOpen ? 'Fechar menu da campanha' : 'Abrir menu da campanha'}
+                aria-label={
+                    isMobileMenuOpen
+                        ? 'Fechar menu da campanha'
+                        : 'Abrir menu da campanha'
+                }
                 aria-expanded={isMobileMenuOpen}
                 aria-controls="lobby-side-menu-nav"
                 onClick={() => setIsMobileMenuOpen((current) => !current)}

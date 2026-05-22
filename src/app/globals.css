@@ -68,18 +68,12 @@ footer {
 
 @layer base {
     .page-shell {
-        width: min(
-            calc(100% - (var(--app-shell-padding) * 2)),
-            var(--app-max-width)
-        );
+        width: min(calc(100% - (var(--app-shell-padding) * 2)), var(--app-max-width));
         margin-inline: auto;
     }
 
     .page-panel {
-        width: min(
-            calc(100% - (var(--app-shell-padding) * 2)),
-            var(--app-panel-width)
-        );
+        width: min(calc(100% - (var(--app-shell-padding) * 2)), var(--app-panel-width));
         margin-inline: auto;
     }
 

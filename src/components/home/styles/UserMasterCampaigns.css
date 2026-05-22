@@ -88,7 +88,9 @@
             @apply w-full text-center;
         }
 
-        .user-master-campaigns .user-master-campaigns-header .user-master-campaigns-buttons {
+        .user-master-campaigns
+            .user-master-campaigns-header
+            .user-master-campaigns-buttons {
             @apply w-full flex-wrap justify-center gap-3;
         }
 
