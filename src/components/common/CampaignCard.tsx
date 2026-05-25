@@ -36,6 +36,7 @@ export default function CampaignCard(cardProps: CampaignCardProps): JSX.Element 
         campaignPlayers = [],
         playerAmountLimit,
         onButtonClick,
+        buttonDisabled = false,
     } = cardProps || {};
 
     const { cardSize, textColorCSS, buttonColorCSS, buttonTextColorCSS } =
@@ -111,6 +112,7 @@ export default function CampaignCard(cardProps: CampaignCardProps): JSX.Element 
                     <button
                         className={`${buttonColorCSS} ${buttonTextColorCSS}`}
                         onClick={onButtonClick}
+                        disabled={buttonDisabled}
                     >
                         {buttonTitle}
                     </button>

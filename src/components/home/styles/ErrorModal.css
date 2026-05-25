@@ -24,4 +24,9 @@
     .err-message {
         @apply text-center text-red-600 mt-2;
     }
+
+    html[data-theme='dark'] .err-modal {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
 }

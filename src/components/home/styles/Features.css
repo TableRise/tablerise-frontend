@@ -49,4 +49,12 @@
             max-width: min(calc(100% - 1rem), 70.5rem);
         }
     }
+
+    html[data-theme='dark'] .features-text p {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .features-text h2 {
+        color: var(--theme-accent);
+    }
 }

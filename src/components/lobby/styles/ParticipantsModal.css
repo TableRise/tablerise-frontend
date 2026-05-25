@@ -100,6 +100,10 @@
             disabled:opacity-50 disabled:cursor-not-allowed;
     }
 
+    .pm-confirm-btn-placeholder {
+        @apply block w-full mt-2 py-1.5 text-center rounded-lg border border-transparent invisible pointer-events-none;
+    }
+
     /* ── Remove confirmation dialog ─────────────── */
     .pm-remove-overlay {
         @apply fixed inset-0 z-[300] flex items-center justify-center bg-black/60;
@@ -152,5 +156,49 @@
         .pm-grid {
             @apply grid-cols-1 p-4;
         }
+    }
+
+    html[data-theme='dark'] .pm-title,
+    html[data-theme='dark'] .pm-close-btn,
+    html[data-theme='dark'] .pm-role,
+    html[data-theme='dark'] .pm-confirm-btn {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .pm-modal,
+    html[data-theme='dark'] .pm-remove-dialog {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .pm-card {
+        background-color: var(--theme-surface-muted);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .pm-header,
+    html[data-theme='dark'] .pm-card,
+    html[data-theme='dark'] .pm-card-footer,
+    html[data-theme='dark'] .pm-avatar,
+    html[data-theme='dark'] .pm-remove-dialog,
+    html[data-theme='dark'] .pm-remove-cancel {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .pm-avatar,
+    html[data-theme='dark'] .pm-remove-cancel:hover {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .pm-nickname,
+    html[data-theme='dark'] .pm-remove-title {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .pm-char-name,
+    html[data-theme='dark'] .pm-loading,
+    html[data-theme='dark'] .pm-empty,
+    html[data-theme='dark'] .pm-remove-body {
+        color: var(--theme-text-muted);
     }
 }

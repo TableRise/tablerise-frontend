@@ -1,16 +1,18 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useRef, useEffect, useContext } from 'react';
 import Image from 'next/image';
 import TableRiseLightMark from '@assets/icons/logo.svg?url';
 import AccountBox from '@assets/icons/social/account-box.svg?url';
 import AccountBoxBlue from '@assets/icons/social/account-box-blue.svg?url';
+import AccountBoxDark from '@assets/icons/social/account-box-dark.svg?url';
 import ExpandMore from '@assets/icons/nav/expand-more.svg?url';
 import MenuSVG from '@assets/icons/nav/menu.svg?url';
 import CloseSVG from '@assets/icons/nav/close.svg?url';
 import SettingsIcon from '@assets/icons/sys/settings-blue.svg?url';
 import HelpIcon from '@assets/icons/sys/help-blue.svg?url';
+import HelpDarkIcon from '@assets/icons/sys/help-dark.svg?url';
 import ExitIcon from '@assets/icons/sys/exit-red.svg?url';
+import TableriseContext from '@/context/TableriseContext';
 import { postLogout } from '@/server/users/logout';
 import Link from 'next/link';
 import '@/components/common/styles/LoggedHeader.css';
@@ -18,17 +20,23 @@ import '@/components/common/styles/LoggedHeader.css';
 const alts = require('@assets/alts');
 
 export default function LoggedHeader(): JSX.Element {
+    const { themeMode } = useContext(TableriseContext);
     const [open, setOpen] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const ref = useRef<HTMLElement>(null);
-    const router = useRouter();
 
     async function handleLogout() {
         setMenuOpen(false);
         setOpen(false);
-        await postLogout();
         localStorage.removeItem('userLogged');
-        router.push('/login');
+
+        try {
+            await postLogout();
+        } catch {
+            // Force a fresh guest render even if the logout request has already expired.
+        }
+
+        window.location.replace('/');
     }
 
     useEffect(() => {
@@ -130,7 +138,11 @@ export default function LoggedHeader(): JSX.Element {
                                 }}
                             >
                                 <Image
-                                    src={AccountBoxBlue}
+                                    src={
+                                        themeMode === 'dark'
+                                            ? AccountBoxDark
+                                            : AccountBoxBlue
+                                    }
                                     alt="perfil"
                                     width={20}
                                     height={20}
@@ -146,7 +158,7 @@ export default function LoggedHeader(): JSX.Element {
                                 }}
                             >
                                 <Image
-                                    src={HelpIcon}
+                                    src={themeMode === 'dark' ? HelpDarkIcon : HelpIcon}
                                     alt="suporte"
                                     width={20}
                                     height={20}

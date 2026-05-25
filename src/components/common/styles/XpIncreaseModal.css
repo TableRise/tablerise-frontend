@@ -70,4 +70,40 @@
     .xpm-hp-option {
         @apply flex items-center gap-2 cursor-pointer;
     }
+
+    html[data-theme='dark'] .xpm-modal {
+        background-color: var(--theme-surface);
+        border-color: var(--theme-border);
+        box-shadow: var(--theme-shadow-strong);
+    }
+
+    html[data-theme='dark'] .xpm-title,
+    html[data-theme='dark'] .xpm-label,
+    html[data-theme='dark'] .xpm-close,
+    html[data-theme='dark'] .xpm-cancel:hover {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .xpm-close,
+    html[data-theme='dark'] .xpm-cancel,
+    html[data-theme='dark'] .xpm-summary-label {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .xpm-input,
+    html[data-theme='dark'] .xpm-summary,
+    html[data-theme='dark'] .xpm-hp-options {
+        border-color: var(--theme-border);
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .xpm-input,
+    html[data-theme='dark'] .xpm-summary-row,
+    html[data-theme='dark'] .xpm-hp-option {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .xpm-input::placeholder {
+        color: var(--theme-text-muted);
+    }
 }

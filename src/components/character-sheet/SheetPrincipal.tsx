@@ -85,7 +85,9 @@ export interface SheetPrincipalHandle {
     getData: () => {
         characterName: string;
         selectedClassId: string;
+        selectedClassName: string;
         selectedRaceId: string;
+        selectedRaceName: string;
         alignment: string;
         background: string;
         personalityTraits: string;
@@ -219,7 +221,11 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                 return {
                     characterName,
                     selectedClassId,
+                    selectedClassName:
+                        classes.find((c) => c.classId === selectedClassId)?.name ?? '',
                     selectedRaceId,
+                    selectedRaceName:
+                        races.find((r) => r.raceId === selectedRaceId)?.name ?? '',
                     alignment,
                     background,
                     personalityTraits,
@@ -305,7 +311,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
             força: 'str',
             destreza: 'dex',
             constituição: 'con',
-            inteligência: 'int',
+            Inteligência: 'int',
             sabedoria: 'wis',
             carisma: 'cha',
         };

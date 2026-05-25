@@ -114,4 +114,26 @@
             @apply p-4;
         }
     }
+
+    html[data-theme='dark'] .user-master-campaigns {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark']
+        .user-master-campaigns
+        .user-master-campaigns-header
+        .user-master-campaigns-created-label
+        .label-title {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark']
+        .user-master-campaigns
+        .user-master-campaigns-header
+        .user-master-campaigns-created-label
+        .creation-limits {
+        background-color: var(--theme-surface-muted);
+        color: var(--theme-text-muted);
+    }
 }

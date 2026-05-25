@@ -413,4 +413,63 @@
             @apply px-4;
         }
     }
+
+    html[data-theme='dark'] .ecm-title,
+    html[data-theme='dark'] .ecm-social-label,
+    html[data-theme='dark'] .ecm-tab--active,
+    html[data-theme='dark'] .ecm-confirm-title {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .ecm-modal,
+    html[data-theme='dark'] .ecm-confirm-modal {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .ecm-header,
+    html[data-theme='dark'] .ecm-tabs,
+    html[data-theme='dark'] .ecm-footer,
+    html[data-theme='dark'] .ecm-img-upload,
+    html[data-theme='dark'] .ecm-confirm-cancel {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .ecm-close-btn:hover,
+    html[data-theme='dark'] .ecm-upload-btn:hover,
+    html[data-theme='dark'] .ecm-confirm-cancel:hover:not(:disabled) {
+        background-color: var(--theme-surface-strong);
+    }
+
+    html[data-theme='dark'] .ecm-close-btn,
+    html[data-theme='dark'] .ecm-tab,
+    html[data-theme='dark'] .ecm-field-hint,
+    html[data-theme='dark'] .ecm-char-count,
+    html[data-theme='dark'] .ecm-section-hint {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .ecm-field-label,
+    html[data-theme='dark'] .ecm-section-title,
+    html[data-theme='dark'] .ecm-confirm-body,
+    html[data-theme='dark'] .ecm-btn-ghost,
+    html[data-theme='dark'] .ecm-calendar-icon {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .ecm-textarea,
+    html[data-theme='dark'] .ecm-upload-btn,
+    html[data-theme='dark'] .ecm-remove-btn {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .ecm-textarea,
+    html[data-theme='dark'] .ecm-upload-btn {
+        border-color: var(--theme-border);
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .ecm-remove-btn {
+        color: #fca5a5;
+    }
 }

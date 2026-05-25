@@ -1,51 +1,108 @@
 const badges = {
-    badge_10_campaigns: {
-        colorful: 'https://i.ibb.co/Kx2x6dv5/badge-true-10-campagins.png',
-        blackandwhite: 'https://i.ibb.co/hRTqYF4n/badge-false-10-campaigns.png',
-        description:
-            'Você ganhou uma insígnia por ter entrado em 10 campanhas, parabéns !!',
+    cleric_badge: {
+        colorful: '/images/badges/cleric.webp',
+        blackandwhite: '/images/badges/cleric-bw.webp',
+        description: '',
     },
-    badge_50_campaigns: {
-        colorful: 'https://i.ibb.co/Y4bz6sZd/badge-true-50-campaigns.png',
-        blackandwhite: 'https://i.ibb.co/WWjX366B/badge-false-50-campaigns.png',
-        description:
-            'Você ganhou uma insígnia por ter entrado em 50 campanhas, uau, parabéns !!',
+    dragon_badge: {
+        colorful: '/images/badges/dragon.webp',
+        blackandwhite: '/images/badges/dragon-bw.webp',
+        description: '',
     },
-    badge_100_campaigns: {
-        colorful: 'https://i.ibb.co/V0ShfWjg/badge-true-100-campaigns.png',
-        blackandwhite: 'https://i.ibb.co/cXsgGrWC/badge-false-100-campaigns.png',
-        description:
-            'Você ganhou uma insígnia por ter entrado em 100 campanhas, pouco viciado né? Parabéns !!',
+    enthusiast_badge: {
+        colorful: '/images/badges/enthusiat.webp',
+        blackandwhite: '/images/badges/enthusiast-bw.webp',
+        description: '',
     },
-    badge_500_campaigns: {
-        colorful: 'https://i.ibb.co/fdsNYN7R/badge-true-500-campaigns.png',
-        blackandwhite: 'https://i.ibb.co/Z6YV5w5J/badge-false-500-campaigns.png',
-        description:
-            'Você ganhou uma insígnia por ter entrado em 500 campanhas, comprou o jogo foi? O meu e o seu? Parabéns !!',
+    high_cleric_badge: {
+        colorful: '/images/badges/high-cleric.webp',
+        blackandwhite: '/images/badges/high-cleric-bw.webp',
+        description: '',
     },
-    badge_1000_campaigns: {
-        colorful: 'https://i.ibb.co/ZpR6SNjj/badge-true-1000-campaigns.png',
-        blackandwhite: 'https://i.ibb.co/gbWfxJtT/badge-false-1000-campaigns.png',
-        description:
-            'Já pode pedir pra sempre música no fantástico, que incrível, 1000 campanhas, Parabéns !!',
+    high_sorcerer_badge: {
+        colorful: '/images/badges/high-sorcerer.webp',
+        blackandwhite: '/images/badges/high-sorcerer-bw.webp',
+        description: '',
     },
-    badge_newbie: {
-        colorful: 'https://i.ibb.co/0PfH06n/badge-true-newbie.png',
-        blackandwhite: 'https://i.ibb.co/qLdjmKf7/badge-false-newbie.png',
-        description:
-            'Parabéns por completar seu cadastro, como recompensa toma essa insígnia de goblin fofinho ^^',
+    imp_badge: {
+        colorful: '/images/badges/imp.webp',
+        blackandwhite: '/images/badges/imp-bw.webp',
+        description: '',
     },
-    badge_elder: {
-        colorful: 'https://i.ibb.co/QFTxdsq4/badge-true-elder.png',
-        blackandwhite: 'https://i.ibb.co/nqXHK68Z/badge-false-elder.png',
-        description:
-            'Já realizou 300 logins no site, quantos anos de gato isso dá? Recebeu uma insígnia de ancião !',
+    imp_king_rich_badge: {
+        colorful: '/images/badges/imp-king-rich.webp',
+        blackandwhite: '/images/badges/imp-king-rich-bw.webp',
+        description: '',
     },
-    badge_creative: {
-        colorful: 'https://i.ibb.co/zWyG2dhH/badge-true-creative.png',
-        blackandwhite: 'https://i.ibb.co/JRh3XY9V/badge-false-creative.png',
-        description:
-            'Já criou 50 personagens, É muita criatividade e tempo livre, merecida insígnia de criatividade !',
+    imp_rich_badge: {
+        colorful: '/images/badges/imp-rich.webp',
+        blackandwhite: '/images/badges/imp-rich-bw.webp',
+        description: '',
+    },
+    imp_very_rich_badge: {
+        colorful: '/images/badges/imp-very-rich.webp',
+        blackandwhite: '/images/badges/imp-very-rich-bw.webp',
+        description: '',
+    },
+    imp_with_glasses_and_money_badge: {
+        colorful: '/images/badges/imp-with-glasses-and-money.webp',
+        blackandwhite: '/images/badges/imp-with-glasses-and-money-bw.webp',
+        description: '',
+    },
+    mage_badge: {
+        colorful: '/images/badges/mage.webp',
+        blackandwhite: '/images/badges/mage-bw.webp',
+        description: '',
+    },
+    necromant_badge: {
+        colorful: '/images/badges/necromant.webp',
+        blackandwhite: '/images/badges/necromant-bw.webp',
+        description: '',
+    },
+    sorcerer_badge: {
+        colorful: '/images/badges/sorcerer.webp',
+        blackandwhite: '/images/badges/sorcerer-bw.webp',
+        description: '',
+    },
+    staff_badge: {
+        colorful: '/images/badges/staff.webp',
+        blackandwhite: '/images/badges/staff-bw.webp',
+        description: '',
+    },
+    student_badge: {
+        colorful: '/images/badges/student.webp',
+        blackandwhite: '/images/badges/student-bw.webp',
+        description: '',
+    },
+    supreme_sorcerer_cleric_badge: {
+        colorful: '/images/badges/supreme-sorcerer-cleric.webp',
+        blackandwhite: '/images/badges/supreme-sorcerer-cleric-bw.webp',
+        description: '',
+    },
+    warrior_arcane_badge: {
+        colorful: '/images/badges/warrior-arcane.webp',
+        blackandwhite: '/images/badges/warrior-arcane-bw.webp',
+        description: '',
+    },
+    warrior_badge: {
+        colorful: '/images/badges/warrior.webp',
+        blackandwhite: '/images/badges/warrior-bw.webp',
+        description: '',
+    },
+    warrior_darkness_badge: {
+        colorful: '/images/badges/warrior-darkness.webp',
+        blackandwhite: '/images/badges/warrior-darkness-bw.webp',
+        description: '',
+    },
+    warrior_two_swords_badge: {
+        colorful: '/images/badges/warrior-two-swords.webp',
+        blackandwhite: '/images/badges/warrior-two-swords-bw.webp',
+        description: '',
+    },
+    warrior_young_badge: {
+        colorful: '/images/badges/warrior-young.webp',
+        blackandwhite: '/images/badges/warrior-young-bw.webp',
+        description: '',
     },
 };
 

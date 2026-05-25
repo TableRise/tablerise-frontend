@@ -238,7 +238,7 @@ export default function ShopModal({
             } catch (error: any) {
                 setBuyWarning(
                     error?.message ??
-                        'A compra foi concluÃ­da, mas não foi possível salvar no histÃ³rico.'
+                        'A compra foi concluÃ­da, mas não foi possível salvar no Histórico.'
                 );
             }
         } catch (error: any) {
@@ -548,7 +548,7 @@ export default function ShopModal({
 
             {/* Conversion form */}
             <div className="sm-vault-form">
-                <h3 className="font-M-semibold text-color-primary/default_900">
+                <h3 className="sm-vault-form-title font-M-semibold">
                     Conversão de Moedas
                 </h3>
 

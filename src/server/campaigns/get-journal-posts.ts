@@ -163,7 +163,7 @@ export const updateCampaignJournalPost = async (
     try {
         await apiCall({
             baseUrl: campaignsBaseUrl,
-            endpoint: `${campaignId}/journal/update`,
+            endpoint: `${campaignId}/update/journal`,
             method: 'PATCH',
             params: { userId },
             data: {

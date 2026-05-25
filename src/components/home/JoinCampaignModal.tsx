@@ -1,12 +1,14 @@
 'use client';
-import { useState, useEffect } from 'react';
+
+import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import CampaignCard from '@/components/common/CampaignCard';
-import CampaignPasswordModal from '@/components/home/CampaignPasswordModal';
 import ErrorModal from '@/components/home/ErrorModal';
-import { searchCampaigns } from '@/server/campaigns/search-campaigns';
-import { getCampaignById } from '@/server/campaigns/join-campaign';
+import CampaignPasswordModal from '@/components/home/CampaignPasswordModal';
+import { isCampaignPlayerPending } from '@/components/home/helpers/campaignPlayerStatus';
 import { useJoinCampaign } from '@/components/home/helpers/useJoinCampaign';
+import { getCampaignById } from '@/server/campaigns/join-campaign';
+import { searchCampaigns } from '@/server/campaigns/search-campaigns';
 import '@/components/home/styles/JoinCampaignModal.css';
 
 interface Props {
@@ -32,6 +34,10 @@ export default function JoinCampaignModal({ onClose }: Props): JSX.Element {
     const [results, setResults] = useState<any[]>([]);
     const [searching, setSearching] = useState(false);
     const [searched, setSearched] = useState(false);
+    const currentUserId =
+        typeof window === 'undefined'
+            ? ''
+            : JSON.parse(localStorage.getItem('userLogged') ?? 'null')?.userId ?? '';
     const {
         handleJoinClick,
         passwordModalOpen,
@@ -40,7 +46,9 @@ export default function JoinCampaignModal({ onClose }: Props): JSX.Element {
         closePasswordModal,
         joinError,
         closeJoinError,
-    } = useJoinCampaign();
+    } = useJoinCampaign({
+        onJoinRequested: onClose,
+    });
 
     useEffect(() => {
         document.body.style.overflow = 'hidden';
@@ -121,32 +129,47 @@ export default function JoinCampaignModal({ onClose }: Props): JSX.Element {
                                 Campanhas encontradas
                             </span>
                             <div className="jcm-results-cards">
-                                {results.map((campaign) => (
-                                    <CampaignCard
-                                        key={uuid()}
-                                        title={campaign.title}
-                                        nextMatchDate={getCampaignNextMatchDate(campaign)}
-                                        fogColor="#0A358A"
-                                        image={campaign.cover?.link}
-                                        textColor="white"
-                                        size="medium-large"
-                                        buttonColor="white"
-                                        buttonTitle="Entrar no Jogo"
-                                        system={campaign.system}
-                                        ageRestriction={campaign.ageRestriction}
-                                        campaignPlayers={getCampaignPlayers(campaign)}
-                                        playerAmountLimit={getCampaignPlayerAmountLimit(
-                                            campaign
-                                        )}
-                                        campaignId={campaign.campaignId}
-                                        onButtonClick={() =>
-                                            handleJoinClick(
-                                                campaign.campaignId,
-                                                getCampaignPlayers(campaign)
-                                            )
-                                        }
-                                    />
-                                ))}
+                                {results.map((campaign) => {
+                                    const campaignPlayers = getCampaignPlayers(campaign);
+                                    const isPending = isCampaignPlayerPending(
+                                        campaignPlayers,
+                                        currentUserId
+                                    );
+
+                                    return (
+                                        <CampaignCard
+                                            key={uuid()}
+                                            title={campaign.title}
+                                            nextMatchDate={getCampaignNextMatchDate(
+                                                campaign
+                                            )}
+                                            fogColor="#0A358A"
+                                            image={campaign.cover?.link}
+                                            textColor="white"
+                                            size="medium-large"
+                                            buttonColor="white"
+                                            buttonTitle={
+                                                isPending
+                                                    ? 'Aguardando aprovação \u29d6'
+                                                    : 'Entrar no Jogo'
+                                            }
+                                            buttonDisabled={isPending}
+                                            system={campaign.system}
+                                            ageRestriction={campaign.ageRestriction}
+                                            campaignPlayers={campaignPlayers}
+                                            playerAmountLimit={getCampaignPlayerAmountLimit(
+                                                campaign
+                                            )}
+                                            campaignId={campaign.campaignId}
+                                            onButtonClick={() =>
+                                                handleJoinClick(
+                                                    campaign.campaignId,
+                                                    campaignPlayers
+                                                )
+                                            }
+                                        />
+                                    );
+                                })}
                             </div>
                         </>
                     )}

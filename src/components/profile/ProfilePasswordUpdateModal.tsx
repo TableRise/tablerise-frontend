@@ -9,7 +9,6 @@ import {
     handleOtpPaste,
 } from '@/utils/otpInputHelpers';
 import {
-    authenticate2fa,
     authenticateEmail,
     authenticateSecretQuestion,
     sendConfirmEmail,
@@ -24,7 +23,7 @@ type ProfilePasswordUpdateModalProps = {
     onSaved: () => void | Promise<void>;
 };
 
-type Step = 'email-code' | 'secret-question' | 'two-factor' | 'new-password' | 'success';
+type Step = 'email-code' | 'secret-question' | 'new-password' | 'success';
 
 const CODE_LENGTH = 6;
 
@@ -55,13 +54,6 @@ function getNextStep(accountSecurityMethod?: string): {
         };
     }
 
-    if (accountSecurityMethod === 'two-factor') {
-        return {
-            nextStep: 'two-factor',
-            secretQuestion: '',
-        };
-    }
-
     return {
         nextStep: 'new-password',
         secretQuestion: '',
@@ -85,7 +77,7 @@ export default function ProfilePasswordUpdateModal({
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
 
-    const isOtpStep = step === 'email-code' || step === 'two-factor';
+    const isOtpStep = step === 'email-code';
     const isCodeComplete = useMemo(
         () => digits.every((digit) => digit.trim() !== ''),
         [digits]
@@ -128,12 +120,12 @@ export default function ProfilePasswordUpdateModal({
     }, [email, step]);
 
     const handleDigitsChange = (value: string, index: number) => {
-        const pattern = step === 'two-factor' ? /^[0-9]?$/ : /^[A-Za-z0-9]?$/;
+        const pattern = /^[A-Za-z0-9]?$/;
 
         if (!pattern.test(value)) return;
 
         const nextDigits = [...digits];
-        nextDigits[index] = step === 'two-factor' ? value : value.toUpperCase();
+        nextDigits[index] = value.toUpperCase();
         setDigits(nextDigits);
     };
 
@@ -181,23 +173,6 @@ export default function ProfilePasswordUpdateModal({
             setError(
                 submitError?.message ?? '*Nao foi possivel validar a resposta informada.'
             );
-        } finally {
-            setSubmitting(false);
-        }
-    };
-
-    const handleConfirmTwoFactor = async () => {
-        if (!isCodeComplete) return;
-
-        setSubmitting(true);
-        setError('');
-
-        try {
-            await authenticate2fa(email, digits.join(''));
-            setDigits(buildDigits());
-            setStep('new-password');
-        } catch (submitError: Error | any) {
-            setError(submitError?.message ?? '*Nao foi possivel validar o codigo 2FA.');
         } finally {
             setSubmitting(false);
         }
@@ -307,52 +282,6 @@ export default function ProfilePasswordUpdateModal({
                             />
                         </label>
                     </div>
-                ) : null}
-
-                {step === 'two-factor' ? (
-                    <>
-                        <p className="profile-action-modal-description font-XS-regular">
-                            Digite o codigo do seu aplicativo autenticador para continuar.
-                        </p>
-
-                        <div className="profile-action-modal-otp">
-                            {digits.map((digit, index) => (
-                                <input
-                                    key={`profile-password-2fa-${index}`}
-                                    id={`profile-password-2fa-${index}`}
-                                    type="text"
-                                    maxLength={1}
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                    value={digit}
-                                    className="profile-action-modal-digit input-default-light font-XS-regular"
-                                    onChange={(event) =>
-                                        handleDigitsChange(event.target.value, index)
-                                    }
-                                    onKeyDown={(event) =>
-                                        handleOtpKeyDown(
-                                            event,
-                                            index,
-                                            'profile-password-2fa-',
-                                            'numeric'
-                                        )
-                                    }
-                                    onInput={(event) =>
-                                        handleOtpAutoAdvance(
-                                            event,
-                                            index,
-                                            'profile-password-2fa-'
-                                        )
-                                    }
-                                    onPaste={(event) =>
-                                        handleOtpPaste(event, CODE_LENGTH, (chars) => {
-                                            setDigits(chars);
-                                        })
-                                    }
-                                />
-                            ))}
-                        </div>
-                    </>
                 ) : null}
 
                 {step === 'new-password' ? (
@@ -485,11 +414,6 @@ export default function ProfilePasswordUpdateModal({
 
                                 if (step === 'secret-question') {
                                     void handleConfirmSecretQuestion();
-                                    return;
-                                }
-
-                                if (step === 'two-factor') {
-                                    void handleConfirmTwoFactor();
                                     return;
                                 }
 

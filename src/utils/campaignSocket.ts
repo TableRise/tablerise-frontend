@@ -1,5 +1,6 @@
 import { io, type Socket } from 'socket.io-client';
 import type {
+    CampaignImagesUpdatedPayload,
     CampaignMapsUpdatedPayload,
     CampaignMusicsUpdatedPayload,
     CampaignPlayerJoinedPayload,
@@ -15,6 +16,7 @@ import type {
     MatchEffect,
     MatchEffectChangedPayload,
     MatchGridChangedPayload,
+    MatchImageHighlightedChangedPayload,
     MatchMapChangedPayload,
     MatchMusicChangedPayload,
     MatchToken,
@@ -136,7 +138,11 @@ interface ServerToClientEvents {
         payload: DungeonMasterTransferredPayload
     ) => void;
     'campaign:maps_updated': (payload: CampaignMapsUpdatedPayload) => void;
+    'campaign:images_updated': (payload: CampaignImagesUpdatedPayload) => void;
     'campaign:musics_updated': (payload: CampaignMusicsUpdatedPayload) => void;
+    'match:image_highlighted_changed': (
+        payload: MatchImageHighlightedChangedPayload
+    ) => void;
     'campaign:settings_updated': (payload: CampaignSettingsUpdatedPayload) => void;
 }
 

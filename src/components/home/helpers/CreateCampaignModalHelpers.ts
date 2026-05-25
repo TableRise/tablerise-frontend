@@ -18,12 +18,6 @@ export function extractYouTubeId(url: string): string | null {
     return match ? match[1] : null;
 }
 
-export function formatDateDisplay(iso: string): string {
-    if (!iso) return '';
-    const [y, m, d] = iso.split('-');
-    return `${d}/${m}/${y}`;
-}
-
 interface Step1Fields {
     title: string;
     description: string;
@@ -54,7 +48,10 @@ export function validateStep1Fields({ title, description, password }: Step1Field
         errors.descError = `Descrição deve ter no máximo ${CAMPAIGN_DESCRIPTION_MAX_LENGTH} caracteres`;
         valid = false;
     }
-    if (password.trim() && !/^[a-zA-Z0-9]{4}$/.test(password)) {
+    if (!password.trim()) {
+        errors.passwordError = 'Senha da campanha é obrigatória';
+        valid = false;
+    } else if (!/^[a-zA-Z0-9]{4}$/.test(password)) {
         errors.passwordError = 'Senha deve ter exatamente 4 caracteres alfanuméricos';
         valid = false;
     }

@@ -305,4 +305,78 @@
             @apply w-full justify-end;
         }
     }
+
+    html[data-theme='dark'] .cdm-modal,
+    html[data-theme='dark'] .cdm-attr-box,
+    html[data-theme='dark'] .cdm-info-box,
+    html[data-theme='dark'] .cdm-text-block,
+    html[data-theme='dark'] .cdm-sell-confirm-modal {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .cdm-tabs,
+    html[data-theme='dark'] .cdm-section-title,
+    html[data-theme='dark'] .cdm-attacks-table,
+    html[data-theme='dark'] .cdm-inventory-table-wrapper,
+    html[data-theme='dark'] .cdm-sell-confirm-cancel {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .cdm-char-name,
+    html[data-theme='dark'] .cdm-attr-value,
+    html[data-theme='dark'] .cdm-text-content {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .cdm-back-btn,
+    html[data-theme='dark'] .cdm-tab--active,
+    html[data-theme='dark'] .cdm-section-title,
+    html[data-theme='dark'] .cdm-attr-label,
+    html[data-theme='dark'] .cdm-sell-confirm-title {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .cdm-attr-box,
+    html[data-theme='dark'] .cdm-info-box,
+    html[data-theme='dark'] .cdm-text-block,
+    html[data-theme='dark'] .cdm-sell-confirm-modal {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .cdm-picture-wrapper,
+    html[data-theme='dark'] .cdm-info-box,
+    html[data-theme='dark'] .cdm-attacks-row,
+    html[data-theme='dark'] .cdm-inventory-table thead,
+    html[data-theme='dark'] .cdm-inventory-table tbody tr,
+    html[data-theme='dark'] .cdm-sell-confirm-cancel {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .cdm-tab,
+    html[data-theme='dark'] .cdm-label,
+    html[data-theme='dark'] .cdm-info-label,
+    html[data-theme='dark'] .cdm-attr-full,
+    html[data-theme='dark'] .cdm-inventory-table th,
+    html[data-theme='dark'] .cdm-inventory-table td,
+    html[data-theme='dark'] .cdm-sell-confirm-body {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .cdm-inventory-table thead,
+    html[data-theme='dark'] .cdm-inventory-table tbody tr:nth-child(even),
+    html[data-theme='dark'] .cdm-sell-confirm-cancel:hover {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .cdm-inventory-row--clickable:hover {
+        background-color: var(--theme-surface-strong);
+    }
+
+    html[data-theme='dark'] .cdm-edit-number,
+    html[data-theme='dark'] .cdm-edit-text,
+    html[data-theme='dark'] .cdm-edit-textarea {
+        border-color: var(--theme-border);
+        color: var(--theme-text);
+    }
 }

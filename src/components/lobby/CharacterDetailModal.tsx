@@ -16,12 +16,14 @@ import {
 } from '@/server/dungeons&dragons5e/system';
 import '@/components/lobby/styles/CharacterDetailModal.css';
 import '@/app/campaigns/character-sheet/page.css';
+import '@/components/profile/styles/ProfileActionModal.css';
 import SheetMagias, {
     type SheetMagiasHandle,
 } from '@/components/character-sheet/SheetMagias';
 import SheetHabilidades, {
     type SheetHabilidadesHandle,
 } from '@/components/character-sheet/SheetHabilidades';
+import { deleteCharacter } from '@/server/characters/create-character';
 import {
     updateCharacter,
     removeCharacterEquipment,
@@ -47,6 +49,7 @@ interface CharacterDetailModalProps {
     xpSystem?: boolean;
     hideInventoryTab?: boolean;
     onBack: () => void;
+    onDeleted?: () => void | Promise<void>;
 }
 
 const ABILITY_LABELS: Record<string, string> = {
@@ -70,25 +73,25 @@ const ABILITY_FULL: Record<string, string> = {
 const SKILL_LABELS: Record<string, string> = {
     athletics: 'Atletismo',
     acrobatics: 'Acrobacia',
-    sleightOfHand: 'Prestidigitação',
+    sleightOfHand: 'PrestidigitaÃ§Ã£o',
     stealth: 'Furtividade',
     arcana: 'Arcanismo',
     history: 'História',
-    investigation: 'Investigação',
+    investigation: 'InvestigaÃ§Ã£o',
     nature: 'Natureza',
-    religion: 'Religião',
+    religion: 'ReligiÃ£o',
     animalHandling: 'Lidar com Animais',
-    insight: 'Intuição',
+    insight: 'IntuiÃ§Ã£o',
     medicine: 'Medicina',
     perception: 'Percepção',
-    survival: 'Sobrevivência',
-    deception: 'Enganação',
-    intimidation: 'Intimidação',
-    performance: 'Atuação',
-    persuasion: 'Persuasão',
+    survival: 'SobrevivÃªncia',
+    deception: 'EnganaÃ§Ã£o',
+    intimidation: 'IntimidaÃ§Ã£o',
+    performance: 'AtuaÃ§Ã£o',
+    persuasion: 'PersuasÃ£o',
 };
 
-// maps skill key → ability key (str/dex/con/int/wis/cha)
+// maps skill key â†’ ability key (str/dex/con/int/wis/cha)
 const SKILL_TO_ABILITY: Record<string, string> = {
     acrobatics: 'dex',
     arcana: 'int',
@@ -121,8 +124,8 @@ const CURRENCY_LABELS: Record<'cp' | 'sp' | 'ep' | 'gp' | 'pp', string> = {
 const MAGIC_CLASS_PT: Record<string, string> = {
     strength: 'Força',
     dexterity: 'Destreza',
-    constitution: 'ConstituiÃ§Ã£o',
-    intelligence: 'InteligÃªncia',
+    constitution: 'ConstituiÃƒÂ§ÃƒÂ£o',
+    intelligence: 'InteligÃƒÂªncia',
     wisdom: 'Sabedoria',
     charisma: 'Carisma',
 };
@@ -225,6 +228,7 @@ export default function CharacterDetailModal({
     xpSystem = true,
     hideInventoryTab = false,
     onBack,
+    onDeleted,
 }: CharacterDetailModalProps): JSX.Element {
     const [char, setChar] = useState<FullCharacterDnd | null>(null);
     const [loading, setLoading] = useState(true);
@@ -312,12 +316,15 @@ export default function CharacterDetailModal({
         properties?: string;
     } | null>(null);
     const [activeTab, setActiveTab] = useState<
-        'principal' | 'magias' | 'habilidades' | 'inventario'
+        'principal' | 'magias' | 'habilidades' | 'equipamentos'
     >('principal');
     const [spellNameMap, setSpellNameMap] = useState<Record<string, string>>({});
+    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+    const [deleteSubmitting, setDeleteSubmitting] = useState(false);
+    const [deleteError, setDeleteError] = useState('');
 
     useEffect(() => {
-        if (hideInventoryTab && activeTab === 'inventario') {
+        if (hideInventoryTab && activeTab === 'equipamentos') {
             setActiveTab('principal');
         }
     }, [activeTab, hideInventoryTab]);
@@ -454,6 +461,28 @@ export default function CharacterDetailModal({
 
     const handlePictureClick = () => {
         pictureInputRef.current?.click();
+    };
+
+    const handleDeleteCharacter = async () => {
+        setDeleteSubmitting(true);
+        setDeleteError('');
+
+        const success = await deleteCharacter(characterId);
+
+        if (!success) {
+            setDeleteError('Nao foi possivel deletar o personagem agora.');
+            setDeleteSubmitting(false);
+            return;
+        }
+
+        setDeleteConfirmOpen(false);
+
+        if (onDeleted) {
+            await onDeleted();
+        }
+
+        setDeleteSubmitting(false);
+        onBack();
     };
 
     const handleCharacterPictureUpload = async (file: File) => {
@@ -845,7 +874,7 @@ export default function CharacterDetailModal({
                         className="cdm-back-btn font-XS-bold"
                         onClick={onBack}
                     >
-                        ← Voltar
+                        ❮ Voltar
                     </button>
 
                     {loading && (
@@ -856,13 +885,13 @@ export default function CharacterDetailModal({
 
                     {!loading && !char && (
                         <span className="font-XS-regular cdm-loading">
-                            Não foi possível carregar a ficha.
+                            NÃ£o foi possÃ­vel carregar a ficha.
                         </span>
                     )}
 
                     {!loading && char && profile && stats && (
                         <>
-                            {/* ── Header ─────────────────────── */}
+                            {/* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                             <div className="cdm-header">
                                 <div className="cdm-picture-wrapper">
                                     <Image
@@ -900,22 +929,32 @@ export default function CharacterDetailModal({
                                         {canEdit && (
                                             <button
                                                 type="button"
-                                                className="button-L-fill font-XS-bold cdm-edit-btn"
+                                                className={`button-L-fill font-XS-bold cdm-edit-btn text-color-primary/default_900${
+                                                    hideInventoryTab
+                                                        ? ' profile-action-modal-button-danger'
+                                                        : ''
+                                                }`}
                                                 onClick={() =>
-                                                    isEditing
+                                                    hideInventoryTab && !isEditing
+                                                        ? setDeleteConfirmOpen(true)
+                                                        : isEditing
                                                         ? handleSave()
                                                         : handleStartEdit()
                                                 }
                                                 disabled={
                                                     saving ||
+                                                    deleteSubmitting ||
                                                     (!isEditing &&
-                                                        activeTab === 'inventario')
+                                                        !hideInventoryTab &&
+                                                        activeTab === 'equipamentos')
                                                 }
                                             >
                                                 {isEditing
                                                     ? saving
                                                         ? 'Salvando...'
                                                         : 'Salvar Ficha'
+                                                    : hideInventoryTab
+                                                    ? 'Deletar Personagem'
                                                     : 'Atualizar Ficha'}
                                             </button>
                                         )}
@@ -934,7 +973,7 @@ export default function CharacterDetailModal({
                                     {!xpSystem && isEditing && isMaster && (
                                         <div className="cdm-header-meta">
                                             <span className="font-XS-regular">
-                                                <span className="cdm-label">NÃ­vel:</span>{' '}
+                                                <span className="cdm-label">Nível:</span>{' '}
                                                 <input
                                                     type="number"
                                                     min="1"
@@ -956,13 +995,13 @@ export default function CharacterDetailModal({
                                     <div className="cdm-header-meta">
                                         <span className="font-XS-regular">
                                             <span className="cdm-label">Tendência:</span>{' '}
-                                            {profile.characteristics?.alignment ?? '—'}
+                                            {profile.characteristics?.alignment ?? '-'}
                                         </span>
                                         <span className="font-XS-regular">
                                             <span className="cdm-label">
                                                 Antecedente:
                                             </span>{' '}
-                                            {profile.characteristics?.background ?? '—'}
+                                            {profile.characteristics?.background ?? '-'}
                                         </span>
                                         <span className="font-XS-regular">
                                             <span className="cdm-label">XP:</span>{' '}
@@ -970,12 +1009,12 @@ export default function CharacterDetailModal({
                                         </span>
                                         <span className="font-XS-regular">
                                             <span className="cdm-label">Player:</span>{' '}
-                                            {char.author?.nickname ?? '—'}
+                                            {char.author?.nickname ?? '-'}
                                         </span>
                                     </div>
                                 </div>
                             </div>
-                            {/* ── Tabs ─────────────────────── */}
+                            {/* â”€â”€ Tabs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                             {xpSystem && activeNotification && (
                                 <div className="cdm-levelup-banner">
                                     <div className="cdm-levelup-copy">
@@ -1026,7 +1065,7 @@ export default function CharacterDetailModal({
                                         >
                                             <Image
                                                 src={ArrowRightIcon}
-                                                alt="próxima"
+                                                alt="prÃ³xima"
                                                 width={18}
                                                 height={18}
                                             />
@@ -1040,7 +1079,7 @@ export default function CharacterDetailModal({
                                             }}
                                             disabled={!canCloseNotifications}
                                         >
-                                            ×
+                                            Ã—
                                         </button>
                                     </div>
                                 </div>
@@ -1070,21 +1109,21 @@ export default function CharacterDetailModal({
                                     <button
                                         type="button"
                                         className={`cdm-tab font-XS-bold${
-                                            activeTab === 'inventario'
+                                            activeTab === 'equipamentos'
                                                 ? ' cdm-tab--active'
                                                 : ''
                                         }`}
                                         disabled={isEditing || saving}
-                                        onClick={() => setActiveTab('inventario')}
+                                        onClick={() => setActiveTab('equipamentos')}
                                     >
-                                        Inventário
+                                        Equipamentos
                                     </button>
                                 )}
                             </div>
-                            {/* ── Principal tab ─────────────── */}
+                            {/* â”€â”€ Principal tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                             {activeTab === 'principal' && (
                                 <>
-                                    {/* ── Atributos ──────────────────── */}
+                                    {/* â”€â”€ Atributos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                                     <div className="cdm-section">
                                         <div className="cdm-section-header">
                                             <h3 className="font-M-semibold cdm-section-title">
@@ -1164,7 +1203,7 @@ export default function CharacterDetailModal({
                                         </div>
                                     </div>
 
-                                    {/* ── Perícias ─────────────────── */}
+                                    {/* â”€â”€ Perícias â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                                     <div className="cdm-section">
                                         <h3 className="font-M-semibold cdm-section-title">
                                             Perícias
@@ -1246,7 +1285,7 @@ export default function CharacterDetailModal({
                                         </div>
                                     </div>
 
-                                    {/* ── Combate ────────────────────── */}
+                                    {/* â”€â”€ Combate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                                     <div className="cdm-section">
                                         <h3 className="font-M-semibold cdm-section-title">
                                             Combate
@@ -1328,7 +1367,7 @@ export default function CharacterDetailModal({
                                             </div>
                                             <div className="cdm-info-box">
                                                 <span className="font-XXS-regular cdm-info-label">
-                                                    PV Máx
+                                                    PV Max
                                                 </span>
                                                 {isEditing ? (
                                                     <input
@@ -1410,7 +1449,7 @@ export default function CharacterDetailModal({
                                             </div>
                                             <div className="cdm-info-box">
                                                 <span className="font-XXS-regular cdm-info-label">
-                                                    Proficiência
+                                                    ProficiÃªncia
                                                 </span>
                                                 <span className="font-M-semibold">
                                                     +{stats.proficiencyBonus}
@@ -1443,11 +1482,12 @@ export default function CharacterDetailModal({
                                         </div>
                                     </div>
 
-                                    {/* ── Proficiências & Habilidades ─── */}
+                                    {/* â”€â”€ Proficiências & Habilidades â”€â”€â”€ */}
                                     {(isEditing ||
                                         hasOtherSectionContent(
                                             profile.characteristics?.other
-                                        )) && (
+                                        ) ||
+                                        Boolean(inventoryText)) && (
                                         <div className="cdm-section">
                                             <h3 className="font-M-semibold cdm-section-title">
                                                 Proficiências &amp; Habilidades
@@ -1517,17 +1557,41 @@ export default function CharacterDetailModal({
                                                                 />
                                                             ) : (
                                                                 <p className="font-XS-regular cdm-text-content cdm-text-scrollable">
-                                                                    {val || '—'}
+                                                                    {val || '-'}
                                                                 </p>
                                                             )}
                                                         </div>
                                                     );
                                                 })}
+                                                <div className="cdm-text-block">
+                                                    <span className="hidden">
+                                                        {'Equipamentos'}
+                                                    </span>
+                                                    <span className="font-XS-bold cdm-label">
+                                                        {'Invent\u00E1rio'}
+                                                    </span>
+                                                    {isEditing ? (
+                                                        <textarea
+                                                            className="cdm-edit-textarea font-XS-regular"
+                                                            rows={4}
+                                                            value={editEquipments}
+                                                            onChange={(e) =>
+                                                                setEditEquipments(
+                                                                    e.target.value
+                                                                )
+                                                            }
+                                                        />
+                                                    ) : (
+                                                        <p className="font-XS-regular cdm-text-content cdm-text-scrollable">
+                                                            {inventoryText || '\u2014'}
+                                                        </p>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     )}
 
-                                    {/* ── Personalidade ──────────────── */}
+                                    {/* â”€â”€ Personalidade â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                                     {(isMaster || hasPersonalityInfo) && (
                                         <div className="cdm-section">
                                             <h3 className="font-M-semibold cdm-section-title">
@@ -1597,7 +1661,7 @@ export default function CharacterDetailModal({
                                         </div>
                                     )}
 
-                                    {/* ── Aparência ──────────────────── */}
+                                    {/* â”€â”€ Aparência â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                                     {(isEditing || appearance) && (
                                         <div className="cdm-section">
                                             <h3 className="font-M-semibold cdm-section-title">
@@ -1705,7 +1769,7 @@ export default function CharacterDetailModal({
                                         </div>
                                     )}
 
-                                    {/* ── Ataques ────────────────────── */}
+                                    {/* â”€â”€ Ataques â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                                     {char.data.attacks?.length > 0 && (
                                         <div className="cdm-section">
                                             <h3 className="font-M-semibold cdm-section-title">
@@ -1717,7 +1781,7 @@ export default function CharacterDetailModal({
                                                         Nome
                                                     </span>
                                                     <span className="font-XXS-bold">
-                                                        Bônus de Ataque
+                                                        BÃ´nus de Ataque
                                                     </span>
                                                     <span className="font-XXS-bold">
                                                         Dano
@@ -1729,13 +1793,13 @@ export default function CharacterDetailModal({
                                                         className="cdm-attacks-row"
                                                     >
                                                         <span className="font-XS-regular">
-                                                            {atk.name || '—'}
+                                                            {atk.name || '-'}
                                                         </span>
                                                         <span className="font-XS-regular">
-                                                            {atk.atkBonus || '—'}
+                                                            {atk.atkBonus || '-'}
                                                         </span>
                                                         <span className="font-XS-regular">
-                                                            {atk.damage || '—'}
+                                                            {atk.damage || '-'}
                                                         </span>
                                                     </div>
                                                 ))}
@@ -1743,7 +1807,7 @@ export default function CharacterDetailModal({
                                         </div>
                                     )}
 
-                                    {/* ── Histórico ──────────────────── */}
+                                    {/* â”€â”€ Histórico â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                                     {(isEditing ||
                                         profile.characteristics?.backstory ||
                                         profile.characteristics?.alliesAndOrgs ||
@@ -1814,103 +1878,19 @@ export default function CharacterDetailModal({
                                             </div>
                                         </div>
                                     )}
-
-                                    {/* ── Proficiências & Habilidades ─── */}
-                                    {(isEditing ||
-                                        hasOtherSectionContent(
-                                            profile.characteristics?.other
-                                        )) && (
-                                        <div className="cdm-section">
-                                            <h3 className="font-M-semibold cdm-section-title">
-                                                Proficiências &amp; Habilidades
-                                            </h3>
-                                            <div className="cdm-text-grid">
-                                                {(
-                                                    [
-                                                        'languagesAndProficiencies',
-                                                        'characteristicsAndAbilities',
-                                                        'characteristicsAndAdditionalAbilities',
-                                                    ] as const
-                                                ).map((field) => {
-                                                    const labels: Record<string, string> =
-                                                        {
-                                                            languagesAndProficiencies:
-                                                                'Idiomas e Outras Proficiências',
-                                                            characteristicsAndAbilities:
-                                                                'Características e Habilidades',
-                                                            characteristicsAndAdditionalAbilities:
-                                                                'Características e Habilidades Adicionais',
-                                                        };
-                                                    const other =
-                                                        profile.characteristics?.other;
-                                                    const viewVals: Record<
-                                                        typeof field,
-                                                        string
-                                                    > = {
-                                                        languagesAndProficiencies:
-                                                            getOtherProficiencies(other),
-                                                        characteristicsAndAbilities:
-                                                            other?.characteristicsAndAbilities ??
-                                                            '',
-                                                        characteristicsAndAdditionalAbilities:
-                                                            getOtherExtraCharacteristics(
-                                                                other
-                                                            ),
-                                                    };
-                                                    const val = isEditing
-                                                        ? editOther[field]
-                                                        : viewVals[field];
-                                                    return (
-                                                        <div
-                                                            key={field}
-                                                            className="cdm-text-block"
-                                                        >
-                                                            <span className="font-XS-bold cdm-label">
-                                                                {labels[field]}
-                                                            </span>
-                                                            {isEditing ? (
-                                                                <textarea
-                                                                    className="cdm-edit-textarea font-XS-regular"
-                                                                    rows={4}
-                                                                    value={
-                                                                        editOther[field]
-                                                                    }
-                                                                    onChange={(e) =>
-                                                                        setEditOther(
-                                                                            (prev) => ({
-                                                                                ...prev,
-                                                                                [field]:
-                                                                                    e
-                                                                                        .target
-                                                                                        .value,
-                                                                            })
-                                                                        )
-                                                                    }
-                                                                />
-                                                            ) : (
-                                                                <p className="font-XS-regular cdm-text-content cdm-text-scrollable">
-                                                                    {val || '—'}
-                                                                </p>
-                                                            )}
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    )}
                                 </>
                             )}{' '}
                             {/* end principal tab */}
-                            {/* ── Inventário tab ──────────────────────── */}
-                            {!hideInventoryTab && activeTab === 'inventario' && (
+                            {/* â”€â”€ Equipamentos tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+                            {!hideInventoryTab && activeTab === 'equipamentos' && (
                                 <div className="cdm-tab-content">
                                     <div className="cdm-section">
                                         <h3 className="font-M-semibold cdm-section-title">
-                                            Equipamentos &amp; Dinheiro
+                                            Equipamentos
                                         </h3>
-                                        <div className="cdm-text-block">
+                                        <div className="hidden">
                                             <span className="font-XS-bold cdm-label">
-                                                Inventário
+                                                Equipamentos
                                             </span>
                                             {inventoryText && (
                                                 <p className="font-XS-regular cdm-text-content">
@@ -1921,7 +1901,7 @@ export default function CharacterDetailModal({
                                         {inventoryItems.length > 0 && (
                                             <div className="cdm-inventory-wrapper">
                                                 <span className="font-XS-bold cdm-label">
-                                                    Itens Comprados
+                                                    Equipamentos
                                                 </span>
                                                 <div className="cdm-inventory-table-wrapper">
                                                     <table className="cdm-inventory-table">
@@ -1967,24 +1947,24 @@ export default function CharacterDetailModal({
                                                                             </td>
                                                                             <td>
                                                                                 {item.type ||
-                                                                                    '—'}
+                                                                                    '-'}
                                                                             </td>
                                                                             <td>
                                                                                 {item.armorClass?.join(
                                                                                     ' '
-                                                                                ) || '—'}
+                                                                                ) || '-'}
                                                                             </td>
                                                                             <td>
                                                                                 {item.weight ||
-                                                                                    '—'}
+                                                                                    '-'}
                                                                             </td>
                                                                             <td>
                                                                                 {item.damage ||
-                                                                                    '—'}
+                                                                                    '-'}
                                                                             </td>
                                                                             <td>
                                                                                 {item.properties ||
-                                                                                    '—'}
+                                                                                    '-'}
                                                                             </td>
                                                                             <td>
                                                                                 {isSelected && (
@@ -2018,6 +1998,13 @@ export default function CharacterDetailModal({
                                                 </div>
                                             </div>
                                         )}
+                                        {inventoryItems.length === 0 && (
+                                            <div className="cdm-text-block">
+                                                <p className="font-XS-regular cdm-text-content">
+                                                    Nenhum equipamento comprado.
+                                                </p>
+                                            </div>
+                                        )}
                                         <div className="cdm-money-grid">
                                             {(
                                                 ['cp', 'sp', 'ep', 'gp', 'pp'] as const
@@ -2041,7 +2028,7 @@ export default function CharacterDetailModal({
                                     </div>
                                 </div>
                             )}
-                            {/* ── Magias tab ──────────────────────────── */}
+                            {/* â”€â”€ Magias tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                             {activeTab === 'magias' && !isEditing && (
                                 <div className="cdm-tab-content">
                                     <div className="cs-spell-header">
@@ -2061,7 +2048,7 @@ export default function CharacterDetailModal({
                                                 readOnly
                                                 className="cs-field-input text-center cs-field-input--readonly bg-transparent"
                                                 value={stats.spellCasting?.ability ?? ''}
-                                                placeholder="—"
+                                                placeholder="-"
                                             />
                                             <span className="cs-field-label">
                                                 Habilidade-Chave de Magia
@@ -2075,7 +2062,7 @@ export default function CharacterDetailModal({
                                                 placeholder="0"
                                             />
                                             <span className="cs-field-label">
-                                                CD Resistência de Magia
+                                                CD ResistÃªncia de Magia
                                             </span>
                                         </div>
                                         <div className="cs-spell-header-box">
@@ -2091,7 +2078,7 @@ export default function CharacterDetailModal({
                                                 placeholder="+0"
                                             />
                                             <span className="cs-field-label">
-                                                Bônus de Ataque com Magia
+                                                BÃ´nus de Ataque com Magia
                                             </span>
                                         </div>
                                     </div>
@@ -2131,7 +2118,7 @@ export default function CharacterDetailModal({
                                                         {sl.slots && (
                                                             <div className="cs-spell-slots">
                                                                 <span>
-                                                                    Espaços de Magia:{' '}
+                                                                    EspaÃ§os de Magia:{' '}
                                                                     {levelData.slotsTotal ||
                                                                         0}
                                                                 </span>
@@ -2260,7 +2247,7 @@ export default function CharacterDetailModal({
                                         </div>
                                     );
                                 })()}
-                            {/* ── Habilidades tab ──────────────────────── */}
+                            {/* â”€â”€ Habilidades tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                             {activeTab === 'habilidades' && !isEditing && (
                                 <div className="cdm-tab-content">
                                     <div className="cs-spell-header">
@@ -2318,7 +2305,7 @@ export default function CharacterDetailModal({
                                                         {sl.slots && (
                                                             <div className="cs-spell-slots">
                                                                 <span>
-                                                                    Espaços de Magia:{' '}
+                                                                    EspaÃ§os de Magia:{' '}
                                                                     {levelData.slotsTotal ||
                                                                         0}
                                                                 </span>
@@ -2458,7 +2445,7 @@ export default function CharacterDetailModal({
                                     <span className="font-XS-bold">
                                         {sellAmount} {unit}
                                     </span>{' '}
-                                    (−10%)
+                                    (âˆ’10%)
                                 </p>
                                 <div className="cdm-sell-confirm-actions">
                                     <button
@@ -2485,6 +2472,59 @@ export default function CharacterDetailModal({
                         </div>
                     );
                 })()}
+
+            {deleteConfirmOpen && (
+                <div
+                    className="cdm-overlay"
+                    onClick={() => {
+                        if (deleteSubmitting) return;
+                        setDeleteConfirmOpen(false);
+                        setDeleteError('');
+                    }}
+                >
+                    <div
+                        className="profile-action-modal-card"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <h1 className="profile-action-modal-title font-L-semibold">
+                            Deletar personagem
+                        </h1>
+                        <p className="profile-action-modal-description font-XS-regular">
+                            Tem certeza que deseja deletar este personagem? Esta acao nao
+                            pode ser desfeita.
+                        </p>
+
+                        <div className="profile-action-modal-buttons">
+                            <button
+                                type="button"
+                                disabled={deleteSubmitting}
+                                onClick={() => {
+                                    void handleDeleteCharacter();
+                                }}
+                                className="font-S-bold button-L-fill bg-color-primary/default_900 profile-action-modal-button-danger w-full"
+                            >
+                                {deleteSubmitting ? 'Excluindo...' : 'Confirmar'}
+                            </button>
+                            {deleteError ? (
+                                <span className="font-XXS-regular profile-action-modal-error">
+                                    {deleteError}
+                                </span>
+                            ) : null}
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setDeleteConfirmOpen(false);
+                                    setDeleteError('');
+                                }}
+                                disabled={deleteSubmitting}
+                                className="font-S-bold form-button-cancel button-L-fill w-full"
+                            >
+                                Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {moneyModalKey !== null && char && (
                 <MoneyModal

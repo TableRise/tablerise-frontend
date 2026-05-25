@@ -82,4 +82,54 @@
     .gsm-close-btn:hover {
         @apply underline;
     }
+
+    html[data-theme='dark'] .gsm-modal {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow-strong);
+    }
+
+    html[data-theme='dark'] .gsm-header,
+    html[data-theme='dark'] .gsm-scores {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .gsm-info-text,
+    html[data-theme='dark'] .gsm-close-btn {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .gsm-extra-message {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .gsm-score-box {
+        background: linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--theme-accent) 18%, var(--theme-surface)) 0%,
+            var(--theme-surface-muted) 100%
+        );
+        border-color: var(--theme-accent);
+        color: var(--theme-text);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .gsm-score-box--selectable:hover {
+        background: color-mix(
+            in srgb,
+            var(--theme-accent) 20%,
+            var(--theme-surface-strong)
+        );
+    }
+
+    html[data-theme='dark'] .gsm-score-box--disabled {
+        border-color: var(--theme-border);
+        background: var(--theme-surface-muted);
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .gsm-close-btn:hover {
+        color: var(--theme-accent);
+    }
 }

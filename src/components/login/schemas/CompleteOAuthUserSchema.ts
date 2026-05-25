@@ -14,7 +14,7 @@ const completeOAuthUserSchema = z.object({
     nickname: z
         .string()
         .min(3, { message: 'Nickname deve ter no mÃ­nimo 3 caracteres*' })
-        .max(30, { message: 'Nickname deve ter no mÃ¡ximo 30 caracteres*' }),
+        .max(30, { message: 'Nickname deve ter no Maximo 30 caracteres*' }),
     ...profileCompletionFields,
 });
 

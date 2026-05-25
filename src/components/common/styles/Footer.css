@@ -155,3 +155,19 @@ p.copy-right {
         @apply gap-4;
     }
 }
+
+html[data-theme='dark'] .footer {
+    background: linear-gradient(180deg, #0c1d39 0%, #07111f 100%);
+}
+
+html[data-theme='dark'] .footer-bottom {
+    border-color: rgba(237, 242, 255, 0.16);
+}
+
+html[data-theme='dark'] .label-darkmode-toggle {
+    background-color: var(--theme-surface-strong);
+}
+
+html[data-theme='dark'] .label-darkmode-toggle:after {
+    background-color: var(--theme-surface);
+}

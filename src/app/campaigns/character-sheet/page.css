@@ -642,4 +642,175 @@
             @apply min-w-0 w-full;
         }
     }
+
+    html[data-theme='dark'] .cs-tabs,
+    html[data-theme='dark'] .cs-sheet,
+    html[data-theme='dark'] .cs-footer-bar,
+    html[data-theme='dark'] .cs-ability-block,
+    html[data-theme='dark'] .cs-combat-box,
+    html[data-theme='dark'] .cs-saves-box,
+    html[data-theme='dark'] .cs-skills-box,
+    html[data-theme='dark'] .cs-hp-section,
+    html[data-theme='dark'] .cs-hp-temp,
+    html[data-theme='dark'] .cs-hit-dice,
+    html[data-theme='dark'] .cs-attacks-box,
+    html[data-theme='dark'] .cs-equipment-box,
+    html[data-theme='dark'] .cs-char-allies-picture,
+    html[data-theme='dark'] .cs-trait-box,
+    html[data-theme='dark'] .cs-bottom-box,
+    html[data-theme='dark'] .cs-char-appearance,
+    html[data-theme='dark'] .cs-char-allies,
+    html[data-theme='dark'] .cs-char-backstory,
+    html[data-theme='dark'] .cs-char-treasure,
+    html[data-theme='dark'] .cs-char-other,
+    html[data-theme='dark'] .cs-spell-header-box,
+    html[data-theme='dark'] .cs-spell-level-box,
+    html[data-theme='dark'] .cs-spell-picker-modal,
+    html[data-theme='dark'] .cs-spell-accordion-item,
+    html[data-theme='dark'] .cs-spell-accordion-body {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .cs-ability-block,
+    html[data-theme='dark'] .cs-combat-box,
+    html[data-theme='dark'] .cs-spell-header-box {
+        background: linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--theme-accent) 12%, var(--theme-surface)) 0%,
+            var(--theme-surface-muted) 100%
+        );
+    }
+
+    html[data-theme='dark'] .cs-section-title,
+    html[data-theme='dark'] .cs-ability-name,
+    html[data-theme='dark'] .cs-combat-label,
+    html[data-theme='dark'] .cs-hp-current,
+    html[data-theme='dark'] .cs-attack-header,
+    html[data-theme='dark'] .cs-passive-circle,
+    html[data-theme='dark'] .cs-spell-level-badge {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .cs-section-title {
+        border-color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .cs-header,
+    html[data-theme='dark'] .cs-char-header,
+    html[data-theme='dark'] .cs-char-header-row2,
+    html[data-theme='dark'] .cs-spell-level-header,
+    html[data-theme='dark'] .cs-spell-picker-header,
+    html[data-theme='dark'] .cs-spell-accordion-body,
+    html[data-theme='dark'] .cs-attack-header {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .cs-field-label,
+    html[data-theme='dark'] .cs-save-name,
+    html[data-theme='dark'] .cs-inventory-currency-label,
+    html[data-theme='dark'] .cs-spell-slots,
+    html[data-theme='dark'] .cs-spell-accordion-field-label,
+    html[data-theme='dark'] .cs-char-allies-picture-label {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .cs-field-input,
+    html[data-theme='dark'] .cs-save-mod,
+    html[data-theme='dark'] .cs-spell-slot-input,
+    html[data-theme='dark'] .cs-spell-name-input,
+    html[data-theme='dark'] .cs-edit-number,
+    html[data-theme='dark'] .cs-edit-text,
+    html[data-theme='dark'] .cs-edit-textarea {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .cs-field-input-box,
+    html[data-theme='dark'] .cs-field-textarea,
+    html[data-theme='dark'] .cs-inventory-panel,
+    html[data-theme='dark'] .cs-inventory-currency-input,
+    html[data-theme='dark'] .cs-spell-picker-search {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .cs-field-input,
+    html[data-theme='dark'] .cs-save-mod,
+    html[data-theme='dark'] .cs-spell-slot-input,
+    html[data-theme='dark'] .cs-spell-name-input {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .cs-field-input::placeholder,
+    html[data-theme='dark'] .cs-field-input-box::placeholder,
+    html[data-theme='dark'] .cs-field-textarea::placeholder,
+    html[data-theme='dark'] .cs-save-mod::placeholder,
+    html[data-theme='dark'] .cs-inventory-textarea::placeholder,
+    html[data-theme='dark'] .cs-inventory-currency-input::placeholder,
+    html[data-theme='dark'] .cs-spell-slot-input::placeholder,
+    html[data-theme='dark'] .cs-spell-name-input::placeholder,
+    html[data-theme='dark'] .cs-spell-picker-search::placeholder {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .cs-field-input--readonly,
+    html[data-theme='dark'] .cs-spell-name-input--inactive {
+        background-color: var(--theme-surface-muted);
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .cs-ability-mod,
+    html[data-theme='dark'] .cs-combat-value,
+    html[data-theme='dark'] .cs-spell-accordion-field-value,
+    html[data-theme='dark'] .cs-spell-picker-list,
+    html[data-theme='dark'] .cs-spell-picker-search,
+    html[data-theme='dark'] .cs-spell-name-input,
+    html[data-theme='dark'] .cs-spell-slot-input,
+    html[data-theme='dark'] .cs-passive-circle,
+    html[data-theme='dark'] .cs-ability-score,
+    html[data-theme='dark'] .cs-footer-btn--secondary,
+    html[data-theme='dark'] .cs-char-allies-picture {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .cs-ability-score,
+    html[data-theme='dark'] .cs-passive-circle,
+    html[data-theme='dark'] .cs-spell-level-badge {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .cs-char-allies-picture {
+        border-color: color-mix(in srgb, var(--theme-border) 70%, transparent);
+    }
+
+    html[data-theme='dark'] .cs-save-check,
+    html[data-theme='dark'] .cs-death-dot,
+    html[data-theme='dark'] .cs-spell-check {
+        border-color: var(--theme-border);
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .cs-footer-btn--secondary {
+        border-color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .cs-spell-picker-close,
+    html[data-theme='dark'] .cs-spell-clear-btn {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .cs-spell-picker-close:hover,
+    html[data-theme='dark'] .cs-spell-clear-btn:hover,
+    html[data-theme='dark'] .cs-tab:hover:not(.cs-tab--active),
+    html[data-theme='dark'] .cs-footer-btn--secondary:hover {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .cs-spell-picker-close:hover,
+    html[data-theme='dark'] .cs-footer-btn--secondary:hover {
+        color: var(--theme-accent);
+    }
 }

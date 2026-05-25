@@ -10,4 +10,13 @@
     .basic-creation-card .basic-add-button {
         @apply w-14 h-14 bg-color-greyScale/50 flex justify-center items-center cursor-pointer rounded-lg;
     }
+
+    html[data-theme='dark'] .basic-creation-card {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .basic-creation-card .basic-add-button {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
 }

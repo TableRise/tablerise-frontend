@@ -24,4 +24,13 @@
             @apply w-full flex-none;
         }
     }
+
+    html[data-theme='dark'] .button-container .social-button {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .button-container .social-button .button-text {
+        color: var(--theme-text);
+    }
 }

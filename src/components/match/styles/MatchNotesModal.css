@@ -19,6 +19,10 @@
         @apply flex flex-col gap-1;
     }
 
+    .mnm-header-actions {
+        @apply flex items-center gap-2 flex-shrink-0;
+    }
+
     .mnm-title {
         @apply text-color-primary/default_900;
     }
@@ -30,7 +34,14 @@
     .mnm-close-btn {
         @apply flex items-center justify-center w-8 h-8 rounded-full flex-shrink-0
             text-color-primary/default_900 bg-transparent cursor-pointer
-            transition-opacity hover:opacity-70;
+            transition-opacity hover:opacity-70 disabled:opacity-40
+            disabled:cursor-not-allowed;
+    }
+
+    .mnm-icon-btn {
+        @apply flex items-center justify-center w-8 h-8 rounded-full flex-shrink-0
+            bg-transparent cursor-pointer transition-opacity hover:opacity-70
+            disabled:opacity-40 disabled:cursor-not-allowed;
     }
 
     .mnm-divider {
@@ -120,11 +131,15 @@
     }
 
     .mnm-read-body {
-        @apply flex flex-col gap-3;
+        @apply flex flex-col;
     }
 
     .mnm-paragraph {
         @apply text-color-greyScale/700 leading-relaxed;
+    }
+
+    .mnm-line-break {
+        @apply h-3;
     }
 
     .mnm-error {
@@ -144,5 +159,81 @@
     .mnm-cancel-btn {
         @apply w-full py-2 text-color-greyScale/700 bg-transparent cursor-pointer
             transition-opacity hover:opacity-70;
+    }
+
+    html[data-theme='dark'] .mnm-modal {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow-strong);
+    }
+
+    html[data-theme='dark'] .mnm-title,
+    html[data-theme='dark'] .mnm-back-btn,
+    html[data-theme='dark'] .mnm-close-btn {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .mnm-meta,
+    html[data-theme='dark'] .mnm-empty,
+    html[data-theme='dark'] .mnm-note-preview,
+    html[data-theme='dark'] .mnm-cancel-btn {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .mnm-divider,
+    html[data-theme='dark'] .mnm-note-card,
+    html[data-theme='dark'] .mnm-input,
+    html[data-theme='dark'] .mnm-toolbar,
+    html[data-theme='dark'] .mnm-toolbar-select,
+    html[data-theme='dark'] .mnm-textarea {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .mnm-note-card,
+    html[data-theme='dark'] .mnm-input,
+    html[data-theme='dark'] .mnm-toolbar-select,
+    html[data-theme='dark'] .mnm-textarea {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .mnm-toolbar {
+        background-color: var(--theme-surface);
+    }
+
+    html[data-theme='dark'] .mnm-note-title,
+    html[data-theme='dark'] .mnm-label,
+    html[data-theme='dark'] .mnm-input,
+    html[data-theme='dark'] .mnm-toolbar-select,
+    html[data-theme='dark'] .mnm-textarea,
+    html[data-theme='dark'] .mnm-paragraph {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .mnm-input::placeholder,
+    html[data-theme='dark'] .mnm-textarea::placeholder {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .mnm-note-card:hover {
+        background-color: var(--theme-surface-strong);
+        border-color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .mnm-toolbar-btn {
+        background-color: var(--theme-surface-strong);
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .mnm-toolbar-btn:hover,
+    html[data-theme='dark'] .mnm-toolbar-select:hover {
+        background-color: color-mix(
+            in srgb,
+            var(--theme-accent) 14%,
+            var(--theme-surface)
+        );
+        border-color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .mnm-toolbar-divider {
+        background-color: var(--theme-border);
     }
 }

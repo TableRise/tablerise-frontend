@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-    deleteCampaign,
+    closeCampaign,
     leaveCampaign,
     transferDungeonMaster,
 } from '@/server/campaigns/join-campaign';
@@ -23,11 +23,9 @@ export default function LeaveCampaignModal({
 }: Props): JSX.Element {
     const router = useRouter();
 
-    // Leave state
     const [leaving, setLeaving] = useState(false);
     const [leaveError, setLeaveError] = useState('');
 
-    // Transfer state
     const [players, setPlayers] = useState<{ userId: string; nickname: string }[]>([]);
     const [selectedUserId, setSelectedUserId] = useState('');
     const [transferring, setTransferring] = useState(false);
@@ -89,14 +87,14 @@ export default function LeaveCampaignModal({
         }
     }
 
-    async function handleDeleteCampaign() {
+    async function handleCloseCampaign() {
         setDeleteError('');
         setDeleting(true);
         try {
-            await deleteCampaign(campaignId);
+            await closeCampaign(campaignId);
             router.push('/');
         } catch (err: any) {
-            setDeleteError(err.message ?? 'Erro ao deletar campanha');
+            setDeleteError(err.message ?? 'Erro ao finalizar campanha');
             setDeleting(false);
         }
     }
@@ -244,7 +242,7 @@ export default function LeaveCampaignModal({
                             }}
                             disabled={leaving || deleting}
                         >
-                            Deletar campanha
+                            Finalizar campanha
                         </button>
                     </div>
                 )}
@@ -267,10 +265,10 @@ export default function LeaveCampaignModal({
                         onClick={(e) => e.stopPropagation()}
                     >
                         <h3 className="font-M-semibold ecm-confirm-title">
-                            Deletar campanha
+                            Finalizar campanha
                         </h3>
                         <p className="font-XS-regular ecm-confirm-body">
-                            Tem certeza que deseja deletar esta campanha? Esta ação não
+                            Tem certeza que deseja finalizar esta campanha? Esta ação não
                             pode ser desfeita.
                         </p>
                         <div className="ecm-confirm-actions">
@@ -285,10 +283,10 @@ export default function LeaveCampaignModal({
                             <button
                                 type="button"
                                 className="ecm-confirm-ok"
-                                onClick={handleDeleteCampaign}
+                                onClick={handleCloseCampaign}
                                 disabled={deleting}
                             >
-                                {deleting ? 'Deletando...' : 'Confirmar'}
+                                {deleting ? 'Finalizando...' : 'Confirmar'}
                             </button>
                         </div>
                     </div>

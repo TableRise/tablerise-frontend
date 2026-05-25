@@ -4,7 +4,7 @@
 
 @layer base {
     .icm-backdrop {
-        @apply fixed inset-0 z-[120] flex items-center justify-center bg-black/70 px-4 py-6;
+        @apply fixed inset-0 z-[400] flex items-center justify-center bg-black/70 px-4 py-6;
     }
 
     .icm-modal {
@@ -105,5 +105,27 @@
         .icm-btn-primary {
             @apply w-full justify-center;
         }
+    }
+
+    html[data-theme='dark'] .icm-modal {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow-strong);
+    }
+
+    html[data-theme='dark'] .icm-header,
+    html[data-theme='dark'] .icm-footer {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .icm-description,
+    html[data-theme='dark'] .icm-close-btn,
+    html[data-theme='dark'] .icm-btn-ghost {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .icm-btn-secondary {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+        color: var(--theme-accent);
     }
 }

@@ -109,6 +109,10 @@
         width: 100%;
     }
 
+    .match-map-token-name--clone {
+        color: #e54d4d;
+    }
+
     .match-map-token-meta {
         @apply flex items-center justify-center gap-2 max-w-full px-2 py-[0.15rem] rounded-md;
         background: rgba(15, 23, 35, 0.5);
@@ -456,6 +460,58 @@
         @apply mt-4 w-full py-2 px-4 bg-color-primary/default_900 text-white rounded-lg transition-opacity hover:opacity-80;
     }
 
+    .match-clone-life-overlay {
+        @apply fixed inset-0 z-[160] flex items-center justify-center bg-black/60 px-4;
+    }
+
+    .match-clone-life-modal {
+        @apply w-full max-w-sm rounded-2xl bg-color-greyScale/100 border border-color-greyScale/200 shadow-2xl;
+    }
+
+    .match-clone-life-header {
+        @apply flex items-start justify-between gap-4 px-6 pt-6 pb-4;
+    }
+
+    .match-clone-life-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .match-clone-life-subtitle {
+        @apply mt-1 text-color-greyScale/500;
+    }
+
+    .match-clone-life-close {
+        @apply flex h-8 w-8 items-center justify-center rounded-full text-color-primary/default_900 transition-opacity hover:opacity-70;
+    }
+
+    .match-clone-life-body {
+        @apply px-6 py-2 flex flex-col gap-2;
+    }
+
+    .match-clone-life-label {
+        @apply text-color-greyScale/700;
+    }
+
+    .match-clone-life-input {
+        @apply w-full rounded-xl border border-color-greyScale/200 bg-color-greyScale/50 px-4 py-3 text-color-greyScale/900 outline-none transition-colors focus:border-color-primary/default_900;
+    }
+
+    .match-clone-life-input::placeholder {
+        @apply text-color-greyScale/500;
+    }
+
+    .match-clone-life-actions {
+        @apply px-6 pb-6 pt-4 flex flex-col gap-3;
+    }
+
+    .match-clone-life-confirm {
+        @apply w-full rounded-lg bg-color-primary/default_900 px-4 py-3 text-white transition-opacity hover:opacity-85;
+    }
+
+    .match-clone-life-cancel {
+        @apply w-full bg-transparent py-2 text-color-greyScale/700 transition-opacity hover:opacity-70;
+    }
+
     /* ── Full-screen dice throw overlay ──────────────────── */
     .match-dice-layer {
         @apply absolute inset-0 z-50 cursor-pointer;
@@ -688,5 +744,174 @@
 
     .match-orientation-overlay-text {
         @apply text-color-greyScale/50;
+    }
+
+    html[data-theme='dark'] .match-logo-badge,
+    html[data-theme='dark'] .match-top-bar,
+    html[data-theme='dark'] .match-journal-highlight-modal,
+    html[data-theme='dark'] .match-journal-highlight-notice,
+    html[data-theme='dark'] .match-char-panel-toggle,
+    html[data-theme='dark'] .match-char-panel,
+    html[data-theme='dark'] .match-bottom-bar,
+    html[data-theme='dark'] .match-volume-panel,
+    html[data-theme='dark'] .match-dice-picker,
+    html[data-theme='dark'] .match-dice-tray,
+    html[data-theme='dark'] .match-dice-btn {
+        background-color: rgba(17, 27, 43, 0.92);
+        box-shadow: var(--theme-shadow-strong);
+        backdrop-filter: blur(14px);
+    }
+
+    html[data-theme='dark'] .match-journal-highlight-option,
+    html[data-theme='dark'] .match-char-tag,
+    html[data-theme='dark'] .match-dice-picker-counter-btn {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .match-char-select {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .match-char-empty,
+    html[data-theme='dark'] .match-volume-label,
+    html[data-theme='dark'] .match-journal-highlight-subtitle,
+    html[data-theme='dark'] .match-journal-highlight-footer-text {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .match-volume-value,
+    html[data-theme='dark'] .match-dice-picker-count,
+    html[data-theme='dark'] .match-char-single-name,
+    html[data-theme='dark'] .match-journal-highlight-option-title {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .match-journal-highlight-title,
+    html[data-theme='dark'] .match-journal-highlight-close,
+    html[data-theme='dark'] .match-journal-highlight-option-state,
+    html[data-theme='dark'] .match-char-panel-open-sheet {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .match-journal-highlight-divider {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .match-top-bar-item:hover,
+    html[data-theme='dark'] .match-bottom-bar-item:hover,
+    html[data-theme='dark'] .match-char-panel-toggle:hover,
+    html[data-theme='dark'] .match-dice-tray-item:hover,
+    html[data-theme='dark'] .match-dice-picker-counter-btn:hover {
+        background-color: var(--theme-surface-strong);
+    }
+
+    html[data-theme='dark'] .match-journal-highlight-option:hover,
+    html[data-theme='dark'] .match-char-tag,
+    html[data-theme='dark'] .match-dice-picker-counter-btn {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .match-journal-highlight-option:hover,
+    html[data-theme='dark'] .match-char-select:focus,
+    html[data-theme='dark'] .match-dice-picker-counter-btn:hover {
+        border-color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .match-journal-highlight-option--active {
+        background-color: color-mix(
+            in srgb,
+            var(--theme-accent) 14%,
+            var(--theme-surface)
+        );
+        border-color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .match-journal-highlight-notice-text,
+    html[data-theme='dark'] .match-char-tab {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .match-char-panel-header,
+    html[data-theme='dark'] .match-char-profile,
+    html[data-theme='dark'] .match-char-grid-two,
+    html[data-theme='dark'] .match-char-section {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .match-char-select::placeholder {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .match-volume-slider {
+        accent-color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .match-spell-item {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .match-spell-item:hover,
+    html[data-theme='dark'] .match-spell-reset-btn {
+        color: color-mix(in srgb, var(--theme-accent) 86%, white);
+    }
+
+    html[data-theme='dark'] .match-spell-item--used {
+        color: rgba(148, 163, 184, 0.62);
+    }
+
+    html[data-theme='dark'] .match-clone-life-modal {
+        background-color: var(--theme-surface);
+        border-color: var(--theme-border);
+        box-shadow: var(--theme-shadow-strong);
+    }
+
+    html[data-theme='dark'] .match-clone-life-title,
+    html[data-theme='dark'] .match-clone-life-close {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .match-clone-life-subtitle,
+    html[data-theme='dark'] .match-clone-life-cancel {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .match-clone-life-label,
+    html[data-theme='dark'] .match-clone-life-input {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .match-clone-life-input {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .match-clone-life-input::placeholder {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .cs-spell-picker-modal,
+    html[data-theme='dark'] .cs-spell-accordion-body {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow-strong);
+    }
+
+    html[data-theme='dark'] .cs-spell-picker-header,
+    html[data-theme='dark'] .cs-spell-accordion-item {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .cs-spell-picker-close,
+    html[data-theme='dark'] .cs-spell-picker-header h2,
+    html[data-theme='dark'] .cs-spell-accordion-field-label {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .cs-spell-picker-list,
+    html[data-theme='dark'] .cs-spell-accordion-field-value,
+    html[data-theme='dark'] .cs-spell-accordion-body p {
+        color: var(--theme-text);
     }
 }

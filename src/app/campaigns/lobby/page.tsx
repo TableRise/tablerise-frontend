@@ -3,6 +3,7 @@ import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import CopyBlueSVG from '@assets/icons/sys/copy-blue.svg?url';
+import CopyDarkSVG from '@assets/icons/sys/copy-dark.svg?url';
 import TableriseContext from '@/context/TableriseContext';
 import RankedAvatarFrame from '@/components/common/RankedAvatarFrame';
 import LoggedHeader from '@/components/common/LoggedHeader';
@@ -108,6 +109,11 @@ function areJournalPostsEqual(
 }
 
 function mapCampaignData(data: any): CampaignData {
+    const campaignPlayers = (data.campaignPlayers ?? []) as SocketPlayer[];
+    const activeCampaignUserIds = new Set(
+        campaignPlayers.map((player) => player.userId).filter(Boolean)
+    );
+
     return {
         campaignId: data.campaignId,
         code: data.code ?? '',
@@ -116,10 +122,12 @@ function mapCampaignData(data: any): CampaignData {
         description: data.description,
         mainHistory: data.mainHistory ?? '',
         system: data.system,
-        campaignPlayers: (data.campaignPlayers ?? []) as SocketPlayer[],
+        campaignPlayers,
         nextMatchDate: data.infos?.nextMatchDate ?? '',
         socialMedia: data.infos?.socialMedia ?? {},
-        confirmedPlayers: normalizeConfirmedPlayers(data.matchData?.confirmedPlayers),
+        confirmedPlayers: normalizeConfirmedPlayers(
+            data.matchData?.confirmedPlayers
+        ).filter((entry) => activeCampaignUserIds.has(entry.userId)),
         mapImages: data.matchData?.mapImages ?? [],
         logs: data.matchData?.logs ?? [],
         musics: data.musics ?? [],
@@ -138,7 +146,7 @@ export default function CampaignLobby(): JSX.Element {
     const searchParams = useSearchParams();
     const campaignId = searchParams.get('campaignId') ?? '';
     const router = useRouter();
-    const { userCampaigns } = useContext(TableriseContext);
+    const { themeMode, userCampaigns } = useContext(TableriseContext);
     const [campaign, setCampaign] = useState<CampaignData | null>(null);
     const [presenceConfirmed, setPresenceConfirmed] = useState(false);
     const [sessionPreviewOpen, setSessionPreviewOpen] = useState(false);
@@ -218,6 +226,11 @@ export default function CampaignLobby(): JSX.Element {
         getCampaignById(campaignId).then((data) => {
             if (data) setCampaign(mapCampaignData(data));
         });
+    }, [campaignId]);
+
+    const refreshLobbyCharacters = useCallback(() => {
+        if (!campaignId) return;
+        getCharactersByCampaignLobby(campaignId).then(setLobbyCharacters);
     }, [campaignId]);
 
     const refreshJournalPosts = useCallback(async (): Promise<JournalPost[]> => {
@@ -479,7 +492,11 @@ export default function CampaignLobby(): JSX.Element {
                                     aria-label="Copiar Código da campanha"
                                 >
                                     <Image
-                                        src={CopyBlueSVG.src}
+                                        src={
+                                            themeMode === 'dark'
+                                                ? CopyDarkSVG.src
+                                                : CopyBlueSVG.src
+                                        }
                                         alt="Copiar Código da campanha"
                                         width={18}
                                         height={18}
@@ -782,6 +799,11 @@ export default function CampaignLobby(): JSX.Element {
                 <ParticipantsModal
                     campaignId={campaign.campaignId}
                     isMaster={isMaster}
+                    currentUserId={userInfo?.userId ?? ''}
+                    onParticipantsChanged={async () => {
+                        refreshCampaign();
+                        refreshLobbyCharacters();
+                    }}
                     onClose={() => setParticipantsModalOpen(false)}
                 />
             )}

@@ -126,4 +126,26 @@
             @apply p-4;
         }
     }
+
+    html[data-theme='dark'] .user-player-campaigns {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark']
+        .user-player-campaigns
+        .user-player-campaigns-header
+        .user-player-campaigns-created-label
+        .label-title {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark']
+        .user-player-campaigns
+        .user-player-campaigns-header
+        .user-player-campaigns-created-label
+        .creation-limits {
+        background-color: var(--theme-surface-muted);
+        color: var(--theme-text-muted);
+    }
 }

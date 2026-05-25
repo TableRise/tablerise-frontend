@@ -39,4 +39,8 @@
             @apply px-2 pb-8;
         }
     }
+
+    html[data-theme='dark'] .tutorial-inside-container header p {
+        color: var(--theme-text-muted);
+    }
 }

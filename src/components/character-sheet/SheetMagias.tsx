@@ -1,7 +1,9 @@
-'use client';
-import { forwardRef, useImperativeHandle, useState } from 'react';
+﻿'use client';
+import { forwardRef, useContext, useImperativeHandle, useState } from 'react';
 import Image from 'next/image';
 import Book from '../../../assets/icons/nav/book.svg?url';
+import BookDark from '../../../assets/icons/nav/book-dark.svg?url';
+import TableriseContext from '@/context/TableriseContext';
 import {
     getDnd5eSpellsByLevel,
     getDnd5eSpellById,
@@ -75,6 +77,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
     },
     ref
 ) {
+    const { themeMode } = useContext(TableriseContext);
     const progressionSnapshot = levelingSpecs
         ? getLevelingSnapshot(levelingSpecs, currentLevel ?? 1)
         : null;
@@ -196,7 +199,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
 
     return (
         <>
-            {/* ── Spellcasting header ─────────────────── */}
+            {/* â”€â”€ Spellcasting header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             <div className="cs-spell-header">
                 <div className="cs-spell-header-box">
                     <input
@@ -211,7 +214,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                     <input
                         className="cs-field-input text-center cs-field-input--readonly bg-transparent"
                         value={spellAbilityLabel}
-                        placeholder="—"
+                        placeholder="-"
                         readOnly
                     />
                     <span className="cs-field-label">Habilidade-Chave de Magia</span>
@@ -236,7 +239,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                 </div>
             </div>
 
-            {/* ── Spell levels grid ───────────────────── */}
+            {/* â”€â”€ Spell levels grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             <div className="cs-spell-grid">
                 {SPELL_LEVELS.map((sl) => (
                     <div key={sl.level} className="cs-spell-level-box">
@@ -257,7 +260,9 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                             : filledSlots >= activeSlots);
                                     return (
                                         <Image
-                                            src={Book.src}
+                                            src={
+                                                themeMode === 'dark' ? BookDark : Book.src
+                                            }
                                             alt="search"
                                             width={32}
                                             height={32}
@@ -321,7 +326,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                     handleClearSpell(sl.level, idx)
                                                 }
                                             >
-                                                ✕
+                                                x
                                             </button>
                                         )}
                                     </div>
@@ -332,7 +337,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                 ))}
             </div>
 
-            {/* ── Spell picker modal ──────────────────── */}
+            {/* â”€â”€ Spell picker modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             {pickerLevel !== null && (
                 <div className="cs-spell-picker-overlay" onClick={closePicker}>
                     <div
@@ -351,7 +356,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                 className="cs-spell-picker-close"
                                 onClick={closePicker}
                             >
-                                ✕
+                                x
                             </button>
                         </div>
 
@@ -417,7 +422,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                         </div>
                                                         <div className="cs-spell-accordion-field">
                                                             <span className="cs-spell-accordion-field-label">
-                                                                Tempo de Conjuração
+                                                                Tempo de ConjuraÃ§Ã£o
                                                             </span>
                                                             <span className="cs-spell-accordion-field-value">
                                                                 {spell.castingTime}
@@ -425,7 +430,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                         </div>
                                                         <div className="cs-spell-accordion-field">
                                                             <span className="cs-spell-accordion-field-label">
-                                                                Duração
+                                                                DuraÃ§Ã£o
                                                             </span>
                                                             <span className="cs-spell-accordion-field-value">
                                                                 {spell.duration}
@@ -481,7 +486,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                 </div>
             )}
 
-            {/* ── Spell detail modal ──────────────────── */}
+            {/* â”€â”€ Spell detail modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
             {(detailSpell !== null || detailLoading) && (
                 <div className="cs-spell-picker-overlay" onClick={closeDetail}>
                     <div
@@ -497,7 +502,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                 className="cs-spell-picker-close"
                                 onClick={closeDetail}
                             >
-                                ✕
+                                x
                             </button>
                         </div>
 
@@ -521,7 +526,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                         </div>
                                         <div className="cs-spell-accordion-field">
                                             <span className="cs-spell-accordion-field-label">
-                                                Tempo de Conjuração
+                                                Tempo de ConjuraÃ§Ã£o
                                             </span>
                                             <span className="cs-spell-accordion-field-value">
                                                 {detailSpell.castingTime}
@@ -529,7 +534,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                         </div>
                                         <div className="cs-spell-accordion-field">
                                             <span className="cs-spell-accordion-field-label">
-                                                Duração
+                                                DuraÃ§Ã£o
                                             </span>
                                             <span className="cs-spell-accordion-field-value">
                                                 {detailSpell.duration}

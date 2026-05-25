@@ -3,7 +3,10 @@ import React, { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { postCompleteOAuthUser } from '@/server/users/complete-oauth-user';
+import { deleteUser } from '@/server/users/delete-user';
+import { postLogout } from '@/server/users/logout';
 import { updateUser } from '@/server/users/update-user';
+import isAtLeastAge from '@/utils/isAtLeastAge';
 import completeOAuthUserSchema, {
     completeProfileUserSchema,
     type CompleteOAuthUserPayload,
@@ -22,6 +25,9 @@ type CompleteUserModalProps = {
     onCancel?: () => void;
 };
 
+const UNDERAGE_MESSAGE =
+    'Para sua segurança e de todos os usuários, a idade minima para registro na plataforma é de 12 anos.';
+
 export default function CompleteUserModal({
     userId,
     mode,
@@ -31,6 +37,7 @@ export default function CompleteUserModal({
 }: CompleteUserModalProps): JSX.Element {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [underageBlocked, setUnderageBlocked] = useState(false);
 
     const isOAuthMode = mode === 'oauth-complete';
     const resolver = useMemo(
@@ -59,6 +66,19 @@ export default function CompleteUserModal({
         window.location.replace('/login');
     };
 
+    const handleUnderageConfirm = async () => {
+        setLoading(true);
+
+        try {
+            localStorage.removeItem('userLogged');
+            await postLogout();
+        } catch {
+            // Ignore logout failures and force the redirect anyway.
+        }
+
+        window.location.replace('/');
+    };
+
     const onSubmit = async (
         data: CompleteOAuthUserPayload | CompleteProfileUserPayload
     ) => {
@@ -66,6 +86,16 @@ export default function CompleteUserModal({
         setLoading(true);
 
         try {
+            if (!isAtLeastAge(data.birthday, 12)) {
+                try {
+                    await deleteUser(userId);
+                } catch {}
+
+                setUnderageBlocked(true);
+                setLoading(false);
+                return;
+            }
+
             if (isOAuthMode) {
                 await postCompleteOAuthUser(userId, data as CompleteOAuthUserPayload);
             } else {
@@ -87,82 +117,106 @@ export default function CompleteUserModal({
     return (
         <div className="complete-oauth-modal-overlay">
             <div className="complete-oauth-modal-card">
-                <h1 className="complete-oauth-modal-title font-L-semibold">
-                    Complete seu perfil
-                </h1>
-                <p className="complete-oauth-modal-description font-XS-regular">
-                    Para continuar, preencha as informações abaixo.
-                </p>
+                {underageBlocked ? (
+                    <>
+                        <h1 className="complete-oauth-modal-title font-L-semibold">
+                            Atenção
+                        </h1>
+                        <p className="complete-oauth-modal-description font-XS-regular">
+                            {UNDERAGE_MESSAGE}
+                        </p>
 
-                <form
-                    className="complete-oauth-modal-form"
-                    onSubmit={handleSubmit(onSubmit)}
-                >
-                    {isOAuthMode ? (
-                        <Input
-                            title="Nickname"
-                            inputStyle="input-default-light"
-                            setter={register}
-                            name="nickname"
-                            type="text"
-                            placeholder="Seu nickname"
-                            errorMessage={
-                                'nickname' in errors ? errors.nickname : undefined
-                            }
-                        />
-                    ) : null}
+                        <div className="complete-oauth-modal-buttons">
+                            <button
+                                type="button"
+                                disabled={loading}
+                                onClick={handleUnderageConfirm}
+                                className="font-S-bold button-L-fill bg-color-primary/default_900 text-color-greyScale/100 w-full"
+                            >
+                                Confirmar
+                            </button>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <h1 className="complete-oauth-modal-title font-L-semibold">
+                            Complete seu perfil
+                        </h1>
+                        <p className="complete-oauth-modal-description font-XS-regular">
+                            Para continuar, preencha as informações abaixo.
+                        </p>
 
-                    <Input
-                        title="Nome"
-                        inputStyle="input-default-light"
-                        setter={register}
-                        name="firstName"
-                        type="text"
-                        placeholder="Seu nome"
-                        errorMessage={errors.firstName}
-                    />
-                    <Input
-                        title="Sobrenome"
-                        inputStyle="input-default-light"
-                        setter={register}
-                        name="lastName"
-                        type="text"
-                        placeholder="Seu sobrenome"
-                        errorMessage={errors.lastName}
-                    />
-
-                    <Input
-                        title="Data de nascimento"
-                        inputStyle="input-default-light"
-                        setter={register}
-                        name="birthday"
-                        type="date"
-                        placeholder="DD/MM/AAAA"
-                        errorMessage={errors.birthday}
-                    />
-
-                    <div className="complete-oauth-modal-buttons">
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="font-S-bold button-L-fill bg-color-primary/default_900 text-color-greyScale/100 w-full"
+                        <form
+                            className="complete-oauth-modal-form"
+                            onSubmit={handleSubmit(onSubmit)}
                         >
-                            {loading ? 'Salvando...' : 'Confirmar'}
-                        </button>
-                        {error && (
-                            <span className="font-XXS-regular text-color-support/alert">
-                                {error}
-                            </span>
-                        )}
-                        <button
-                            type="button"
-                            onClick={handleCancel}
-                            className="font-S-bold form-button-cancel button-L-fill w-full"
-                        >
-                            Cancelar
-                        </button>
-                    </div>
-                </form>
+                            {isOAuthMode ? (
+                                <Input
+                                    title="Nickname"
+                                    inputStyle="input-default-light"
+                                    setter={register}
+                                    name="nickname"
+                                    type="text"
+                                    placeholder="Seu nickname"
+                                    errorMessage={
+                                        'nickname' in errors ? errors.nickname : undefined
+                                    }
+                                />
+                            ) : null}
+
+                            <Input
+                                title="Nome"
+                                inputStyle="input-default-light"
+                                setter={register}
+                                name="firstName"
+                                type="text"
+                                placeholder="Seu nome"
+                                errorMessage={errors.firstName}
+                            />
+                            <Input
+                                title="Sobrenome"
+                                inputStyle="input-default-light"
+                                setter={register}
+                                name="lastName"
+                                type="text"
+                                placeholder="Seu sobrenome"
+                                errorMessage={errors.lastName}
+                            />
+
+                            <Input
+                                title="Data de nascimento"
+                                inputStyle="input-default-light"
+                                setter={register}
+                                name="birthday"
+                                type="date"
+                                placeholder="DD/MM/AAAA"
+                                errorMessage={errors.birthday}
+                            />
+
+                            <div className="complete-oauth-modal-buttons">
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="font-S-bold button-L-fill bg-color-primary/default_900 text-color-greyScale/100 w-full"
+                                >
+                                    {loading ? 'Salvando...' : 'Confirmar'}
+                                </button>
+                                {error && (
+                                    <span className="font-XXS-regular text-color-support/alert">
+                                        {error}
+                                    </span>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={handleCancel}
+                                    className="font-S-bold form-button-cancel button-L-fill w-full"
+                                >
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </>
+                )}
             </div>
         </div>
     );

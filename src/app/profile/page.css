@@ -115,6 +115,10 @@
         opacity: 0.72;
     }
 
+    .profile-hero__action--danger {
+        @apply text-color-support/alert;
+    }
+
     .profile-hero__actions-separator {
         @apply text-color-greyScale/300;
     }
@@ -133,7 +137,6 @@
 
     .profile-hero__badge {
         @apply relative w-[4.75rem] h-[4.75rem] rounded-2xl p-2 overflow-hidden;
-        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
     }
 
     .profile-badge-popover {
@@ -546,5 +549,33 @@
         .profile-carousel__arrow {
             @apply h-10 w-10;
         }
+    }
+
+    html[data-theme='dark'] .profile-state-card,
+    html[data-theme='dark'] .profile-hero,
+    html[data-theme='dark'] .profile-bio__card,
+    html[data-theme='dark'] .profile-showcase,
+    html[data-theme='dark'] .profile-empty-state,
+    html[data-theme='dark'] .profile-carousel__arrow {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .profile-empty-state {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .profile-state-title,
+    html[data-theme='dark'] .profile-hero__name,
+    html[data-theme='dark'] .profile-hero__email,
+    html[data-theme='dark'] .profile-hero__actions,
+    html[data-theme='dark'] .profile-hero__action:not(.profile-hero__action--danger),
+    html[data-theme='dark'] .profile-section-heading {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .profile-hero__meta strong,
+    html[data-theme='dark'] .profile-badge-card__label {
+        color: var(--theme-text);
     }
 }

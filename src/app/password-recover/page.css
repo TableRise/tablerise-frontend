@@ -49,4 +49,9 @@
             border-radius: 1.25rem 1.25rem 0 0;
         }
     }
+
+    html[data-theme='dark'] .section-container {
+        background-color: var(--theme-surface);
+        box-shadow: -24px 0 42px rgba(2, 6, 23, 0.28);
+    }
 }

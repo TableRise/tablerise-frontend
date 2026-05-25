@@ -62,4 +62,9 @@
             @apply w-full;
         }
     }
+
+    html[data-theme='dark'] .login-form-container {
+        background-color: var(--theme-surface);
+        box-shadow: -24px 0 42px rgba(2, 6, 23, 0.28);
+    }
 }

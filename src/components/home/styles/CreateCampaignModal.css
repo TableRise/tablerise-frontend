@@ -649,4 +649,154 @@
             @apply flex-col items-stretch gap-3;
         }
     }
+
+    html[data-theme='dark'] .ccm-modal,
+    html[data-theme='dark'] .ccm-playlist-item {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow-strong);
+    }
+
+    html[data-theme='dark'] .ccm-cover-upload,
+    html[data-theme='dark'] .ccm-playlist,
+    html[data-theme='dark'] .ccm-system-option,
+    html[data-theme='dark'] .ccm-agenda-row--filled .ccm-agenda-input,
+    html[data-theme='dark'] .ccm-agenda-row--filled .ccm-agenda-time {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .ccm-title,
+    html[data-theme='dark'] .ccm-step-label--active,
+    html[data-theme='dark'] .ccm-template-link,
+    html[data-theme='dark'] .ccm-social-field span {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .ccm-step-circle {
+        background-color: var(--theme-surface-strong);
+    }
+
+    html[data-theme='dark'] .ccm-step-circle--active,
+    html[data-theme='dark'] .ccm-step-circle--done,
+    html[data-theme='dark'] .ccm-step-connector--done {
+        background-color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .ccm-step-connector,
+    html[data-theme='dark'] .ccm-or-divider hr,
+    html[data-theme='dark'] .ccm-richtext-wrapper,
+    html[data-theme='dark'] .ccm-richtext-toolbar,
+    html[data-theme='dark'] .ccm-footer,
+    html[data-theme='dark'] .ccm-system-option,
+    html[data-theme='dark'] .ccm-playlist-item,
+    html[data-theme='dark'] .ccm-textarea,
+    html[data-theme='dark'] .ccm-agenda-add,
+    html[data-theme='dark'] .ccm-agenda-input,
+    html[data-theme='dark'] .ccm-agenda-time {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .ccm-upload-btn,
+    html[data-theme='dark'] .ccm-playlist-add-btn,
+    html[data-theme='dark'] .ccm-richtext-toolbar,
+    html[data-theme='dark'] .ccm-agenda-add,
+    html[data-theme='dark'] .ccm-richtext-area,
+    html[data-theme='dark'] .ccm-textarea {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .ccm-field-label,
+    html[data-theme='dark'] .ccm-system-option-main,
+    html[data-theme='dark'] .ccm-playlist-item-title,
+    html[data-theme='dark'] .ccm-richtext-area,
+    html[data-theme='dark'] .ccm-textarea,
+    html[data-theme='dark'] .ccm-agenda-header span {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .ccm-field-hint,
+    html[data-theme='dark'] .ccm-char-count,
+    html[data-theme='dark'] .ccm-char-count--richtext,
+    html[data-theme='dark'] .ccm-playlist-empty-label,
+    html[data-theme='dark'] .ccm-step-label,
+    html[data-theme='dark'] .ccm-or-divider span,
+    html[data-theme='dark'] .ccm-btn-ghost,
+    html[data-theme='dark'] .ccm-playlist-edit-btn,
+    html[data-theme='dark'] .ccm-playlist-remove-btn,
+    html[data-theme='dark'] .ccm-richtext-tool,
+    html[data-theme='dark'] .ccm-agenda-calendar-icon,
+    html[data-theme='dark'] .ccm-agenda-add {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .ccm-textarea::placeholder,
+    html[data-theme='dark'] .ccm-richtext-area::placeholder {
+        color: var(--theme-text-subtle);
+    }
+
+    html[data-theme='dark'] .ccm-textarea:focus,
+    html[data-theme='dark'] .ccm-richtext-area:focus,
+    html[data-theme='dark'] .ccm-agenda-input:focus,
+    html[data-theme='dark'] .ccm-agenda-time:focus {
+        border-color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .ccm-upload-btn,
+    html[data-theme='dark'] .ccm-playlist-add-btn {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .ccm-upload-btn:hover,
+    html[data-theme='dark'] .ccm-playlist-add-btn:hover,
+    html[data-theme='dark'] .ccm-richtext-tool:hover,
+    html[data-theme='dark'] .ccm-playlist-edit-btn:hover,
+    html[data-theme='dark'] .ccm-playlist-remove-btn:hover,
+    html[data-theme='dark'] .ccm-close-btn:hover,
+    html[data-theme='dark'] .ccm-close-input:hover,
+    html[data-theme='dark'] .ccm-agenda-add:hover:not(:disabled) {
+        background-color: var(--theme-surface-strong);
+    }
+
+    html[data-theme='dark'] .ccm-playlist-add-btn {
+        border-color: var(--theme-accent);
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .ccm-playlist-add-btn:hover {
+        background-color: var(--theme-accent);
+        color: #07111f;
+    }
+
+    html[data-theme='dark'] .ccm-playlist-title-input,
+    html[data-theme='dark'] .ccm-playlist-url-input,
+    html[data-theme='dark'] .ccm-select,
+    html[data-theme='dark'] .ccm-input {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .ccm-playlist-title-input::placeholder,
+    html[data-theme='dark'] .ccm-playlist-url-input::placeholder {
+        color: var(--theme-text-subtle);
+    }
+
+    html[data-theme='dark'] .ccm-richtext-toolbar {
+        background-color: var(--theme-surface);
+    }
+
+    html[data-theme='dark'] .ccm-richtext-divider {
+        background-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .ccm-map-images-remove {
+        color: #ffffff;
+    }
+
+    html[data-theme='dark'] .ccm-btn-ghost:hover {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .ccm-playlist-confirm-btn:disabled {
+        background-color: var(--theme-surface-strong);
+        color: var(--theme-text-subtle);
+    }
 }

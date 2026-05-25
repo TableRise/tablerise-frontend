@@ -9,7 +9,8 @@ export type ImageUploadIntent =
     | 'profile-avatar'
     | 'character-portrait'
     | 'campaign-cover'
-    | 'campaign-map';
+    | 'campaign-map'
+    | 'match-highlight-image';
 
 export interface ImageCropConfig {
     aspect?: number;
@@ -39,6 +40,12 @@ export const IMAGE_CROP_CONFIG: Record<ImageUploadIntent, ImageCropConfig> = {
     'campaign-map': {
         title: 'Recortar mapa',
         description: 'Recorte o mapa se desejar ou mantenha a imagem original.',
+        defaultCropWidthPercent: 90,
+    },
+    'match-highlight-image': {
+        title: 'Recortar imagem em destaque',
+        description:
+            'Recorte a imagem em destaque se desejar ou mantenha a imagem original.',
         defaultCropWidthPercent: 90,
     },
 };

@@ -1,9 +1,13 @@
 'use client';
+
 import Image from 'next/image';
+import { useContext } from 'react';
 import formatDate from '@/utils/formatDate';
+import TableriseContext from '@/context/TableriseContext';
 import { type JournalPost } from '@/server/campaigns/get-journal-posts';
 import TrashSVG from '../../../assets/icons/sys/trash.svg?url';
 import EditBlueSVG from '../../../assets/icons/sys/edit-blue.svg?url';
+import EditDarkSVG from '../../../assets/icons/sys/edit-dark.svg?url';
 import '@/components/lobby/styles/JournalPostModal.css';
 
 const CATEGORY_LABEL: Record<string, string> = {
@@ -100,7 +104,9 @@ export default function JournalPostModal({
     onEdit,
     onClose,
 }: JournalPostModalProps): JSX.Element {
+    const { themeMode } = useContext(TableriseContext);
     const lines = normalizePostContent(post.content);
+    const editIcon = themeMode === 'dark' ? EditDarkSVG : EditBlueSVG;
 
     return (
         <div className="jpm-overlay">
@@ -118,6 +124,23 @@ export default function JournalPostModal({
                         </div>
                     </div>
                     <div className="jpm-header-actions">
+                        {canEdit && onEdit && (
+                            <button
+                                type="button"
+                                className="jpm-action-btn"
+                                onClick={onEdit}
+                                disabled={isDeleting}
+                                aria-label="Editar post"
+                                title="Editar post"
+                            >
+                                <Image
+                                    src={editIcon}
+                                    alt="Editar post"
+                                    width={16}
+                                    height={16}
+                                />
+                            </button>
+                        )}
                         {canDelete && onDelete && (
                             <button
                                 type="button"
@@ -130,23 +153,6 @@ export default function JournalPostModal({
                                 <Image
                                     src={TrashSVG.src}
                                     alt="Excluir post"
-                                    width={16}
-                                    height={16}
-                                />
-                            </button>
-                        )}
-                        {canEdit && onEdit && (
-                            <button
-                                type="button"
-                                className="jpm-action-btn"
-                                onClick={onEdit}
-                                disabled={isDeleting}
-                                aria-label="Editar post"
-                                title="Editar post"
-                            >
-                                <Image
-                                    src={EditBlueSVG.src}
-                                    alt="Editar post"
                                     width={16}
                                     height={16}
                                 />

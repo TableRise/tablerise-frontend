@@ -84,4 +84,32 @@
     .profile-action-modal-error {
         @apply text-center text-color-support/alert;
     }
+
+    .profile-action-modal-button-danger {
+        @apply bg-color-support/alert text-color-greyScale/50;
+    }
+
+    .profile-action-modal-button-danger:hover:enabled {
+        filter: brightness(0.95);
+    }
+
+    html[data-theme='dark'] .profile-action-modal-card {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow-strong);
+    }
+
+    html[data-theme='dark'] .profile-action-modal-title,
+    html[data-theme='dark'] .profile-action-modal-description,
+    html[data-theme='dark'] .profile-action-modal-label,
+    html[data-theme='dark'] .profile-action-modal-helper {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .profile-action-modal-input,
+    html[data-theme='dark'] .profile-action-modal-textarea,
+    html[data-theme='dark'] .profile-action-modal-digit {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+        color: var(--theme-text);
+    }
 }

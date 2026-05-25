@@ -14,11 +14,7 @@ import DarkModeLogo from '@assets/icons/light-dark-mode/dark-mode-moon.svg?url';
 import '@/components/common/styles/Footer.css';
 
 export default function Footer(): JSX.Element {
-    const { darkModeOn, setDarkModeOn } = useContext(TableriseContext);
-
-    const handleDarkModeChange = () => {
-        setDarkModeOn(!darkModeOn);
-    };
+    const { themeMode, toggleThemeMode } = useContext(TableriseContext);
 
     return (
         <footer className="footer">
@@ -116,7 +112,8 @@ export default function Footer(): JSX.Element {
                     <input
                         type="checkbox"
                         id="darkmode-toggle"
-                        onChange={handleDarkModeChange}
+                        checked={themeMode === 'dark'}
+                        onChange={toggleThemeMode}
                     />
                     <label htmlFor="darkmode-toggle" className="label-darkmode-toggle">
                         <Image

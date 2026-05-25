@@ -29,6 +29,8 @@ import ProfileTwoFactorActivationModal from '@/components/profile/ProfileTwoFact
 import ProfileTwoFactorDisableModal from '@/components/profile/ProfileTwoFactorDisableModal';
 import ProfileFlowWarningModal from '@/components/profile/ProfileFlowWarningModal';
 import ProfileBiographyModal from '@/components/profile/ProfileBiographyModal';
+import ProfileDeleteAccountModal from '@/components/profile/ProfileDeleteAccountModal';
+import ProfileDeleteAccountVerificationModal from '@/components/profile/ProfileDeleteAccountVerificationModal';
 import ProfileEmailUpdateModal from '@/components/profile/ProfileEmailUpdateModal';
 import ProfilePasswordUpdateModal from '@/components/profile/ProfilePasswordUpdateModal';
 import { updateUserPicture } from '@/server/users/update-user-picture';
@@ -79,8 +81,12 @@ type StoredUser = {
     };
 };
 
-type ProfileGateStep = 'none' | 'complete-profile' | 'activate-two-factor';
-type PendingProfileFlowWarning = 'update-email' | 'update-password' | 'enable-two-factor';
+type ProfileGateStep = 'none' | 'complete-profile';
+type PendingProfileFlowWarning =
+    | 'update-email'
+    | 'update-password'
+    | 'enable-two-factor'
+    | 'delete-user';
 
 function normalizeUserDetails(
     user: DatabaseUserWithDetails | null
@@ -202,10 +208,6 @@ function normalizeStoredUserId(storedUser: StoredUser | null): string {
     return typeof rawUserId === 'string' ? rawUserId.trim() : '';
 }
 
-function hasValidTwoFactorSecret(user: DatabaseUserWithDetails | null): boolean {
-    return Boolean(user?.twoFactorSecret?.secret?.trim());
-}
-
 export default function ProfilePageContent({
     userId,
 }: ProfilePageContentProps): JSX.Element {
@@ -219,8 +221,10 @@ export default function ProfilePageContent({
     const [currentUserId, setCurrentUserId] = useState('');
     const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
     const [gateStep, setGateStep] = useState<ProfileGateStep>('none');
-    const [twoFactorGateLocked, setTwoFactorGateLocked] = useState(false);
     const [biographyModalOpen, setBiographyModalOpen] = useState(false);
+    const [deleteAccountModalOpen, setDeleteAccountModalOpen] = useState(false);
+    const [deleteAccountVerificationModalOpen, setDeleteAccountVerificationModalOpen] =
+        useState(false);
     const [emailModalOpen, setEmailModalOpen] = useState(false);
     const [passwordModalOpen, setPasswordModalOpen] = useState(false);
     const [disableTwoFactorModalOpen, setDisableTwoFactorModalOpen] = useState(false);
@@ -407,7 +411,6 @@ export default function ProfilePageContent({
     useEffect(() => {
         if (!isOwnProfile || !userDetails || !user) {
             setGateStep('none');
-            setTwoFactorGateLocked(false);
             return;
         }
 
@@ -416,19 +419,8 @@ export default function ProfilePageContent({
             return;
         }
 
-        if (twoFactorGateLocked) {
-            setGateStep('activate-two-factor');
-            return;
-        }
-
-        if (!user.twoFactorSecret?.active && !hasValidTwoFactorSecret(user)) {
-            setTwoFactorGateLocked(true);
-            setGateStep('activate-two-factor');
-            return;
-        }
-
         setGateStep('none');
-    }, [isOwnProfile, twoFactorGateLocked, user, userDetails]);
+    }, [isOwnProfile, user, userDetails]);
 
     if (loading) {
         return (
@@ -470,6 +462,7 @@ export default function ProfilePageContent({
     }`.trim();
     const profileHandle = `${user.nickname ?? ''}${user.tag ?? ''}`;
     const biography = userDetails.biography?.trim();
+    const hasExternalProvider = user.providerId !== null && user.providerId !== undefined;
     const accountStatus = formatAccountStatus(user.inProgress?.status);
     const accountStatusClass =
         user.inProgress?.status === 'done'
@@ -530,7 +523,7 @@ export default function ProfilePageContent({
                     </span>
                 </div>
                 <span className="font-XXS-regular profile-campaign-card__date">
-                    Próxima sessÃƒÂ£o: {formatCampaignDate(campaign.nextMatchDate)}
+                    Próxima sessão: {formatCampaignDate(campaign.nextMatchDate)}
                 </span>
             </div>
         </article>
@@ -604,6 +597,8 @@ export default function ProfilePageContent({
             ? 'Atualizar email'
             : pendingFlowWarning === 'update-password'
             ? 'Atualizar senha'
+            : pendingFlowWarning === 'delete-user'
+            ? 'Deletar conta'
             : 'Habilitar dois fatores';
 
     return (
@@ -691,36 +686,42 @@ export default function ProfilePageContent({
                                     >
                                         |
                                     </span>
-                                    <button
-                                        type="button"
-                                        className="font-XS-regular profile-hero__action"
-                                        onClick={() =>
-                                            setPendingFlowWarning('update-email')
-                                        }
-                                    >
-                                        Atualizar email
-                                    </button>
-                                    <span
-                                        className="font-XS-regular profile-hero__actions-separator"
-                                        aria-hidden="true"
-                                    >
-                                        |
-                                    </span>
-                                    <button
-                                        type="button"
-                                        className="font-XS-regular profile-hero__action"
-                                        onClick={() =>
-                                            setPendingFlowWarning('update-password')
-                                        }
-                                    >
-                                        Atualizar senha
-                                    </button>
-                                    <span
-                                        className="font-XS-regular profile-hero__actions-separator"
-                                        aria-hidden="true"
-                                    >
-                                        |
-                                    </span>
+                                    {!hasExternalProvider ? (
+                                        <>
+                                            <button
+                                                type="button"
+                                                className="font-XS-regular profile-hero__action"
+                                                onClick={() =>
+                                                    setPendingFlowWarning('update-email')
+                                                }
+                                            >
+                                                Atualizar email
+                                            </button>
+                                            <span
+                                                className="font-XS-regular profile-hero__actions-separator"
+                                                aria-hidden="true"
+                                            >
+                                                |
+                                            </span>
+                                            <button
+                                                type="button"
+                                                className="font-XS-regular profile-hero__action"
+                                                onClick={() =>
+                                                    setPendingFlowWarning(
+                                                        'update-password'
+                                                    )
+                                                }
+                                            >
+                                                Atualizar senha
+                                            </button>
+                                            <span
+                                                className="font-XS-regular profile-hero__actions-separator"
+                                                aria-hidden="true"
+                                            >
+                                                |
+                                            </span>
+                                        </>
+                                    ) : null}
                                     <button
                                         type="button"
                                         className="font-XS-regular profile-hero__action"
@@ -736,6 +737,21 @@ export default function ProfilePageContent({
                                         {user.twoFactorSecret?.active
                                             ? 'Desabilitar dois fatores'
                                             : 'Habilitar dois fatores'}
+                                    </button>
+                                    <span
+                                        className="font-XS-regular profile-hero__actions-separator"
+                                        aria-hidden="true"
+                                    >
+                                        |
+                                    </span>
+                                    <button
+                                        type="button"
+                                        className="font-XS-regular profile-hero__action profile-hero__action--danger"
+                                        onClick={() =>
+                                            setPendingFlowWarning('delete-user')
+                                        }
+                                    >
+                                        Deletar conta
                                     </button>
                                 </div>
                             ) : null}
@@ -857,6 +873,16 @@ export default function ProfilePageContent({
                     characterId={selectedCharacterId}
                     campaignId=""
                     hideInventoryTab={true}
+                    onDeleted={() => {
+                        const deletedCharacterId = selectedCharacterId;
+                        setSelectedCharacterId(null);
+                        setCharacters((prev) =>
+                            prev.filter(
+                                (character) =>
+                                    character.characterId !== deletedCharacterId
+                            )
+                        );
+                    }}
                     onBack={() => setSelectedCharacterId(null)}
                 />
             )}
@@ -877,21 +903,6 @@ export default function ProfilePageContent({
                 />
             )}
 
-            {gateStep === 'activate-two-factor' && (
-                <ProfileTwoFactorActivationModal
-                    user={user}
-                    onRefreshUser={refreshProfileUser}
-                    onCancel={() => {
-                        setTwoFactorGateLocked(false);
-                        router.push('/');
-                    }}
-                    onCompleted={() => {
-                        setTwoFactorGateLocked(false);
-                        setGateStep('none');
-                    }}
-                />
-            )}
-
             {pendingFlowWarning ? (
                 <ProfileFlowWarningModal
                     flowLabel={warningFlowLabel}
@@ -901,6 +912,8 @@ export default function ProfilePageContent({
                             setEmailModalOpen(true);
                         } else if (pendingFlowWarning === 'update-password') {
                             setPasswordModalOpen(true);
+                        } else if (pendingFlowWarning === 'delete-user') {
+                            setDeleteAccountVerificationModalOpen(true);
                         } else {
                             setManualTwoFactorActivationOpen(true);
                         }
@@ -933,6 +946,28 @@ export default function ProfilePageContent({
                     onSaved={async () => {
                         await refreshProfileUser();
                         setBiographyModalOpen(false);
+                    }}
+                />
+            ) : null}
+
+            {deleteAccountModalOpen ? (
+                <ProfileDeleteAccountModal
+                    userId={user.userId}
+                    onClose={() => setDeleteAccountModalOpen(false)}
+                    onDeleted={() => {
+                        setDeleteAccountModalOpen(false);
+                        window.location.replace('/');
+                    }}
+                />
+            ) : null}
+
+            {deleteAccountVerificationModalOpen ? (
+                <ProfileDeleteAccountVerificationModal
+                    email={user.email}
+                    onClose={() => setDeleteAccountVerificationModalOpen(false)}
+                    onVerified={() => {
+                        setDeleteAccountVerificationModalOpen(false);
+                        setDeleteAccountModalOpen(true);
                     }}
                 />
             ) : null}

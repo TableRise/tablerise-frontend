@@ -184,4 +184,28 @@
             @apply p-5;
         }
     }
+
+    html[data-theme='dark'] .about-hey-text,
+    html[data-theme='dark'] .about-team-description,
+    html[data-theme='dark'] .about-team-link-btn {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .about-team-card,
+    html[data-theme='dark'] .about-timeline-card {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .about-team-link-btn {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .about-team-link-btn:hover {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .about-timeline-section {
+        background: linear-gradient(180deg, #0c255f 0%, #07111f 100%);
+    }
 }

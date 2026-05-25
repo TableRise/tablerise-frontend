@@ -62,4 +62,45 @@
     .profile-2fa-timer-text {
         @apply self-end text-color-greyScale/500;
     }
+
+    html[data-theme='dark'] .profile-2fa-modal-card {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow-strong);
+    }
+
+    html[data-theme='dark'] .profile-2fa-modal-title {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .profile-2fa-modal-description,
+    html[data-theme='dark'] .profile-2fa-checkbox-row span {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .profile-2fa-modal-digit {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .profile-2fa-qr-wrapper {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .profile-2fa-checkbox-row {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .profile-2fa-timer-bar {
+        background-color: var(--theme-surface-strong);
+    }
+
+    html[data-theme='dark'] .profile-2fa-timer-text {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .profile-2fa-modal-buttons .form-button-cancel {
+        color: var(--theme-text-muted);
+    }
 }

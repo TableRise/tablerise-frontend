@@ -131,4 +131,51 @@
             @apply w-[calc(100vw-1rem)] p-5;
         }
     }
+
+    html[data-theme='dark'] .csm-modal,
+    html[data-theme='dark'] .csm-confirm-modal {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .csm-card {
+        background-color: var(--theme-surface-muted);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .csm-tabs,
+    html[data-theme='dark'] .csm-card,
+    html[data-theme='dark'] .csm-confirm-btn-cancel {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .csm-title,
+    html[data-theme='dark'] .csm-tab--active {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .csm-tab {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .csm-card-name,
+    html[data-theme='dark'] .csm-cancel-btn,
+    html[data-theme='dark'] .csm-confirm-title {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .csm-card-date,
+    html[data-theme='dark'] .csm-loading,
+    html[data-theme='dark'] .csm-empty,
+    html[data-theme='dark'] .csm-confirm-text {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .csm-card-delete {
+        color: var(--theme-text-subtle);
+    }
+
+    html[data-theme='dark'] .csm-confirm-btn-cancel:hover {
+        background-color: var(--theme-surface-strong);
+    }
 }

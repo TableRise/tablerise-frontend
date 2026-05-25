@@ -1,12 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import DiceBoxThreejs from '@3d-dice/dice-box-threejs';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import RankedAvatarFrame from '@/components/common/RankedAvatarFrame';
+import TableriseContext from '@/context/TableriseContext';
 import { getCampaignById } from '@/server/campaigns/join-campaign';
 import { getUser } from '@/server/users/get-user';
 import {
@@ -36,7 +37,13 @@ import MapFogOverlay, { type FogVariant } from '@/components/match/MapFogOverlay
 import MapRainOverlay from '@/components/match/MapRainOverlay';
 import MatchMediaModal from '@/components/lobby/MatchMediaModal';
 import MatchNotesModal from '@/components/match/MatchNotesModal';
+import MatchImageHighlightManagerModal from '@/components/match/MatchImageHighlightManagerModal';
+import MatchImageHighlightViewerModal from '@/components/match/MatchImageHighlightViewerModal';
 import type { CampaignMusic } from '@/server/campaigns/create-campaign';
+import {
+    setMatchHighlightedImage,
+    uploadMatchHighlightImages,
+} from '@/server/campaigns/match-image-highlight';
 import {
     disconnectCampaignSocket,
     emitCampaignSocketAck,
@@ -44,11 +51,13 @@ import {
     type CampaignSocket,
 } from '@/utils/campaignSocket';
 import type {
+    CampaignImagesUpdatedPayload,
     CampaignMapsUpdatedPayload,
     CampaignMusicsUpdatedPayload,
     CampaignSyncPayload,
     CharacterUpdatedPayload,
     DiceRollResolvedPayload,
+    MatchImageHighlightedChangedPayload,
     MatchToken,
     SocketJournal,
     TokenBatchUpdatedPayload,
@@ -57,28 +66,50 @@ import type {
     TokenWrappedPayload,
 } from '@/types/shared/socket';
 import type { ImageObject } from '@/types/shared/general';
-import LogoSVG from '../../../../assets/icons/logo-blue.svg?url';
-import SheetSVG from '../../../../assets/icons/menu-panel-lobby/sheet.svg?url';
-import MediaSVG from '../../../../assets/icons/menu-panel-lobby/media.svg?url';
-import LeftPanelOpenSVG from '../../../../assets/icons/game/left-panel-open.svg?url';
-import EditBlueSVG from '../../../../assets/icons/sys/edit-blue.svg?url';
-import StarBlueSVG from '../../../../assets/icons/game/star-blue.svg?url';
-import AvatarSelectionSVG from '../../../../assets/icons/game/avatar-selection.svg?url';
-import ResizeBlueSVG from '../../../../assets/icons/game/resize-blue.svg?url';
-import CloneSVG from '../../../../assets/icons/game/clone.svg?url';
-import BookmarkSVG from '../../../../assets/icons/game/bookmark.svg?url';
-import VolumeSVG from '../../../../assets/icons/game/volume.svg?url';
-import DiceSVG from '../../../../assets/icons/dice/default.svg?url';
-import D4SVG from '../../../../assets/icons/dice/d4.svg?url';
-import D6SVG from '../../../../assets/icons/dice/d6.svg?url';
-import D8SVG from '../../../../assets/icons/dice/d8.svg?url';
-import D10SVG from '../../../../assets/icons/dice/d10.svg?url';
-import D12SVG from '../../../../assets/icons/dice/d12.svg?url';
-import D20SVG from '../../../../assets/icons/dice/d20.svg?url';
+import LogoLightSVG from '../../../../assets/icons/logo-blue.svg?url';
+import LogoDarkSVG from '../../../../assets/icons/logo-dark.svg?url';
+import SheetLightSVG from '../../../../assets/icons/menu-panel-lobby/sheet.svg?url';
+import SheetDarkSVG from '../../../../assets/icons/menu-panel-lobby/sheet-dark.svg?url';
+import MediaLightSVG from '../../../../assets/icons/menu-panel-lobby/media.svg?url';
+import MediaDarkSVG from '../../../../assets/icons/menu-panel-lobby/media-dark.svg?url';
+import LeftPanelOpenLightSVG from '../../../../assets/icons/game/left-panel-open.svg?url';
+import LeftPanelOpenDarkSVG from '../../../../assets/icons/game/left-panel-open-dark.svg?url';
+import EditLightSVG from '../../../../assets/icons/sys/edit-blue.svg?url';
+import EditDarkSVG from '../../../../assets/icons/sys/edit-dark.svg?url';
+import StarLightSVG from '../../../../assets/icons/game/star-blue.svg?url';
+import StarDarkSVG from '../../../../assets/icons/game/star-dark.svg?url';
+import AvatarSelectionLightSVG from '../../../../assets/icons/game/avatar-selection.svg?url';
+import AvatarSelectionDarkSVG from '../../../../assets/icons/game/avatar-selection-dark.svg?url';
+import ResizeLightSVG from '../../../../assets/icons/game/resize-blue.svg?url';
+import ResizeDarkSVG from '../../../../assets/icons/game/resize-dark.svg?url';
+import CloneLightSVG from '../../../../assets/icons/game/clone.svg?url';
+import CloneDarkSVG from '../../../../assets/icons/game/clone-dark.svg?url';
+import ImageHighlightLightSVG from '../../../../assets/icons/game/image-highlight-blue-light.svg?url';
+import ImageHighlightDarkSVG from '../../../../assets/icons/game/image-highlight-blue-dark.svg?url';
+import BookmarkLightSVG from '../../../../assets/icons/game/bookmark.svg?url';
+import BookmarkDarkSVG from '../../../../assets/icons/game/bookmark-dark.svg?url';
+import VolumeLightSVG from '../../../../assets/icons/game/volume.svg?url';
+import VolumeDarkSVG from '../../../../assets/icons/game/volume-dark.svg?url';
+import DiceLightSVG from '../../../../assets/icons/dice/default.svg?url';
+import DiceDarkSVG from '../../../../assets/icons/dice/default-dark.svg?url';
+import D4LightSVG from '../../../../assets/icons/dice/d4.svg?url';
+import D4DarkSVG from '../../../../assets/icons/dice/d4-dark.svg?url';
+import D6LightSVG from '../../../../assets/icons/dice/d6.svg?url';
+import D6DarkSVG from '../../../../assets/icons/dice/d6-dark.svg?url';
+import D8LightSVG from '../../../../assets/icons/dice/d8.svg?url';
+import D8DarkSVG from '../../../../assets/icons/dice/d8-dark.svg?url';
+import D10LightSVG from '../../../../assets/icons/dice/d10.svg?url';
+import D10DarkSVG from '../../../../assets/icons/dice/d10-dark.svg?url';
+import D12LightSVG from '../../../../assets/icons/dice/d12.svg?url';
+import D12DarkSVG from '../../../../assets/icons/dice/d12-dark.svg?url';
+import D20LightSVG from '../../../../assets/icons/dice/d20.svg?url';
+import D20DarkSVG from '../../../../assets/icons/dice/d20-dark.svg?url';
 import ExitRedSVG from '../../../../assets/icons/sys/exit-red.svg?url';
 import WhiteRotateSVG from '../../../../assets/icons/sys/white-rotate.svg?url';
-import GridOffSVG from '../../../../assets/icons/nav/grid-off-blue.svg?url';
-import GridOnSVG from '../../../../assets/icons/nav/grind-on-blue.svg?url';
+import GridOffLightSVG from '../../../../assets/icons/nav/grid-off-blue.svg?url';
+import GridOffDarkSVG from '../../../../assets/icons/nav/grid-off-dark.svg?url';
+import GridOnLightSVG from '../../../../assets/icons/nav/grind-on-blue.svg?url';
+import GridOnDarkSVG from '../../../../assets/icons/nav/grind-on-dark.svg?url';
 import SideImageBackground from '../../../../public/images/SideImageBackground.svg?url';
 import '@/app/campaigns/match/page.css';
 
@@ -215,6 +246,18 @@ interface MapTokenInstance {
     isClone: boolean;
 }
 
+interface CloneLifeEditorState {
+    tokenId: string;
+    characterName: string;
+}
+
+interface MatchDataWithImageHighlight {
+    images?: ImageObject[];
+    imageHighlighted?: ImageObject | null;
+    imageHighlight?: ImageObject | null;
+    mapImages?: ImageObject[];
+}
+
 type TokenInteractionType = 'drag' | 'resize';
 
 interface ActiveTokenInteraction {
@@ -303,6 +346,7 @@ export default function MatchPage(): JSX.Element {
     const searchParams = useSearchParams();
     const campaignId = searchParams.get('campaignId') ?? '';
     const router = useRouter();
+    const { themeMode } = useContext(TableriseContext);
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const campaignSocketRef = useRef<CampaignSocket | null>(null);
     const diceBoxHostRef = useRef<HTMLDivElement>(null);
@@ -339,6 +383,9 @@ export default function MatchPage(): JSX.Element {
     const [gridVisible, setGridVisible] = useState(true);
     const [diceTrayOpen, setDiceTrayOpen] = useState(false);
     const [mediaModalOpen, setMediaModalOpen] = useState(false);
+    const [imageHighlightManagerModalOpen, setImageHighlightManagerModalOpen] =
+        useState(false);
+    const [imageHighlightViewerOpen, setImageHighlightViewerOpen] = useState(false);
     const [notesModalOpen, setNotesModalOpen] = useState(false);
     const [effectsModalOpen, setEffectsModalOpen] = useState(false);
     const [avatarSelectionModalOpen, setAvatarSelectionModalOpen] = useState(false);
@@ -349,6 +396,13 @@ export default function MatchPage(): JSX.Element {
     const [cloneModeOpen, setCloneModeOpen] = useState(false);
     const [activeEffect, setActiveEffect] = useState<MapEffect | null>(null);
     const [musics, setMusics] = useState<CampaignMusic[]>([]);
+    const [matchImages, setMatchImages] = useState<ImageObject[]>([]);
+    const [highlightedMatchImage, setHighlightedMatchImage] =
+        useState<ImageObject | null>(null);
+    const [imageHighlightUploading, setImageHighlightUploading] = useState(false);
+    const [selectingHighlightedImageId, setSelectingHighlightedImageId] = useState<
+        string | null
+    >(null);
     const [mapImages, setMapImages] = useState<ImageObject[]>([]);
     const [playingMusicId, setPlayingMusicId] = useState<string | null>(null);
     const [musicVolume, setMusicVolume] = useState(50);
@@ -368,6 +422,9 @@ export default function MatchPage(): JSX.Element {
         Record<string, MapTokenLayout>
     >({});
     const [clonedMapTokens, setClonedMapTokens] = useState<MapTokenInstance[]>([]);
+    const [cloneTokenHitPoints, setCloneTokenHitPoints] = useState<
+        Record<string, number | null>
+    >({});
     const [visibleMapCharacterIds, setVisibleMapCharacterIds] = useState<string[]>([]);
     const [avatarSearch, setAvatarSearch] = useState('');
     const [journalPosts, setJournalPosts] = useState<JournalPost[]>([]);
@@ -412,6 +469,11 @@ export default function MatchPage(): JSX.Element {
         tokenId: string;
         type: TokenInteractionType;
     } | null>(null);
+    const [cloneLifeEditor, setCloneLifeEditor] = useState<CloneLifeEditorState | null>(
+        null
+    );
+    const [cloneLifeInput, setCloneLifeInput] = useState('');
+    const seenHighlightedMatchImageIdRef = useRef<string | null>(null);
 
     useEffect(() => {
         function syncViewportOrientation() {
@@ -428,6 +490,33 @@ export default function MatchPage(): JSX.Element {
         };
     }, []);
 
+    const isDarkTheme = themeMode === 'dark';
+    const LogoSVG = isDarkTheme ? LogoDarkSVG : LogoLightSVG;
+    const SheetSVG = isDarkTheme ? SheetDarkSVG : SheetLightSVG;
+    const MediaSVG = isDarkTheme ? MediaDarkSVG : MediaLightSVG;
+    const LeftPanelOpenSVG = isDarkTheme ? LeftPanelOpenDarkSVG : LeftPanelOpenLightSVG;
+    const EditBlueSVG = isDarkTheme ? EditDarkSVG : EditLightSVG;
+    const StarBlueSVG = isDarkTheme ? StarDarkSVG : StarLightSVG;
+    const AvatarSelectionSVG = isDarkTheme
+        ? AvatarSelectionDarkSVG
+        : AvatarSelectionLightSVG;
+    const ResizeBlueSVG = isDarkTheme ? ResizeDarkSVG : ResizeLightSVG;
+    const CloneSVG = isDarkTheme ? CloneDarkSVG : CloneLightSVG;
+    const BookmarkSVG = isDarkTheme ? BookmarkDarkSVG : BookmarkLightSVG;
+    const ImageHighlightSVG = isDarkTheme
+        ? ImageHighlightDarkSVG
+        : ImageHighlightLightSVG;
+    const VolumeSVG = isDarkTheme ? VolumeDarkSVG : VolumeLightSVG;
+    const DiceSVG = isDarkTheme ? DiceDarkSVG : DiceLightSVG;
+    const D4SVG = isDarkTheme ? D4DarkSVG : D4LightSVG;
+    const D6SVG = isDarkTheme ? D6DarkSVG : D6LightSVG;
+    const D8SVG = isDarkTheme ? D8DarkSVG : D8LightSVG;
+    const D10SVG = isDarkTheme ? D10DarkSVG : D10LightSVG;
+    const D12SVG = isDarkTheme ? D12DarkSVG : D12LightSVG;
+    const D20SVG = isDarkTheme ? D20DarkSVG : D20LightSVG;
+    const GridOffSVG = isDarkTheme ? GridOffDarkSVG : GridOffLightSVG;
+    const GridOnSVG = isDarkTheme ? GridOnDarkSVG : GridOnLightSVG;
+
     const diceOptions = [
         { label: 'D20', icon: D20SVG, sides: 20 },
         { label: 'D12', icon: D12SVG, sides: 12 },
@@ -436,6 +525,44 @@ export default function MatchPage(): JSX.Element {
         { label: 'D6', icon: D6SVG, sides: 6 },
         { label: 'D4', icon: D4SVG, sides: 4 },
     ];
+
+    const getImageIdentity = (image: ImageObject | null | undefined): string | null =>
+        image?.id || image?.link || null;
+
+    const applyHighlightedMatchImage = (
+        image: ImageObject | null,
+        options?: { openIfNew?: boolean }
+    ) => {
+        setHighlightedMatchImage(image);
+
+        const imageIdentity = getImageIdentity(image);
+        if (!imageIdentity) {
+            seenHighlightedMatchImageIdRef.current = null;
+            setImageHighlightViewerOpen(false);
+            return;
+        }
+
+        if (
+            options?.openIfNew &&
+            seenHighlightedMatchImageIdRef.current !== imageIdentity
+        ) {
+            seenHighlightedMatchImageIdRef.current = imageIdentity;
+            setImageHighlightViewerOpen(true);
+        }
+    };
+
+    const getMatchDataHighlightedImage = (
+        matchData: MatchDataWithImageHighlight | undefined
+    ): ImageObject | null =>
+        matchData?.imageHighlighted ?? matchData?.imageHighlight ?? null;
+
+    const getCloneDisplayedHitPoints = (tokenId: string, characterId: string) => {
+        if (Object.prototype.hasOwnProperty.call(cloneTokenHitPoints, tokenId)) {
+            return cloneTokenHitPoints[tokenId];
+        }
+
+        return campaignCharacterSummaries[characterId]?.currentHitPoints ?? null;
+    };
 
     const previousCampaignCharacterIdsRef = useRef<string[]>([]);
     const hasInitializedVisibleMapCharactersRef = useRef(false);
@@ -1117,6 +1244,7 @@ export default function MatchPage(): JSX.Element {
             setGridVisible(payload.match.gridVisible);
             setActiveEffect(payload.match.activeEffect);
             setPlayingMusicId(payload.match.playingMusicId);
+            setMatchImages(payload.match.images ?? []);
 
             if (payload.match.visibleCharacterIds.length > 0) {
                 hasAppliedVisibleCharacterSyncRef.current = true;
@@ -1126,6 +1254,9 @@ export default function MatchPage(): JSX.Element {
             setHighlightedJournalPost(
                 normalizeHighlightedJournalPostPayload(payload.match)
             );
+            applyHighlightedMatchImage(payload.match.imageHighlighted ?? null, {
+                openIfNew: true,
+            });
             applySocketTokenSnapshot(payload.match.tokens);
         };
 
@@ -1309,6 +1440,20 @@ export default function MatchPage(): JSX.Element {
             setMusics(payload.musics);
         };
 
+        const handleImagesUpdated = (payload: CampaignImagesUpdatedPayload) => {
+            if (payload.campaignId !== campaignId) return;
+            setMatchImages(payload.images);
+        };
+
+        const handleImageHighlightedChanged = (
+            payload: MatchImageHighlightedChangedPayload
+        ) => {
+            if (payload.campaignId !== campaignId) return;
+            applyHighlightedMatchImage(payload.imageHighlighted ?? null, {
+                openIfNew: true,
+            });
+        };
+
         const handleSocketError = (payload: { message: string }) => {
             reportSocketIssue(payload.message);
         };
@@ -1331,6 +1476,8 @@ export default function MatchPage(): JSX.Element {
         socket.on('journal:post_created', handleJournalPostCreated as never);
         socket.on('character:updated', handleCharacterUpdated as never);
         socket.on('campaign:maps_updated', handleMapsUpdated);
+        socket.on('campaign:images_updated', handleImagesUpdated);
+        socket.on('match:image_highlighted_changed', handleImageHighlightedChanged);
         socket.on('campaign:musics_updated', handleMusicsUpdated);
         socket.on('campaign:error', handleSocketError as never);
 
@@ -1365,6 +1512,8 @@ export default function MatchPage(): JSX.Element {
             socket.off('journal:post_created', handleJournalPostCreated as never);
             socket.off('character:updated', handleCharacterUpdated as never);
             socket.off('campaign:maps_updated', handleMapsUpdated);
+            socket.off('campaign:images_updated', handleImagesUpdated);
+            socket.off('match:image_highlighted_changed', handleImageHighlightedChanged);
             socket.off('campaign:musics_updated', handleMusicsUpdated);
             socket.off('campaign:error', handleSocketError as never);
             campaignSocketRef.current = null;
@@ -1375,7 +1524,8 @@ export default function MatchPage(): JSX.Element {
     useEffect(() => {
         if (!campaignId) return;
         getCampaignById(campaignId).then((data) => {
-            const firstMap = data?.matchData?.mapImages?.[0]?.link;
+            const matchData = data?.matchData as MatchDataWithImageHighlight | undefined;
+            const firstMap = matchData?.mapImages?.[0]?.link;
             if (firstMap) {
                 setBackgroundImage((current) =>
                     !hasHydratedMatchSyncRef.current ||
@@ -1385,7 +1535,11 @@ export default function MatchPage(): JSX.Element {
                 );
             }
             setMusics(data?.musics ?? []);
-            setMapImages(data?.matchData?.mapImages ?? []);
+            setMapImages(matchData?.mapImages ?? []);
+            setMatchImages(matchData?.images ?? []);
+            applyHighlightedMatchImage(getMatchDataHighlightedImage(matchData), {
+                openIfNew: true,
+            });
             setXpSystem(data?.configurations?.xpSystem ?? true);
             if (data && userInfo?.userId) {
                 const role = data.campaignPlayers?.find(
@@ -1397,6 +1551,36 @@ export default function MatchPage(): JSX.Element {
             }
         });
     }, [campaignId]);
+
+    const handleUploadMatchImage = async (file: File) => {
+        setImageHighlightUploading(true);
+
+        try {
+            const updatedImages = await uploadMatchHighlightImages(campaignId, file);
+            setMatchImages(updatedImages);
+        } finally {
+            setImageHighlightUploading(false);
+        }
+    };
+
+    const handleSelectMatchHighlightedImage = async (
+        imageId: string,
+        remove?: boolean
+    ) => {
+        setSelectingHighlightedImageId(imageId);
+
+        try {
+            const highlightedImage = await setMatchHighlightedImage(
+                campaignId,
+                imageId,
+                remove
+            );
+            applyHighlightedMatchImage(highlightedImage, { openIfNew: true });
+            setImageHighlightManagerModalOpen(false);
+        } finally {
+            setSelectingHighlightedImageId(null);
+        }
+    };
 
     useEffect(() => {
         if (!campaignId) return;
@@ -1500,6 +1684,46 @@ export default function MatchPage(): JSX.Element {
                 : nextClones;
         });
     }, [campaignCharacters, visibleMapCharacterIds]);
+
+    useEffect(() => {
+        setCloneTokenHitPoints((current) => {
+            const next: Record<string, number | null> = {};
+            let didChange = Object.keys(current).length !== clonedMapTokens.length;
+
+            clonedMapTokens.forEach((token) => {
+                const defaultHitPoints =
+                    campaignCharacterSummaries[token.characterId]?.currentHitPoints ??
+                    null;
+                const hasStoredValue = Object.prototype.hasOwnProperty.call(
+                    current,
+                    token.tokenId
+                );
+                const storedValue = current[token.tokenId];
+                const nextValue =
+                    !hasStoredValue || (storedValue === null && defaultHitPoints !== null)
+                        ? defaultHitPoints
+                        : storedValue;
+
+                next[token.tokenId] = nextValue;
+
+                if (!hasStoredValue || storedValue !== nextValue) {
+                    didChange = true;
+                }
+            });
+
+            return didChange ? next : current;
+        });
+    }, [clonedMapTokens, campaignCharacterSummaries]);
+
+    useEffect(() => {
+        if (
+            cloneLifeEditor &&
+            !clonedMapTokens.some((token) => token.tokenId === cloneLifeEditor.tokenId)
+        ) {
+            setCloneLifeEditor(null);
+            setCloneLifeInput('');
+        }
+    }, [cloneLifeEditor, clonedMapTokens]);
 
     useEffect(() => {
         if (campaignCharacters.length === 0) {
@@ -1923,9 +2147,38 @@ export default function MatchPage(): JSX.Element {
             }
         }
 
-        if (token.isClone || character.authorUserId !== userInfo?.userId) {
+        if (token.isClone) {
+            const currentHitPoints = getCloneDisplayedHitPoints(
+                token.tokenId,
+                token.characterId
+            );
+            setCloneLifeEditor({
+                tokenId: token.tokenId,
+                characterName: character.name,
+            });
+            setCloneLifeInput(currentHitPoints === null ? '' : String(currentHitPoints));
+            return;
+        }
+
+        if (character.authorUserId !== userInfo?.userId) {
             setSelectedMapCharacterId(character.id);
         }
+    };
+
+    const handleCloneLifeSave = () => {
+        if (!cloneLifeEditor) return;
+
+        const normalizedInput = cloneLifeInput.trim();
+
+        setCloneTokenHitPoints((current) => ({
+            ...current,
+            [cloneLifeEditor.tokenId]:
+                normalizedInput === ''
+                    ? null
+                    : Math.max(0, Math.trunc(Number(normalizedInput) || 0)),
+        }));
+        setCloneLifeEditor(null);
+        setCloneLifeInput('');
     };
 
     const handleCloneToken = (token: MapTokenInstance) => {
@@ -1963,6 +2216,15 @@ export default function MatchPage(): JSX.Element {
         setClonedMapTokens((current) =>
             current.filter((entry) => entry.tokenId !== tokenId)
         );
+        setCloneTokenHitPoints((current) => {
+            if (!Object.prototype.hasOwnProperty.call(current, tokenId)) {
+                return current;
+            }
+
+            const next = { ...current };
+            delete next[tokenId];
+            return next;
+        });
         setMapTokenLayoutById((current) => {
             if (!current[tokenId]) {
                 return current;
@@ -2154,6 +2416,9 @@ export default function MatchPage(): JSX.Element {
                         const tokenLayout = mapTokenLayoutById[token.tokenId];
                         const isInspectable =
                             token.isClone || character.authorUserId !== userInfo?.userId;
+                        const displayedHitPoints = token.isClone
+                            ? getCloneDisplayedHitPoints(token.tokenId, token.characterId)
+                            : summary?.currentHitPoints ?? null;
                         const canMoveToken = canMoveCharacterToken(character);
                         const isActiveToken =
                             activeTokenInteractionMeta?.tokenId === token.tokenId;
@@ -2258,12 +2523,18 @@ export default function MatchPage(): JSX.Element {
                                         </button>
                                     )}
                                 </div>
-                                <span className="font-XXS-regular match-map-token-name">
+                                <span
+                                    className={`font-XXS-regular match-map-token-name${
+                                        token.isClone
+                                            ? ' match-map-token-name--clone'
+                                            : ''
+                                    }`}
+                                >
                                     {character.name}
                                 </span>
                                 <div className="match-map-token-meta">
                                     <span className="font-XXS-regular match-map-token-stat">
-                                        &#9829; {summary?.currentHitPoints ?? '-'}
+                                        &#9829; {displayedHitPoints ?? '-'}
                                     </span>
                                     <span className="font-XXS-regular match-map-token-stat">
                                         <strong>LVL</strong> {summary?.level ?? '-'}
@@ -2685,6 +2956,22 @@ export default function MatchPage(): JSX.Element {
                         <Image
                             src={CloneSVG.src}
                             alt="Duplicar avatares"
+                            width={28}
+                            height={28}
+                        />
+                    </button>
+                    <button
+                        className={`match-top-bar-item${
+                            imageHighlightManagerModalOpen
+                                ? ' match-top-bar-item--active'
+                                : ''
+                        }`}
+                        title="Imagem em destaque"
+                        onClick={() => setImageHighlightManagerModalOpen(true)}
+                    >
+                        <Image
+                            src={ImageHighlightSVG.src}
+                            alt="Imagem em destaque"
                             width={28}
                             height={28}
                         />
@@ -3132,6 +3419,111 @@ export default function MatchPage(): JSX.Element {
                     onClose={() => setMediaModalOpen(false)}
                     onMapSelect={handleMapSelection}
                 />
+            )}
+
+            {imageHighlightManagerModalOpen && (
+                <MatchImageHighlightManagerModal
+                    images={matchImages}
+                    highlightedImageId={highlightedMatchImage?.id ?? null}
+                    isUploading={imageHighlightUploading}
+                    selectingImageId={selectingHighlightedImageId}
+                    onClose={() => setImageHighlightManagerModalOpen(false)}
+                    onUpload={handleUploadMatchImage}
+                    onSelect={handleSelectMatchHighlightedImage}
+                />
+            )}
+
+            {imageHighlightViewerOpen && highlightedMatchImage && (
+                <MatchImageHighlightViewerModal
+                    image={highlightedMatchImage}
+                    onClose={() => setImageHighlightViewerOpen(false)}
+                />
+            )}
+
+            {cloneLifeEditor && (
+                <div
+                    className="match-clone-life-overlay"
+                    onClick={() => {
+                        setCloneLifeEditor(null);
+                        setCloneLifeInput('');
+                    }}
+                >
+                    <div
+                        className="match-clone-life-modal"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <div className="match-clone-life-header">
+                            <div>
+                                <h2 className="font-L-bold match-clone-life-title">
+                                    Vida do Clone
+                                </h2>
+                                <p className="font-XXS-regular match-clone-life-subtitle">
+                                    Ajuste a vida atual de {cloneLifeEditor.characterName}
+                                    .
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                className="match-clone-life-close"
+                                onClick={() => {
+                                    setCloneLifeEditor(null);
+                                    setCloneLifeInput('');
+                                }}
+                                aria-label="Fechar"
+                            >
+                                <svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                >
+                                    <path d="M18 6 6 18M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div className="match-clone-life-body">
+                            <label
+                                htmlFor="match-clone-life-input"
+                                className="font-XS-bold match-clone-life-label"
+                            >
+                                Pontos de vida
+                            </label>
+                            <input
+                                id="match-clone-life-input"
+                                type="number"
+                                min="0"
+                                inputMode="numeric"
+                                className="match-clone-life-input font-S-bold"
+                                value={cloneLifeInput}
+                                onChange={(event) =>
+                                    setCloneLifeInput(event.target.value)
+                                }
+                                placeholder="Informe a vida atual"
+                            />
+                        </div>
+                        <div className="match-clone-life-actions">
+                            <button
+                                type="button"
+                                className="match-clone-life-confirm font-XS-bold"
+                                onClick={handleCloneLifeSave}
+                            >
+                                Confirmar
+                            </button>
+                            <button
+                                type="button"
+                                className="match-clone-life-cancel font-XS-regular"
+                                onClick={() => {
+                                    setCloneLifeEditor(null);
+                                    setCloneLifeInput('');
+                                }}
+                            >
+                                Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
 
             {notesModalOpen && campaignId && userInfo?.userId && (

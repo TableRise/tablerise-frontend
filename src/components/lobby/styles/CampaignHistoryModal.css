@@ -58,4 +58,37 @@
     .campaign-history-empty {
         @apply block text-center text-color-greyScale/500;
     }
+
+    html[data-theme='dark'] .campaign-history-modal-title,
+    html[data-theme='dark'] .campaign-history-modal-close,
+    html[data-theme='dark'] .campaign-history-group-trigger {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .campaign-history-modal,
+    html[data-theme='dark'] .campaign-history-group,
+    html[data-theme='dark'] .campaign-history-log {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .campaign-history-modal-header,
+    html[data-theme='dark'] .campaign-history-group,
+    html[data-theme='dark'] .campaign-history-group-body {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .campaign-history-group-trigger:hover,
+    html[data-theme='dark'] .campaign-history-log {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .campaign-history-log-content {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .campaign-history-log-date,
+    html[data-theme='dark'] .campaign-history-empty {
+        color: var(--theme-text-muted);
+    }
 }

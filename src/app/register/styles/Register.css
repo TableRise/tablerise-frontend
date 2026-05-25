@@ -97,4 +97,18 @@
             @apply w-full;
         }
     }
+
+    html[data-theme='dark'] .register-page .side-form-container {
+        background-color: var(--theme-surface);
+        box-shadow: -24px 0 42px rgba(2, 6, 23, 0.28);
+    }
+
+    html[data-theme='dark'] .register-page .title-container .subtitle-text,
+    html[data-theme='dark'] .register-page .divider-content {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .register-page .divider-line {
+        border-color: var(--theme-border);
+    }
 }

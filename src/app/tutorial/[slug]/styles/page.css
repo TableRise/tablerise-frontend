@@ -105,4 +105,18 @@
             @apply h-44;
         }
     }
+
+    html[data-theme='dark'] .tutorial-detail-sidebar-title,
+    html[data-theme='dark'] .tutorial-detail-sidebar-item {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .tutorial-detail-sidebar-item:hover {
+        background-color: var(--theme-surface-muted);
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .tutorial-detail-hero--placeholder {
+        background-image: repeating-conic-gradient(#192437 0% 25%, #111b2b 0% 50%);
+    }
 }

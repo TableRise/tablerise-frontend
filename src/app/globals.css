@@ -13,6 +13,37 @@ html {
     --app-shell-padding: 1.5rem;
     --app-header-offset: 8.6rem;
     --app-header-offset-compact: 6.75rem;
+    --theme-app-bg: #efefef;
+    --theme-surface: #ffffff;
+    --theme-surface-muted: #efefef;
+    --theme-surface-strong: #dcdcdc;
+    --theme-border: #dcdcdc;
+    --theme-border-strong: #bdbdbd;
+    --theme-text: #292929;
+    --theme-text-muted: #525252;
+    --theme-text-subtle: #7c7c7c;
+    --theme-accent: #0a358a;
+    --theme-accent-soft: rgba(10, 53, 138, 0.14);
+    --theme-shadow: 0 18px 40px rgba(12, 37, 95, 0.08);
+    --theme-shadow-strong: 0 24px 48px rgba(12, 37, 95, 0.18);
+    --theme-overlay: rgba(7, 23, 63, 0.65);
+}
+
+html[data-theme='dark'] {
+    --theme-app-bg: #07111f;
+    --theme-surface: #111b2b;
+    --theme-surface-muted: #192437;
+    --theme-surface-strong: #223049;
+    --theme-border: #31415f;
+    --theme-border-strong: #415276;
+    --theme-text: #edf2ff;
+    --theme-text-muted: #b8c5de;
+    --theme-text-subtle: #8f9fbc;
+    --theme-accent: #8ab5fc;
+    --theme-accent-soft: rgba(140, 184, 255, 0.16);
+    --theme-shadow: 0 22px 48px rgba(2, 6, 23, 0.34);
+    --theme-shadow-strong: 0 28px 56px rgba(2, 6, 23, 0.42);
+    --theme-overlay: rgba(2, 6, 23, 0.78);
 }
 
 * {
@@ -23,9 +54,87 @@ html {
 }
 
 body {
-    background-color: #efefef;
+    background-color: var(--theme-app-bg);
+    color: var(--theme-text);
     min-height: 100vh;
     overflow-x: clip;
+    transition:
+        background-color 0.25s ease,
+        color 0.25s ease;
+}
+
+html[data-theme='dark'] .bg-color-greyScale\/50,
+html[data-theme='dark'] .bg-white {
+    background-color: var(--theme-surface) !important;
+}
+
+html[data-theme='dark'] .bg-color-greyScale\/100,
+html[data-theme='dark'] .bg-color-greyScale\/200,
+html[data-theme='dark'] .bg-white\/5 {
+    background-color: var(--theme-surface-muted) !important;
+}
+
+html[data-theme='dark'] .text-color-greyScale\/950,
+html[data-theme='dark'] .text-color-greyScale\/900,
+html[data-theme='dark'] .text-black {
+    color: var(--theme-text) !important;
+}
+
+html[data-theme='dark'] .text-color-greyScale\/800,
+html[data-theme='dark'] .text-color-greyScale\/700,
+html[data-theme='dark'] .text-color-greyScale\/500,
+html[data-theme='dark'] .text-color-greyScale\/300,
+html[data-theme='dark'] .text-color-greyScale\/200 {
+    color: var(--theme-text-muted) !important;
+}
+
+html[data-theme='dark'] .text-color-primary\/default_900,
+html[data-theme='dark'] .text-color-primary\/950,
+html[data-theme='dark'] .text-color-primary\/800,
+html[data-theme='dark'] .text-color-primary\/500 {
+    color: var(--theme-accent) !important;
+}
+
+html[data-theme='dark'] .border-color-greyScale\/200,
+html[data-theme='dark'] .border-color-greyScale\/300,
+html[data-theme='dark'] .border-white\/10 {
+    border-color: transparent !important;
+}
+
+html[data-theme='dark'] .border-color-greyScale\/500,
+html[data-theme='dark'] .border-gray-500 {
+    border-color: rgba(138, 181, 252, 0.18) !important;
+}
+
+html[data-theme='dark'] .hover\:bg-color-greyScale\/50:hover,
+html[data-theme='dark'] .hover\:bg-color-greyScale\/100:hover,
+html[data-theme='dark'] .hover\:bg-color-greyScale\/200:hover,
+html[data-theme='dark'] .hover\:bg-white\/20:hover,
+html[data-theme='dark'] .hover\:bg-red-50:hover {
+    background-color: var(--theme-surface-strong) !important;
+}
+
+html[data-theme='dark'] .hover\:text-color-greyScale\/900:hover,
+html[data-theme='dark'] .hover\:text-color-primary\/default_900:hover {
+    color: var(--theme-accent) !important;
+}
+
+html[data-theme='dark'] .hover\:text-color-greyScale\/900:hover {
+    color: var(--theme-text) !important;
+}
+
+html[data-theme='dark'] [style*='color:#0A358A'],
+html[data-theme='dark'] [style*='color: #0A358A'],
+html[data-theme='dark'] [style*='color:#0a358a'],
+html[data-theme='dark'] [style*='color: #0a358a'] {
+    color: #8ab5fc !important;
+}
+
+html[data-theme='dark'] .shadow-md,
+html[data-theme='dark'] .shadow-lg,
+html[data-theme='dark'] .shadow-xl,
+html[data-theme='dark'] .shadow-2xl {
+    box-shadow: var(--theme-shadow) !important;
 }
 
 svg {
@@ -54,6 +163,60 @@ textarea {
 
 button {
     touch-action: manipulation;
+}
+
+input,
+select,
+textarea {
+    color-scheme: inherit;
+}
+
+html[data-theme='dark'] input::placeholder,
+html[data-theme='dark'] textarea::placeholder {
+    color: var(--theme-text-subtle);
+}
+
+html[data-theme='dark'] .input-default-light,
+html[data-theme='dark'] .input-i1-light,
+html[data-theme='dark'] .input-i2-light,
+html[data-theme='dark'] .input-success-light {
+    background-color: var(--theme-surface-muted);
+    border-color: var(--theme-border);
+    color: var(--theme-text);
+}
+
+html[data-theme='dark'] .input-default-light:focus,
+html[data-theme='dark'] .input-i1-light:focus,
+html[data-theme='dark'] .input-i2-light:focus {
+    border-color: var(--theme-accent);
+}
+
+html[data-theme='dark'] .input-active-light {
+    background-color: var(--theme-surface-muted);
+    border-color: var(--theme-accent);
+    color: var(--theme-text);
+}
+
+html[data-theme='dark'] .input-error-light {
+    background-color: var(--theme-surface-muted);
+    border-color: #f87171;
+    color: var(--theme-text);
+}
+
+html[data-theme='dark'] .button-transparent-default {
+    border-color: transparent;
+    color: var(--theme-text);
+}
+
+html[data-theme='dark'] .button-white-default {
+    background-color: var(--theme-surface);
+    border-color: transparent;
+    color: var(--theme-accent);
+}
+
+html[data-theme='dark'] .button-L-fill:disabled {
+    background-color: var(--theme-surface-strong);
+    color: var(--theme-text-subtle);
 }
 
 main,

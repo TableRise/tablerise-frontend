@@ -63,6 +63,8 @@ export interface CampaignSyncPayload {
         activeEffect: MatchEffect;
         playingMusicId: string | null;
         visibleCharacterIds: string[];
+        images: ImageObject[];
+        imageHighlighted: ImageObject | null;
         tokens: MatchToken[];
         highlightedJournalPost: SocketJournal | null;
     };
@@ -179,9 +181,19 @@ export interface CampaignMapsUpdatedPayload {
     mapImages: SocketImageObject[];
 }
 
+export interface CampaignImagesUpdatedPayload {
+    campaignId: string;
+    images: SocketImageObject[];
+}
+
 export interface CampaignMusicsUpdatedPayload {
     campaignId: string;
     musics: SocketMusic[];
+}
+
+export interface MatchImageHighlightedChangedPayload {
+    campaignId: string;
+    imageHighlighted: SocketImageObject | null;
 }
 
 export interface CampaignSettingsUpdatedPayload {

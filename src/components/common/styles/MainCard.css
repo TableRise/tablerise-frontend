@@ -31,4 +31,8 @@
             height: min(22rem, var(--main-card-height));
         }
     }
+
+    html[data-theme='dark'] .main-card .card-infos {
+        color: var(--theme-text);
+    }
 }

@@ -1,14 +1,22 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+
+import Image from 'next/image';
+import { useContext, useEffect, useRef, useState } from 'react';
+import EditSVG from '@assets/icons/sys/edit-blue.svg?url';
+import EditDarkSVG from '@assets/icons/sys/edit-dark.svg?url';
+import TrashSVG from '@assets/icons/sys/trash.svg?url';
 import formatDate from '@/utils/formatDate';
+import TableriseContext from '@/context/TableriseContext';
 import {
     createUserCampaignNote,
     getUserCampaignNotes,
+    removeCampaignNote,
     type CampaignNote,
+    updateCampaignNote,
 } from '@/server/users/campaign-notes';
 import '@/components/match/styles/MatchNotesModal.css';
 
-type MatchNotesView = 'list' | 'create' | 'read';
+type MatchNotesView = 'list' | 'create' | 'read' | 'edit';
 
 interface MatchNotesModalProps {
     campaignId: string;
@@ -48,6 +56,10 @@ function renderInline(text: string, keyOffset: number): React.ReactNode[] {
 }
 
 function renderLine(line: string, index: number): React.ReactNode {
+    if (line.trim().length === 0) {
+        return <div key={index} className="mnm-line-break" aria-hidden="true" />;
+    }
+
     const h1 = line.match(/^#\s(.+)/);
     const h2 = line.match(/^##\s(.+)/);
     const h3 = line.match(/^###\s(.+)/);
@@ -88,6 +100,7 @@ export default function MatchNotesModal({
     userId,
     onClose,
 }: MatchNotesModalProps): JSX.Element {
+    const { themeMode } = useContext(TableriseContext);
     const [view, setView] = useState<MatchNotesView>('list');
     const [notes, setNotes] = useState<CampaignNote[]>([]);
     const [selectedNote, setSelectedNote] = useState<CampaignNote | null>(null);
@@ -95,8 +108,22 @@ export default function MatchNotesModal({
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const [deleting, setDeleting] = useState(false);
     const [error, setError] = useState('');
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    const refreshNotes = async (nextSelectedTitle?: string): Promise<CampaignNote[]> => {
+        const recoveredNotes = await getUserCampaignNotes(userId, campaignId);
+        setNotes(recoveredNotes);
+
+        if (nextSelectedTitle) {
+            const nextSelectedNote =
+                recoveredNotes.find((note) => note.title === nextSelectedTitle) ?? null;
+            setSelectedNote(nextSelectedNote);
+        }
+
+        return recoveredNotes;
+    };
 
     useEffect(() => {
         async function loadNotes() {
@@ -159,19 +186,53 @@ export default function MatchNotesModal({
 
     const handleReadClick = (note: CampaignNote) => {
         setSelectedNote(note);
+        setTitle('');
+        setContent('');
         setError('');
         setView('read');
     };
 
     const handleBackToList = () => {
         setSelectedNote(null);
+        setTitle('');
+        setContent('');
         setError('');
         setView('list');
     };
 
+    const handleEditClick = () => {
+        if (!selectedNote) return;
+
+        setContent(selectedNote.content);
+        setError('');
+        setView('edit');
+    };
+
+    const handleBackToRead = () => {
+        if (!selectedNote) {
+            handleBackToList();
+            return;
+        }
+
+        setContent(selectedNote.content);
+        setError('');
+        setView('read');
+    };
+
     const handleSubmit = async () => {
-        if (!title.trim() || !content.trim()) {
+        const isEditing = view === 'edit';
+
+        if ((isEditing && !selectedNote) || (!isEditing && !title.trim())) {
             setError('Título e conteúdo são obrigatórios.');
+            return;
+        }
+
+        if (!content.trim()) {
+            setError(
+                isEditing
+                    ? 'Conteúdo é obrigatório.'
+                    : 'Título e conteúdo são obrigatórios.'
+            );
             return;
         }
 
@@ -179,13 +240,31 @@ export default function MatchNotesModal({
         setError('');
 
         try {
+            if (isEditing && selectedNote) {
+                await updateCampaignNote(campaignId, selectedNote.title, {
+                    content: content.trim(),
+                });
+
+                const refreshedNotes = await refreshNotes(selectedNote.title);
+                const refreshedSelectedNote =
+                    refreshedNotes.find((note) => note.title === selectedNote.title) ??
+                    refreshedNotes.find(
+                        (note) => Boolean(note.id) && note.id === selectedNote.id
+                    ) ??
+                    null;
+
+                setSelectedNote(refreshedSelectedNote);
+                setContent(refreshedSelectedNote?.content ?? '');
+                setView('read');
+                return;
+            }
+
             await createUserCampaignNote(userId, campaignId, {
                 title: title.trim(),
                 content: content.trim(),
             });
 
-            const refreshedNotes = await getUserCampaignNotes(userId, campaignId);
-            setNotes(refreshedNotes);
+            await refreshNotes();
             setTitle('');
             setContent('');
             setView('list');
@@ -196,10 +275,29 @@ export default function MatchNotesModal({
         }
     };
 
-    const renderedLines = (selectedNote?.content ?? '')
-        .split('\n')
-        .filter((line) => line.trim().length > 0);
+    const handleRemove = async () => {
+        if (!selectedNote || deleting) return;
+
+        setDeleting(true);
+        setError('');
+
+        try {
+            await removeCampaignNote(campaignId, selectedNote.title);
+            await refreshNotes();
+            setSelectedNote(null);
+            setTitle('');
+            setContent('');
+            setView('list');
+        } catch (err: any) {
+            setError(err?.message ?? 'Erro ao remover anotação.');
+        } finally {
+            setDeleting(false);
+        }
+    };
+
+    const renderedLines = (selectedNote?.content ?? '').split('\n');
     const selectedTimestamp = selectedNote?.updatedAt ?? selectedNote?.createdAt;
+    const editIcon = themeMode === 'dark' ? EditDarkSVG : EditSVG;
 
     return (
         <div className="mnm-overlay">
@@ -209,7 +307,7 @@ export default function MatchNotesModal({
                         <h2 className="font-L-bold mnm-title">
                             {view === 'create'
                                 ? 'Nova anotação'
-                                : view === 'read'
+                                : view === 'read' || view === 'edit'
                                 ? selectedNote?.title
                                 : 'Anotações'}
                         </h2>
@@ -219,22 +317,57 @@ export default function MatchNotesModal({
                             </span>
                         )}
                     </div>
-                    <button
-                        className="mnm-close-btn"
-                        onClick={onClose}
-                        aria-label="Fechar"
-                    >
-                        <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
+                    <div className="mnm-header-actions">
+                        {view === 'read' && (
+                            <>
+                                <button
+                                    className="mnm-icon-btn"
+                                    onClick={handleEditClick}
+                                    aria-label="Editar anotação"
+                                    disabled={deleting}
+                                >
+                                    <Image
+                                        src={editIcon}
+                                        alt=""
+                                        width={20}
+                                        height={20}
+                                        aria-hidden="true"
+                                    />
+                                </button>
+                                <button
+                                    className="mnm-icon-btn"
+                                    onClick={handleRemove}
+                                    aria-label="Excluir anotação"
+                                    disabled={deleting}
+                                >
+                                    <Image
+                                        src={TrashSVG}
+                                        alt=""
+                                        width={20}
+                                        height={20}
+                                        aria-hidden="true"
+                                    />
+                                </button>
+                            </>
+                        )}
+                        <button
+                            className="mnm-close-btn"
+                            onClick={onClose}
+                            aria-label="Fechar"
+                            disabled={deleting}
                         >
-                            <path d="M18 6 6 18M6 6l12 12" />
-                        </svg>
-                    </button>
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                            >
+                                <path d="M18 6 6 18M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 <div className="mnm-divider" />
@@ -280,25 +413,33 @@ export default function MatchNotesModal({
                         </>
                     )}
 
-                    {view === 'create' && (
+                    {(view === 'create' || view === 'edit') && (
                         <>
                             <button
                                 className="mnm-back-btn font-XXS-bold"
-                                onClick={handleBackToList}
+                                onClick={
+                                    view === 'edit' ? handleBackToRead : handleBackToList
+                                }
                             >
-                                Voltar para a lista
+                                {view === 'edit'
+                                    ? 'Voltar para a anotação'
+                                    : 'Voltar para a lista'}
                             </button>
 
-                            <div className="mnm-field">
-                                <label className="font-XS-bold mnm-label">Título</label>
-                                <input
-                                    className="mnm-input font-XS-regular"
-                                    placeholder="Título da anotação"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                    maxLength={120}
-                                />
-                            </div>
+                            {view === 'create' && (
+                                <div className="mnm-field">
+                                    <label className="font-XS-bold mnm-label">
+                                        Título
+                                    </label>
+                                    <input
+                                        className="mnm-input font-XS-regular"
+                                        placeholder="Título da anotação"
+                                        value={title}
+                                        onChange={(e) => setTitle(e.target.value)}
+                                        maxLength={120}
+                                    />
+                                </div>
+                            )}
 
                             <div className="mnm-field">
                                 <label className="font-XS-bold mnm-label">Conteúdo</label>
@@ -379,18 +520,24 @@ export default function MatchNotesModal({
                     {error && <span className="mnm-error font-XS-regular">{error}</span>}
                 </div>
 
-                {view === 'create' && (
+                {(view === 'create' || view === 'edit') && (
                     <div className="mnm-footer">
                         <button
                             className="mnm-primary-btn font-XS-bold"
                             onClick={handleSubmit}
                             disabled={submitting}
                         >
-                            {submitting ? 'Salvando...' : 'Salvar anotação'}
+                            {submitting
+                                ? 'Salvando...'
+                                : view === 'edit'
+                                ? 'Salvar alterações'
+                                : 'Salvar anotação'}
                         </button>
                         <button
                             className="mnm-cancel-btn font-XS-regular"
-                            onClick={handleBackToList}
+                            onClick={
+                                view === 'edit' ? handleBackToRead : handleBackToList
+                            }
                         >
                             Cancelar
                         </button>

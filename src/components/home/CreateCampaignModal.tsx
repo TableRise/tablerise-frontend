@@ -46,9 +46,6 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
     const [description, setDescription] = useState('');
     const [password, setPassword] = useState('');
     const [coverImage, setCoverImage] = useState<File | null>(null);
-    const [agendaRows, setAgendaRows] = useState<{ date: string; start: string }[]>([
-        { date: '', start: '' },
-    ]);
 
     /* ── step 2 fields ── */
     const [system, setSystem] = useState('');
@@ -148,10 +145,6 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
         }
         setSubmitting(true);
         try {
-            const filledDates = agendaRows
-                .filter((r) => r.date && r.start)
-                .map((r) => `${r.date}T${r.start}:00`);
-
             await createCampaign({
                 title,
                 description,
@@ -164,7 +157,7 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
                 mapImages,
                 mainHistory,
                 playerAmountLimit,
-                nextMatchDate: filledDates.length > 0 ? filledDates : [],
+                nextMatchDate: [],
                 socialMedia: {
                     ...(discordLink ? { discord: discordLink } : {}),
                     ...(twitterLink ? { twitter: twitterLink } : {}),
@@ -255,8 +248,6 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
                             passwordError={passwordError}
                             coverImage={coverImage}
                             onSelectCoverImage={handleCoverImageSelected}
-                            agendaRows={agendaRows}
-                            setAgendaRows={setAgendaRows}
                         />
                     )}
                     {step === 1 && (

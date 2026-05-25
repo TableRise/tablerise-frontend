@@ -15,6 +15,8 @@ import '@/components/lobby/styles/ParticipantsModal.css';
 interface ParticipantsModalProps {
     campaignId: string;
     isMaster: boolean;
+    currentUserId: string;
+    onParticipantsChanged?: () => void | Promise<void>;
     onClose: () => void;
 }
 
@@ -36,6 +38,8 @@ const ROLE_LABEL: Record<string, string> = {
 export default function ParticipantsModal({
     campaignId,
     isMaster,
+    currentUserId,
+    onParticipantsChanged,
     onClose,
 }: ParticipantsModalProps): JSX.Element {
     const router = useRouter();
@@ -52,6 +56,7 @@ export default function ParticipantsModal({
         try {
             await removeCampaignPlayer(campaignId, pendingRemoveId);
             setPlayers((prev) => prev.filter((p) => p.userId !== pendingRemoveId));
+            await onParticipantsChanged?.();
         } finally {
             setRemovingId(null);
         }
@@ -64,6 +69,7 @@ export default function ParticipantsModal({
             setPlayers((prev) =>
                 prev.map((p) => (p.userId === userId ? { ...p, status: 'active' } : p))
             );
+            await onParticipantsChanged?.();
         } finally {
             setConfirmingId(null);
         }
@@ -226,29 +232,43 @@ export default function ParticipantsModal({
                                         >
                                             Ver perfil
                                         </button>
-                                        {isMaster && (
-                                            <button
-                                                className="pm-confirm-btn font-XS-bold"
-                                                disabled={
-                                                    confirmingId === player.userId ||
+                                        {isMaster &&
+                                            currentUserId === player.userId &&
+                                            player.role === 'dungeon_master' && (
+                                                <span
+                                                    className="pm-confirm-btn-placeholder font-XS-bold"
+                                                    aria-hidden="true"
+                                                >
+                                                    Remover Jogador
+                                                </span>
+                                            )}
+                                        {isMaster &&
+                                            !(
+                                                currentUserId === player.userId &&
+                                                player.role === 'dungeon_master'
+                                            ) && (
+                                                <button
+                                                    className="pm-confirm-btn font-XS-bold"
+                                                    disabled={
+                                                        confirmingId === player.userId ||
+                                                        removingId === player.userId
+                                                    }
+                                                    onClick={() =>
+                                                        player.status !== 'active'
+                                                            ? handleConfirm(player.userId)
+                                                            : setPendingRemoveId(
+                                                                  player.userId
+                                                              )
+                                                    }
+                                                >
+                                                    {confirmingId === player.userId ||
                                                     removingId === player.userId
-                                                }
-                                                onClick={() =>
-                                                    player.status !== 'active'
-                                                        ? handleConfirm(player.userId)
-                                                        : setPendingRemoveId(
-                                                              player.userId
-                                                          )
-                                                }
-                                            >
-                                                {confirmingId === player.userId ||
-                                                removingId === player.userId
-                                                    ? 'Processando...'
-                                                    : player.status !== 'active'
-                                                    ? 'Aceitar Jogador'
-                                                    : 'Remover Jogador'}
-                                            </button>
-                                        )}
+                                                        ? 'Processando...'
+                                                        : player.status !== 'active'
+                                                        ? 'Aceitar Jogador'
+                                                        : 'Remover Jogador'}
+                                                </button>
+                                            )}
                                     </div>
                                 </div>
                             ))}

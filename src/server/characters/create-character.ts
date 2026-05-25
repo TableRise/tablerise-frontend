@@ -36,3 +36,16 @@ export const removeCharacterFromCampaign = async (
     });
     return data;
 };
+
+export const deleteCharacter = async (characterId: string): Promise<boolean> => {
+    try {
+        await apiCall({
+            baseUrl: charactersBaseUrl,
+            endpoint: `${characterId}/delete`,
+            method: 'DELETE',
+        });
+        return true;
+    } catch {
+        return false;
+    }
+};

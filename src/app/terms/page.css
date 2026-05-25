@@ -92,4 +92,22 @@
             @apply gap-6 p-4;
         }
     }
+
+    html[data-theme='dark'] .terms-card,
+    html[data-theme='dark'] .terms-note {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .terms-note,
+    html[data-theme='dark'] .terms-section {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .terms-lead,
+    html[data-theme='dark'] .terms-note-text,
+    html[data-theme='dark'] .terms-section-text,
+    html[data-theme='dark'] .terms-section-list {
+        color: var(--theme-text-muted);
+    }
 }

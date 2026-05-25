@@ -141,4 +141,13 @@
             width: min(calc(100% - 1rem), 70.5rem);
         }
     }
+
+    html[data-theme='dark'] .logged-header-dropdown {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow-strong);
+    }
+
+    html[data-theme='dark'] .logged-header-dropdown-item {
+        color: var(--theme-text);
+    }
 }

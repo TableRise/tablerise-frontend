@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
-import { apiCall, usersBaseUrl } from '../wrapper';
 import { getCampaignById } from '@/server/campaigns/join-campaign';
+import { apiCall, campaignsBaseUrl, usersBaseUrl } from '../wrapper';
 
 export interface CampaignNote {
     id?: string;
@@ -12,6 +12,10 @@ export interface CampaignNote {
 
 interface CreateCampaignNotePayload {
     title: string;
+    content: string;
+}
+
+interface UpdateCampaignNotePayload {
     content: string;
 }
 
@@ -48,6 +52,46 @@ export const getUserCampaignNotes = async (
             .filter((note): note is CampaignNote => note !== null);
     } catch (error) {
         throw error;
+    }
+};
+
+export const updateCampaignNote = async (
+    campaignId: string,
+    title: string,
+    payload: UpdateCampaignNotePayload
+): Promise<void> => {
+    try {
+        await apiCall({
+            baseUrl: campaignsBaseUrl,
+            endpoint: `${campaignId}/update/notes`,
+            method: 'PATCH',
+            params: { title },
+            data: payload,
+        });
+    } catch ({ response }: AxiosError | any) {
+        if (response?.status === 400) throw new Error('Dados inválidos');
+        if (response?.status === 404) throw new Error('Anotação não encontrada');
+        if (response?.status === 500) throw new Error('Erro no servidor');
+        throw new Error('Erro ao atualizar anotação');
+    }
+};
+
+export const removeCampaignNote = async (
+    campaignId: string,
+    title: string
+): Promise<void> => {
+    try {
+        await apiCall({
+            baseUrl: campaignsBaseUrl,
+            endpoint: `${campaignId}/update/notes/remove`,
+            method: 'PATCH',
+            params: { title },
+        });
+    } catch ({ response }: AxiosError | any) {
+        if (response?.status === 400) throw new Error('Dados inválidos');
+        if (response?.status === 404) throw new Error('Anotação não encontrada');
+        if (response?.status === 500) throw new Error('Erro no servidor');
+        throw new Error('Erro ao remover anotação');
     }
 };
 

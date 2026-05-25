@@ -68,4 +68,29 @@
     .jpm-error {
         @apply text-color-support/alert;
     }
+
+    html[data-theme='dark'] .jpm-title,
+    html[data-theme='dark'] .jpm-close-btn,
+    html[data-theme='dark'] .jpm-action-btn {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .jpm-modal {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .jpm-meta,
+    html[data-theme='dark'] .jpm-paragraph {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .jpm-divider {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .jpm-close-btn:hover,
+    html[data-theme='dark'] .jpm-action-btn:hover {
+        background-color: var(--theme-surface-strong);
+    }
 }

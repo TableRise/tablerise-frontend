@@ -1,5 +1,6 @@
 import type { ImageObject } from '@/types/shared/general';
 import type { DatabaseCampaign, DatabaseCampaignPlayer } from '@/types/shared/entities';
+import type { ThemeMode } from '@/utils/theme';
 
 export type CampaignPlayer = DatabaseCampaignPlayer & {
     userId_sk?: string;
@@ -45,12 +46,12 @@ export interface UserCampaignsContract {
 export interface TableriseContextContract {
     loading: boolean;
     newPassVisible: boolean;
-    darkModeOn: boolean;
+    themeMode: ThemeMode;
     userLoggedToggle: number;
     userCampaigns: UserCampaignsContract;
     setLoading: (boolean: boolean) => void;
     setNewPassVisible: (boolean: boolean) => void;
-    setDarkModeOn: (boolean: boolean) => void;
+    toggleThemeMode: () => void;
     setUserCampaigns: (data: UserCampaignsContract) => void;
     recoverUserCampaigns: () => Promise<void>;
 }

@@ -1,15 +1,24 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
+import TableriseContext from '@/context/TableriseContext';
 import SheetSVG from '../../../assets/icons/menu-panel-lobby/sheet.svg?url';
+import SheetDarkSVG from '../../../assets/icons/menu-panel-lobby/sheet-dark.svg?url';
 import ParticipantsSVG from '../../../assets/icons/menu-panel-lobby/participants.svg?url';
+import ParticipantsDarkSVG from '../../../assets/icons/menu-panel-lobby/participants-dark.svg?url';
 import PostSVG from '../../../assets/icons/menu-panel-lobby/post.svg?url';
+import PostDarkSVG from '../../../assets/icons/menu-panel-lobby/post-dark.svg?url';
 import ExitRedSVG from '../../../assets/icons/sys/exit-red.svg?url';
 import HistorySVG from '../../../assets/icons/menu-panel-lobby/history.svg?url';
+import HistoryDarkSVG from '../../../assets/icons/menu-panel-lobby/history-dark.svg?url';
 import SettingsSVG from '../../../assets/icons/menu-panel-lobby/settings.svg?url';
+import SettingsDarkSVG from '../../../assets/icons/menu-panel-lobby/settings-dark.svg?url';
 import PlaySVG from '../../../assets/icons/menu-panel-lobby/play.svg?url';
+import PlayDarkSVG from '../../../assets/icons/menu-panel-lobby/play-dark.svg?url';
 import ShoppingBlueSVG from '../../../assets/icons/menu-panel-lobby/shopping-blue.svg?url';
+import ShoppingDarkSVG from '../../../assets/icons/menu-panel-lobby/shopping-dark.svg?url';
 import ArrowRightBlueSVG from '../../../assets/icons/nav/arrow-right-blue.svg?url';
+import ArrowRightDarkSVG from '../../../assets/icons/nav/arrow-right-dark.svg?url';
 import '@/components/lobby/styles/LobbySideMenu.css';
 
 interface LobbySideMenuProps {
@@ -19,27 +28,70 @@ interface LobbySideMenuProps {
     onMenuAction?: (key: string) => void;
 }
 
-const playerMenuItems = [
-    { key: 'play-match', icon: PlaySVG, label: 'Entrar na Partida' },
-    { key: 'create-sheet', icon: SheetSVG, label: 'Criar/Editar Ficha de Personagem' },
-    { key: 'participants', icon: ParticipantsSVG, label: 'Ver Participantes' },
-    { key: 'new-post', icon: PostSVG, label: 'Criar Novo Post' },
-    { key: 'shop', icon: ShoppingBlueSVG, label: 'Loja de Equipamentos' },
-    { key: 'leave', icon: ExitRedSVG, label: 'Sair da Campanha', danger: true },
-];
-
-const masterExtraItems = [
-    { key: 'history', icon: HistorySVG, label: 'Histórico de partidas' },
-    { key: 'edit-settings', icon: SettingsSVG, label: 'Editar Configurações' },
-];
-
 export default function LobbySideMenu({
     isPlayer,
     isMaster,
     shopEnabled = true,
     onMenuAction,
 }: LobbySideMenuProps): JSX.Element {
+    const { themeMode } = useContext(TableriseContext);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const isDarkMode = themeMode === 'dark';
+    const arrowIcon = isDarkMode ? ArrowRightDarkSVG : ArrowRightBlueSVG;
+
+    const playerMenuItems = useMemo(
+        () => [
+            {
+                key: 'play-match',
+                icon: isDarkMode ? PlayDarkSVG : PlaySVG,
+                label: 'Entrar na Partida',
+            },
+            {
+                key: 'create-sheet',
+                icon: isDarkMode ? SheetDarkSVG : SheetSVG,
+                label: 'Criar/Editar Ficha de Personagem',
+            },
+            {
+                key: 'participants',
+                icon: isDarkMode ? ParticipantsDarkSVG : ParticipantsSVG,
+                label: 'Ver Participantes',
+            },
+            {
+                key: 'new-post',
+                icon: isDarkMode ? PostDarkSVG : PostSVG,
+                label: 'Criar Novo Post',
+            },
+            {
+                key: 'shop',
+                icon: isDarkMode ? ShoppingDarkSVG : ShoppingBlueSVG,
+                label: 'Loja de Equipamentos',
+            },
+            {
+                key: 'leave',
+                icon: ExitRedSVG,
+                label: 'Sair da Campanha',
+                danger: true,
+            },
+        ],
+        [isDarkMode]
+    );
+
+    const masterExtraItems = useMemo(
+        () => [
+            {
+                key: 'history',
+                icon: isDarkMode ? HistoryDarkSVG : HistorySVG,
+                label: 'Histórico de partidas',
+            },
+            {
+                key: 'edit-settings',
+                icon: isDarkMode ? SettingsDarkSVG : SettingsSVG,
+                label: 'Editar Configurações',
+            },
+        ],
+        [isDarkMode]
+    );
+
     const baseItems = playerMenuItems.filter((item) => item.key !== 'leave');
     const leaveItem = playerMenuItems.find((item) => item.key === 'leave')!;
 
@@ -80,7 +132,7 @@ export default function LobbySideMenu({
                 onClick={() => setIsMobileMenuOpen((current) => !current)}
             >
                 <Image
-                    src={ArrowRightBlueSVG}
+                    src={arrowIcon}
                     alt=""
                     className={`lobby-side-menu-mobile-toggle-icon${
                         isMobileMenuOpen

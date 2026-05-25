@@ -44,12 +44,20 @@
     }
 
     .main-logged-page {
-        @apply mt-[8.6rem] flex w-full flex-col;
+        @apply mt-[8.6rem] mx-auto flex w-full flex-col;
         width: min(calc(100% - 2rem), 70.5rem);
     }
 
     .main-logged-page h2 {
         @apply text-color-primary/default_900 mb-6;
+    }
+
+    html[data-theme='dark'] .content-home {
+        background-color: var(--theme-app-bg);
+    }
+
+    html[data-theme='dark'] .main-logged-page h2 {
+        color: var(--theme-accent);
     }
 
     @media (max-width: 1024px) {

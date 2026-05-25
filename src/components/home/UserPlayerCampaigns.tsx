@@ -2,11 +2,12 @@ import { v4 as uuid } from 'uuid';
 import CampaignCard from '@/components/common/CampaignCard';
 import CampaignPasswordModal from '@/components/home/CampaignPasswordModal';
 import ErrorModal from '@/components/home/ErrorModal';
+import { useJoinCampaign } from '@/components/home/helpers/useJoinCampaign';
+import { isCampaignPlayerPending } from '@/components/home/helpers/campaignPlayerStatus';
 import { CampaignsToRender } from '@/types/modules/components/home/UserMasterCampaigns';
 import Carousel from '../common/Carousel';
-import '@/components/home/styles/UserPlayerCampaigns.css';
 import BasicParticipationCard from '../common/BasicParticipationCard';
-import { useJoinCampaign } from '@/components/home/helpers/useJoinCampaign';
+import '@/components/home/styles/UserPlayerCampaigns.css';
 
 export default function UserPlayerCampaigns({
     campaigns,
@@ -21,29 +22,41 @@ export default function UserPlayerCampaigns({
         joinError,
         closeJoinError,
     } = useJoinCampaign();
+    const currentUserId =
+        typeof window === 'undefined'
+            ? ''
+            : JSON.parse(localStorage.getItem('userLogged') ?? 'null')?.userId ?? '';
 
-    const cardMap = campaigns.map((campaign) => (
-        <CampaignCard
-            className={'embla__slide'}
-            key={uuid()}
-            title={campaign.title}
-            nextMatchDate={campaign.infos.nextMatchDate}
-            image={campaign.cover?.link}
-            fogColor="#0A358A"
-            textColor="white"
-            size="straight"
-            buttonColor="white"
-            buttonTitle="Entrar no Jogo"
-            system={campaign.system}
-            ageRestriction={campaign.ageRestriction}
-            campaignPlayers={campaign.campaignPlayers}
-            playerAmountLimit={campaign.infos.playerAmountLimit}
-            campaignId={campaign.campaignId}
-            onButtonClick={() =>
-                handleJoinClick(campaign.campaignId, campaign.campaignPlayers)
-            }
-        />
-    ));
+    const cardMap = campaigns.map((campaign) => {
+        const isPending = isCampaignPlayerPending(
+            campaign.campaignPlayers,
+            currentUserId
+        );
+
+        return (
+            <CampaignCard
+                className="embla__slide"
+                key={uuid()}
+                title={campaign.title}
+                nextMatchDate={campaign.infos.nextMatchDate}
+                image={campaign.cover?.link}
+                fogColor="#0A358A"
+                textColor="white"
+                size="straight"
+                buttonColor="white"
+                buttonTitle={isPending ? 'Aguardando aprovação \u29d6' : 'Entrar no Jogo'}
+                buttonDisabled={isPending}
+                system={campaign.system}
+                ageRestriction={campaign.ageRestriction}
+                campaignPlayers={campaign.campaignPlayers}
+                playerAmountLimit={campaign.infos.playerAmountLimit}
+                campaignId={campaign.campaignId}
+                onButtonClick={() =>
+                    handleJoinClick(campaign.campaignId, campaign.campaignPlayers)
+                }
+            />
+        );
+    });
 
     const cards =
         cardMap.length > 0

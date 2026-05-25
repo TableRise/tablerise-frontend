@@ -115,8 +115,8 @@ export default function CharacterSheetPage(): JSX.Element {
             data: {
                 profile: {
                     name: p.characterName,
-                    class: p.selectedClassId,
-                    race: p.selectedRaceId,
+                    class: p.selectedClassName || p.selectedClassId,
+                    race: p.selectedRaceName || p.selectedRaceId,
                     level: p.level,
                     xp: p.xp,
                     characteristics: {

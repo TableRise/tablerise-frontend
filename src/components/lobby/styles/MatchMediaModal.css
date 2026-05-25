@@ -119,4 +119,46 @@
             grid-template-columns: 1fr;
         }
     }
+
+    html[data-theme='dark'] .mmm-tab--active,
+    html[data-theme='dark'] .mmm-playing-badge {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .mmm-modal {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .mmm-header h2,
+    html[data-theme='dark'] .mmm-close {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .mmm-close:hover,
+    html[data-theme='dark'] .mmm-music-item:hover {
+        background-color: var(--theme-surface-strong);
+    }
+
+    html[data-theme='dark'] .mmm-tabs,
+    html[data-theme='dark'] .mmm-music-item {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .mmm-music-item {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .mmm-tab,
+    html[data-theme='dark'] .mmm-empty {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .mmm-music-title {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .mmm-music-item--active {
+        background-color: var(--theme-accent-soft);
+    }
 }

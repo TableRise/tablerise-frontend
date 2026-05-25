@@ -2,11 +2,19 @@ import { useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getCampaignById, addPlayerToCampaign } from '@/server/campaigns/join-campaign';
 import TableriseContext from '@/context/TableriseContext';
+import {
+    getCampaignPlayerStatus,
+    type CampaignPlayerStatusLike,
+} from '@/components/home/helpers/campaignPlayerStatus';
+
+interface UseJoinCampaignOptions {
+    onJoinRequested?: () => void | Promise<void>;
+}
 
 interface UseJoinCampaignReturn {
     handleJoinClick: (
         campaignId: string,
-        campaignPlayers: { role?: string; userId?: string }[]
+        campaignPlayers: CampaignPlayerStatusLike[]
     ) => Promise<void>;
     passwordModalOpen: boolean;
     passwordError: string;
@@ -16,23 +24,43 @@ interface UseJoinCampaignReturn {
     closeJoinError: () => void;
 }
 
-export function useJoinCampaign(): UseJoinCampaignReturn {
+function getCurrentUserId(): string {
+    if (typeof window === 'undefined') return '';
+
+    return JSON.parse(localStorage.getItem('userLogged') ?? 'null')?.userId ?? '';
+}
+
+export function useJoinCampaign(options?: UseJoinCampaignOptions): UseJoinCampaignReturn {
     const router = useRouter();
-    const { userCampaigns } = useContext(TableriseContext);
+    const { userCampaigns, recoverUserCampaigns } = useContext(TableriseContext);
     const [passwordModalOpen, setPasswordModalOpen] = useState(false);
     const [passwordError, setPasswordError] = useState('');
     const [pendingCampaignId, setPendingCampaignId] = useState('');
     const [joinError, setJoinError] = useState('');
 
-    async function handleJoinClick(campaignId: string) {
-        const alreadyJoined =
-            userCampaigns.player.some((c) => c.campaignId === campaignId) ||
-            userCampaigns.master.some((c) => c.campaignId === campaignId);
+    async function handleJoinClick(
+        campaignId: string,
+        campaignPlayers: CampaignPlayerStatusLike[] = []
+    ) {
+        const currentUserId = getCurrentUserId();
+        const playerCampaign = userCampaigns.player.find(
+            (campaign) => campaign.campaignId === campaignId
+        );
+        const masterCampaign = userCampaigns.master.find(
+            (campaign) => campaign.campaignId === campaignId
+        );
+        const playerStatus =
+            getCampaignPlayerStatus(
+                playerCampaign?.campaignPlayers ?? campaignPlayers,
+                currentUserId
+            ) ?? getCampaignPlayerStatus(campaignPlayers, currentUserId);
 
-        if (alreadyJoined) {
+        if (masterCampaign || playerStatus === 'active') {
             router.push(`/campaigns/lobby?campaignId=${campaignId}`);
             return;
         }
+
+        if (playerStatus === 'pending') return;
 
         try {
             const campaign = await getCampaignById(campaignId);
@@ -42,7 +70,8 @@ export function useJoinCampaign(): UseJoinCampaignReturn {
 
             if (!hasPassword) {
                 await addPlayerToCampaign(campaignId);
-                router.push(`/campaigns/lobby?campaignId=${campaignId}`);
+                await recoverUserCampaigns();
+                await options?.onJoinRequested?.();
             } else {
                 setPendingCampaignId(campaignId);
                 setPasswordError('');
@@ -57,7 +86,9 @@ export function useJoinCampaign(): UseJoinCampaignReturn {
         try {
             await addPlayerToCampaign(pendingCampaignId, password);
             setPasswordModalOpen(false);
-            router.push(`/campaigns/lobby?campaignId=${pendingCampaignId}`);
+            setPendingCampaignId('');
+            await recoverUserCampaigns();
+            await options?.onJoinRequested?.();
         } catch (err: any) {
             setPasswordError(err.message || 'Erro ao entrar na campanha');
         }

@@ -16,6 +16,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 export default function LoginFormCredentials(): JSX.Element {
     const [activationModalOpen, setActivationModalOpen] = useState(false);
     const [pendingEmail, setPendingEmail] = useState('');
+    const [activationSuccessMessage, setActivationSuccessMessage] = useState('');
 
     const {
         register,
@@ -28,6 +29,7 @@ export default function LoginFormCredentials(): JSX.Element {
 
     const login = async (value: LoginPayload): Promise<AxiosResponse | void> => {
         try {
+            setActivationSuccessMessage('');
             const loginResult = await postLogin(value);
 
             if (!loginResult) return;
@@ -38,11 +40,13 @@ export default function LoginFormCredentials(): JSX.Element {
 
             return;
         } catch (error: Error | any) {
-            if (error.message?.includes('Usuário com status incorreto para login')) {
+            if (error.message?.includes('status incorreto para login')) {
+                setActivationSuccessMessage('');
                 setPendingEmail(value.email);
                 setActivationModalOpen(true);
                 return;
             }
+
             setError('root', {
                 type: 'manual',
                 message: `${error.message}`,
@@ -58,6 +62,13 @@ export default function LoginFormCredentials(): JSX.Element {
                 <ActivationCodeModal
                     email={pendingEmail}
                     onClose={() => setActivationModalOpen(false)}
+                    onConfirmed={() => {
+                        setActivationModalOpen(false);
+                        setPendingEmail('');
+                        setActivationSuccessMessage(
+                            'Conta confirmada com sucesso. Entre com seu email e senha para continuar.'
+                        );
+                    }}
                 />
             )}
             <form className="login-form-credentials" onSubmit={handleSubmit(login)}>
@@ -98,6 +109,11 @@ export default function LoginFormCredentials(): JSX.Element {
                     {errors.root && (
                         <span className="font-XXS-regular text-color-support/alert">
                             {errors.root.message}
+                        </span>
+                    )}
+                    {activationSuccessMessage && (
+                        <span className="font-XXS-regular text-color-support/success">
+                            {activationSuccessMessage}
                         </span>
                     )}
                     <div className="divider-container">

@@ -1,0 +1,219 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .mhim-overlay,
+    .mhiv-overlay {
+        @apply fixed inset-0 z-[220] flex items-center justify-center bg-black/65 px-4;
+    }
+
+    .mhim-modal,
+    .mhiv-modal {
+        @apply w-full rounded-2xl bg-color-greyScale/100 shadow-2xl border border-color-greyScale/200;
+    }
+
+    .mhim-modal {
+        @apply max-w-4xl overflow-hidden;
+    }
+
+    .mhiv-modal {
+        @apply max-w-5xl relative p-5;
+    }
+
+    .mhim-header {
+        @apply flex items-start justify-between gap-4 px-6 pt-6 pb-4;
+    }
+
+    .mhim-title,
+    .mhim-close,
+    .mhiv-close,
+    .mhiv-kicker {
+        @apply text-color-primary/default_900;
+    }
+
+    .mhim-subtitle,
+    .mhim-gallery-hint {
+        @apply mt-1 text-color-greyScale/500;
+    }
+
+    .mhim-close,
+    .mhiv-close {
+        @apply flex h-8 w-8 items-center justify-center rounded-full transition-opacity hover:opacity-70;
+    }
+
+    .mhiv-close {
+        @apply absolute right-4 top-4 z-[1];
+    }
+
+    .mhim-body {
+        @apply flex flex-col gap-5 px-6 pb-6;
+    }
+
+    .mhim-actions {
+        @apply flex justify-start;
+    }
+
+    .mhim-upload-btn {
+        @apply rounded-lg border border-color-greyScale/300 bg-color-greyScale/50 px-4 py-2 text-color-greyScale/700 transition-colors hover:bg-color-greyScale/100 disabled:cursor-not-allowed disabled:opacity-50;
+    }
+
+    .mhim-gallery {
+        @apply flex flex-col gap-3;
+    }
+
+    .mhim-gallery-header {
+        @apply flex flex-col gap-1;
+    }
+
+    .mhim-gallery-title {
+        @apply text-color-greyScale/900;
+    }
+
+    .mhim-empty {
+        @apply rounded-xl border border-dashed border-color-greyScale/300 py-8 text-center text-color-greyScale/500;
+    }
+
+    .mhim-grid {
+        @apply grid gap-4;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .mhim-item {
+        @apply rounded-xl overflow-hidden border border-color-greyScale/200 bg-color-greyScale/50 text-left transition-colors hover:border-color-primary/default_900 hover:bg-white disabled:cursor-not-allowed disabled:opacity-60;
+    }
+
+    .mhim-item--active {
+        @apply border-color-primary/default_900;
+        box-shadow: inset 0 0 0 1px rgba(10, 53, 138, 0.14);
+    }
+
+    .mhim-item-image {
+        @apply block h-40 w-full object-cover;
+    }
+
+    .mhim-item-footer {
+        @apply flex items-center justify-between gap-3 px-3 py-3;
+    }
+
+    .mhim-item-title {
+        @apply truncate text-color-greyScale/900;
+    }
+
+    .mhim-item-state {
+        @apply whitespace-nowrap text-color-primary/default_900;
+    }
+
+    .mhim-error {
+        @apply text-red-600;
+    }
+
+    .mhiv-content {
+        @apply flex flex-col gap-4;
+    }
+
+    .mhiv-copy {
+        @apply flex flex-col gap-1 pr-10;
+    }
+
+    .mhiv-title {
+        @apply text-color-greyScale/900;
+    }
+
+    .mhiv-image-shell {
+        @apply overflow-hidden rounded-2xl border border-color-greyScale/200 bg-color-greyScale/50;
+        max-height: calc(100vh - 10rem);
+    }
+
+    .mhiv-image {
+        @apply block w-full object-contain;
+        max-height: calc(100vh - 10rem);
+    }
+
+    @media (max-width: 768px) {
+        .mhim-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .mhim-header,
+        .mhim-body {
+            @apply px-5;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .mhim-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .mhim-header,
+        .mhim-body {
+            @apply px-4;
+        }
+
+        .mhiv-modal {
+            @apply p-4;
+        }
+    }
+
+    html[data-theme='dark'] .mhim-modal,
+    html[data-theme='dark'] .mhiv-modal {
+        background-color: var(--theme-surface);
+        border-color: var(--theme-border);
+        box-shadow: var(--theme-shadow-strong);
+    }
+
+    html[data-theme='dark'] .mhim-title,
+    html[data-theme='dark'] .mhim-close,
+    html[data-theme='dark'] .mhiv-close,
+    html[data-theme='dark'] .mhiv-kicker {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .mhim-subtitle,
+    html[data-theme='dark'] .mhim-gallery-hint {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .mhim-upload-btn,
+    html[data-theme='dark'] .mhim-item,
+    html[data-theme='dark'] .mhim-empty,
+    html[data-theme='dark'] .mhiv-image-shell {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .mhim-upload-btn,
+    html[data-theme='dark'] .mhim-item,
+    html[data-theme='dark'] .mhiv-image-shell {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .mhim-upload-btn {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .mhim-upload-btn:hover,
+    html[data-theme='dark'] .mhim-item:hover {
+        background-color: var(--theme-surface-strong);
+    }
+
+    html[data-theme='dark'] .mhim-gallery-title,
+    html[data-theme='dark'] .mhim-item-title,
+    html[data-theme='dark'] .mhiv-title {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .mhim-empty {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .mhim-item-state {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .mhim-item--active {
+        border-color: var(--theme-accent);
+        box-shadow: inset 0 0 0 1px
+            color-mix(in srgb, var(--theme-accent) 36%, transparent);
+    }
+}

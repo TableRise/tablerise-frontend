@@ -79,4 +79,16 @@
             @apply ml-0 w-full justify-start;
         }
     }
+
+    html[data-theme='dark'] .campaign-card .card-infos .card-buttons .card-player-limit {
+        background-color: rgba(7, 17, 31, 0.82);
+        color: var(--theme-accent);
+        border: 1px solid rgba(237, 242, 255, 0.14);
+        backdrop-filter: blur(8px);
+    }
+
+    html[data-theme='dark'] .campaign-card .card-infos .card-buttons .card-menu {
+        border-color: rgba(237, 242, 255, 0.18);
+        background-color: rgba(7, 17, 31, 0.7);
+    }
 }

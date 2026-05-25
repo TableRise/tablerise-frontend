@@ -85,4 +85,16 @@
             @apply w-full;
         }
     }
+
+    html[data-theme='dark'] .jcm-modal {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .jcm-input-title,
+    html[data-theme='dark'] .jcm-input-code {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+        color: var(--theme-text);
+    }
 }

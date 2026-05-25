@@ -25,6 +25,8 @@ export default function CheckBoxField({
                     {labelWithLink && (
                         <Link
                             href={srcLink || ''}
+                            target="_blank"
+                            rel="noreferrer"
                             className="checkbox-link font-XS-regular"
                         >
                             {' '}

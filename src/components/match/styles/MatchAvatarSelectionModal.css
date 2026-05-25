@@ -95,4 +95,68 @@
     .masm-empty {
         @apply text-color-greyScale/500;
     }
+
+    html[data-theme='dark'] .masm-modal {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow-strong);
+    }
+
+    html[data-theme='dark'] .masm-title,
+    html[data-theme='dark'] .masm-close-btn {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .masm-subtitle,
+    html[data-theme='dark'] .masm-empty {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .masm-divider,
+    html[data-theme='dark'] .masm-search-input,
+    html[data-theme='dark'] .masm-action-btn,
+    html[data-theme='dark'] .masm-option {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .masm-search-input,
+    html[data-theme='dark'] .masm-action-btn,
+    html[data-theme='dark'] .masm-option,
+    html[data-theme='dark'] .masm-option-avatar {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .masm-search-input,
+    html[data-theme='dark'] .masm-option-name {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .masm-search-input::placeholder {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .masm-action-btn {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .masm-action-btn:hover:not(:disabled),
+    html[data-theme='dark'] .masm-option:hover {
+        background-color: var(--theme-surface-strong);
+        border-color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .masm-option--active {
+        background-color: color-mix(
+            in srgb,
+            var(--theme-accent) 14%,
+            var(--theme-surface)
+        );
+        border-color: var(--theme-accent);
+        box-shadow: inset 0 0 0 1px
+            color-mix(in srgb, var(--theme-accent) 38%, transparent);
+    }
+
+    html[data-theme='dark'] .masm-option-state {
+        background-color: var(--theme-accent);
+        color: #081223;
+    }
 }

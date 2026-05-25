@@ -256,4 +256,75 @@
             @apply overflow-x-auto;
         }
     }
+
+    html[data-theme='dark'] .sm-title,
+    html[data-theme='dark'] .sm-money-value,
+    html[data-theme='dark'] .sm-change-char-btn,
+    html[data-theme='dark'] .sm-tab--active,
+    html[data-theme='dark'] .sm-vault-preview-value,
+    html[data-theme='dark'] .sm-vault-form-title {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .sm-modal,
+    html[data-theme='dark'] .sm-picker-card,
+    html[data-theme='dark'] .sm-vault-form {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .sm-money-item,
+    html[data-theme='dark'] .sm-vault-currency-box,
+    html[data-theme='dark'] .sm-vault-preview,
+    html[data-theme='dark'] .sm-table thead,
+    html[data-theme='dark'] .sm-picker-card:hover {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .sm-tabs,
+    html[data-theme='dark'] .sm-search-input,
+    html[data-theme='dark'] .sm-type-select,
+    html[data-theme='dark'] .sm-table-wrapper,
+    html[data-theme='dark'] .sm-table tbody tr,
+    html[data-theme='dark'] .sm-picker-card,
+    html[data-theme='dark'] .sm-vault-form,
+    html[data-theme='dark'] .sm-vault-select,
+    html[data-theme='dark'] .sm-vault-amount-input {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .sm-search-input,
+    html[data-theme='dark'] .sm-type-select,
+    html[data-theme='dark'] .sm-vault-select,
+    html[data-theme='dark'] .sm-vault-amount-input {
+        background-color: var(--theme-surface-muted);
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .sm-close-btn,
+    html[data-theme='dark'] .sm-tab,
+    html[data-theme='dark'] .sm-money-label,
+    html[data-theme='dark'] .sm-loading,
+    html[data-theme='dark'] .sm-empty-row td,
+    html[data-theme='dark'] .sm-picker-empty,
+    html[data-theme='dark'] .sm-vault-preview-label,
+    html[data-theme='dark'] .sm-history-date {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .sm-char-name,
+    html[data-theme='dark'] .sm-table th,
+    html[data-theme='dark'] .sm-table td,
+    html[data-theme='dark'] .sm-vault-label {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .sm-table tbody tr:nth-child(even),
+    html[data-theme='dark'] .sm-table tbody tr:nth-child(odd) {
+        background-color: var(--theme-surface);
+    }
+
+    html[data-theme='dark'] .sm-table tbody tr:hover {
+        background-color: var(--theme-surface-strong);
+    }
 }

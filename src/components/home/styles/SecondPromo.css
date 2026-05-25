@@ -50,4 +50,17 @@
             @apply h-[13rem];
         }
     }
+
+    html[data-theme='dark'] .second-promo-section {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .second-promo-text h2 {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .second-promo-text p {
+        color: var(--theme-text-muted);
+    }
 }

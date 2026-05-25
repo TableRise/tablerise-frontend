@@ -45,7 +45,7 @@ export const createCampaign = async (payload: CreateCampaignPayload) => {
         formData.append('mainHistory', payload.mainHistory);
         formData.append('playerAmountLimit', String(payload.playerAmountLimit));
         formData.append('configurations', JSON.stringify(payload.configurations));
-        if (payload.password) formData.append('password', payload.password);
+        formData.append('password', payload.password);
         if (payload.coverImage) formData.append('cover', payload.coverImage);
         if (payload.nextMatchDate.length > 0) {
             formData.append('nextMatchDate', JSON.stringify(payload.nextMatchDate[0]));

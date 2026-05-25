@@ -93,4 +93,15 @@
             @apply px-3 py-5;
         }
     }
+
+    html[data-theme='dark'] .support-page-card {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .support-form-textarea {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+        color: var(--theme-text);
+    }
 }

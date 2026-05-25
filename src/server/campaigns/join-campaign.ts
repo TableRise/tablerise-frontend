@@ -85,18 +85,18 @@ export const leaveCampaign = async (campaignId: string): Promise<void> => {
     }
 };
 
-export const deleteCampaign = async (campaignId: string): Promise<void> => {
+export const closeCampaign = async (campaignId: string): Promise<void> => {
     try {
         await apiCall({
             baseUrl: campaignsBaseUrl,
-            endpoint: `${campaignId}/delete`,
-            method: 'DELETE',
+            endpoint: `${campaignId}/close`,
+            method: 'PATCH',
         });
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
         if (status === 404) throw new Error('Campanha não encontrada');
         if (status === 500) throw new Error('Erro no servidor');
-        throw new Error('Erro ao deletar campanha');
+        throw new Error('Erro ao finalizar campanha');
     }
 };
 
