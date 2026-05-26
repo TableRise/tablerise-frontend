@@ -422,7 +422,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                         </div>
                                                         <div className="cs-spell-accordion-field">
                                                             <span className="cs-spell-accordion-field-label">
-                                                                Tempo de ConjuraÃ§Ã£o
+                                                                Tempo de Conjuração
                                                             </span>
                                                             <span className="cs-spell-accordion-field-value">
                                                                 {spell.castingTime}
@@ -430,7 +430,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                                         </div>
                                                         <div className="cs-spell-accordion-field">
                                                             <span className="cs-spell-accordion-field-label">
-                                                                DuraÃ§Ã£o
+                                                                Duração
                                                             </span>
                                                             <span className="cs-spell-accordion-field-value">
                                                                 {spell.duration}
@@ -526,7 +526,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                         </div>
                                         <div className="cs-spell-accordion-field">
                                             <span className="cs-spell-accordion-field-label">
-                                                Tempo de ConjuraÃ§Ã£o
+                                                Tempo de Conjuração
                                             </span>
                                             <span className="cs-spell-accordion-field-value">
                                                 {detailSpell.castingTime}
@@ -534,7 +534,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                         </div>
                                         <div className="cs-spell-accordion-field">
                                             <span className="cs-spell-accordion-field-label">
-                                                DuraÃ§Ã£o
+                                                Duração
                                             </span>
                                             <span className="cs-spell-accordion-field-value">
                                                 {detailSpell.duration}

@@ -10,21 +10,17 @@ export default function SocialLoginButton({
     title,
     socialType,
 }: SocialLoginButtonProps): JSX.Element {
+    const oauthHref = `${process.env.API_OAUTH ?? ''}/${socialType}`;
+
     return (
         <div className="button-container">
             <Link
-                href={`${process.env.API_OAUTH}/${socialType}`}
-                className="social-button-link"
+                href={oauthHref}
+                className="social-button social-button-link button-M-outline-il"
             >
-                <button className="social-button button-M-outline-il" type="button">
-                    {socialType === 'discord' && (
-                        <DiscordLogo style={{ color: '#464646' }} />
-                    )}
-                    {socialType === 'google' && (
-                        <GoogleLogo style={{ color: '#464646' }} />
-                    )}
-                    <p className="button-text font-XS-bold">{title}</p>
-                </button>
+                {socialType === 'discord' && <DiscordLogo style={{ color: '#464646' }} />}
+                {socialType === 'google' && <GoogleLogo style={{ color: '#464646' }} />}
+                <span className="button-text font-XS-bold">{title}</span>
             </Link>
         </div>
     );

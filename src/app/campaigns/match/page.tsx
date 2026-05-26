@@ -111,6 +111,7 @@ import GridOffDarkSVG from '../../../../assets/icons/nav/grid-off-dark.svg?url';
 import GridOnLightSVG from '../../../../assets/icons/nav/grind-on-blue.svg?url';
 import GridOnDarkSVG from '../../../../assets/icons/nav/grind-on-dark.svg?url';
 import SideImageBackground from '../../../../public/images/SideImageBackground.svg?url';
+import { useStoredUser } from '@/hooks/useStoredUser';
 import '@/app/campaigns/match/page.css';
 
 const ABILITY_LABELS: Record<string, string> = {
@@ -347,6 +348,7 @@ export default function MatchPage(): JSX.Element {
     const campaignId = searchParams.get('campaignId') ?? '';
     const router = useRouter();
     const { themeMode } = useContext(TableriseContext);
+    const { storedUser: userInfo, hasResolvedStoredUser } = useStoredUser();
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const campaignSocketRef = useRef<CampaignSocket | null>(null);
     const diceBoxHostRef = useRef<HTMLDivElement>(null);
@@ -894,11 +896,6 @@ export default function MatchPage(): JSX.Element {
             }
         }
     };
-
-    const userInfo =
-        typeof window !== 'undefined'
-            ? JSON.parse(localStorage.getItem('userLogged') as string)
-            : null;
 
     const handleLeaveMatch = (target: string) => {
         router.push(target);
@@ -1540,7 +1537,7 @@ export default function MatchPage(): JSX.Element {
             applyHighlightedMatchImage(getMatchDataHighlightedImage(matchData), {
                 openIfNew: true,
             });
-            setXpSystem(data?.configurations?.xpSystem ?? true);
+            setXpSystem((data as any)?.configurations?.xpSystem ?? true);
             if (data && userInfo?.userId) {
                 const role = data.campaignPlayers?.find(
                     (p: { userId: string; role: string }) => p.userId === userInfo.userId
@@ -1821,7 +1818,7 @@ export default function MatchPage(): JSX.Element {
                 setSelectedCharacterId(mine[0].id);
             }
         });
-    }, [campaignId]);
+    }, [campaignId, userInfo?.userId]);
 
     useEffect(() => {
         if (!selectedCharacterId) {
@@ -3077,7 +3074,7 @@ export default function MatchPage(): JSX.Element {
                         title={
                             playingMusicId
                                 ? 'Volume da mÃºsica'
-                                : 'Nenhuma mÃºsica em reproduÃ§Ã£o'
+                                : 'Nenhuma mÃºsica em reprodução'
                         }
                         onClick={() => {
                             if (!playingMusicId) return;
@@ -3612,7 +3609,7 @@ export default function MatchPage(): JSX.Element {
                         <div className="match-journal-highlight-body">
                             {journalHighlightLoading || journalPostsLoading ? (
                                 <span className="font-XS-regular match-journal-highlight-empty">
-                                    Carregando publicaÃ§Ãµes...
+                                    Carregando publicaçÃµes...
                                 </span>
                             ) : journalPosts.length === 0 ? (
                                 <span className="font-XS-regular match-journal-highlight-empty">

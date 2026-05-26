@@ -285,7 +285,7 @@ export default function ProfileTwoFactorActivationModal({
                         <div className="profile-2fa-qr-wrapper">
                             <Image
                                 src={user.twoFactorSecret.qrcode}
-                                alt="QR Code para ativaÃ§Ã£o do autenticador"
+                                alt="QR Code para ativação do autenticador"
                                 width={220}
                                 height={220}
                                 unoptimized

@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid';
 import CampaignCard from '@/components/common/CampaignCard';
 import CampaignPasswordModal from '@/components/home/CampaignPasswordModal';
 import ErrorModal from '@/components/home/ErrorModal';
@@ -7,6 +6,7 @@ import { isCampaignPlayerPending } from '@/components/home/helpers/campaignPlaye
 import { CampaignsToRender } from '@/types/modules/components/home/UserMasterCampaigns';
 import Carousel from '../common/Carousel';
 import BasicParticipationCard from '../common/BasicParticipationCard';
+import { useStoredUser } from '@/hooks/useStoredUser';
 import '@/components/home/styles/UserPlayerCampaigns.css';
 
 export default function UserPlayerCampaigns({
@@ -22,10 +22,8 @@ export default function UserPlayerCampaigns({
         joinError,
         closeJoinError,
     } = useJoinCampaign();
-    const currentUserId =
-        typeof window === 'undefined'
-            ? ''
-            : JSON.parse(localStorage.getItem('userLogged') ?? 'null')?.userId ?? '';
+    const { storedUser } = useStoredUser();
+    const currentUserId = storedUser?.userId ?? '';
 
     const cardMap = campaigns.map((campaign) => {
         const isPending = isCampaignPlayerPending(
@@ -36,7 +34,7 @@ export default function UserPlayerCampaigns({
         return (
             <CampaignCard
                 className="embla__slide"
-                key={uuid()}
+                key={campaign.campaignId}
                 title={campaign.title}
                 nextMatchDate={campaign.infos.nextMatchDate}
                 image={campaign.cover?.link}

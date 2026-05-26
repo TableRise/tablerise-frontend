@@ -17,7 +17,8 @@
         @apply relative h-[5rem] -top-4 px-4 flex flex-col justify-evenly;
     }
 
-    .main-card .card-infos button {
+    .main-card .card-infos .main-card-link {
+        @apply flex w-full items-center justify-center;
         @apply w-full h-10;
         font-family: var('--dm-sans-base');
         font-weight: 700;

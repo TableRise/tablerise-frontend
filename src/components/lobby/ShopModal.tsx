@@ -288,12 +288,12 @@ export default function ShopModal({
         if (!selectedChar || !conversionPreview || !canConvert) return;
 
         if (conversionPreview.net <= 0) {
-            setVaultWarning('ConversÃ£o insuficiente para cobrir a taxa.');
+            setVaultWarning('Conversão insuficiente para cobrir a taxa.');
             return;
         }
 
         if ((currentMoney[fromCurrency] ?? 0) < parsedConvertAmount) {
-            setVaultWarning('Saldo insuficiente para realizar a conversÃ£o.');
+            setVaultWarning('Saldo insuficiente para realizar a conversão.');
             return;
         }
 

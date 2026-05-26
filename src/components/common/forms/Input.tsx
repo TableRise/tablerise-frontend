@@ -20,7 +20,7 @@ export default function Input({
     return (
         <label className="generic-form-input">
             <span className={labelClass}>{title}</span>
-            <div>
+            <span className="generic-form-input-shell">
                 <input
                     className={`${
                         errorMessage ? 'input-error-light' : inputStyle
@@ -34,7 +34,7 @@ export default function Input({
                     disabled={disabled}
                 />
                 {toggleVisibilityButton && <ShowInfoEyeButton />}
-            </div>
+            </span>
             {errorMessage && (
                 <span className={`${errorMessageClass}`}>{errorMessage.message}</span>
             )}

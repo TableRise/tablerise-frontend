@@ -17,6 +17,7 @@
 
     html[data-theme='dark'] .basic-creation-card .basic-add-button {
         background-color: var(--theme-surface);
-        box-shadow: var(--theme-shadow);
+        border: 1px solid var(--theme-border);
+        box-shadow: none;
     }
 }

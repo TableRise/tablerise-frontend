@@ -129,7 +129,8 @@
 
     html[data-theme='dark'] .user-player-campaigns {
         background-color: var(--theme-surface);
-        box-shadow: var(--theme-shadow);
+        border: 1px solid var(--theme-border);
+        box-shadow: none;
     }
 
     html[data-theme='dark']

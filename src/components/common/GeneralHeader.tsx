@@ -78,15 +78,19 @@ export default function GeneralHeader(): JSX.Element {
                     </ul>
                 </nav>
                 <div className="buttons-header">
-                    <Link href="/login" onClick={closeMenu}>
-                        <button className="font-XS-bold button-transparent-default">
-                            Entrar
-                        </button>
+                    <Link
+                        href="/login"
+                        onClick={closeMenu}
+                        className="font-XS-bold button-transparent-default"
+                    >
+                        Entrar
                     </Link>
-                    <Link href="/register" onClick={closeMenu}>
-                        <button className="font-XS-bold button-white-default">
-                            Registrar
-                        </button>
+                    <Link
+                        href="/register"
+                        onClick={closeMenu}
+                        className="font-XS-bold button-white-default"
+                    >
+                        Registrar
                     </Link>
                 </div>
             </div>

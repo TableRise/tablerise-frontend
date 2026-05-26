@@ -16,10 +16,11 @@ export default function Banner(): JSX.Element {
                         <br />
                         pr&aacute;tica e descomplicada
                     </p>
-                    <Link href="/register">
-                        <button className="button-white-default font-S-bold banner-home-cta">
-                            Registrar-se
-                        </button>
+                    <Link
+                        href="/register"
+                        className="button-white-default font-S-bold banner-home-cta"
+                    >
+                        Registrar-se
                     </Link>
                 </div>
             </div>

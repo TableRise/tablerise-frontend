@@ -1,6 +1,5 @@
 'use client';
 import { useState } from 'react';
-import { v4 as uuid } from 'uuid';
 import CampaignCard from '@/components/common/CampaignCard';
 import BasicCreationCard from '@/components/common/BasicCreationCard';
 import CreateCampaignModal from '@/components/home/CreateCampaignModal';
@@ -51,7 +50,7 @@ export default function UserMasterCampaigns({
                 {campaigns.length > 0 && (
                     <CampaignCard
                         className={'embla__slide'}
-                        key={uuid()}
+                        key={campaigns[0].campaignId}
                         title={campaigns[0].title}
                         nextMatchDate={campaigns[0].infos.nextMatchDate}
                         fogColor="#0A358A"
@@ -76,7 +75,7 @@ export default function UserMasterCampaigns({
                 {campaigns.length > 1 ? (
                     <CampaignCard
                         className={'embla__slide'}
-                        key={uuid()}
+                        key={campaigns[1].campaignId}
                         title={campaigns[1].title}
                         nextMatchDate={campaigns[1].infos.nextMatchDate}
                         fogColor="#0A358A"

@@ -73,22 +73,22 @@ const ABILITY_FULL: Record<string, string> = {
 const SKILL_LABELS: Record<string, string> = {
     athletics: 'Atletismo',
     acrobatics: 'Acrobacia',
-    sleightOfHand: 'PrestidigitaÃ§Ã£o',
+    sleightOfHand: 'Prestidigitação',
     stealth: 'Furtividade',
     arcana: 'Arcanismo',
     history: 'História',
-    investigation: 'InvestigaÃ§Ã£o',
+    investigation: 'Investigação',
     nature: 'Natureza',
-    religion: 'ReligiÃ£o',
+    religion: 'Religião',
     animalHandling: 'Lidar com Animais',
-    insight: 'IntuiÃ§Ã£o',
+    insight: 'Intuição',
     medicine: 'Medicina',
     perception: 'Percepção',
     survival: 'SobrevivÃªncia',
-    deception: 'EnganaÃ§Ã£o',
-    intimidation: 'IntimidaÃ§Ã£o',
-    performance: 'AtuaÃ§Ã£o',
-    persuasion: 'PersuasÃ£o',
+    deception: 'Enganação',
+    intimidation: 'Intimidação',
+    performance: 'Atuação',
+    persuasion: 'Persuasão',
 };
 
 // maps skill key â†’ ability key (str/dex/con/int/wis/cha)
@@ -885,7 +885,7 @@ export default function CharacterDetailModal({
 
                     {!loading && !char && (
                         <span className="font-XS-regular cdm-loading">
-                            NÃ£o foi possÃ­vel carregar a ficha.
+                            não foi possível carregar a ficha.
                         </span>
                     )}
 
@@ -1065,7 +1065,7 @@ export default function CharacterDetailModal({
                                         >
                                             <Image
                                                 src={ArrowRightIcon}
-                                                alt="prÃ³xima"
+                                                alt="próxima"
                                                 width={18}
                                                 height={18}
                                             />
@@ -1781,7 +1781,7 @@ export default function CharacterDetailModal({
                                                         Nome
                                                     </span>
                                                     <span className="font-XXS-bold">
-                                                        BÃ´nus de Ataque
+                                                        Bônus de Ataque
                                                     </span>
                                                     <span className="font-XXS-bold">
                                                         Dano
@@ -2078,7 +2078,7 @@ export default function CharacterDetailModal({
                                                 placeholder="+0"
                                             />
                                             <span className="cs-field-label">
-                                                BÃ´nus de Ataque com Magia
+                                                Bônus de Ataque com Magia
                                             </span>
                                         </div>
                                     </div>
@@ -2118,7 +2118,7 @@ export default function CharacterDetailModal({
                                                         {sl.slots && (
                                                             <div className="cs-spell-slots">
                                                                 <span>
-                                                                    EspaÃ§os de Magia:{' '}
+                                                                    Espaços de Magia:{' '}
                                                                     {levelData.slotsTotal ||
                                                                         0}
                                                                 </span>
@@ -2305,7 +2305,7 @@ export default function CharacterDetailModal({
                                                         {sl.slots && (
                                                             <div className="cs-spell-slots">
                                                                 <span>
-                                                                    EspaÃ§os de Magia:{' '}
+                                                                    Espaços de Magia:{' '}
                                                                     {levelData.slotsTotal ||
                                                                         0}
                                                                 </span>

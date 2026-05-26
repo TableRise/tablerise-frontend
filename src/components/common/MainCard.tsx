@@ -6,6 +6,7 @@ import { resolveCardStyles } from '@/utils/cardStyles';
 
 export default function MainCard(cardProps: MainCardProps): JSX.Element {
     const {
+        slug,
         title = 'default',
         buttonTitle = 'Ler mais',
         fogColor = '#FFFFFF',
@@ -38,10 +39,11 @@ export default function MainCard(cardProps: MainCardProps): JSX.Element {
             />
             <div className="card-infos">
                 <span className={`font-L-semibold ${textColorCSS} mb-4`}>{title}</span>
-                <Link href={`/tutorial/${title.toLowerCase()}`}>
-                    <button className={`${buttonColorCSS} ${buttonTextColorCSS}`}>
-                        {buttonTitle}
-                    </button>
+                <Link
+                    href={`/tutorial/${slug ?? title.toLowerCase()}`}
+                    className={`main-card-link ${buttonColorCSS} ${buttonTextColorCSS}`}
+                >
+                    {buttonTitle}
                 </Link>
             </div>
         </div>

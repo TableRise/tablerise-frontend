@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid';
 import MainCard from '@/components/common/MainCard';
 import { cards } from '@/app/tutorial/data';
 import '@/app/tutorial/styles/page.css';
@@ -11,13 +10,14 @@ export default function Tutorial(): JSX.Element {
                     <h2 className="font-XXL-bold">Tutorial</h2>
                     <span>
                         Aprenda a configurar campanhas, personagens, mapas, trilhas
-                        sonoras e outras funções disponíveis na sua sessão.
+                        sonoras e outras funçÃµes disponÃ­veis na sua sessão.
                     </span>
                 </header>
                 <div className="tutorial-cards">
                     {cards.map((card) => (
                         <MainCard
-                            key={uuid()}
+                            key={card.slug}
+                            slug={card.slug}
                             title={card.title}
                             textColor={card.textColor}
                             buttonColor={card.buttonColor}

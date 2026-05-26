@@ -5,7 +5,7 @@ const profileCompletionFields = {
     lastName: z
         .string()
         .min(2, { message: 'Sobrenome deve ter no mÃ­nimo 2 caracteres*' }),
-    birthday: z.string().min(1, { message: 'Data de nascimento Ã© obrigatÃ³ria*' }),
+    birthday: z.string().min(1, { message: 'Data de nascimento é obrigatória*' }),
 };
 
 export const completeProfileUserSchema = z.object(profileCompletionFields);

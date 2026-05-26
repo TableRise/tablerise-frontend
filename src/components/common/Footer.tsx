@@ -61,8 +61,8 @@ export default function Footer(): JSX.Element {
                 </div>
 
                 <div className="footer-links">
+                    <h5>Links Rápidos</h5>
                     <ul>
-                        <h5>Links Rápidos</h5>
                         <li>
                             <Link href="/">Sobre</Link>
                         </li>
@@ -75,16 +75,16 @@ export default function Footer(): JSX.Element {
                     </ul>
                 </div>
                 <div className="footer-links">
+                    <h5>Outros</h5>
                     <ul>
-                        <h5>Outros</h5>
                         <li>
                             <Link href="/terms">Termos de serviço</Link>
                         </li>
                         <li>
-                            <Link href="/">Políticas de privacidade</Link>
+                            <Link href="/">PolÃ­ticas de privacidade</Link>
                         </li>
                         <li>
-                            <Link href="/">Configurações de cookies</Link>
+                            <Link href="/">ConfiguraçÃµes de cookies</Link>
                         </li>
                         <li>
                             <Link href="/">supporte</Link>

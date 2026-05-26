@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { v4 as uuid } from 'uuid';
 import CampaignCard from '@/components/common/CampaignCard';
 import ErrorModal from '@/components/home/ErrorModal';
 import CampaignPasswordModal from '@/components/home/CampaignPasswordModal';
@@ -102,7 +101,7 @@ export default function JoinCampaignModal({ onClose }: Props): JSX.Element {
                     <input
                         className="jcm-input-title font-XS-regular"
                         type="text"
-                        placeholder="Título da campanha"
+                        placeholder="TÃ­tulo da campanha"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                     />
@@ -138,7 +137,7 @@ export default function JoinCampaignModal({ onClose }: Props): JSX.Element {
 
                                     return (
                                         <CampaignCard
-                                            key={uuid()}
+                                            key={campaign.campaignId}
                                             title={campaign.title}
                                             nextMatchDate={getCampaignNextMatchDate(
                                                 campaign

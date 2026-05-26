@@ -1,30 +1,23 @@
 'use client';
 
-import { KeyboardEvent, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import badgesCatalog from '@assets/badges.js';
-import EditIcon from '@assets/icons/sys/edit.svg?url';
 import { getUser } from '@/server/users/get-user';
 import { getCampaignsByUserId } from '@/server/campaigns/get-campaigns';
-import formatDate from '@/utils/formatDate';
 import {
     getCharacterById,
     type FullCharacterDnd,
 } from '@/server/characters/get-characters';
-import type {
-    DatabaseCampaign,
-    DatabaseCampaignGroupsResponse,
-    DatabaseUserDetail,
-    DatabaseUserWithDetails,
-} from '@/types/shared/entities';
+import type { DatabaseUserWithDetails } from '@/types/shared/entities';
 import TableriseContext from '@/context/TableriseContext';
 import CharacterDetailModal from '@/components/lobby/CharacterDetailModal';
-import ProfileCarousel from '@/components/profile/ProfileCarousel';
-import ProfileBadgePopover from '@/components/profile/ProfileBadgePopover';
 import ImageCropModal from '@/components/common/ImageCropModal';
 import CompleteUserModal from '@/components/login/CompleteUserModal';
-import RankedAvatarFrame from '@/components/common/RankedAvatarFrame';
+import ProfileBadgePopover from '@/components/profile/ProfileBadgePopover';
+import ProfileHeroSection from '@/components/profile/ProfileHeroSection';
+import ProfileShowcaseSection from '@/components/profile/ProfileShowcaseSection';
+import ProfileStateCard from '@/components/profile/ProfileStateCard';
 import ProfileTwoFactorActivationModal from '@/components/profile/ProfileTwoFactorActivationModal';
 import ProfileTwoFactorDisableModal from '@/components/profile/ProfileTwoFactorDisableModal';
 import ProfileFlowWarningModal from '@/components/profile/ProfileFlowWarningModal';
@@ -33,6 +26,25 @@ import ProfileDeleteAccountModal from '@/components/profile/ProfileDeleteAccount
 import ProfileDeleteAccountVerificationModal from '@/components/profile/ProfileDeleteAccountVerificationModal';
 import ProfileEmailUpdateModal from '@/components/profile/ProfileEmailUpdateModal';
 import ProfilePasswordUpdateModal from '@/components/profile/ProfilePasswordUpdateModal';
+import {
+    badgeEntries,
+    badgeMap,
+    defaultProfileImage,
+    formatAccountStatus,
+    formatBadgeName,
+    formatCampaignDate,
+    handleCardKeyDown,
+    mapCharacter,
+    mergeCampaigns,
+    normalizeBirthdayInput,
+    normalizeStoredUserId,
+    normalizeUserDetails,
+    type PendingProfileFlowWarning,
+    type ProfileCampaign,
+    type ProfileCharacter,
+    type ProfileGateStep,
+    type StoredUser,
+} from '@/components/profile/profilePageHelpers';
 import { updateUserPicture } from '@/server/users/update-user-picture';
 import type { ImageUploadIntent } from '@/utils/imageCrop';
 
@@ -40,172 +52,8 @@ type ProfilePageContentProps = {
     userId: string;
 };
 
-type BadgeVariant = {
-    colorful: string;
-    blackandwhite: string;
-    description: string;
-};
-
-type ProfileCampaign = {
-    campaignId: string;
-    title: string;
-    description: string;
-    cover: string;
-    system?: string;
-    ageRestriction?: string;
-    nextMatchDate?: string;
-    playerAmountLimit?: number;
-    playerCount: number;
-};
-
-type ProfileCharacter = {
-    characterId: string;
-    name: string;
-    race: string;
-    className: string;
-    level: number;
-    picture: string;
-};
-
-const badgeMap = badgesCatalog as Record<string, BadgeVariant>;
-const badgeEntries = Object.entries(badgeMap);
-const defaultProfileImage = '/images/SideImageBackground.svg';
-
-type StoredUser = {
-    userId?: string;
-    result?: {
-        userId?: string;
-    };
-    user?: {
-        userId?: string;
-    };
-};
-
-type ProfileGateStep = 'none' | 'complete-profile';
-type PendingProfileFlowWarning =
-    | 'update-email'
-    | 'update-password'
-    | 'enable-two-factor'
-    | 'delete-user';
-
-function normalizeUserDetails(
-    user: DatabaseUserWithDetails | null
-): DatabaseUserDetail | null {
-    return user?.details ?? user?.result?.details ?? null;
-}
-
-function formatBirthday(dateString?: string): string {
-    if (!dateString) return 'não informado';
-
-    const normalizedDate = dateString.includes('T')
-        ? dateString
-        : `${dateString}T00:00:00`;
-    const parsedDate = new Date(normalizedDate);
-
-    if (Number.isNaN(parsedDate.getTime())) return 'não informado';
-
-    return new Intl.DateTimeFormat('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-    }).format(parsedDate);
-}
-
-function normalizeBirthdayInput(dateString?: string): string {
-    if (!dateString) return '';
-    return dateString.includes('T') ? dateString.split('T')[0] : dateString;
-}
-
-function formatAccountStatus(status?: string): string {
-    if (status === 'done') return 'Ativa';
-    return 'Pendente';
-}
-
-function formatBadgeName(key: string): string {
-    return key
-        .replace(/^badge_/g, '')
-        .split('_')
-        .map((part) => {
-            if (/^\d+$/.test(part)) return part;
-            if (part === 'campaigns') return 'campanhas';
-            return part.charAt(0).toUpperCase() + part.slice(1);
-        })
-        .join(' ');
-}
-
-function formatCampaignDate(dateString?: string): string {
-    if (!dateString || dateString === 'no-date' || dateString === 'undefined') {
-        return 'Em aberto';
-    }
-
-    const formattedDate = formatDate(dateString);
-
-    return formattedDate || 'Em aberto';
-}
-
-function mapCampaign(campaign: DatabaseCampaign): ProfileCampaign {
-    const playerCount = (campaign.campaignPlayers ?? []).filter(
-        (player) => player.role === 'player' || player.role === 'admin_player'
-    ).length;
-
-    return {
-        campaignId: campaign.campaignId ?? '',
-        title: campaign.title,
-        description: campaign.description,
-        cover: campaign.cover?.link ?? defaultProfileImage,
-        system: campaign.system,
-        ageRestriction: campaign.ageRestriction,
-        nextMatchDate: campaign.infos?.nextMatchDate,
-        playerAmountLimit: campaign.infos?.playerAmountLimit,
-        playerCount,
-    };
-}
-
-function mergeCampaigns(
-    campaignGroups?: DatabaseCampaignGroupsResponse
-): ProfileCampaign[] {
-    const campaignMap = new Map<string, ProfileCampaign>();
-
-    [...(campaignGroups?.master ?? []), ...(campaignGroups?.player ?? [])].forEach(
-        (campaign) => {
-            const mappedCampaign = mapCampaign(campaign);
-
-            if (!mappedCampaign.campaignId) return;
-            if (campaignMap.has(mappedCampaign.campaignId)) return;
-
-            campaignMap.set(mappedCampaign.campaignId, mappedCampaign);
-        }
-    );
-
-    return Array.from(campaignMap.values());
-}
-
-function mapCharacter(character: FullCharacterDnd): ProfileCharacter {
-    return {
-        characterId: character.characterId,
-        name: character.data.profile.name,
-        race: character.data.profile.race,
-        className: character.data.profile.class,
-        level: character.data.profile.level,
-        picture:
-            character.data.profile.characteristics?.appearance?.picture?.link ??
-            character.data.profile.picture?.link ??
-            character.picture?.link ??
-            defaultProfileImage,
-    };
-}
-
-function handleCardKeyDown(event: KeyboardEvent<HTMLElement>, handler: () => void): void {
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-    event.preventDefault();
-    handler();
-}
-
-function normalizeStoredUserId(storedUser: StoredUser | null): string {
-    const rawUserId =
-        storedUser?.userId ?? storedUser?.result?.userId ?? storedUser?.user?.userId;
-
-    return typeof rawUserId === 'string' ? rawUserId.trim() : '';
+function buildBadgePopoverId(scope: 'catalog', badgeKey: string): string {
+    return `${scope}:${badgeKey}`;
 }
 
 export default function ProfilePageContent({
@@ -369,11 +217,17 @@ export default function ProfilePageContent({
 
         return rawBadges.filter((badgeKey): badgeKey is string => badgeKey in badgeMap);
     }, [userDetails]);
-
     const badgeKeySet = useMemo(() => new Set(earnedBadgeKeys), [earnedBadgeKeys]);
 
-    const buildBadgePopoverId = (scope: 'hero' | 'catalog', badgeKey: string): string =>
-        `${scope}:${badgeKey}`;
+    const refreshProfileUser = async (): Promise<DatabaseUserWithDetails | null> => {
+        const refreshedUser = await getUser(userId);
+
+        if (refreshedUser) {
+            setUser(refreshedUser);
+        }
+
+        return refreshedUser;
+    };
 
     const handleProfilePictureClick = () => {
         if (pictureUploading) return;
@@ -398,16 +252,6 @@ export default function ProfilePageContent({
         }
     };
 
-    const refreshProfileUser = async (): Promise<DatabaseUserWithDetails | null> => {
-        const refreshedUser = await getUser(userId);
-
-        if (refreshedUser) {
-            setUser(refreshedUser);
-        }
-
-        return refreshedUser;
-    };
-
     useEffect(() => {
         if (!isOwnProfile || !userDetails || !user) {
             setGateStep('none');
@@ -424,36 +268,25 @@ export default function ProfilePageContent({
 
     if (loading) {
         return (
-            <section className="profile-state-card">
-                <h1 className="font-XL-bold profile-state-title">Carregando perfil...</h1>
-                <p className="font-S-regular text-color-greyScale/700">
-                    Estamos buscando as informações deste aventureiro.
-                </p>
-            </section>
+            <ProfileStateCard
+                title="Carregando perfil..."
+                description="Estamos buscando as informações deste aventureiro."
+            />
         );
     }
 
     if (fetchError) {
         return (
-            <section className="profile-state-card">
-                <h1 className="font-XL-bold profile-state-title">
-                    Erro ao carregar perfil
-                </h1>
-                <p className="font-S-regular text-color-greyScale/700">{fetchError}</p>
-            </section>
+            <ProfileStateCard title="Erro ao carregar perfil" description={fetchError} />
         );
     }
 
     if (!user || !userDetails) {
         return (
-            <section className="profile-state-card">
-                <h1 className="font-XL-bold profile-state-title">
-                    Perfil não encontrado
-                </h1>
-                <p className="font-S-regular text-color-greyScale/700">
-                    Não encontramos este perfil ou ele não está disponível agora.
-                </p>
-            </section>
+            <ProfileStateCard
+                title="Perfil não encontrado"
+                description="não encontramos este perfil ou ele não está disponÃ­vel agora."
+            />
         );
     }
 
@@ -461,13 +294,13 @@ export default function ProfilePageContent({
         userDetails.lastName ?? ''
     }`.trim();
     const profileHandle = `${user.nickname ?? ''}${user.tag ?? ''}`;
-    const biography = userDetails.biography?.trim();
-    const hasExternalProvider = user.providerId !== null && user.providerId !== undefined;
+    const biography = userDetails.biography?.trim() ?? '';
     const accountStatus = formatAccountStatus(user.inProgress?.status);
     const accountStatusClass =
         user.inProgress?.status === 'done'
             ? 'text-color-support/success'
             : 'text-[#E8B022]';
+
     const campaignItems = campaigns.map((campaign) => (
         <article
             key={campaign.campaignId}
@@ -499,18 +332,18 @@ export default function ProfilePageContent({
                     style={{ objectFit: 'cover' }}
                 />
                 <div className="profile-campaign-card__fog" />
-                {campaign.ageRestriction && (
+                {campaign.ageRestriction ? (
                     <span className="profile-campaign-card__age font-XXS-bold">
                         {campaign.ageRestriction}
                     </span>
-                )}
+                ) : null}
             </div>
             <div className="profile-campaign-card__body">
                 <h3 className="font-M-semibold text-color-greyScale/50">
                     {campaign.title}
                 </h3>
                 <p className="font-XS-regular profile-campaign-card__description">
-                    {campaign.description || 'Sem descriÃƒÂ§ÃƒÂ£o disponível.'}
+                    {campaign.description || 'Sem descriÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o disponÃ­vel.'}
                 </p>
                 <div className="profile-campaign-card__meta">
                     <span className="font-XXS-bold">
@@ -528,6 +361,7 @@ export default function ProfilePageContent({
             </div>
         </article>
     ));
+
     const characterItems = characters.map((character) => (
         <article
             key={character.characterId}
@@ -568,14 +402,14 @@ export default function ProfilePageContent({
                     <span className="font-XXS-bold">{character.race}</span>
                 </div>
                 <span className="font-XS-regular text-color-greyScale/200">
-                    Nível {character.level}
+                    NÃ­vel {character.level}
                 </span>
             </div>
         </article>
     ));
+
     const badgeItems = badgeEntries.map(([badgeKey, badgeVariant]) => {
         const earned = badgeKeySet.has(badgeKey);
-        const badgeSource = earned ? badgeVariant.colorful : badgeVariant.blackandwhite;
         const popoverId = buildBadgePopoverId('catalog', badgeKey);
 
         return (
@@ -583,7 +417,7 @@ export default function ProfilePageContent({
                 key={badgeKey}
                 popoverId={popoverId}
                 label={formatBadgeName(badgeKey)}
-                imageSrc={badgeSource}
+                imageSrc={earned ? badgeVariant.colorful : badgeVariant.blackandwhite}
                 description={badgeVariant.description}
                 variant="card"
                 isOpen={openBadgePopoverId === popoverId}
@@ -592,6 +426,7 @@ export default function ProfilePageContent({
             />
         );
     });
+
     const warningFlowLabel =
         pendingFlowWarning === 'update-email'
             ? 'Atualizar email'
@@ -603,272 +438,76 @@ export default function ProfilePageContent({
 
     return (
         <div className="profile-content">
-            <section className="profile-hero">
-                <div className="profile-hero__cover" />
-                <div className="profile-hero__panel">
-                    <div className="profile-hero__media">
-                        <div
-                            className={`profile-hero__avatar${
-                                isOwnProfile ? ' profile-hero__avatar--editable' : ''
-                            }`}
-                        >
-                            <RankedAvatarFrame
-                                image={user.picture?.link ?? defaultProfileImage}
-                                alt={profileName || user.nickname}
-                                rank={user.details?.rank}
-                                variant="profile"
-                                sizes="(max-width: 768px) 14rem, 16rem"
-                            />
-                            {isOwnProfile ? (
-                                <>
-                                    <button
-                                        type="button"
-                                        className="profile-hero__avatar-overlay"
-                                        onClick={handleProfilePictureClick}
-                                        disabled={pictureUploading}
-                                        aria-label="Editar foto do perfil"
-                                    >
-                                        <Image
-                                            src={EditIcon}
-                                            alt=""
-                                            width={32}
-                                            height={32}
-                                        />
-                                    </button>
-                                    <input
-                                        ref={pictureInputRef}
-                                        type="file"
-                                        accept="image/*"
-                                        className="hidden"
-                                        onChange={(event) => {
-                                            const file = event.target.files?.[0];
+            <ProfileHeroSection
+                user={user}
+                profileName={profileName}
+                profileHandle={profileHandle}
+                biography={biography}
+                accountStatus={accountStatus}
+                accountStatusClass={accountStatusClass}
+                isOwnProfile={isOwnProfile}
+                pictureUploading={pictureUploading}
+                pictureFeedback={pictureFeedback}
+                earnedBadgeKeys={earnedBadgeKeys}
+                openBadgePopoverId={openBadgePopoverId}
+                pictureInputRef={pictureInputRef}
+                onOpenBadgePopover={setOpenBadgePopoverId}
+                onCloseBadgePopover={() => setOpenBadgePopoverId(null)}
+                onPictureClick={handleProfilePictureClick}
+                onSelectImage={(file) =>
+                    setPendingImageCrop({ file, intent: 'profile-avatar' })
+                }
+                onEditBiography={() => setBiographyModalOpen(true)}
+                onRequestEmailUpdate={() => setPendingFlowWarning('update-email')}
+                onRequestPasswordUpdate={() => setPendingFlowWarning('update-password')}
+                onRequestToggleTwoFactor={() => {
+                    if (user.twoFactorSecret?.active) {
+                        setDisableTwoFactorModalOpen(true);
+                        return;
+                    }
 
-                                            if (!file) return;
-                                            setPendingImageCrop({
-                                                file,
-                                                intent: 'profile-avatar',
-                                            });
-                                            event.target.value = '';
-                                        }}
-                                    />
-                                </>
-                            ) : null}
-                        </div>
-                        {isOwnProfile && pictureFeedback ? (
-                            <p className="font-XXS-regular profile-hero__avatar-feedback">
-                                {pictureFeedback}
-                            </p>
-                        ) : null}
-                    </div>
+                    setPendingFlowWarning('enable-two-factor');
+                }}
+                onRequestDeleteAccount={() => setPendingFlowWarning('delete-user')}
+            />
 
-                    <div className="profile-hero__copy">
-                        <div className="profile-hero__identity">
-                            <h1 className="font-L-bold profile-hero__name">
-                                {profileName || 'Aventureiro sem nome'}
-                            </h1>
-                            {user.email ? (
-                                <p className="font-XS-regular profile-hero__email">
-                                    {user.email}
-                                </p>
-                            ) : null}
-                            {isOwnProfile ? (
-                                <div className="profile-hero__actions">
-                                    <button
-                                        type="button"
-                                        className="font-XS-regular profile-hero__action"
-                                        onClick={() => setBiographyModalOpen(true)}
-                                    >
-                                        Atualizar biografia e nome
-                                    </button>
-                                    <span
-                                        className="font-XS-regular profile-hero__actions-separator"
-                                        aria-hidden="true"
-                                    >
-                                        |
-                                    </span>
-                                    {!hasExternalProvider ? (
-                                        <>
-                                            <button
-                                                type="button"
-                                                className="font-XS-regular profile-hero__action"
-                                                onClick={() =>
-                                                    setPendingFlowWarning('update-email')
-                                                }
-                                            >
-                                                Atualizar email
-                                            </button>
-                                            <span
-                                                className="font-XS-regular profile-hero__actions-separator"
-                                                aria-hidden="true"
-                                            >
-                                                |
-                                            </span>
-                                            <button
-                                                type="button"
-                                                className="font-XS-regular profile-hero__action"
-                                                onClick={() =>
-                                                    setPendingFlowWarning(
-                                                        'update-password'
-                                                    )
-                                                }
-                                            >
-                                                Atualizar senha
-                                            </button>
-                                            <span
-                                                className="font-XS-regular profile-hero__actions-separator"
-                                                aria-hidden="true"
-                                            >
-                                                |
-                                            </span>
-                                        </>
-                                    ) : null}
-                                    <button
-                                        type="button"
-                                        className="font-XS-regular profile-hero__action"
-                                        onClick={() => {
-                                            if (user.twoFactorSecret?.active) {
-                                                setDisableTwoFactorModalOpen(true);
-                                                return;
-                                            }
+            <ProfileShowcaseSection
+                title="CAMPANHAS"
+                subtitle={
+                    campaigns.length > 0
+                        ? `${campaigns.length} campanha(s) encontrada(s)`
+                        : 'Nenhuma campanha disponÃ­vel'
+                }
+                items={campaignItems}
+                label="Campanhas do perfil"
+                variant="campaigns"
+                emptyMessage="Este usuário ainda não possui campanhas visÃ­veis."
+                cardLayout={true}
+            />
 
-                                            setPendingFlowWarning('enable-two-factor');
-                                        }}
-                                    >
-                                        {user.twoFactorSecret?.active
-                                            ? 'Desabilitar dois fatores'
-                                            : 'Habilitar dois fatores'}
-                                    </button>
-                                    <span
-                                        className="font-XS-regular profile-hero__actions-separator"
-                                        aria-hidden="true"
-                                    >
-                                        |
-                                    </span>
-                                    <button
-                                        type="button"
-                                        className="font-XS-regular profile-hero__action profile-hero__action--danger"
-                                        onClick={() =>
-                                            setPendingFlowWarning('delete-user')
-                                        }
-                                    >
-                                        Deletar conta
-                                    </button>
-                                </div>
-                            ) : null}
-                            <p className="font-XS-bold profile-hero__handle">
-                                {profileHandle || 'Sem nickname'}
-                            </p>
-                            <p className="font-XS-regular">
-                                <strong>Status da conta:</strong>{' '}
-                                <span className={accountStatusClass}>
-                                    {accountStatus}
-                                </span>
-                            </p>
-                            <p className="font-S-regular text-color-greyScale/700">
-                                {biography ||
-                                    'Este aventureiro ainda não adicionou uma biografia.'}
-                            </p>
-                        </div>
+            <ProfileShowcaseSection
+                title="PERSONAGENS CRIADOS"
+                subtitle={
+                    characters.length > 0
+                        ? `${characters.length} personagem(ns) encontrado(s)`
+                        : 'Nenhum personagem disponÃ­vel'
+                }
+                items={characterItems}
+                label="Personagens do perfil"
+                variant="characters"
+                emptyMessage="Este usuário ainda não criou personagens visÃ­veis."
+                cardLayout={true}
+            />
 
-                        {earnedBadgeKeys.length > 0 ? (
-                            <div
-                                className="profile-hero__badges"
-                                aria-label="Badges ativas"
-                            >
-                                {earnedBadgeKeys.map((badgeKey) => (
-                                    <ProfileBadgePopover
-                                        key={badgeKey}
-                                        popoverId={buildBadgePopoverId('hero', badgeKey)}
-                                        label={formatBadgeName(badgeKey)}
-                                        imageSrc={badgeMap[badgeKey].colorful}
-                                        description={badgeMap[badgeKey].description}
-                                        variant="hero"
-                                        isOpen={
-                                            openBadgePopoverId ===
-                                            buildBadgePopoverId('hero', badgeKey)
-                                        }
-                                        onOpen={setOpenBadgePopoverId}
-                                        onClose={() => setOpenBadgePopoverId(null)}
-                                    />
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="font-XXS-regular profile-hero__empty-badges">
-                                Este usuário ainda não possui badges ativas.
-                            </p>
-                        )}
-                    </div>
-                </div>
-            </section>
+            <ProfileShowcaseSection
+                title="BADGES"
+                subtitle="Coloridas para badges conquistadas, cinza para as restantes."
+                items={badgeItems}
+                label="Badges do perfil"
+                variant="badges"
+            />
 
-            <section className="profile-showcase profile-showcase--cards">
-                <div className="profile-showcase__header">
-                    <h2 className="font-L-bold text-color-greyScale/50">CAMPANHAS</h2>
-                    <p className="font-XS-regular text-color-greyScale/200">
-                        {campaigns.length > 0
-                            ? `${campaigns.length} campanha(s) encontrada(s)`
-                            : 'Nenhuma campanha disponível'}
-                    </p>
-                </div>
-
-                {campaignItems.length > 0 ? (
-                    <ProfileCarousel
-                        items={campaignItems}
-                        label="Campanhas do perfil"
-                        variant="campaigns"
-                    />
-                ) : (
-                    <div className="profile-empty-state">
-                        <p className="font-S-regular text-color-greyScale/200">
-                            Este usuário ainda não possui campanhas visíveis.
-                        </p>
-                    </div>
-                )}
-            </section>
-
-            <section className="profile-showcase profile-showcase--cards">
-                <div className="profile-showcase__header">
-                    <h2 className="font-L-bold text-color-greyScale/50">
-                        PERSONAGENS CRIADOS
-                    </h2>
-                    <p className="font-XS-regular text-color-greyScale/200">
-                        {characters.length > 0
-                            ? `${characters.length} personagem(ns) encontrado(s)`
-                            : 'Nenhum personagem disponível'}
-                    </p>
-                </div>
-
-                {characterItems.length > 0 ? (
-                    <ProfileCarousel
-                        items={characterItems}
-                        label="Personagens do perfil"
-                        variant="characters"
-                    />
-                ) : (
-                    <div className="profile-empty-state">
-                        <p className="font-S-regular text-color-greyScale/200">
-                            Este usuário ainda não criou personagens visíveis.
-                        </p>
-                    </div>
-                )}
-            </section>
-
-            <section className="profile-showcase">
-                <div className="profile-showcase__header">
-                    <h2 className="font-L-bold text-color-greyScale/50">BADGES</h2>
-                    <p className="font-XS-regular text-color-greyScale/200">
-                        Coloridas para badges conquistadas, cinza para as restantes.
-                    </p>
-                </div>
-
-                <ProfileCarousel
-                    items={badgeItems}
-                    label="Badges do perfil"
-                    variant="badges"
-                />
-            </section>
-
-            {selectedCharacterId && (
+            {selectedCharacterId ? (
                 <CharacterDetailModal
                     characterId={selectedCharacterId}
                     campaignId=""
@@ -876,8 +515,8 @@ export default function ProfilePageContent({
                     onDeleted={() => {
                         const deletedCharacterId = selectedCharacterId;
                         setSelectedCharacterId(null);
-                        setCharacters((prev) =>
-                            prev.filter(
+                        setCharacters((previous) =>
+                            previous.filter(
                                 (character) =>
                                     character.characterId !== deletedCharacterId
                             )
@@ -885,9 +524,9 @@ export default function ProfilePageContent({
                     }}
                     onBack={() => setSelectedCharacterId(null)}
                 />
-            )}
+            ) : null}
 
-            {gateStep === 'complete-profile' && (
+            {gateStep === 'complete-profile' ? (
                 <CompleteUserModal
                     userId={userId}
                     mode="profile-complete"
@@ -901,7 +540,7 @@ export default function ProfilePageContent({
                     }}
                     onCancel={() => router.push('/')}
                 />
-            )}
+            ) : null}
 
             {pendingFlowWarning ? (
                 <ProfileFlowWarningModal
@@ -941,7 +580,7 @@ export default function ProfilePageContent({
                     userId={userId}
                     firstName={userDetails.firstName ?? ''}
                     lastName={userDetails.lastName ?? ''}
-                    biography={biography ?? ''}
+                    biography={biography}
                     onClose={() => setBiographyModalOpen(false)}
                     onSaved={async () => {
                         await refreshProfileUser();

@@ -1,11 +1,9 @@
-import { v4 as uuid } from 'uuid';
 import { projectDescription, timeline, team } from '@/app/about/data';
 import '@/app/about/styles/page.css';
 
 export default function About(): JSX.Element {
     return (
         <main className="about-page">
-            {/* ── Hey! ────────────────────────────────────────────── */}
             <section className="about-hey-section">
                 <div className="about-container">
                     <h2 className="font-XL-bold about-hey-title">Hey!</h2>
@@ -13,7 +11,6 @@ export default function About(): JSX.Element {
                 </div>
             </section>
 
-            {/* ── Timeline ────────────────────────────────────────── */}
             <section className="about-timeline-section">
                 <div className="about-container">
                     <h2 className="font-XL-bold about-timeline-heading">
@@ -26,14 +23,12 @@ export default function About(): JSX.Element {
                             (_, rowIdx) => timeline.slice(rowIdx * 4, rowIdx * 4 + 4)
                         ).map((row, rowIdx) => (
                             <div key={rowIdx} className="about-timeline-row-wrapper">
-                                {/* horizontal line for this row */}
                                 <div className="about-timeline-line" />
 
-                                {/* date columns */}
                                 <div className="about-timeline-columns">
                                     {row.map((entry) => (
                                         <div
-                                            key={uuid()}
+                                            key={entry.date}
                                             className="about-timeline-column"
                                         >
                                             <div className="about-timeline-date-row">
@@ -46,7 +41,7 @@ export default function About(): JSX.Element {
                                             <div className="about-timeline-cards">
                                                 {entry.cards.map((card) => (
                                                     <div
-                                                        key={uuid()}
+                                                        key={`${entry.date}-${card.badge}`}
                                                         className="about-timeline-card"
                                                     >
                                                         <span
@@ -73,14 +68,13 @@ export default function About(): JSX.Element {
                 </div>
             </section>
 
-            {/* ── Nossa equipe ────────────────────────────────────── */}
             <section className="about-team-section">
                 <div className="about-container">
                     <h2 className="font-XL-bold about-team-heading">Nossa equipe</h2>
 
                     <div className="about-team-grid">
                         {team.map((member) => (
-                            <div key={uuid()} className="about-team-card">
+                            <div key={member.name} className="about-team-card">
                                 <div className="about-team-card-header">
                                     <div className="about-team-avatar" />
                                     <div className="about-team-card-info">
@@ -90,7 +84,7 @@ export default function About(): JSX.Element {
                                         <div className="about-team-roles">
                                             {member.roles.map((role) => (
                                                 <span
-                                                    key={uuid()}
+                                                    key={`${member.name}-${role}`}
                                                     className="font-XS-regular about-team-role-badge"
                                                 >
                                                     {role}
@@ -107,7 +101,7 @@ export default function About(): JSX.Element {
                                 <div className="about-team-links">
                                     {member.links.map((link) => (
                                         <button
-                                            key={uuid()}
+                                            key={`${member.name}-${link}`}
                                             className="font-XS-bold about-team-link-btn"
                                         >
                                             <svg
