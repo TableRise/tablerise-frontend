@@ -1,4 +1,3 @@
-import { withSentryConfig } from '@sentry/nextjs';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
@@ -60,20 +59,4 @@ const nextConfig = {
     },
 };
 
-export default withSentryConfig(nextConfig, {
-    org: 'tablerise',
-    project: 'tablerise-sentry-tracking',
-    silent: !process.env.CI,
-    widenClientFileUpload: true,
-    tunnelRoute: '/monitoring',
-    hideSourceMaps: true,
-    webpack: {
-        automaticVercelMonitors: true,
-        reactComponentAnnotation: {
-            enabled: true,
-        },
-        treeshake: {
-            removeDebugLogging: true,
-        },
-    },
-});
+export default nextConfig;
