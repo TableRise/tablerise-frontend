@@ -16,13 +16,17 @@
 // Import commands.js using ES2015 syntax:
 import './commands';
 
-const ignoredHydrationErrors = [
+const ignoredHydrationErrorMatchers = [
     'Hydration failed because the initial UI does not match what was rendered on the server.',
     'There was an error while hydrating. Because the error happened outside of a Suspense boundary, the entire root will switch to client rendering.',
+    'Minified React error #418',
+    'react.dev/errors/418',
 ];
 
 Cypress.on('uncaught:exception', (error) => {
-    if (ignoredHydrationErrors.some((message) => error.message.includes(message))) {
+    if (
+        ignoredHydrationErrorMatchers.some((message) => error.message.includes(message))
+    ) {
         return false;
     }
 });
