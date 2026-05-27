@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .user-player-campaigns {
+        @apply mt-6 flex w-full flex-col items-start justify-center rounded-xl bg-color-greyScale/50 p-6;
+        max-width: 70.5rem;
+    }
+
+    .user-player-campaigns .user-player-campaigns-header {
+        @apply flex justify-between items-center w-full;
+    }
+
+    .user-player-campaigns
+        .user-player-campaigns-header
+        .user-player-campaigns-created-label {
+        @apply flex justify-center items-center;
+    }
+
+    .user-player-campaigns
+        .user-player-campaigns-header
+        .user-player-campaigns-created-label
+        .label-title {
+        @apply mr-6 text-color-primary/default_900;
+    }
+
+    .user-player-campaigns
+        .user-player-campaigns-header
+        .user-player-campaigns-created-label
+        .creation-limits {
+        @apply px-3 py-2 w-full bg-color-greyScale/100 rounded-lg;
+    }
+
+    .user-player-campaigns .user-player-campaigns-header .user-player-campaigns-buttons {
+        @apply flex text-color-greyScale/50;
+    }
+
+    .user-player-campaigns
+        .user-player-campaigns-header
+        .user-player-campaigns-buttons
+        button {
+        @apply h-10;
+    }
+
+    .user-player-campaigns
+        .user-player-campaigns-header
+        .user-player-campaigns-buttons
+        img {
+        @apply ml-4 cursor-pointer;
+    }
+
+    .user-player-campaigns
+        .user-player-campaigns-header
+        .user-player-campaigns-created-label
+        .creation-limits
+        span:nth-child(2) {
+        @apply ml-1;
+    }
+
+    .user-player-campaigns .user-player-campaigns-cards {
+        @apply mt-6 flex w-full flex-wrap gap-4 select-none;
+    }
+
+    .user-player-campaigns .embla__viewport {
+        @apply overflow-hidden h-[23rem];
+    }
+
+    .user-player-campaigns .embla__container {
+        @apply flex w-auto;
+    }
+
+    .user-player-campaigns .embla__slide {
+        flex: 0 0 auto;
+        margin-right: 1rem;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .embla__viewport {
+        border: 2px solid transparent;
+    }
+
+    .embla__container {
+        border: 2px solid transparent;
+    }
+
+    @media (max-width: 768px) {
+        .user-player-campaigns {
+            @apply items-center p-5;
+        }
+
+        .user-player-campaigns .user-player-campaigns-header {
+            @apply flex-col items-start gap-4 text-center;
+        }
+
+        .user-player-campaigns
+            .user-player-campaigns-header
+            .user-player-campaigns-created-label {
+            @apply flex-col items-start gap-3;
+        }
+
+        .user-player-campaigns
+            .user-player-campaigns-header
+            .user-player-campaigns-buttons {
+            @apply w-full flex-wrap justify-center gap-3;
+        }
+
+        .user-player-campaigns
+            .user-player-campaigns-header
+            .user-player-campaigns-buttons
+            button {
+            @apply w-full;
+        }
+
+        .user-player-campaigns
+            .user-player-campaigns-header
+            .user-player-campaigns-buttons
+            img {
+            @apply ml-0;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .user-player-campaigns {
+            @apply p-4;
+        }
+    }
+
+    html[data-theme='dark'] .user-player-campaigns {
+        background-color: var(--theme-surface);
+        border: 1px solid var(--theme-border);
+        box-shadow: none;
+    }
+
+    html[data-theme='dark']
+        .user-player-campaigns
+        .user-player-campaigns-header
+        .user-player-campaigns-created-label
+        .label-title {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark']
+        .user-player-campaigns
+        .user-player-campaigns-header
+        .user-player-campaigns-created-label
+        .creation-limits {
+        background-color: var(--theme-surface-muted);
+        color: var(--theme-text-muted);
+    }
+}

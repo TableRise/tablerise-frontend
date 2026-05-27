@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .mmm-overlay {
+        @apply fixed inset-0 z-[320] flex items-center justify-center bg-black/60 px-4;
+    }
+
+    .mmm-modal {
+        @apply w-full max-w-sm rounded-2xl bg-color-greyScale/50 p-6 shadow-xl border border-color-greyScale/200 flex flex-col gap-4;
+    }
+
+    .mmm-header {
+        @apply flex items-center justify-between;
+    }
+
+    .mmm-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .mmm-close {
+        @apply bg-transparent text-color-greyScale/500 transition-colors hover:text-color-primary/default_900;
+    }
+
+    .mmm-operation-row {
+        @apply flex gap-2;
+    }
+
+    .mmm-op-btn {
+        @apply flex-1 rounded-xl border-2 border-color-greyScale/200 py-2 text-sm font-semibold transition-colors;
+    }
+
+    .mmm-op-btn--active {
+        @apply border-color-primary/default_900 bg-color-primary/default_900 text-color-primary/default_900;
+    }
+
+    .mmm-op-btn--inactive {
+        @apply bg-color-greyScale/100 text-color-greyScale/700 hover:border-color-primary/default_900;
+    }
+
+    .mmm-field {
+        @apply flex flex-col gap-2;
+    }
+
+    .mmm-label {
+        @apply text-color-primary/default_900;
+    }
+
+    .mmm-input {
+        @apply border-2 border-color-greyScale/200 rounded-xl px-4 py-3 bg-color-greyScale/100 outline-none text-color-greyScale/900 transition-colors focus:border-color-primary/default_900;
+    }
+
+    .mmm-summary {
+        @apply rounded-xl border border-color-greyScale/200 bg-color-greyScale/100 px-4 py-3 flex flex-col gap-2;
+    }
+
+    .mmm-summary-row {
+        @apply flex items-center justify-between gap-4;
+    }
+
+    .mmm-summary-label {
+        @apply text-color-greyScale/700;
+    }
+
+    .mmm-actions {
+        @apply flex items-center justify-end gap-3;
+    }
+
+    .mmm-cancel {
+        @apply bg-transparent text-color-greyScale/500 transition-colors hover:text-color-primary/default_900;
+    }
+
+    html[data-theme='dark'] .mmm-modal {
+        background-color: var(--theme-surface);
+        border-color: var(--theme-border);
+        box-shadow: var(--theme-shadow-strong);
+    }
+
+    html[data-theme='dark'] .mmm-title,
+    html[data-theme='dark'] .mmm-label,
+    html[data-theme='dark'] .mmm-close,
+    html[data-theme='dark'] .mmm-cancel:hover {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .mmm-close,
+    html[data-theme='dark'] .mmm-cancel,
+    html[data-theme='dark'] .mmm-summary-label {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .mmm-op-btn,
+    html[data-theme='dark'] .mmm-input,
+    html[data-theme='dark'] .mmm-summary {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .mmm-op-btn--inactive,
+    html[data-theme='dark'] .mmm-input,
+    html[data-theme='dark'] .mmm-summary {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .mmm-op-btn--inactive,
+    html[data-theme='dark'] .mmm-input,
+    html[data-theme='dark'] .mmm-summary-row {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .mmm-input::placeholder {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .mmm-op-btn--inactive:hover {
+        border-color: var(--theme-accent);
+        background-color: var(--theme-surface-strong);
+    }
+
+    html[data-theme='dark'] .mmm-op-btn--active {
+        border-color: var(--theme-accent);
+        background-color: color-mix(
+            in srgb,
+            var(--theme-accent) 14%,
+            var(--theme-surface)
+        );
+        color: var(--theme-accent);
+    }
+}

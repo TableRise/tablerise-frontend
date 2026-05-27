@@ -1,21 +1,37 @@
 'use client';
+import TableriseContext from '@/context/TableriseContext';
+import { getUser } from '@/server/users/get-user';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 
 export default function LoginRedirectParams(): JSX.Element {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const userData = searchParams.get('userData');
+    const { recoverUserCampaigns } = useContext(TableriseContext);
+    const userId = searchParams.get('userId');
+
+    const getUserAndRedirect = useCallback(async () => {
+        const data = await getUser(userId as string);
+        if (!data) return;
+
+        const userToStorage = {
+            userId: data.userId,
+            providerId: data.providerId,
+            nickname: data.nickname,
+            username: `${data.nickname}${data.tag}`,
+            picture: data.picture?.link,
+        };
+
+        localStorage.setItem('userLogged', JSON.stringify(userToStorage));
+        await recoverUserCampaigns();
+        router.replace('/');
+    }, [userId, recoverUserCampaigns, router]);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            if (userData) {
-                localStorage.setItem('userLogged', decodeURIComponent(userData || ''));
-            }
-
-            router.replace('/');
+            getUserAndRedirect();
         }
-    }, [userData, router]);
+    }, [getUserAndRedirect]);
 
     return <p>...</p>;
 }

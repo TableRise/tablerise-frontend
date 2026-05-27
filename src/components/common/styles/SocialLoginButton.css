@@ -4,7 +4,11 @@
 
 @layer base {
     .button-container {
-        @apply flex flex-col;
+        @apply flex min-w-0 flex-1 flex-col;
+    }
+
+    .button-container .social-button-link {
+        @apply block w-full;
     }
 
     .button-container .social-button {
@@ -13,5 +17,20 @@
 
     .button-container .social-button .button-text {
         @apply text-color-greyScale/800;
+    }
+
+    @media (max-width: 480px) {
+        .button-container {
+            @apply w-full flex-none;
+        }
+    }
+
+    html[data-theme='dark'] .button-container .social-button {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .button-container .social-button .button-text {
+        color: var(--theme-text);
     }
 }

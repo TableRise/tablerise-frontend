@@ -4,11 +4,12 @@
 
 @layer base {
     .promo-section {
-        @apply w-[70.5rem] flex flex-col items-center rounded-lg bg-color-greyScale/50 relative -top-14;
+        @apply relative -top-14 flex w-full flex-col items-center rounded-lg bg-color-greyScale/50;
+        max-width: 70.5rem;
     }
 
     .promo-section .promo-text {
-        @apply p-6 self-start;
+        @apply self-start p-6;
     }
 
     .promo-section .promo-text h2 {
@@ -20,6 +21,45 @@
     }
 
     .promo-section .promo-image {
-        @apply w-[96.5%] h-[25rem] bg-[url('../../../../assets/images/image_dnd_5e_02.jpeg')] rounded-t-lg bg-cover bg-center;
+        @apply h-[25rem] w-[96.5%] rounded-t-lg bg-[url('../../../../assets/images/image_dnd_5e_02.jpeg')] bg-cover bg-center;
+    }
+
+    @media (max-width: 768px) {
+        .promo-section {
+            @apply -top-8 rounded-[1.25rem];
+            max-width: min(calc(100% - 1.5rem), 70.5rem);
+        }
+
+        .promo-section .promo-text {
+            @apply p-5;
+        }
+
+        .promo-section .promo-image {
+            @apply h-[18rem] w-full rounded-b-[1.25rem] rounded-t-none;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .promo-section {
+            @apply -top-6;
+            max-width: min(calc(100% - 1rem), 70.5rem);
+        }
+
+        .promo-section .promo-image {
+            @apply h-[14rem];
+        }
+    }
+
+    html[data-theme='dark'] .promo-section {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .promo-section .promo-text h2 {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .promo-section .promo-text p {
+        color: var(--theme-text-muted);
     }
 }

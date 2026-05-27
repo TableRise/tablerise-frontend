@@ -3,11 +3,55 @@
 @tailwind utilities;
 
 @layer base {
+    .recover-template {
+        @apply flex min-h-screen w-full;
+    }
+
     .section-container {
-        @apply flex justify-center items-center px-[7.4rem] w-[38.8rem] right-0 top-0 absolute h-screen bg-color-greyScale/100 rounded-l-xl;
+        @apply absolute right-0 top-0 flex h-screen w-[38.8rem] items-center justify-center bg-color-greyScale/100 px-[7.4rem];
+        border-radius: 1rem 0 0 1rem;
+    }
+
+    .section-container .inside-div {
+        @apply flex flex-col justify-center;
     }
 
     .section-container section {
         @apply w-full;
+    }
+
+    @media (max-width: 1024px) {
+        .section-container {
+            @apply w-[34rem] px-12;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .recover-template {
+            @apply flex-col;
+        }
+
+        .section-container {
+            @apply relative h-auto w-full px-5 py-8;
+            border-radius: 1.5rem 1.5rem 0 0;
+            margin-top: -1.5rem;
+        }
+
+        .section-container .inside-div {
+            @apply mx-auto;
+            max-width: 30rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .section-container {
+            @apply px-4 py-6;
+            border-radius: 1.25rem 1.25rem 0 0;
+        }
+    }
+
+    html[data-theme='dark'] .section-container {
+        background-color: var(--theme-surface);
+        box-shadow: -24px 0 42px rgba(2, 6, 23, 0.28);
     }
 }

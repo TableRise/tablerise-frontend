@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .support-page {
+        @apply w-full px-6 pb-10 flex justify-start;
+    }
+
+    .support-inside-container {
+        @apply w-full;
+        max-width: 70.5rem;
+    }
+
+    .support-page-title {
+        @apply text-color-primary/default_900 mb-6 text-left;
+    }
+
+    .support-page--logged {
+        @apply min-h-[calc(100vh-8.6rem)];
+    }
+
+    .support-page--guest {
+        @apply min-h-[calc(100vh-4.5rem)];
+    }
+
+    .support-page-card {
+        @apply w-full bg-color-greyScale/50 rounded-[1.5rem] shadow-md p-8 flex flex-col gap-8;
+        box-shadow: 0 18px 40px rgba(12, 37, 95, 0.08);
+    }
+
+    .support-page-copy {
+        @apply flex flex-col gap-3;
+    }
+
+    .support-form {
+        @apply flex flex-col gap-5;
+    }
+
+    .support-form-field {
+        @apply flex flex-col gap-2;
+    }
+
+    .support-form-input,
+    .support-form-select {
+        @apply w-full;
+    }
+
+    .support-form-select {
+        @apply h-10;
+    }
+
+    .support-form-select--error {
+        @apply border-color-support/alert;
+    }
+
+    .support-form-textarea {
+        @apply w-full min-h-[12rem] rounded-lg border border-color-greyScale/300 bg-color-greyScale/50 p-3 resize-y outline-none text-color-greyScale/950;
+    }
+
+    .support-form-textarea:focus {
+        border-color: #0a358a;
+    }
+
+    .support-form-textarea--error {
+        @apply border-color-support/alert;
+    }
+
+    .support-form-submit {
+        @apply self-start w-full !bg-color-primary/default_900;
+    }
+
+    @media (max-width: 768px) {
+        .support-page {
+            @apply px-4 py-6;
+        }
+
+        .support-page-card {
+            @apply p-5 rounded-[1.25rem];
+        }
+
+        .support-inside-container {
+            @apply w-full;
+        }
+
+        .support-form-submit {
+            @apply w-full;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .support-page {
+            @apply px-3 py-5;
+        }
+    }
+
+    html[data-theme='dark'] .support-page-card {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .support-form-textarea {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+        color: var(--theme-text);
+    }
+}

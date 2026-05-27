@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .tutorial-page {
+        @apply flex justify-center px-4 pb-12;
+    }
+
+    .tutorial-inside-container {
+        @apply w-full;
+        max-width: 70.5rem;
+    }
+
+    .tutorial-inside-container header h2 {
+        @apply text-color-primary/default_900 mb-2;
+    }
+
+    .tutorial-inside-container .tutorial-cards {
+        @apply mt-6 flex flex-wrap justify-between gap-6;
+    }
+
+    .tutorial-inside-container .tutorial-cards .main-card {
+        @apply mt-0;
+    }
+
+    @media (max-width: 768px) {
+        .tutorial-page {
+            @apply px-3 pb-10;
+        }
+
+        .tutorial-inside-container .tutorial-cards {
+            @apply justify-center gap-4;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .tutorial-page {
+            @apply px-2 pb-8;
+        }
+    }
+
+    html[data-theme='dark'] .tutorial-inside-container header p {
+        color: var(--theme-text-muted);
+    }
+}

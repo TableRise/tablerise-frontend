@@ -1,6 +1,8 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { DM_Sans } from 'next/font/google';
 import TableriseProvider from '@/context/TableriseProvider';
+import { cookies } from 'next/headers';
+import { getThemeBootstrapScript } from '@/utils/theme';
 import '@/app/globals.css';
 
 const dm_sans = DM_Sans({ variable: '--dm-sans-base', subsets: ['latin'] });
@@ -8,20 +10,12 @@ const dm_sans = DM_Sans({ variable: '--dm-sans-base', subsets: ['latin'] });
 export const metadata: Metadata = {
     title: 'TableRise - Sua mesa virtual de RPG online',
     description: 'Sua mesa virtual de RPG online',
-    icons: {
-        icon: [
-            {
-                media: '(prefers-color-scheme: light)',
-                url: '/images/icon-light.ico',
-                href: '/images/icon-light.ico',
-            },
-            {
-                media: '(prefers-color-scheme: dark)',
-                url: '/images/icon-dark.ico',
-                href: '/images/icon-dark.ico',
-            },
-        ],
-    },
+};
+
+export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    viewportFit: 'cover',
 };
 
 export default function RootLayout({
@@ -29,10 +23,23 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const recoverUserInfo = cookies().get('token') ? 1 : 0;
+
     return (
-        <html lang="en">
+        <html lang="en" data-theme="light" suppressHydrationWarning>
+            <head>
+                <link
+                    rel="icon"
+                    href="/images/icon-light.ico"
+                    type="image/x-icon"
+                    data-tablerise-favicon="true"
+                />
+                <script dangerouslySetInnerHTML={{ __html: getThemeBootstrapScript() }} />
+            </head>
             <body className={dm_sans.className}>
-                <TableriseProvider>{children}</TableriseProvider>
+                <TableriseProvider userLogged={recoverUserInfo}>
+                    {children}
+                </TableriseProvider>
             </body>
         </html>
     );

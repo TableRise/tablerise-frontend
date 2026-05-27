@@ -1,0 +1,164 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    /* ── Backdrop ─────────────────────────────────────────── */
+    .mmm-backdrop {
+        @apply fixed inset-0 z-[200] flex items-center justify-center;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    /* ── Modal ────────────────────────────────────────────── */
+    .mmm-modal {
+        @apply relative bg-white rounded-2xl flex flex-col overflow-hidden shadow-xl;
+        width: 36rem;
+        max-height: 85vh;
+    }
+
+    /* ── Header ───────────────────────────────────────────── */
+    .mmm-header {
+        @apply flex items-center justify-between px-6 pt-5 pb-3 flex-shrink-0;
+    }
+
+    .mmm-close {
+        @apply w-8 h-8 flex items-center justify-center rounded-lg text-color-greyScale/500 hover:bg-color-greyScale/50 transition-colors;
+    }
+
+    /* ── Tabs ─────────────────────────────────────────────── */
+    .mmm-tabs {
+        @apply flex px-6 flex-shrink-0 border-b border-color-greyScale/200;
+    }
+
+    .mmm-tab {
+        @apply px-4 py-3 text-color-greyScale/500 border-b-2 border-transparent transition-colors;
+        margin-bottom: -1px;
+    }
+
+    .mmm-tab--active {
+        @apply text-color-primary/default_900 border-color-primary/default_900;
+    }
+
+    /* ── Body ─────────────────────────────────────────────── */
+    .mmm-body {
+        @apply flex-1 overflow-y-auto px-6 py-4;
+    }
+
+    .mmm-empty {
+        @apply text-color-greyScale/500 block text-center py-8;
+    }
+
+    /* ── Music list ───────────────────────────────────────── */
+    .mmm-list {
+        @apply flex flex-col gap-2;
+    }
+
+    .mmm-music-item {
+        @apply flex items-center gap-3 w-full text-left px-3 py-2 rounded-xl border border-color-greyScale/200 hover:bg-color-greyScale/50 transition-colors;
+    }
+
+    .mmm-music-item--active {
+        @apply border-color-primary/default_900 bg-blue-50;
+    }
+
+    .mmm-music-thumb {
+        @apply relative flex-shrink-0 rounded-lg overflow-hidden;
+        width: 4rem;
+        height: 3rem;
+    }
+
+    .mmm-music-title {
+        @apply flex-1 truncate text-color-greyScale/900;
+    }
+
+    .mmm-playing-badge {
+        @apply flex-shrink-0 text-color-primary/default_900;
+    }
+
+    /* ── Map grid ─────────────────────────────────────────── */
+    .mmm-maps-grid {
+        @apply grid gap-3;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .mmm-map-item {
+        @apply relative rounded-xl overflow-hidden border-2 border-transparent hover:border-color-primary/default_900 transition-colors;
+        aspect-ratio: 16 / 9;
+    }
+
+    .mmm-map-label {
+        @apply absolute bottom-0 left-0 right-0 text-center text-white py-1;
+        background: rgba(0, 0, 0, 0.45);
+    }
+
+    @media (max-width: 768px) {
+        .mmm-modal {
+            width: min(100vw - 1.5rem, 36rem);
+            max-height: 90vh;
+        }
+
+        .mmm-header,
+        .mmm-tabs,
+        .mmm-body {
+            @apply px-5;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .mmm-modal {
+            width: min(100vw - 1rem, 36rem);
+        }
+
+        .mmm-header,
+        .mmm-tabs,
+        .mmm-body {
+            @apply px-4;
+        }
+
+        .mmm-maps-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    html[data-theme='dark'] .mmm-tab--active,
+    html[data-theme='dark'] .mmm-playing-badge {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .mmm-modal {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .mmm-header h2,
+    html[data-theme='dark'] .mmm-close {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .mmm-close:hover,
+    html[data-theme='dark'] .mmm-music-item:hover {
+        background-color: var(--theme-surface-strong);
+    }
+
+    html[data-theme='dark'] .mmm-tabs,
+    html[data-theme='dark'] .mmm-music-item {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .mmm-music-item {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .mmm-tab,
+    html[data-theme='dark'] .mmm-empty {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .mmm-music-title {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .mmm-music-item--active {
+        background-color: var(--theme-accent-soft);
+    }
+}

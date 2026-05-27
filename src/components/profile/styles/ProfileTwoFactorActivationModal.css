@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .profile-2fa-modal-overlay {
+        @apply fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4;
+    }
+
+    .profile-2fa-modal-card {
+        @apply flex w-full max-w-[30rem] flex-col items-center gap-4 rounded-2xl bg-white p-8 shadow-xl;
+    }
+
+    .profile-2fa-modal-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .profile-2fa-modal-description {
+        @apply text-center text-color-greyScale/950;
+    }
+
+    .profile-2fa-modal-inputs {
+        @apply mt-2 flex gap-2;
+    }
+
+    .profile-2fa-modal-digit {
+        @apply h-12 w-11 rounded-lg border bg-white text-center uppercase text-color-greyScale/500 focus:outline-none;
+    }
+
+    .profile-2fa-modal-buttons {
+        @apply mt-2 flex w-full flex-col gap-2;
+    }
+
+    .profile-2fa-modal-error {
+        @apply text-color-support/alert text-center;
+    }
+
+    .profile-2fa-qr-wrapper {
+        @apply rounded-2xl bg-color-greyScale/100 p-4;
+    }
+
+    .profile-2fa-checkbox-row {
+        @apply flex w-full items-center gap-3 rounded-xl border border-color-greyScale/200 p-4;
+    }
+
+    .profile-2fa-checkbox-row input {
+        @apply h-4 w-4 accent-color-primary/default_900;
+    }
+
+    .profile-2fa-timer-block {
+        @apply flex w-full flex-col gap-2;
+    }
+
+    .profile-2fa-timer-bar {
+        @apply h-2 w-full overflow-hidden rounded-full bg-color-greyScale/200;
+    }
+
+    .profile-2fa-timer-bar-fill {
+        @apply h-full origin-left rounded-full bg-gradient-to-r from-[#64A7FF] via-[#0A358A] to-[#08245D];
+    }
+
+    .profile-2fa-timer-text {
+        @apply self-end text-color-greyScale/500;
+    }
+
+    html[data-theme='dark'] .profile-2fa-modal-card {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow-strong);
+    }
+
+    html[data-theme='dark'] .profile-2fa-modal-title {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .profile-2fa-modal-description,
+    html[data-theme='dark'] .profile-2fa-checkbox-row span {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .profile-2fa-modal-digit {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .profile-2fa-qr-wrapper {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .profile-2fa-checkbox-row {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .profile-2fa-timer-bar {
+        background-color: var(--theme-surface-strong);
+    }
+
+    html[data-theme='dark'] .profile-2fa-timer-text {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .profile-2fa-modal-buttons .form-button-cancel {
+        color: var(--theme-text-muted);
+    }
+}

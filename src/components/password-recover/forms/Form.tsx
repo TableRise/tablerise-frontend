@@ -10,19 +10,17 @@ import { FieldError } from 'react-hook-form';
 import './styles/Form.css';
 
 function Title(props: HTMLProps<HTMLHeadingElement>) {
-    return (
-        <h1 className="font-L-semibold text-color-primary/default_900 pb-1" {...props} />
-    );
+    return <h1 className="recover-form-title font-L-semibold pb-1" {...props} />;
 }
 
 function Description(props: HTMLProps<HTMLHeadingElement>) {
-    return <p className="font-XS-regular text-color-greyScale/950 pb-6" {...props} />;
+    return <p className="recover-form-description font-XS-regular pb-6" {...props} />;
 }
 
 function Label(props: LabelHTMLAttributes<HTMLLabelElement>) {
     return (
         <label
-            className="flex flex-col font-S-bold text-color-greyScale/950 gap-2"
+            className="recover-form-label flex flex-col font-S-bold gap-2"
             {...props}
         />
     );

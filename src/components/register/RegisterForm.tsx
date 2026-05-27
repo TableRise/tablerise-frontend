@@ -38,7 +38,7 @@ export default function RegisterForm(): JSX.Element {
 
         try {
             await postRegister(registerPayload);
-            router.push('/');
+            router.push('/login');
         } catch (error: any) {
             setError('confirmPassword', {
                 type: 'manual',
@@ -102,7 +102,7 @@ export default function RegisterForm(): JSX.Element {
             />
 
             <Button
-                title="Entrar"
+                title="Cadastrar-se"
                 name="login-btn"
                 buttonStyle="button-L-fill"
                 props="font-S-bold text-color-greyScale/50"

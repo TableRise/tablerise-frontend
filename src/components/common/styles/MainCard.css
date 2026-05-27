@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .main-card {
+        @apply flex flex-col items-start justify-end rounded-xl bg-cover;
+        width: min(100%, var(--main-card-width));
+        height: var(--main-card-height);
+    }
+
+    .main-card .card-fog {
+        @apply relative w-full h-44 top-[5rem] rounded-xl;
+    }
+
+    .main-card .card-infos {
+        @apply relative h-[5rem] -top-4 px-4 flex flex-col justify-evenly;
+    }
+
+    .main-card .card-infos .main-card-link {
+        @apply flex w-full items-center justify-center;
+        @apply w-full h-10;
+        font-family: var('--dm-sans-base');
+        font-weight: 700;
+        font-style: normal;
+        font-size: 1rem;
+        line-height: 1.2rem;
+    }
+
+    @media (max-width: 480px) {
+        .main-card {
+            height: min(22rem, var(--main-card-height));
+        }
+    }
+
+    html[data-theme='dark'] .main-card .card-infos {
+        color: var(--theme-text);
+    }
+}

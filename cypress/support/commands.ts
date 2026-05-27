@@ -1,37 +1,52 @@
 /// <reference types="cypress" />
-// ***********************************************
-// This example commands.ts shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-//
-// declare global {
-//   namespace Cypress {
-//     interface Chainable {
-//       login(email: string, password: string): Chainable<void>
-//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
-//     }
-//   }
-// }
+
+type VisitWithAppStateOptions = {
+    cookieToken?: string | null;
+    localStorageUser?: Record<string, unknown> | null;
+    onBeforeLoad?: (win: Cypress.AUTWindow) => void;
+};
+
+declare global {
+    namespace Cypress {
+        interface Chainable {
+            visitWithAppState(
+                path: string,
+                options?: VisitWithAppStateOptions
+            ): Chainable<void>;
+            fillOtp(code: string, prefix?: string): Chainable<void>;
+        }
+    }
+}
+
+Cypress.Commands.add('visitWithAppState', (path, options = {}) => {
+    const {
+        cookieToken = null,
+        localStorageUser = null,
+        onBeforeLoad,
+    } = options as VisitWithAppStateOptions;
+
+    cy.clearCookies();
+    cy.clearLocalStorage();
+
+    if (cookieToken) {
+        cy.setCookie('token', cookieToken);
+    }
+
+    cy.visit(path, {
+        onBeforeLoad(win) {
+            if (localStorageUser) {
+                win.localStorage.setItem('userLogged', JSON.stringify(localStorageUser));
+            }
+
+            onBeforeLoad?.(win);
+        },
+    });
+});
+
+Cypress.Commands.add('fillOtp', (code, prefix = 'fild') => {
+    code.split('').forEach((character, index) => {
+        cy.get(`#${prefix}${index}`).type(character);
+    });
+});
+
+export {};

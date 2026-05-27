@@ -14,4 +14,8 @@
     label .input {
         @apply w-full h-10 focus:w-full focus:h-10;
     }
+
+    html[data-theme='dark'] label .label-text {
+        color: var(--theme-text);
+    }
 }

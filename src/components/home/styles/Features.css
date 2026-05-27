@@ -4,7 +4,8 @@
 
 @layer base {
     .features-section {
-        @apply w-[70.5rem] flex flex-col;
+        @apply flex w-full flex-col;
+        max-width: 70.5rem;
     }
 
     .features-text {
@@ -25,5 +26,35 @@
 
     .feature-card {
         @apply w-full;
+    }
+
+    @media (max-width: 768px) {
+        .features-section {
+            max-width: min(calc(100% - 1.5rem), 70.5rem);
+        }
+
+        .features-cards {
+            @apply gap-4;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .features-cards {
+            @apply flex-col;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .features-section {
+            max-width: min(calc(100% - 1rem), 70.5rem);
+        }
+    }
+
+    html[data-theme='dark'] .features-text p {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .features-text h2 {
+        color: var(--theme-accent);
     }
 }

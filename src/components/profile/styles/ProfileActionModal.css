@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .profile-action-modal-overlay {
+        @apply fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4;
+    }
+
+    .profile-action-modal-card {
+        @apply flex w-full max-w-[30rem] flex-col items-center gap-4 rounded-2xl bg-white p-8 shadow-xl;
+    }
+
+    .profile-action-modal-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .profile-action-modal-description {
+        @apply text-center text-color-greyScale/950;
+    }
+
+    .profile-action-modal-form {
+        @apply flex w-full flex-col gap-2;
+    }
+
+    .profile-action-modal-field {
+        @apply flex w-full flex-col;
+    }
+
+    .profile-action-modal-label {
+        @apply text-color-greyScale/950;
+    }
+
+    .profile-action-modal-textarea {
+        @apply mt-2 w-full rounded-lg border border-color-greyScale/300 bg-color-greyScale/50 p-3 text-color-greyScale/500 focus:outline-none;
+        min-height: 9rem;
+        resize: vertical;
+    }
+
+    .profile-action-modal-input {
+        @apply mt-2 w-full rounded-lg border border-color-greyScale/300 bg-color-greyScale/50 p-3 text-color-greyScale/500 focus:outline-none;
+    }
+
+    .profile-action-modal-input:focus {
+        border-color: rgb(10 53 138);
+    }
+
+    .profile-action-modal-textarea:focus {
+        border-color: rgb(10 53 138);
+    }
+
+    .profile-action-modal-input--error {
+        @apply border-color-support/alert;
+    }
+
+    .profile-action-modal-textarea--error {
+        @apply border-color-support/alert;
+    }
+
+    .profile-action-modal-otp {
+        @apply mt-2 flex gap-2;
+    }
+
+    .profile-action-modal-digit {
+        @apply h-12 w-11 rounded-lg border bg-white text-center uppercase text-color-greyScale/500 focus:outline-none;
+    }
+
+    .profile-action-modal-buttons {
+        @apply mt-2 flex w-full flex-col gap-2;
+    }
+
+    .profile-action-modal-password-row {
+        @apply relative;
+    }
+
+    .profile-action-modal-password-toggle {
+        @apply absolute right-4 top-1/2 h-6 w-6 -translate-y-1/2 bg-transparent text-color-greyScale/500;
+    }
+
+    .profile-action-modal-helper {
+        @apply text-color-greyScale/700;
+    }
+
+    .profile-action-modal-error {
+        @apply text-center text-color-support/alert;
+    }
+
+    .profile-action-modal-button-danger {
+        @apply bg-color-support/alert text-color-greyScale/50;
+    }
+
+    .profile-action-modal-button-danger:hover:enabled {
+        filter: brightness(0.95);
+    }
+
+    html[data-theme='dark'] .profile-action-modal-card {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow-strong);
+    }
+
+    html[data-theme='dark'] .profile-action-modal-title,
+    html[data-theme='dark'] .profile-action-modal-description,
+    html[data-theme='dark'] .profile-action-modal-label,
+    html[data-theme='dark'] .profile-action-modal-helper {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .profile-action-modal-input,
+    html[data-theme='dark'] .profile-action-modal-textarea,
+    html[data-theme='dark'] .profile-action-modal-digit {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+        color: var(--theme-text);
+    }
+}

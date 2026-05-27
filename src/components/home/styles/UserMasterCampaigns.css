@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .user-master-campaigns {
+        @apply flex w-full flex-col items-start justify-center rounded-xl bg-color-greyScale/50 p-6;
+        max-width: 70.5rem;
+    }
+
+    .user-master-campaigns .user-master-campaigns-header {
+        @apply flex justify-between items-center w-full;
+    }
+
+    .user-master-campaigns
+        .user-master-campaigns-header
+        .user-master-campaigns-created-label {
+        @apply flex justify-center items-center;
+    }
+
+    .user-master-campaigns
+        .user-master-campaigns-header
+        .user-master-campaigns-created-label
+        .label-title {
+        @apply mr-6 text-color-primary/default_900;
+    }
+
+    .user-master-campaigns
+        .user-master-campaigns-header
+        .user-master-campaigns-created-label
+        .creation-limits {
+        @apply px-3 py-2 bg-color-greyScale/100 rounded-lg;
+    }
+
+    .user-master-campaigns .user-master-campaigns-header .user-master-campaigns-buttons {
+        @apply flex text-color-greyScale/50;
+    }
+
+    .user-master-campaigns
+        .user-master-campaigns-header
+        .user-master-campaigns-buttons
+        button {
+        @apply h-10;
+    }
+
+    .user-master-campaigns
+        .user-master-campaigns-header
+        .user-master-campaigns-buttons
+        img {
+        @apply ml-4 cursor-pointer;
+    }
+
+    .user-master-campaigns
+        .user-master-campaigns-header
+        .user-master-campaigns-created-label
+        .creation-limits
+        span:nth-child(2) {
+        @apply ml-1;
+    }
+
+    .user-master-campaigns .user-master-campaigns-cards {
+        @apply mt-6 flex w-full flex-wrap justify-between;
+    }
+
+    @media (max-width: 768px) {
+        .user-master-campaigns {
+            @apply items-center p-5;
+        }
+
+        .user-master-campaigns .user-master-campaigns-cards {
+            @apply gap-4;
+        }
+
+        .user-master-campaigns .user-master-campaigns-header {
+            @apply flex-col items-start gap-4 text-center;
+        }
+
+        .user-master-campaigns
+            .user-master-campaigns-header
+            .user-master-campaigns-created-label {
+            @apply flex-col items-stretch gap-3;
+        }
+
+        .user-master-campaigns
+            .user-master-campaigns-header
+            .user-master-campaigns-created-label
+            .creation-limits {
+            @apply w-full text-center;
+        }
+
+        .user-master-campaigns
+            .user-master-campaigns-header
+            .user-master-campaigns-buttons {
+            @apply w-full flex-wrap justify-center gap-3;
+        }
+
+        .user-master-campaigns
+            .user-master-campaigns-header
+            .user-master-campaigns-buttons
+            button {
+            @apply w-full;
+        }
+
+        .user-master-campaigns
+            .user-master-campaigns-header
+            .user-master-campaigns-buttons
+            img {
+            @apply ml-0;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .user-master-campaigns {
+            @apply p-4;
+        }
+    }
+
+    html[data-theme='dark'] .user-master-campaigns {
+        background-color: var(--theme-surface);
+        border: 1px solid var(--theme-border);
+        box-shadow: none;
+    }
+
+    html[data-theme='dark']
+        .user-master-campaigns
+        .user-master-campaigns-header
+        .user-master-campaigns-created-label
+        .label-title {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark']
+        .user-master-campaigns
+        .user-master-campaigns-header
+        .user-master-campaigns-created-label
+        .creation-limits {
+        background-color: var(--theme-surface-muted);
+        color: var(--theme-text-muted);
+    }
+}

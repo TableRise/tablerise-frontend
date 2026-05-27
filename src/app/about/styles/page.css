@@ -1,0 +1,211 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    /* ── Shared container ────────────────────────────────────── */
+    .about-container {
+        @apply mx-auto;
+        width: min(calc(100% - 2rem), 70.5rem);
+    }
+
+    /* ── Hey! ─────────────────────────────────────────────────── */
+    .about-hey-section {
+        @apply py-16;
+    }
+
+    .about-hey-title {
+        @apply mb-4 text-color-primary/950;
+    }
+
+    .about-hey-text {
+        @apply text-color-greyScale/900 leading-relaxed max-w-3xl;
+    }
+
+    /* ── Timeline ─────────────────────────────────────────────── */
+    .about-timeline-section {
+        @apply py-14;
+        background-color: #0a358a;
+    }
+
+    .about-timeline-heading {
+        @apply text-color-greyScale/50 mb-10;
+    }
+
+    .about-timeline-track-wrapper {
+        @apply flex flex-col gap-10;
+    }
+
+    .about-timeline-row-wrapper {
+        @apply relative;
+    }
+
+    .about-timeline-line {
+        @apply absolute left-0 right-0 h-[2px] bg-white/30;
+        top: 2.25rem; /* aligned with dots */
+    }
+
+    .about-timeline-columns {
+        @apply relative grid grid-cols-4 gap-6;
+    }
+
+    .about-timeline-column {
+        @apply flex flex-col gap-4;
+    }
+
+    .about-timeline-date-row {
+        @apply flex flex-col items-start gap-2;
+    }
+
+    .about-timeline-date {
+        @apply text-color-greyScale/50;
+    }
+
+    .about-timeline-dot {
+        @apply w-4 h-4 rounded-full bg-white border-2 border-white;
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+    }
+
+    .about-timeline-cards {
+        @apply flex flex-col gap-4;
+    }
+
+    .about-timeline-card {
+        @apply bg-white rounded-xl p-4 flex flex-col gap-2;
+    }
+
+    .about-timeline-badge {
+        @apply self-start px-2 py-0.5 rounded text-white text-xs;
+    }
+
+    .about-timeline-card-text {
+        @apply text-color-greyScale/700;
+    }
+
+    /* ── Nossa equipe ─────────────────────────────────────────── */
+    .about-team-section {
+        @apply py-16;
+    }
+
+    .about-team-heading {
+        @apply text-color-primary/default_900 mb-8;
+    }
+
+    .about-team-grid {
+        @apply grid grid-cols-3 gap-6;
+    }
+
+    .about-team-card {
+        @apply bg-white rounded-xl p-6 flex flex-col gap-4;
+    }
+
+    .about-team-card-header {
+        @apply flex items-center gap-4;
+    }
+
+    .about-team-avatar {
+        @apply w-14 h-14 rounded-full bg-color-greyScale/300 flex-shrink-0;
+    }
+
+    .about-team-card-info {
+        @apply flex flex-col gap-1;
+    }
+
+    .about-team-name {
+        @apply text-color-greyScale/950;
+    }
+
+    .about-team-roles {
+        @apply flex gap-2 flex-wrap;
+    }
+
+    .about-team-role-badge {
+        @apply px-2 py-0.5 rounded bg-color-primary/default_900 text-color-greyScale/50;
+    }
+
+    .about-team-description {
+        @apply text-color-greyScale/700 leading-relaxed flex-1;
+    }
+
+    .about-team-links {
+        @apply flex gap-3;
+    }
+
+    .about-team-link-btn {
+        @apply flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-color-greyScale/300
+               text-color-greyScale/700 transition-colors;
+    }
+
+    .about-team-link-btn:hover {
+        @apply bg-color-greyScale/100;
+    }
+
+    @media (max-width: 1024px) {
+        .about-container {
+            width: min(calc(100% - 2rem), 64rem);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .about-container {
+            width: min(calc(100% - 1.5rem), 70.5rem);
+        }
+
+        .about-hey-section,
+        .about-team-section,
+        .about-timeline-section {
+            @apply py-12;
+        }
+
+        .about-timeline-columns {
+            @apply grid-cols-2 gap-5;
+        }
+
+        .about-team-grid {
+            @apply grid-cols-2 gap-5;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .about-container {
+            width: min(calc(100% - 1rem), 70.5rem);
+        }
+
+        .about-timeline-line {
+            display: none;
+        }
+
+        .about-timeline-columns,
+        .about-team-grid {
+            @apply grid-cols-1;
+        }
+
+        .about-team-card {
+            @apply p-5;
+        }
+    }
+
+    html[data-theme='dark'] .about-hey-text,
+    html[data-theme='dark'] .about-team-description,
+    html[data-theme='dark'] .about-team-link-btn {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .about-team-card,
+    html[data-theme='dark'] .about-timeline-card {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .about-team-link-btn {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .about-team-link-btn:hover {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .about-timeline-section {
+        background: linear-gradient(180deg, #0c255f 0%, #07111f 100%);
+    }
+}

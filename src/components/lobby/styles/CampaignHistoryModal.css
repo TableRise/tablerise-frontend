@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .campaign-history-modal-overlay {
+        @apply fixed inset-0 z-[200] flex items-center justify-center bg-black/60;
+    }
+
+    .campaign-history-modal {
+        @apply flex max-h-[90vh] w-[42rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl bg-color-greyScale/100;
+    }
+
+    .campaign-history-modal-header {
+        @apply flex items-center justify-between border-b border-color-greyScale/200 px-6 py-4;
+    }
+
+    .campaign-history-modal-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .campaign-history-modal-close {
+        @apply flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-transparent text-color-primary/default_900 transition-opacity hover:opacity-70;
+    }
+
+    .campaign-history-modal-body {
+        @apply overflow-y-auto p-6;
+    }
+
+    .campaign-history-groups {
+        @apply flex flex-col gap-3;
+    }
+
+    .campaign-history-group {
+        @apply overflow-hidden rounded-xl border border-color-greyScale/200 bg-color-greyScale/50;
+    }
+
+    .campaign-history-group-trigger {
+        @apply flex w-full items-center justify-between px-4 py-3 text-left text-color-primary/default_900 transition-colors hover:bg-color-greyScale/100;
+    }
+
+    .campaign-history-group-body {
+        @apply flex flex-col gap-3 border-t border-color-greyScale/200 px-4 py-4;
+    }
+
+    .campaign-history-log {
+        @apply flex flex-col gap-1 rounded-lg bg-color-greyScale/100 p-3;
+    }
+
+    .campaign-history-log-content {
+        @apply break-words text-color-greyScale/700;
+    }
+
+    .campaign-history-log-date {
+        @apply text-color-greyScale/500;
+    }
+
+    .campaign-history-empty {
+        @apply block text-center text-color-greyScale/500;
+    }
+
+    html[data-theme='dark'] .campaign-history-modal-title,
+    html[data-theme='dark'] .campaign-history-modal-close,
+    html[data-theme='dark'] .campaign-history-group-trigger {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .campaign-history-modal,
+    html[data-theme='dark'] .campaign-history-group,
+    html[data-theme='dark'] .campaign-history-log {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .campaign-history-modal-header,
+    html[data-theme='dark'] .campaign-history-group,
+    html[data-theme='dark'] .campaign-history-group-body {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .campaign-history-group-trigger:hover,
+    html[data-theme='dark'] .campaign-history-log {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .campaign-history-log-content {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .campaign-history-log-date,
+    html[data-theme='dark'] .campaign-history-empty {
+        color: var(--theme-text-muted);
+    }
+}

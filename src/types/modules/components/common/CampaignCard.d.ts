@@ -1,0 +1,20 @@
+import { SVGProps } from 'react';
+
+export interface CampaignCardProps {
+    image?: any;
+    fogColor?: string;
+    className?: string;
+    size?: string;
+    title?: string;
+    buttonTitle?: string;
+    textColor?: string;
+    buttonColor?: string;
+    nextMatchDate?: string;
+    system?: string;
+    ageRestriction?: string;
+    campaignPlayers?: { role: string; userId?: string; status?: string }[];
+    playerAmountLimit?: number;
+    campaignId?: string;
+    onButtonClick?: () => void;
+    buttonDisabled?: boolean;
+}

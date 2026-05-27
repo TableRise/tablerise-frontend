@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .general-header {
+        @apply absolute left-[50%] top-5 z-[100] flex min-h-[4.5rem] -translate-x-1/2 items-center justify-between gap-4 rounded-xl bg-color-primary/default_900 px-6 py-3;
+        width: min(calc(100% - 2rem), 70.5rem);
+    }
+
+    .general-header .logo-header {
+        @apply h-auto w-[8.75rem];
+    }
+
+    .general-header-mobile-toggle {
+        @apply hidden h-11 w-11 items-center justify-center rounded-lg bg-white/10 text-color-greyScale/50 transition-colors hover:bg-white/20;
+    }
+
+    .general-header .menu-and-buttons {
+        @apply flex items-center gap-6;
+    }
+
+    .general-header .menu {
+        @apply flex h-8 items-center justify-center;
+    }
+
+    .general-header .menu-list {
+        @apply flex items-center gap-6;
+    }
+
+    .general-header .menu-list li {
+        @apply text-color-greyScale/50;
+    }
+
+    .general-header .buttons-header {
+        @apply flex items-center gap-3;
+    }
+
+    @media (max-width: 1024px) {
+        .general-header {
+            @apply px-5;
+            width: min(calc(100% - 2rem), 64rem);
+        }
+
+        .general-header .menu-and-buttons,
+        .general-header .menu-list {
+            @apply gap-4;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .general-header {
+            @apply items-start rounded-[1.1rem] px-4 py-4;
+            width: min(calc(100% - 1.5rem), 70.5rem);
+        }
+
+        .general-header .logo-header {
+            @apply w-[7.75rem];
+        }
+
+        .general-header-mobile-toggle {
+            @apply flex;
+        }
+
+        .general-header .menu-and-buttons {
+            @apply absolute left-0 right-0 top-[calc(100%+0.5rem)] hidden flex-col items-stretch gap-4 rounded-[1.1rem] bg-color-primary/default_900 px-4 py-4 shadow-lg;
+        }
+
+        .general-header .menu-and-buttons.menu-and-buttons--open {
+            @apply flex;
+        }
+
+        .general-header .menu {
+            @apply h-auto w-full;
+        }
+
+        .general-header .menu-list {
+            @apply w-full flex-col items-stretch gap-2;
+        }
+
+        .general-header .menu-list li a {
+            @apply flex w-full rounded-lg bg-white/5 px-4 py-3;
+        }
+
+        .general-header .buttons-header {
+            @apply w-full flex-col gap-2;
+        }
+
+        .general-header .buttons-header a,
+        .general-header .buttons-header button {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .general-header {
+            @apply top-3 px-3 py-3;
+            width: min(calc(100% - 1rem), 70.5rem);
+        }
+    }
+
+    html[data-theme='dark'] .general-header .button-transparent-default {
+        border-color: rgba(255, 255, 255, 0.8);
+        color: #ffffff;
+    }
+}

@@ -6,6 +6,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useContext } from 'react';
 import RecoverPasswordContext from '@/context/RecoverPasswordContext';
 import { useRouter } from 'next/navigation';
+import {
+    handleOtpKeyDown,
+    handleOtpAutoAdvance,
+    handleOtpPaste,
+} from '@/utils/otpInputHelpers';
 
 export default function FormTwoFactor() {
     const router = useRouter();
@@ -24,65 +29,16 @@ export default function FormTwoFactor() {
         resolver: zodResolver(twoFactorSchema),
     });
 
-    const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>, index: number) => {
-        e.preventDefault();
-        const clipboardData = e.clipboardData.getData('Text');
-        const inputs = document.querySelectorAll('input');
-
-        clipboardData.split('').forEach((char, idx) => {
-            if (inputs[idx]) {
-                (inputs[idx] as HTMLInputElement).value = char;
-                setValue(`fild${idx}` as `fild${1}`, char); // Atualiza o valor do formulário
+    const onPasteFilled = (chars: string[]) => {
+        chars.forEach((char, idx) => {
+            const input = document.getElementById(
+                `fild${idx}`
+            ) as HTMLInputElement | null;
+            if (input) {
+                input.value = char;
+                setValue(`fild${idx}` as `fild${1}`, char);
             }
         });
-    };
-
-    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
-        const inputElement = e.currentTarget;
-
-        if (!/^[a-zA-Z0-9]$/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
-            e.preventDefault(); // Impede qualquer caractere que não seja número
-            return;
-        }
-
-        // Se a tecla pressionada for Backspace ou Delete e o campo estiver vazio, move para o campo anterior
-        if ((e.key === 'Backspace' || e.key === 'Delete') && inputElement.value === '') {
-            const previousField = document.getElementById(
-                `fild${index - 1}`
-            ) as HTMLInputElement | null;
-            if (previousField) {
-                previousField.focus();
-            }
-        } else if (
-            inputElement.value.length === 1 &&
-            e.key !== 'Backspace' &&
-            e.key !== 'Delete'
-        ) {
-            // Limpa o campo antes de adicionar o novo valor
-            inputElement.value = '';
-        }
-    };
-
-    const nextInput = (e: React.FormEvent<HTMLInputElement>, index: number) => {
-        const { value } = e.currentTarget;
-
-        if (value.length === 1) {
-            const nextField = document.getElementById(
-                `fild${index + 1}`
-            ) as HTMLInputElement | null;
-
-            if (nextField) {
-                nextField.focus();
-            }
-        } else if (value.length === 0 && index > 0) {
-            const previousField = document.getElementById(
-                `fild${index - 1}`
-            ) as HTMLInputElement | null;
-
-            if (previousField) {
-                previousField.focus();
-            }
-        }
     };
 
     const sendCode = async (data: TwoFactorSchema) => {
@@ -105,7 +61,7 @@ export default function FormTwoFactor() {
         <form onSubmit={handleSubmit(sendCode)}>
             <Form.Label>
                 Insira o código de verificação, indicado em seu e-mail.
-                <div className="flex justify-center gap-2">
+                <div className="form-opts-inputs">
                     {num6.map((_, index) => (
                         <input
                             {...register(
@@ -115,9 +71,11 @@ export default function FormTwoFactor() {
                             key={index}
                             type="text"
                             maxLength={1}
-                            onPaste={(e) => handlePaste(e, index)}
-                            onKeyDown={(e) => handleKeyPress(e, index)}
-                            onInput={(e) => nextInput(e, index)}
+                            onPaste={(e) => handleOtpPaste(e, 6, onPasteFilled)}
+                            onKeyDown={(e) =>
+                                handleOtpKeyDown(e, index, 'fild', 'alphanumeric')
+                            }
+                            onInput={(e) => handleOtpAutoAdvance(e, index, 'fild')}
                             className={`
                                     form-opt-input font-XS-regular
                                     ${
