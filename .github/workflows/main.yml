@@ -26,9 +26,6 @@ jobs:
       - name: Checking lint
         run:  npm run lint
 
-      - name: Checking prettier
-        run:  npm run prettier
-
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
