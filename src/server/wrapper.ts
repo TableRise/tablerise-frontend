@@ -5,6 +5,33 @@ export const usersBaseUrl = process.env.API_USERS;
 export const dndBaseUrl = process.env.API_DD5E;
 export const campaignsBaseUrl = process.env.API_CAMPAIGNS;
 export const oAuthBaseUrl = process.env.API_OAUTH;
+export const charactersBaseUrl = process.env.API_CHARACTERS;
+
+if (typeof window !== 'undefined') {
+    axios.interceptors.response.use(
+        (response) => response,
+        async (error) => {
+            const is401 = error?.response?.status === 401;
+            const isLogoutUrl = error?.config?.url?.includes('/logout');
+            const isLoginUrl = error?.config?.url?.includes('/login');
+            const isAuthenticationFlowUrl =
+                error?.config?.url?.includes('/authenticate/');
+
+            if (is401 && !isLogoutUrl && !isLoginUrl && !isAuthenticationFlowUrl) {
+                try {
+                    await axios.get(`${usersBaseUrl}/logout`, {
+                        withCredentials: true,
+                    });
+                } catch {
+                    // ignore logout errors — redirect regardless
+                }
+                window.location.href = '/';
+            }
+
+            return Promise.reject(error);
+        }
+    );
+}
 
 export const apiCall = async (data: WrapperPayload) => {
     const { method, baseUrl, endpoint, data: requestData, params } = data;

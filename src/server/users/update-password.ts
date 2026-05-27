@@ -12,8 +12,8 @@ export const sendConfirmEmail = async (email: string) => {
     try {
         await apiCall({
             baseUrl: usersBaseUrl,
-            endpoint: 'verify',
-            method: 'GET',
+            endpoint: 'authenticate/email/send-code',
+            method: 'POST',
             params: { email, flow: 'update-password' },
         });
     } catch ({ response }: AxiosError | any) {
@@ -27,7 +27,7 @@ export const authenticateEmail = async (email: string, code: string) => {
         const { data }: AxiosResponse<Response> = await apiCall({
             baseUrl: usersBaseUrl,
             endpoint: 'authenticate/email',
-            method: 'PATCH',
+            method: 'POST',
             params: { email, code, flow: 'update-password' },
         });
 
@@ -49,7 +49,7 @@ export const authenticate2fa = async (email: string, code: string) => {
         const { status }: AxiosResponse<Response> = await apiCall({
             baseUrl: usersBaseUrl,
             endpoint: 'authenticate/2fa',
-            method: 'PATCH',
+            method: 'POST',
             params: { email, token: code, flow: 'update-password' },
         });
 
@@ -88,8 +88,7 @@ export const sendNewPassword = async (email: string, newPassword: string) => {
             baseUrl: usersBaseUrl,
             endpoint: 'update/password',
             method: 'PATCH',
-            data: { password: newPassword },
-            params: { email },
+            data: { email, password: newPassword },
         });
     } catch ({ response }: AxiosError | any) {
         if (response.status == 400)

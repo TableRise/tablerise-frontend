@@ -7,18 +7,45 @@ jobs:
     runs-on: ubuntu-22.04
     permissions:
       pull-requests: write
+    env:
+      API_BASE_URL: http://127.0.0.1:3000
+      API_USERS: http://127.0.0.1:3000/users
+      API_OAUTH: http://127.0.0.1:3000/oauth
+      API_CAMPAIGNS: http://127.0.0.1:3000/campaigns
+      API_CHARACTERS: http://127.0.0.1:3000/characters
+      API_DD5E: http://127.0.0.1:3000/dnd5e
+      API_GOOGLE_YOUTUBE: http://127.0.0.1:3000/youtube
+      API_GOOGLE_KEY: test-key
+      TYPE_KEY: x-api-key
+      API_ACCESS_KEY: test-access-key
+      NEXT_PUBLIC_API_CAMPAIGNS: http://127.0.0.1:3000/campaigns
+      NEXT_PUBLIC_TYPE_KEY: x-api-key
+      NEXT_PUBLIC_API_ACCESS_KEY: test-access-key
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@tablerise'
+
       - name: Install dependencies
-        run:  npm install
+        run:  npm ci
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_REGISTRY_PACKAGES }}
+
+      - name: Checking lint
+        run:  npm run lint
+
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
           build: npm run build
           start: npm start
+
       - uses: mshick/add-pr-comment@v2
         with:
           message: |

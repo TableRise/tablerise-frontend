@@ -1,0 +1,181 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .csm-overlay {
+        @apply fixed inset-0 z-[200] flex items-center justify-center bg-black/50;
+    }
+
+    .csm-modal {
+        @apply w-[50rem] max-h-[90vh] overflow-y-auto bg-color-greyScale/100 rounded-2xl p-8 flex flex-col gap-6;
+    }
+
+    .csm-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .csm-tabs {
+        @apply flex gap-1 border-b border-color-greyScale/200;
+    }
+
+    .csm-tab {
+        @apply px-5 py-2 cursor-pointer bg-transparent transition-colors
+            text-color-greyScale/500 border-b-2 border-transparent -mb-px;
+    }
+
+    .csm-tab--active {
+        @apply text-color-primary/default_900 border-color-primary/default_900;
+    }
+
+    .csm-list {
+        @apply flex flex-col gap-4;
+    }
+
+    .csm-loading,
+    .csm-empty {
+        @apply text-color-greyScale/500 text-center py-4;
+    }
+
+    .csm-card {
+        @apply flex items-center justify-between bg-color-greyScale/50 rounded-lg px-4 py-3 border border-color-greyScale/200 cursor-pointer;
+    }
+
+    .csm-card-left {
+        @apply flex items-center gap-3;
+    }
+
+    .csm-card-icon {
+        @apply relative w-16 h-16 rounded-md overflow-hidden flex-shrink-0;
+    }
+
+    .csm-card-info {
+        @apply flex flex-col;
+    }
+
+    .csm-card-name {
+        @apply text-color-greyScale/700;
+    }
+
+    .csm-card-date {
+        @apply text-color-greyScale/500;
+    }
+
+    .csm-card-delete {
+        @apply text-color-greyScale/300 cursor-pointer transition-opacity hover:opacity-70;
+    }
+
+    .csm-create-btn {
+        @apply w-full py-4 rounded-lg bg-color-primary/default_900 text-color-greyScale/50 cursor-pointer transition-opacity hover:opacity-80;
+    }
+
+    .csm-cancel-btn {
+        @apply w-full py-2 text-color-greyScale/700 cursor-pointer transition-opacity hover:opacity-70 bg-transparent;
+    }
+
+    .csm-confirm-overlay {
+        @apply fixed inset-0 z-[300] flex items-center justify-center bg-black/60;
+    }
+
+    .csm-confirm-modal {
+        @apply w-[26rem] bg-color-greyScale/100 rounded-2xl p-8 flex flex-col gap-5;
+    }
+
+    .csm-confirm-title {
+        @apply text-color-greyScale/900;
+    }
+
+    .csm-confirm-text {
+        @apply text-color-greyScale/500;
+    }
+
+    .csm-confirm-actions {
+        @apply flex gap-3 justify-end;
+    }
+
+    .csm-confirm-btn-cancel {
+        @apply px-5 py-2.5 rounded-lg border border-color-greyScale/300
+            text-color-greyScale/700 bg-transparent cursor-pointer
+            transition-colors hover:bg-color-greyScale/200;
+    }
+
+    .csm-confirm-btn-delete {
+        @apply px-5 py-2.5 rounded-lg bg-red-600 text-white cursor-pointer
+            transition-opacity hover:opacity-80;
+    }
+
+    @media (max-width: 768px) {
+        .csm-modal {
+            @apply w-[calc(100vw-1.5rem)] rounded-[1.25rem] p-5;
+        }
+
+        .csm-tabs {
+            @apply overflow-x-auto;
+        }
+
+        .csm-card {
+            @apply items-start gap-3;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .csm-modal {
+            @apply w-[calc(100vw-1rem)] p-4;
+        }
+
+        .csm-card {
+            @apply flex-col;
+        }
+
+        .csm-confirm-modal {
+            @apply w-[calc(100vw-1rem)] p-5;
+        }
+    }
+
+    html[data-theme='dark'] .csm-modal,
+    html[data-theme='dark'] .csm-confirm-modal {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .csm-card {
+        background-color: var(--theme-surface-muted);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .csm-tabs,
+    html[data-theme='dark'] .csm-card,
+    html[data-theme='dark'] .csm-confirm-btn-cancel {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .csm-title,
+    html[data-theme='dark'] .csm-tab--active {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .csm-tab {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .csm-card-name,
+    html[data-theme='dark'] .csm-cancel-btn,
+    html[data-theme='dark'] .csm-confirm-title {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .csm-card-date,
+    html[data-theme='dark'] .csm-loading,
+    html[data-theme='dark'] .csm-empty,
+    html[data-theme='dark'] .csm-confirm-text {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .csm-card-delete {
+        color: var(--theme-text-subtle);
+    }
+
+    html[data-theme='dark'] .csm-confirm-btn-cancel:hover {
+        background-color: var(--theme-surface-strong);
+    }
+}

@@ -1,5 +1,5 @@
 'use client';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import GeneralHeader from '@/components/common/GeneralHeader';
 import FAQ from '@/components/home/FAQ';
 import Banner from '@/components/home/Banner';
@@ -12,9 +12,11 @@ import LoggedHeader from '@/components/common/LoggedHeader';
 import '@/app/page.css';
 import UserMasterCampaigns from '@/components/home/UserMasterCampaigns';
 import UserPlayerCampaigns from '@/components/home/UserPlayerCampaigns';
+import JoinCampaignModal from '@/components/home/JoinCampaignModal';
 
 export default function Home(): JSX.Element {
     const { userLoggedToggle, userCampaigns } = useContext(TableriseContext);
+    const [joinModalOpen, setJoinModalOpen] = useState(false);
 
     const userNotLoggedPage = (
         <>
@@ -38,7 +40,13 @@ export default function Home(): JSX.Element {
                 <LoggedHeader />
                 <h2 className="font-XL-bold">Campanhas</h2>
                 <UserMasterCampaigns campaigns={userCampaigns.master} />
-                <UserPlayerCampaigns campaigns={userCampaigns.player} />
+                <UserPlayerCampaigns
+                    campaigns={userCampaigns.player}
+                    onJoinClick={() => setJoinModalOpen(true)}
+                />
+                {joinModalOpen && (
+                    <JoinCampaignModal onClose={() => setJoinModalOpen(false)} />
+                )}
             </section>
             <Footer />
         </>

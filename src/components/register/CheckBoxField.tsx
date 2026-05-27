@@ -20,18 +20,20 @@ export default function CheckBoxField({
                     {...register(name)}
                     id="checkBtn"
                 />
-                <h3 className="checkbox-text font-XS-regular">
+                <span className="checkbox-text font-XS-regular">
                     {label}{' '}
                     {labelWithLink && (
                         <Link
                             href={srcLink || ''}
+                            target="_blank"
+                            rel="noreferrer"
                             className="checkbox-link font-XS-regular"
                         >
                             {' '}
                             {labelWithLink}
                         </Link>
                     )}
-                </h3>
+                </span>
             </label>
             {error && <p className="error-message font-XXS-bold">{error.message}</p>}
         </div>

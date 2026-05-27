@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .tutorial-detail-page {
+        @apply flex justify-center px-4 pb-12;
+    }
+
+    .tutorial-detail-container {
+        @apply flex w-full gap-8 items-start;
+        max-width: 70.5rem;
+    }
+
+    /* ----------- Sidebar ----------- */
+    .tutorial-detail-sidebar {
+        @apply flex-shrink-0 w-44;
+    }
+
+    .tutorial-detail-sidebar-title {
+        @apply text-color-greyScale/700 uppercase tracking-wide mb-3;
+    }
+
+    .tutorial-detail-sidebar-list {
+        @apply flex flex-col list-none;
+    }
+
+    .tutorial-detail-sidebar-item {
+        @apply block py-2 px-3 rounded-lg text-color-greyScale/700 transition-colors;
+    }
+
+    .tutorial-detail-sidebar-item:hover {
+        @apply bg-color-greyScale/200 text-color-primary/default_900;
+    }
+
+    .tutorial-detail-sidebar-item--active {
+        @apply bg-color-primary/default_900 text-color-greyScale/50;
+    }
+
+    .tutorial-detail-sidebar-item--active:hover {
+        @apply bg-color-primary/default_900 text-color-greyScale/50;
+    }
+
+    /* ----------- Content ----------- */
+    .tutorial-detail-content {
+        @apply flex-1 flex flex-col gap-6 pb-12;
+    }
+
+    /* ----------- Hero ----------- */
+    .tutorial-detail-hero {
+        @apply relative w-full h-72 rounded-xl bg-cover bg-center flex flex-col justify-end overflow-hidden;
+    }
+
+    .tutorial-detail-hero--placeholder {
+        background-image: repeating-conic-gradient(#dcdcdc 0% 25%, #ffffff 0% 50%);
+        background-size: 24px 24px;
+    }
+
+    .tutorial-detail-hero-fog {
+        @apply absolute inset-0 rounded-xl;
+        background: linear-gradient(to top, #0a358a 10%, rgba(255, 255, 255, 0) 70%);
+    }
+
+    .tutorial-detail-hero-title {
+        @apply relative z-10 px-6 pb-4;
+    }
+
+    /* ----------- Body ----------- */
+    .tutorial-detail-body {
+        @apply flex flex-col gap-6;
+    }
+
+    .tutorial-detail-topic {
+        @apply flex flex-col gap-3;
+    }
+
+    @media (max-width: 768px) {
+        .tutorial-detail-page {
+            @apply px-3 pb-10;
+        }
+
+        .tutorial-detail-container {
+            @apply flex-col gap-5;
+        }
+
+        .tutorial-detail-sidebar {
+            @apply w-full;
+        }
+
+        .tutorial-detail-sidebar-list {
+            @apply flex-row flex-wrap gap-2;
+        }
+
+        .tutorial-detail-hero {
+            @apply h-56;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .tutorial-detail-page {
+            @apply px-2 pb-8;
+        }
+
+        .tutorial-detail-hero {
+            @apply h-44;
+        }
+    }
+
+    html[data-theme='dark'] .tutorial-detail-sidebar-title,
+    html[data-theme='dark'] .tutorial-detail-sidebar-item {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .tutorial-detail-sidebar-item:hover {
+        background-color: var(--theme-surface-muted);
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .tutorial-detail-hero--placeholder {
+        background-image: repeating-conic-gradient(#192437 0% 25%, #111b2b 0% 50%);
+    }
+}

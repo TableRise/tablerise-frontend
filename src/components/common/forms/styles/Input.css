@@ -7,15 +7,15 @@
         @apply mb-4;
     }
 
-    .generic-form-input div {
+    .generic-form-input .generic-form-input-shell {
         @apply relative;
     }
 
-    .generic-form-input div input {
+    .generic-form-input .generic-form-input-shell input {
         @apply pr-9;
     }
 
-    .generic-form-input div button {
-        @apply absolute top-2 right-5;
+    .generic-form-input .generic-form-input-shell button {
+        @apply absolute top-2 right-3;
     }
 }

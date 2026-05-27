@@ -1,33 +1,65 @@
-import { v4 as uuid } from 'uuid';
-import Image from 'next/image';
 import CampaignCard from '@/components/common/CampaignCard';
-import MoreVertBlueSVG from '../../../assets/icons/nav/more-vert-blue.svg?url';
-import SearchBlueSVG from '../../../assets/icons/nav/search-blue.svg?url';
+import CampaignPasswordModal from '@/components/home/CampaignPasswordModal';
+import ErrorModal from '@/components/home/ErrorModal';
+import { useJoinCampaign } from '@/components/home/helpers/useJoinCampaign';
+import { isCampaignPlayerPending } from '@/components/home/helpers/campaignPlayerStatus';
 import { CampaignsToRender } from '@/types/modules/components/home/UserMasterCampaigns';
-import Link from 'next/link';
 import Carousel from '../common/Carousel';
-import '@/components/home/styles/UserPlayerCampaigns.css';
 import BasicParticipationCard from '../common/BasicParticipationCard';
+import { useStoredUser } from '@/hooks/useStoredUser';
+import '@/components/home/styles/UserPlayerCampaigns.css';
 
 export default function UserPlayerCampaigns({
     campaigns,
-}: CampaignsToRender): JSX.Element {
-    const cardMap = campaigns.map((campaign) => (
-        <CampaignCard
-            className={'embla__slide'}
-            key={uuid()}
-            title={campaign.title}
-            nextMatchDate={campaign.infos.nextMatchDate}
-            fogColor="#0A358A"
-            textColor="white"
-            size="straight"
-            buttonColor="white"
-            buttonTitle="Entrar no Jogo"
-        />
-    ));
+    onJoinClick,
+}: CampaignsToRender & { onJoinClick?: () => void }): JSX.Element {
+    const {
+        handleJoinClick,
+        passwordModalOpen,
+        passwordError,
+        handlePasswordConfirm,
+        closePasswordModal,
+        joinError,
+        closeJoinError,
+    } = useJoinCampaign();
+    const { storedUser } = useStoredUser();
+    const currentUserId = storedUser?.userId ?? '';
+
+    const cardMap = campaigns.map((campaign) => {
+        const isPending = isCampaignPlayerPending(
+            campaign.campaignPlayers,
+            currentUserId
+        );
+
+        return (
+            <CampaignCard
+                className="embla__slide"
+                key={campaign.campaignId}
+                title={campaign.title}
+                nextMatchDate={campaign.infos.nextMatchDate}
+                image={campaign.cover?.link}
+                fogColor="#0A358A"
+                textColor="white"
+                size="straight"
+                buttonColor="white"
+                buttonTitle={isPending ? 'Aguardando aprovação \u29d6' : 'Entrar no Jogo'}
+                buttonDisabled={isPending}
+                system={campaign.system}
+                ageRestriction={campaign.ageRestriction}
+                campaignPlayers={campaign.campaignPlayers}
+                playerAmountLimit={campaign.infos.playerAmountLimit}
+                campaignId={campaign.campaignId}
+                onButtonClick={() =>
+                    handleJoinClick(campaign.campaignId, campaign.campaignPlayers)
+                }
+            />
+        );
+    });
 
     const cards =
-        cardMap.length > 0 ? cardMap : [<BasicParticipationCard key="no-campaigns" />];
+        cardMap.length > 0
+            ? cardMap
+            : [<BasicParticipationCard key="no-campaigns" onClick={onJoinClick} />];
 
     return (
         <section className="user-player-campaigns">
@@ -40,34 +72,29 @@ export default function UserPlayerCampaigns({
                     </div>
                 </div>
                 <div className="user-player-campaigns-buttons">
-                    <Link href="/home/campaigns">
-                        <button
-                            className="button-L-fill font-XS-bold"
-                            disabled={campaigns.length >= 8}
-                        >
-                            Entrar em uma nova campanha
-                        </button>
-                    </Link>
-
-                    <Image
-                        src={SearchBlueSVG.src}
-                        alt="more-vert"
-                        width={SearchBlueSVG.width}
-                        height={SearchBlueSVG.height}
-                    />
-
-                    <Image
-                        src={MoreVertBlueSVG.src}
-                        alt="more-vert"
-                        width={MoreVertBlueSVG.width}
-                        height={MoreVertBlueSVG.height}
-                    />
+                    <button
+                        className="button-L-fill font-XS-bold"
+                        disabled={campaigns.length >= 8}
+                        onClick={onJoinClick}
+                    >
+                        Entrar em uma nova campanha
+                    </button>
                 </div>
             </div>
 
             <div className="user-player-campaigns-cards embla">
                 <Carousel elements={cards} />
             </div>
+
+            {passwordModalOpen && (
+                <CampaignPasswordModal
+                    onConfirm={handlePasswordConfirm}
+                    onClose={closePasswordModal}
+                    error={passwordError}
+                />
+            )}
+
+            {joinError && <ErrorModal message={joinError} onClose={closeJoinError} />}
         </section>
     );
 }

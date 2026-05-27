@@ -1,13 +1,8 @@
 export default function formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    const options: Intl.DateTimeFormatOptions = {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-    };
-
-    const preFormatedDate = date.toLocaleDateString('pt-BR', options);
-    return preFormatedDate.replace(',', ' ·');
+    if (dateString === 'undefined' || !dateString) return '';
+    const cleaned = dateString.replace(/"/g, '');
+    const [datePart, timePart] = cleaned.split('T');
+    const [year, month, day] = datePart.split('-');
+    const [hour, minute] = timePart.split(':');
+    return `${day}/${month}/${year} · ${hour}:${minute}`;
 }

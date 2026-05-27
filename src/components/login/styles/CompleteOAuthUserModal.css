@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .complete-oauth-modal-overlay {
+        @apply fixed inset-0 z-50 flex items-center justify-center bg-black/60;
+    }
+
+    .complete-oauth-modal-card {
+        @apply w-[30rem] bg-white rounded-2xl p-8 flex flex-col items-center gap-4 shadow-xl;
+    }
+
+    .complete-oauth-modal-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .complete-oauth-modal-description {
+        @apply text-color-greyScale/950 text-center;
+    }
+
+    .complete-oauth-modal-form {
+        @apply flex flex-col w-full gap-2;
+    }
+
+    .complete-oauth-modal-form .generic-form-input {
+        @apply w-full;
+    }
+
+    .complete-oauth-modal-form .generic-form-input input,
+    .complete-oauth-modal-form .complete-oauth-select {
+        @apply w-full mt-2;
+    }
+
+    .complete-oauth-modal-buttons {
+        @apply flex flex-col gap-2 w-full mt-4;
+    }
+
+    html[data-theme='dark'] .complete-oauth-modal-card {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow-strong);
+    }
+
+    html[data-theme='dark'] .complete-oauth-modal-title {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .complete-oauth-modal-description,
+    html[data-theme='dark'] .complete-oauth-modal-form .generic-form-input > span {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .complete-oauth-modal-form .generic-form-input input {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark']
+        .complete-oauth-modal-form
+        .generic-form-input
+        input::placeholder {
+        color: var(--theme-text-subtle);
+    }
+
+    html[data-theme='dark'] .complete-oauth-modal-buttons .form-button-cancel {
+        color: var(--theme-text-muted);
+    }
+}

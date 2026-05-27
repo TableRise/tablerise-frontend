@@ -1,0 +1,382 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .cdm-overlay {
+        @apply fixed inset-0 z-[200] flex items-center justify-center bg-black/60;
+    }
+
+    .cdm-modal {
+        @apply w-[62rem] max-h-[92vh] overflow-y-auto bg-color-greyScale/100 rounded-2xl p-8 flex flex-col gap-6;
+    }
+
+    .cdm-loading {
+        @apply text-color-greyScale/500 text-center py-8;
+    }
+
+    .cdm-back-btn {
+        @apply self-start text-color-primary/default_900 cursor-pointer transition-opacity hover:opacity-70 bg-transparent;
+    }
+
+    .cdm-tabs {
+        @apply flex gap-1 border-b border-color-greyScale/200 mb-6 mt-4;
+    }
+
+    .cdm-tab {
+        @apply px-4 py-2 text-color-greyScale/500 border-b-2 border-transparent -mb-px
+            cursor-pointer transition-colors hover:text-color-greyScale/900 bg-transparent;
+    }
+
+    .cdm-tab--active {
+        @apply text-color-primary/default_900 border-color-primary/default_900;
+    }
+
+    .cdm-tab-content {
+        @apply flex flex-col gap-6;
+    }
+
+    .cdm-name-row {
+        @apply flex items-center justify-between gap-4;
+    }
+
+    .cdm-edit-btn {
+        @apply shrink-0;
+    }
+
+    /* ── Header ───────────────────────────── */
+    .cdm-header {
+        @apply flex gap-6 items-start border-color-greyScale/200;
+    }
+
+    .cdm-picture-wrapper {
+        @apply relative w-32 h-32 rounded-xl overflow-hidden flex-shrink-0 border border-color-greyScale/200;
+    }
+
+    .cdm-picture-overlay {
+        @apply absolute inset-0 flex items-center justify-center
+            bg-black/0 opacity-0 transition-all duration-300
+            cursor-pointer;
+    }
+
+    .cdm-picture-wrapper:hover .cdm-picture-overlay {
+        @apply bg-black/60 opacity-100;
+    }
+
+    .cdm-header-info {
+        @apply flex flex-col gap-3 flex-1;
+    }
+
+    .cdm-char-name {
+        @apply text-color-greyScale/950;
+    }
+
+    .cdm-badges {
+        @apply flex flex-wrap gap-2;
+    }
+
+    .cdm-badge {
+        @apply px-3 py-1 rounded-full bg-color-primary/default_900 text-color-greyScale/50;
+    }
+
+    .cdm-header-meta {
+        @apply flex flex-wrap gap-x-6 gap-y-1;
+    }
+
+    .cdm-label {
+        @apply text-color-greyScale/700;
+    }
+
+    /* ── Sections ─────────────────────────── */
+    .cdm-levelup-banner {
+        @apply flex items-start justify-between gap-4 rounded-2xl border
+            bg-color-primary/default_900 px-4 py-3;
+    }
+
+    .cdm-levelup-copy {
+        @apply flex flex-col gap-1;
+    }
+
+    .cdm-levelup-kicker {
+        @apply uppercase tracking-wide text-color-greyScale/50;
+    }
+
+    .cdm-levelup-text {
+        @apply text-color-greyScale/50 leading-relaxed;
+    }
+
+    .cdm-levelup-actions {
+        @apply flex items-center gap-2 self-stretch;
+    }
+
+    .cdm-levelup-progress {
+        @apply text-color-greyScale/50 whitespace-nowrap;
+    }
+
+    .cdm-levelup-nav {
+        @apply flex h-9 w-9 items-center justify-center rounded-full border border-color-greyScale/50
+            bg-color-greyScale/50 transition-opacity hover:opacity-80 disabled:cursor-not-allowed
+            disabled:opacity-40;
+    }
+
+    .cdm-levelup-close {
+        @apply flex h-9 w-9 items-center justify-center rounded-full border border-color-greyScale/50
+            text-color-greyScale/50  text-lg leading-none transition-opacity hover:opacity-80
+            disabled:cursor-not-allowed disabled:opacity-30;
+    }
+
+    .cdm-section {
+        @apply flex flex-col gap-4;
+    }
+
+    .cdm-section-header {
+        @apply flex items-center justify-between gap-4;
+    }
+
+    .cdm-section-title {
+        @apply text-color-primary/default_900 pb-1 border-b border-color-greyScale/200;
+    }
+
+    /* ── Ability scores ───────────────────── */
+    .cdm-attributes-grid {
+        @apply grid grid-cols-6 gap-3;
+    }
+
+    .cdm-attr-box {
+        @apply flex flex-col items-center gap-0.5 bg-color-greyScale/50 border border-color-greyScale/200 rounded-xl py-3 px-2;
+    }
+
+    .cdm-attr-label {
+        @apply text-color-primary/default_900;
+    }
+
+    .cdm-attr-value {
+        @apply text-color-greyScale/950;
+    }
+
+    .cdm-attr-modifier {
+        @apply bg-color-primary/default_900 text-color-greyScale/50 rounded-md px-2 py-0.5 text-sm font-bold;
+    }
+
+    .cdm-attr-full {
+        @apply text-color-greyScale/500 text-center leading-tight;
+    }
+
+    /* ── Info grid (combat / appearance) ─── */
+    .cdm-info-grid {
+        @apply grid grid-cols-3 gap-3;
+    }
+
+    .cdm-info-box {
+        @apply flex flex-col gap-0.5 bg-color-greyScale/50 border border-color-greyScale/200 rounded-lg px-4 py-3;
+    }
+
+    .cdm-info-label {
+        @apply text-color-greyScale/500;
+    }
+
+    /* ── Text blocks ──────────────────────── */
+    .cdm-text-grid {
+        @apply grid grid-cols-2 gap-4;
+    }
+
+    .cdm-text-block {
+        @apply flex flex-col gap-1 bg-color-greyScale/50 border border-color-greyScale/200 rounded-lg px-4 py-3;
+    }
+
+    .cdm-text-content {
+        @apply text-color-greyScale/800 whitespace-pre-wrap leading-relaxed;
+    }
+
+    .cdm-text-scrollable {
+        @apply max-h-40 overflow-y-auto;
+    }
+
+    /* ── Attacks table ────────────────────── */
+    .cdm-attacks-table {
+        @apply flex flex-col rounded-lg overflow-hidden border border-color-greyScale/200;
+    }
+
+    .cdm-attacks-header {
+        @apply grid grid-cols-3 bg-color-primary/default_900 text-color-greyScale/50 px-4 py-2 gap-4;
+    }
+
+    .cdm-attacks-row {
+        @apply grid grid-cols-3 px-4 py-3 gap-4 border-t border-color-greyScale/200 even:bg-color-greyScale/50;
+    }
+
+    /* ── Money grid ───────────────────────── */
+    .cdm-money-grid {
+        @apply grid grid-cols-5 gap-3 mt-2;
+    }
+
+    /* ── Bought items table ───────────────── */
+    .cdm-inventory-wrapper {
+        @apply flex flex-col gap-1;
+    }
+
+    .cdm-inventory-table-wrapper {
+        @apply overflow-auto rounded-lg border border-color-greyScale/200 max-h-48;
+    }
+
+    .cdm-inventory-table {
+        @apply w-full text-xs border-collapse;
+    }
+
+    .cdm-inventory-table thead {
+        @apply bg-color-greyScale/200 sticky top-0 z-10;
+    }
+
+    .cdm-inventory-table th {
+        @apply px-2 py-1.5 text-left font-bold text-color-greyScale/700 whitespace-nowrap;
+    }
+
+    .cdm-inventory-table tbody tr {
+        @apply border-t border-color-greyScale/200 even:bg-color-greyScale/50;
+    }
+
+    .cdm-inventory-table td {
+        @apply px-2 py-1.5 text-color-greyScale/700 whitespace-nowrap;
+    }
+
+    .cdm-inventory-row--clickable {
+        @apply cursor-pointer hover:bg-color-greyScale/100 transition-colors;
+    }
+
+    .cdm-inventory-row--selected {
+        @apply !bg-color-primary/default_900/10 cursor-pointer;
+    }
+
+    .cdm-sell-btn {
+        @apply px-3 py-2 rounded-lg !bg-red-500 text-white font-bold text-xs cursor-pointer
+            transition-opacity hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed;
+    }
+
+    /* ── Sell confirmation modal ──────────── */
+    .cdm-sell-confirm-modal {
+        @apply rounded-2xl shadow-2xl p-6 flex flex-col gap-4
+            w-full max-w-sm mx-4 bg-color-greyScale/50;
+    }
+
+    .cdm-sell-confirm-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .cdm-sell-confirm-body {
+        @apply text-color-greyScale/700;
+    }
+
+    .cdm-sell-confirm-actions {
+        @apply flex justify-end gap-3;
+    }
+
+    .cdm-sell-confirm-cancel {
+        @apply px-4 py-2 rounded-lg border border-color-greyScale/200 text-color-greyScale/700
+            font-bold text-xs cursor-pointer transition-opacity hover:opacity-70;
+    }
+
+    .cdm-sell-confirm-ok {
+        @apply px-4 py-2 rounded-lg !bg-red-500 text-white font-bold text-xs cursor-pointer
+            transition-opacity hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed;
+    }
+
+    /* ── Edit inputs ──────────────────────── */
+    .cdm-edit-number {
+        @apply w-full text-center border-b-2 border-color-greyScale/200 bg-transparent outline-none
+            focus:border-color-primary/default_900 transition-colors;
+    }
+
+    .cdm-edit-text {
+        @apply w-full border-b-2 border-color-greyScale/200 bg-transparent outline-none
+            focus:border-color-primary/default_900 transition-colors;
+    }
+
+    .cdm-edit-textarea {
+        @apply w-full border-2 border-color-greyScale/200 rounded-lg px-3 py-2 bg-transparent
+            outline-none resize-none focus:border-color-primary/default_900 transition-colors;
+    }
+
+    @media (max-width: 768px) {
+        .cdm-levelup-banner {
+            @apply flex-col;
+        }
+
+        .cdm-levelup-actions {
+            @apply w-full justify-end;
+        }
+    }
+
+    html[data-theme='dark'] .cdm-modal,
+    html[data-theme='dark'] .cdm-attr-box,
+    html[data-theme='dark'] .cdm-info-box,
+    html[data-theme='dark'] .cdm-text-block,
+    html[data-theme='dark'] .cdm-sell-confirm-modal {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .cdm-tabs,
+    html[data-theme='dark'] .cdm-section-title,
+    html[data-theme='dark'] .cdm-attacks-table,
+    html[data-theme='dark'] .cdm-inventory-table-wrapper,
+    html[data-theme='dark'] .cdm-sell-confirm-cancel {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .cdm-char-name,
+    html[data-theme='dark'] .cdm-attr-value,
+    html[data-theme='dark'] .cdm-text-content {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .cdm-back-btn,
+    html[data-theme='dark'] .cdm-tab--active,
+    html[data-theme='dark'] .cdm-section-title,
+    html[data-theme='dark'] .cdm-attr-label,
+    html[data-theme='dark'] .cdm-sell-confirm-title {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .cdm-attr-box,
+    html[data-theme='dark'] .cdm-info-box,
+    html[data-theme='dark'] .cdm-text-block,
+    html[data-theme='dark'] .cdm-sell-confirm-modal {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .cdm-picture-wrapper,
+    html[data-theme='dark'] .cdm-info-box,
+    html[data-theme='dark'] .cdm-attacks-row,
+    html[data-theme='dark'] .cdm-inventory-table thead,
+    html[data-theme='dark'] .cdm-inventory-table tbody tr,
+    html[data-theme='dark'] .cdm-sell-confirm-cancel {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .cdm-tab,
+    html[data-theme='dark'] .cdm-label,
+    html[data-theme='dark'] .cdm-info-label,
+    html[data-theme='dark'] .cdm-attr-full,
+    html[data-theme='dark'] .cdm-inventory-table th,
+    html[data-theme='dark'] .cdm-inventory-table td,
+    html[data-theme='dark'] .cdm-sell-confirm-body {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .cdm-inventory-table thead,
+    html[data-theme='dark'] .cdm-inventory-table tbody tr:nth-child(even),
+    html[data-theme='dark'] .cdm-sell-confirm-cancel:hover {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .cdm-inventory-row--clickable:hover {
+        background-color: var(--theme-surface-strong);
+    }
+
+    html[data-theme='dark'] .cdm-edit-number,
+    html[data-theme='dark'] .cdm-edit-text,
+    html[data-theme='dark'] .cdm-edit-textarea {
+        border-color: var(--theme-border);
+        color: var(--theme-text);
+    }
+}

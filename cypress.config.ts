@@ -9,6 +9,6 @@ export default defineConfig({
         baseUrl: 'http://127.0.0.1:3000',
         viewportWidth: 1366,
         viewportHeight: 768,
-        testIsolation: false,
+        testIsolation: true,
     },
 });

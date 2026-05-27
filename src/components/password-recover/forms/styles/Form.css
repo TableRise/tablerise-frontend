@@ -16,7 +16,7 @@
     }
 
     .form-opt-input {
-        @apply flex text-center w-[15%] h-12 items-center justify-center bg-white text-color-greyScale/500 uppercase;
+        @apply flex h-12 min-w-[3rem] flex-1 items-center justify-center bg-white text-center uppercase text-color-greyScale/500;
     }
 
     .form-opts-inputs {
@@ -33,5 +33,39 @@
 
     .form-button-cancel {
         @apply w-full h-10 text-color-greyScale/500;
+    }
+
+    .recover-form-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .recover-form-description,
+    .recover-form-label {
+        @apply text-color-greyScale/950;
+    }
+
+    html[data-theme='dark'] .recover-form-title {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .recover-form-description,
+    html[data-theme='dark'] .recover-form-label {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .form-opt-input {
+        background-color: var(--theme-surface-muted);
+        color: var(--theme-text);
+        border: 1px solid var(--theme-border);
+    }
+
+    html[data-theme='dark'] .form-button-cancel {
+        color: var(--theme-text-muted);
+    }
+
+    @media (max-width: 480px) {
+        .form-opts-inputs {
+            @apply gap-1.5;
+        }
     }
 }

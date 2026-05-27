@@ -2,35 +2,33 @@ import { MainCardProps } from '@/types/modules/components/common/MainCard';
 import SideImageBackground from '../../../public/images/SideImageBackground.svg?url';
 import '@/components/common/styles/MainCard.css';
 import Link from 'next/link';
+import { resolveCardStyles } from '@/utils/cardStyles';
 
 export default function MainCard(cardProps: MainCardProps): JSX.Element {
     const {
+        slug,
         title = 'default',
         buttonTitle = 'Ler mais',
-        image = SideImageBackground.src,
         fogColor = '#FFFFFF',
         size = 'medium',
         textColor = 'blue',
         buttonColor = 'blue',
     } = cardProps || {};
 
-    const cardSize = { w: '22.5rem', h: '22.5rem' };
-    let textColorCSS = 'text-color-primary/default_900';
-    let buttonColorCSS = 'button-L-fill';
-    let buttonTextColorCSS = 'text-color-greyScale/50';
+    let { image } = cardProps;
 
-    if (size === 'large') cardSize.w = '46.5rem';
-    if (textColor === 'white') textColorCSS = 'text-color-greyScale/50';
-    if (buttonColor === 'white') buttonColorCSS = 'button-white-default';
-    if (buttonColor === 'white') buttonTextColorCSS = 'text-color-primary/default_900';
+    const { cardSize, textColorCSS, buttonColorCSS, buttonTextColorCSS } =
+        resolveCardStyles({ size, textColor, buttonColor });
+
+    if (!image) image = SideImageBackground.src;
 
     return (
         <div
             className="main-card"
             style={{
                 backgroundImage: `url(${image})`,
-                width: cardSize.w,
-                height: cardSize.h,
+                ['--main-card-width' as string]: cardSize.w,
+                ['--main-card-height' as string]: cardSize.h,
             }}
         >
             <div
@@ -41,10 +39,11 @@ export default function MainCard(cardProps: MainCardProps): JSX.Element {
             />
             <div className="card-infos">
                 <span className={`font-L-semibold ${textColorCSS} mb-4`}>{title}</span>
-                <Link href={`/tutorial/${title.toLowerCase()}`}>
-                    <button className={`${buttonColorCSS} ${buttonTextColorCSS}`}>
-                        {buttonTitle}
-                    </button>
+                <Link
+                    href={`/tutorial/${slug ?? title.toLowerCase()}`}
+                    className={`main-card-link ${buttonColorCSS} ${buttonTextColorCSS}`}
+                >
+                    {buttonTitle}
                 </Link>
             </div>
         </div>

@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .ranked-avatar-frame {
+        @apply relative h-full w-full;
+        --ranked-avatar-mask-inset: 0;
+        --ranked-avatar-mask-radius: 0;
+        --ranked-avatar-mask-clip: none;
+        --ranked-avatar-object-position: center center;
+        --ranked-avatar-frame-scale: 1;
+    }
+
+    .ranked-avatar-frame__mask {
+        @apply absolute;
+        inset: var(--ranked-avatar-mask-inset);
+        overflow: hidden;
+        border-radius: var(--ranked-avatar-mask-radius);
+        clip-path: var(--ranked-avatar-mask-clip);
+        z-index: 1;
+    }
+
+    .ranked-avatar-frame__portrait-layer {
+        @apply relative h-full w-full;
+    }
+
+    .ranked-avatar-frame__image {
+        @apply h-full w-full;
+        object-fit: cover;
+        object-position: var(--ranked-avatar-object-position);
+    }
+
+    .ranked-avatar-frame__frame-overlay {
+        @apply pointer-events-none absolute inset-0;
+        transform: scale(var(--ranked-avatar-frame-scale));
+        transform-origin: center;
+        z-index: 2;
+    }
+
+    .ranked-avatar-frame__frame-image {
+        @apply h-full w-full object-contain;
+    }
+
+    .ranked-avatar-frame--profile.ranked-avatar-frame--plain .ranked-avatar-frame__mask {
+        --ranked-avatar-mask-radius: 9999px;
+    }
+
+    .ranked-avatar-frame--profile.ranked-avatar-frame--framed .ranked-avatar-frame__mask {
+        --ranked-avatar-mask-inset: 7%;
+        --ranked-avatar-mask-radius: 9999px;
+        --ranked-avatar-object-position: center 35%;
+    }
+
+    .ranked-avatar-frame--profile.ranked-avatar-frame--framed {
+        --ranked-avatar-frame-scale: 1.05;
+    }
+
+    .ranked-avatar-frame--avatar.ranked-avatar-frame--plain .ranked-avatar-frame__mask {
+        --ranked-avatar-object-position: center 35%;
+    }
+
+    .ranked-avatar-frame--avatar.ranked-avatar-frame--framed .ranked-avatar-frame__mask {
+        --ranked-avatar-mask-clip: polygon(
+            50% 0%,
+            93.3% 25%,
+            93.3% 75%,
+            50% 100%,
+            6.7% 75%,
+            6.7% 25%
+        );
+        --ranked-avatar-object-position: center 35%;
+    }
+
+    .ranked-avatar-frame--avatar.ranked-avatar-frame--framed {
+        --ranked-avatar-frame-scale: 1.22;
+    }
+}

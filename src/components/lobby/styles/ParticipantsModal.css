@@ -1,0 +1,204 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .pm-overlay {
+        @apply fixed inset-0 z-[200] flex items-center justify-center bg-black/60;
+    }
+
+    .pm-modal {
+        @apply w-[58rem] max-h-[90vh] overflow-hidden bg-color-greyScale/100 rounded-2xl flex flex-col;
+    }
+
+    /* ── Header ─────────────────────────────────── */
+    .pm-header {
+        @apply flex items-center justify-between px-6 py-4
+            border-b border-color-greyScale/200
+            flex-shrink-0;
+    }
+
+    .pm-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .pm-close-btn {
+        @apply flex items-center justify-center w-8 h-8 rounded-full
+            text-color-primary/default_900 bg-transparent cursor-pointer
+            transition-opacity hover:opacity-70;
+    }
+
+    /* ── Grid ───────────────────────────────────── */
+    .pm-grid {
+        @apply p-6 overflow-y-auto grid grid-cols-3 gap-4;
+    }
+
+    .pm-loading {
+        @apply flex items-center justify-center p-10 text-color-greyScale/500;
+    }
+
+    .pm-empty {
+        @apply col-span-3 text-center text-color-greyScale/500 py-6;
+    }
+
+    /* ── Card ───────────────────────────────────── */
+    .pm-card {
+        @apply flex flex-col bg-color-greyScale/50 rounded-xl
+            border border-color-greyScale/200 overflow-hidden;
+    }
+
+    .pm-card-body {
+        @apply flex items-center gap-3 p-4;
+    }
+
+    .pm-avatar {
+        @apply relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0
+            bg-color-greyScale/200 border border-color-greyScale/200;
+    }
+
+    .pm-card-info {
+        @apply flex flex-col gap-0.5 min-w-0;
+    }
+
+    .pm-char-name {
+        @apply text-color-greyScale/500 truncate;
+    }
+
+    .pm-nickname {
+        @apply text-color-greyScale/900 truncate;
+    }
+
+    .pm-role {
+        @apply text-color-primary/default_900 truncate;
+    }
+
+    /* ── Card footer ────────────────────────────── */
+    .pm-card-footer {
+        @apply px-4 py-3
+            border-t border-color-greyScale/200;
+    }
+
+    .pm-profile-btn {
+        @apply w-full py-1.5 text-center rounded-lg
+            bg-color-primary/default_900 text-color-greyScale/50
+            cursor-pointer transition-opacity hover:opacity-80;
+    }
+
+    .pm-pending {
+        @apply text-yellow-600;
+    }
+
+    .pm-confirmed {
+        @apply text-green-600;
+    }
+
+    .pm-confirm-btn {
+        @apply w-full mt-2 py-1.5 text-center rounded-lg
+            border border-color-primary/default_900 text-color-primary/default_900
+            bg-transparent cursor-pointer transition-colors
+            hover:bg-color-primary/default_900 hover:text-color-greyScale/50
+            disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+
+    .pm-confirm-btn-placeholder {
+        @apply block w-full mt-2 py-1.5 text-center rounded-lg border border-transparent invisible pointer-events-none;
+    }
+
+    /* ── Remove confirmation dialog ─────────────── */
+    .pm-remove-overlay {
+        @apply fixed inset-0 z-[300] flex items-center justify-center bg-black/60;
+    }
+
+    .pm-remove-dialog {
+        @apply w-80 bg-color-greyScale/100 rounded-2xl p-6 flex flex-col gap-4
+            border border-color-greyScale/200;
+    }
+
+    .pm-remove-title {
+        @apply text-color-greyScale/900;
+    }
+
+    .pm-remove-body {
+        @apply text-color-greyScale/500;
+    }
+
+    .pm-remove-actions {
+        @apply flex gap-3 justify-end;
+    }
+
+    .pm-remove-cancel {
+        @apply px-4 py-2 rounded-lg
+            border border-color-greyScale/300 text-color-greyScale/700
+            bg-transparent cursor-pointer transition-opacity hover:opacity-70;
+    }
+
+    .pm-remove-confirm {
+        @apply px-4 py-2 rounded-lg
+            bg-red-600 text-white cursor-pointer
+            transition-opacity hover:opacity-80;
+    }
+
+    @media (max-width: 768px) {
+        .pm-modal {
+            @apply w-[calc(100vw-1.5rem)];
+        }
+
+        .pm-grid {
+            @apply grid-cols-2 p-5;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .pm-modal {
+            @apply w-[calc(100vw-1rem)] rounded-[1.25rem];
+        }
+
+        .pm-grid {
+            @apply grid-cols-1 p-4;
+        }
+    }
+
+    html[data-theme='dark'] .pm-title,
+    html[data-theme='dark'] .pm-close-btn,
+    html[data-theme='dark'] .pm-role,
+    html[data-theme='dark'] .pm-confirm-btn {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .pm-modal,
+    html[data-theme='dark'] .pm-remove-dialog {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .pm-card {
+        background-color: var(--theme-surface-muted);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .pm-header,
+    html[data-theme='dark'] .pm-card,
+    html[data-theme='dark'] .pm-card-footer,
+    html[data-theme='dark'] .pm-avatar,
+    html[data-theme='dark'] .pm-remove-dialog,
+    html[data-theme='dark'] .pm-remove-cancel {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .pm-avatar,
+    html[data-theme='dark'] .pm-remove-cancel:hover {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .pm-nickname,
+    html[data-theme='dark'] .pm-remove-title {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .pm-char-name,
+    html[data-theme='dark'] .pm-loading,
+    html[data-theme='dark'] .pm-empty,
+    html[data-theme='dark'] .pm-remove-body {
+        color: var(--theme-text-muted);
+    }
+}

@@ -1,17 +1,22 @@
 import { AxiosResponse, AxiosError } from 'axios';
-import { apiCall, campaignsBaseUrl } from '../wrapper';
+import { apiCall, usersBaseUrl } from '../wrapper';
+import type { DatabaseCampaignGroupsResponse } from '@/types/shared/entities';
 
-export const getCampaignsByUserId = async (userId: string) => {
+export const getCampaignsByUserId = async (
+    userId: string
+): Promise<DatabaseCampaignGroupsResponse | undefined> => {
     try {
         const { data }: AxiosResponse = await apiCall({
-            baseUrl: campaignsBaseUrl,
-            endpoint: `user/${userId}`,
+            baseUrl: usersBaseUrl,
+            endpoint: `${userId}/campaigns`,
             method: 'GET',
         });
 
         return data;
-    } catch ({ response }: AxiosError | any) {
-        if (response.status == 404) throw new Error('Campanhas não encontradas');
-        if (response.status == 500) throw new Error('Erro no servidor');
+    } catch (error: AxiosError | any) {
+        const status = error?.response?.status;
+        if (status === 400) throw new Error('Erro no preenchimento de dados');
+        if (status === 404) return { master: [], player: [] };
+        if (status === 500) throw new Error('Erro no servidor');
     }
 };

@@ -14,11 +14,7 @@ import DarkModeLogo from '@assets/icons/light-dark-mode/dark-mode-moon.svg?url';
 import '@/components/common/styles/Footer.css';
 
 export default function Footer(): JSX.Element {
-    const { darkModeOn, setDarkModeOn } = useContext(TableriseContext);
-
-    const handleDarkModeChange = () => {
-        setDarkModeOn(!darkModeOn);
-    };
+    const { themeMode, toggleThemeMode } = useContext(TableriseContext);
 
     return (
         <footer className="footer">
@@ -65,8 +61,8 @@ export default function Footer(): JSX.Element {
                 </div>
 
                 <div className="footer-links">
+                    <h5>Links Rápidos</h5>
                     <ul>
-                        <h5>Links Rápidos</h5>
                         <li>
                             <Link href="/">Sobre</Link>
                         </li>
@@ -79,16 +75,16 @@ export default function Footer(): JSX.Element {
                     </ul>
                 </div>
                 <div className="footer-links">
+                    <h5>Outros</h5>
                     <ul>
-                        <h5>Outros</h5>
                         <li>
-                            <Link href="/">Termos de serviço</Link>
+                            <Link href="/terms">Termos de serviço</Link>
                         </li>
                         <li>
-                            <Link href="/">Políticas de privacidade</Link>
+                            <Link href="/">PolÃ­ticas de privacidade</Link>
                         </li>
                         <li>
-                            <Link href="/">Configurações de cookies</Link>
+                            <Link href="/">ConfiguraçÃµes de cookies</Link>
                         </li>
                         <li>
                             <Link href="/">supporte</Link>
@@ -116,7 +112,8 @@ export default function Footer(): JSX.Element {
                     <input
                         type="checkbox"
                         id="darkmode-toggle"
-                        onChange={handleDarkModeChange}
+                        checked={themeMode === 'dark'}
+                        onChange={toggleThemeMode}
                     />
                     <label htmlFor="darkmode-toggle" className="label-darkmode-toggle">
                         <Image

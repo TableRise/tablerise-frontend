@@ -1,0 +1,802 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    /* ── Backdrop ─────────────────────────────────────────── */
+    .ccm-backdrop {
+        @apply fixed inset-0 z-[150] flex items-center justify-center;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    /* ── Modal container ──────────────────────────────────── */
+    .ccm-modal {
+        @apply relative bg-white rounded-2xl flex flex-col;
+        width: 45rem;
+        max-height: 90vh;
+        overflow: hidden;
+    }
+
+    /* ── Header ───────────────────────────────────────────── */
+    .ccm-modal-header {
+        @apply flex items-center justify-between px-8 pt-6 pb-4 flex-shrink-0;
+    }
+
+    .ccm-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .ccm-close-btn {
+        @apply w-8 h-8 flex items-center justify-center rounded-lg;
+        @apply text-color-greyScale/500 transition-colors;
+    }
+
+    .ccm-close-btn:hover {
+        @apply bg-color-greyScale/100;
+    }
+
+    /* ── Stepper ──────────────────────────────────────────── */
+    .ccm-stepper {
+        @apply flex items-start pb-4 flex-shrink-0;
+        padding-left: 10%;
+        padding-right: 10%;
+    }
+
+    .ccm-step-group {
+        @apply flex flex-col items-center gap-1.5 flex-shrink-0;
+        /* fixed to circle diameter so the connector meets the circle edge,
+           label overflows visually without widening the box */
+        width: 2.25rem;
+        overflow: visible;
+        position: relative;
+        z-index: 1;
+    }
+
+    .ccm-step-connector {
+        @apply flex-1 h-[2px] bg-color-greyScale/200;
+        /* align to vertical center of the w-9 (2.25rem) circle */
+        margin-top: calc(2.25rem / 2 - 1px);
+        /* extend half a circle width into each neighbor so the line
+           passes fully behind both circles */
+        margin-left: -1.125rem;
+        margin-right: -1.125rem;
+        min-width: 1.5rem;
+        position: relative;
+        z-index: 0;
+    }
+
+    .ccm-step-connector--done {
+        @apply bg-color-primary/default_900;
+    }
+
+    .ccm-step-circle {
+        @apply w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0;
+        background-color: #9ca3af; /* gray-400 */
+    }
+
+    .ccm-step-circle--active,
+    .ccm-step-circle--done {
+        background-color: #0a358a;
+    }
+
+    .ccm-step-circle img {
+        filter: brightness(0) invert(1);
+    }
+
+    .ccm-step-label {
+        @apply text-color-greyScale/500 whitespace-nowrap;
+    }
+
+    .ccm-step-label--active {
+        @apply text-color-primary/default_900;
+    }
+
+    /* ── Scrollable body ──────────────────────────────────── */
+    .ccm-body {
+        @apply flex-1 overflow-y-auto px-8 py-2;
+    }
+
+    /* ── Step content ─────────────────────────────────────── */
+    .ccm-step-content {
+        @apply flex flex-col gap-5;
+    }
+
+    /* ── Field ────────────────────────────────────────────── */
+    .ccm-field {
+        @apply flex flex-col gap-1;
+    }
+
+    .ccm-field-label {
+        @apply text-color-greyScale/950;
+    }
+
+    .ccm-field-hint {
+        @apply text-color-greyScale/500;
+    }
+
+    .ccm-field-error {
+        @apply text-color-support/alert;
+    }
+
+    /* ── Inputs ───────────────────────────────────────────── */
+    .ccm-input {
+        @apply w-full;
+    }
+
+    .ccm-input--password {
+        @apply w-28 tracking-widest font-bold;
+    }
+
+    .ccm-select {
+        @apply w-full appearance-none cursor-pointer;
+    }
+
+    /* ── Textarea ─────────────────────────────────────────── */
+    .ccm-textarea-wrapper {
+        @apply relative;
+    }
+
+    .ccm-textarea {
+        @apply w-full bg-color-greyScale/50 border border-color-greyScale/300 rounded-lg
+               p-3 resize-none text-color-greyScale/950 outline-none;
+        font-size: 0.8rem;
+        line-height: 1.4;
+    }
+
+    .ccm-textarea:focus {
+        border-color: #0a358a;
+    }
+
+    .ccm-textarea--error {
+        @apply !border-color-support/alert;
+    }
+
+    .ccm-char-count {
+        @apply absolute bottom-2 right-3 text-color-greyScale/500;
+    }
+
+    .ccm-char-count--richtext {
+        position: static;
+        @apply text-right mt-1 text-color-greyScale/500;
+    }
+
+    /* ── Cover upload ─────────────────────────────────────── */
+    .ccm-cover-upload {
+        @apply bg-color-greyScale/100 rounded-xl flex flex-col items-center justify-center gap-3;
+        min-height: 11rem;
+        padding: 1.5rem;
+    }
+
+    .ccm-cover-upload--small {
+        min-height: 7rem;
+        padding: 1rem;
+    }
+
+    .ccm-upload-btn {
+        @apply flex items-center gap-2 px-4 py-2 bg-white border border-color-greyScale/300
+               rounded-lg text-color-greyScale/700 transition-colors;
+    }
+
+    .ccm-upload-btn:hover {
+        @apply bg-color-greyScale/50;
+    }
+
+    .ccm-or-divider {
+        @apply flex items-center gap-2 w-full max-w-[12rem];
+    }
+
+    .ccm-or-divider hr {
+        @apply flex-1 border-color-greyScale/300;
+    }
+
+    .ccm-or-divider span {
+        @apply text-color-greyScale/500;
+    }
+
+    .ccm-template-link {
+        @apply text-color-primary/default_900 cursor-pointer;
+    }
+
+    .ccm-template-link:hover {
+        @apply underline;
+    }
+
+    /* ── Cover preview ────────────────────────────────────── */
+    .ccm-cover-preview {
+        @apply flex flex-col items-center gap-3 w-full;
+    }
+
+    .ccm-cover-preview-img {
+        @apply w-full rounded-lg object-cover;
+        max-height: 10rem;
+    }
+
+    /* ── Map images grid ──────────────────────────────────── */
+    .ccm-map-images {
+        @apply flex flex-col items-center gap-3 w-full;
+    }
+
+    .ccm-map-images-grid {
+        @apply flex gap-3 w-full;
+    }
+
+    .ccm-map-images-item {
+        @apply relative flex-1;
+    }
+
+    .ccm-map-images-thumb {
+        @apply w-full rounded-lg object-cover;
+        height: 5rem;
+    }
+
+    .ccm-map-images-remove {
+        @apply absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center
+               rounded-full bg-color-support/alert text-white text-xs font-bold
+               leading-none transition-colors;
+    }
+
+    .ccm-map-images-remove:hover {
+        @apply opacity-80;
+    }
+
+    /* ── Agenda ───────────────────────────────────────────── */
+    .ccm-agenda {
+        @apply flex flex-col gap-2;
+    }
+
+    .ccm-agenda-header {
+        @apply flex gap-3;
+    }
+
+    .ccm-agenda-header span:first-child {
+        @apply w-36;
+    }
+
+    .ccm-agenda-row {
+        @apply flex items-center gap-3;
+    }
+
+    .ccm-agenda-row--filled .ccm-agenda-input,
+    .ccm-agenda-row--filled .ccm-agenda-time {
+        @apply bg-color-greyScale/100;
+    }
+
+    .ccm-agenda-date-cell {
+        @apply flex items-center;
+        position: relative;
+    }
+
+    .ccm-agenda-calendar-icon {
+        position: absolute;
+        right: 0.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .ccm-agenda-date-hidden {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        height: 0;
+    }
+
+    .ccm-agenda-input {
+        @apply w-36;
+        padding-right: 2rem;
+    }
+
+    .ccm-agenda-time-cells {
+        @apply flex items-center gap-2;
+    }
+
+    .ccm-agenda-time {
+        @apply w-20;
+    }
+
+    .ccm-agenda-add {
+        @apply w-8 h-8 flex items-center justify-center border border-color-greyScale/300
+               rounded-lg text-color-greyScale/700 transition-colors;
+    }
+
+    .ccm-agenda-add:hover:not(:disabled) {
+        @apply bg-color-greyScale/100;
+    }
+
+    .ccm-agenda-add:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    .ccm-agenda-remove {
+        @apply w-8 h-8 flex items-center justify-center border border-color-support/alert
+               rounded-lg text-color-support/alert transition-colors text-base font-bold;
+    }
+
+    .ccm-agenda-remove:hover {
+        @apply bg-color-support/alert text-white;
+    }
+
+    /* ── Age ratings ──────────────────────────────────────── */
+    .ccm-age-ratings {
+        @apply flex gap-3 flex-wrap;
+    }
+
+    .ccm-age-square {
+        @apply w-12 h-12 rounded-lg text-white transition-all;
+        opacity: 0.55;
+    }
+
+    .ccm-age-square:hover {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+
+    .ccm-age-square--selected {
+        opacity: 1;
+        transform: scale(1.1);
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+    }
+
+    /* ── Playlist ─────────────────────────────────────────── */
+    .ccm-system-options {
+        @apply mt-1 flex flex-col gap-3;
+    }
+
+    .ccm-system-option {
+        @apply flex items-center justify-between gap-3 rounded-lg border border-color-greyScale/200
+               bg-color-greyScale/50 px-4 py-3;
+    }
+
+    .ccm-system-option-main {
+        @apply flex items-center gap-3 text-color-greyScale/950;
+    }
+
+    .ccm-system-checkbox {
+        @apply h-4 w-4 cursor-pointer;
+        accent-color: #0a358a;
+    }
+
+    .ccm-system-help {
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .ccm-system-help-trigger {
+        @apply flex h-6 w-6 items-center justify-center rounded-full transition-opacity;
+    }
+
+    .ccm-system-help-trigger:hover {
+        opacity: 0.8;
+    }
+
+    .ccm-system-tooltip {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 0.5rem);
+        z-index: 20;
+        width: 18rem;
+        border-radius: 0.75rem;
+        background: #0a358a;
+        color: #ffffff;
+        padding: 0.75rem;
+        line-height: 1.5;
+        white-space: pre-line;
+        box-shadow: 0 12px 30px rgba(10, 53, 138, 0.22);
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-0.25rem);
+        transition:
+            opacity 0.2s ease,
+            transform 0.2s ease;
+    }
+
+    .ccm-system-help:hover .ccm-system-tooltip,
+    .ccm-system-help-trigger:focus-visible + .ccm-system-tooltip {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .ccm-playlist {
+        @apply bg-color-greyScale/100 rounded-xl flex flex-col gap-3;
+        min-height: 8rem;
+        padding: 1.5rem;
+    }
+
+    .ccm-playlist-list {
+        @apply flex flex-col items-center gap-2;
+    }
+
+    .ccm-playlist-empty-label {
+        @apply text-color-greyScale/500;
+    }
+
+    .ccm-playlist-item {
+        @apply w-full flex items-center gap-3 bg-white rounded-lg p-2;
+    }
+
+    .ccm-playlist-item-main {
+        @apply flex-1 min-w-0 flex flex-col gap-1;
+    }
+
+    .ccm-playlist-thumb-btn {
+        @apply relative flex-shrink-0 rounded overflow-hidden cursor-pointer;
+        width: 60px;
+        height: 45px;
+        border: none;
+        padding: 0;
+        background: none;
+    }
+
+    .ccm-playlist-thumb {
+        @apply rounded flex-shrink-0 object-cover;
+        width: 60px;
+        height: 45px;
+    }
+
+    .ccm-playlist-thumb-overlay {
+        @apply absolute inset-0 flex items-center justify-center rounded;
+        background-color: rgba(0, 0, 0, 0.45);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .ccm-playlist-thumb-btn:hover .ccm-playlist-thumb-overlay,
+    .ccm-playlist-thumb-overlay--playing {
+        opacity: 1;
+    }
+
+    .ccm-playlist-item-title {
+        @apply flex-1 text-color-greyScale/950 truncate;
+    }
+
+    .ccm-playlist-title-input {
+        @apply w-full min-w-0;
+    }
+
+    .ccm-playlist-title-error {
+        @apply text-color-support/alert;
+    }
+
+    .ccm-playlist-actions {
+        @apply flex items-center gap-1 flex-shrink-0;
+    }
+
+    .ccm-playlist-edit-btn {
+        @apply flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg
+               text-color-greyScale/500 transition-colors;
+    }
+
+    .ccm-playlist-edit-btn:hover {
+        @apply bg-color-greyScale/100 text-color-primary/default_900;
+    }
+
+    .ccm-playlist-remove-btn {
+        @apply flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg
+               text-color-greyScale/500 transition-colors;
+    }
+
+    .ccm-playlist-remove-btn:hover {
+        @apply bg-color-greyScale/100 text-color-support/alert;
+    }
+
+    .ccm-playlist-input-row {
+        @apply flex items-center gap-2 flex-wrap;
+    }
+
+    .ccm-playlist-url-input {
+        @apply flex-1 min-w-0;
+    }
+
+    .ccm-playlist-confirm-btn {
+        @apply flex items-center gap-1 px-4 py-2
+               text-white rounded-lg transition-colors flex-shrink-0;
+    }
+
+    .ccm-playlist-confirm-btn:hover:not(:disabled) {
+        @apply opacity-90;
+    }
+
+    .ccm-playlist-confirm-btn:disabled {
+        @apply cursor-not-allowed;
+    }
+
+    .ccm-playlist-confirm-btn img {
+        filter: brightness(0) invert(1);
+    }
+
+    .ccm-playlist-close-input {
+        @apply w-8 h-8 flex items-center justify-center rounded-lg;
+    }
+
+    .ccm-playlist-close-input:hover {
+        @apply bg-color-greyScale/300;
+    }
+
+    .ccm-playlist-input-error {
+        @apply w-full text-color-support/alert;
+    }
+
+    .ccm-playlist-add-btn {
+        @apply flex items-center justify-center gap-1 px-4 py-2 bg-white border border-color-primary/default_900
+               text-color-primary/default_900 rounded-lg transition-colors;
+    }
+
+    .ccm-playlist-add-btn:hover {
+        @apply bg-color-primary/default_900 text-white;
+    }
+
+    /* ── Richtext ─────────────────────────────────────────── */
+    .ccm-richtext-wrapper {
+        @apply border border-color-greyScale/300 rounded-lg overflow-hidden;
+    }
+
+    .ccm-richtext-toolbar {
+        @apply flex items-center gap-1 px-3 py-2 border-b border-color-greyScale/300 bg-white;
+    }
+
+    .ccm-richtext-tool {
+        @apply w-7 h-7 flex items-center justify-center rounded
+               text-color-greyScale/700 transition-colors;
+    }
+
+    .ccm-richtext-tool:hover {
+        @apply bg-color-greyScale/100;
+    }
+
+    .ccm-richtext-tool--italic {
+        font-style: italic;
+    }
+
+    .ccm-richtext-tool--underline {
+        text-decoration: underline;
+    }
+
+    .ccm-richtext-divider {
+        @apply w-px h-5 bg-color-greyScale/300 mx-1;
+    }
+
+    .ccm-richtext-area {
+        @apply w-full p-3 bg-color-greyScale/50 resize-none outline-none text-color-greyScale/950;
+        font-size: 0.8rem;
+        line-height: 1.6;
+    }
+
+    /* ── Error ────────────────────────────────────────────── */
+    .ccm-error {
+        @apply text-color-support/alert px-8 pb-2 flex-shrink-0;
+    }
+
+    /* ── Footer ───────────────────────────────────────────── */
+    .ccm-footer {
+        @apply flex items-center justify-between px-8 py-5 border-t border-color-greyScale/200 flex-shrink-0;
+    }
+
+    .ccm-btn-ghost {
+        @apply text-color-greyScale/700 transition-colors;
+    }
+
+    .ccm-btn-ghost:hover {
+        @apply text-color-greyScale/950;
+    }
+
+    .ccm-btn-primary {
+        @apply w-[50%];
+    }
+
+    /* ── Social media fields ─────────────────────────────── */
+    .ccm-social-fields {
+        @apply flex flex-col gap-3 mt-2;
+    }
+
+    .ccm-social-field {
+        @apply flex flex-col gap-1;
+    }
+
+    .ccm-social-field span {
+        @apply text-color-primary/default_900;
+    }
+
+    @media (max-width: 768px) {
+        .ccm-modal {
+            width: min(100vw - 1.5rem, 45rem);
+            max-height: 92vh;
+        }
+
+        .ccm-modal-header,
+        .ccm-body,
+        .ccm-footer,
+        .ccm-error {
+            @apply px-5;
+        }
+
+        .ccm-stepper {
+            @apply overflow-x-auto pb-5;
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
+        }
+
+        .ccm-map-images-grid,
+        .ccm-agenda-header,
+        .ccm-agenda-row,
+        .ccm-playlist-input-row {
+            @apply flex-col items-stretch;
+        }
+
+        .ccm-agenda-input,
+        .ccm-agenda-time,
+        .ccm-btn-primary {
+            @apply w-full;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .ccm-modal {
+            width: min(100vw - 1rem, 45rem);
+        }
+
+        .ccm-modal-header,
+        .ccm-body,
+        .ccm-footer,
+        .ccm-error {
+            @apply px-4;
+        }
+
+        .ccm-footer {
+            @apply flex-col items-stretch gap-3;
+        }
+    }
+
+    html[data-theme='dark'] .ccm-modal,
+    html[data-theme='dark'] .ccm-playlist-item {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow-strong);
+    }
+
+    html[data-theme='dark'] .ccm-cover-upload,
+    html[data-theme='dark'] .ccm-playlist,
+    html[data-theme='dark'] .ccm-system-option,
+    html[data-theme='dark'] .ccm-agenda-row--filled .ccm-agenda-input,
+    html[data-theme='dark'] .ccm-agenda-row--filled .ccm-agenda-time {
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .ccm-title,
+    html[data-theme='dark'] .ccm-step-label--active,
+    html[data-theme='dark'] .ccm-template-link,
+    html[data-theme='dark'] .ccm-social-field span {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .ccm-step-circle {
+        background-color: var(--theme-surface-strong);
+    }
+
+    html[data-theme='dark'] .ccm-step-circle--active,
+    html[data-theme='dark'] .ccm-step-circle--done,
+    html[data-theme='dark'] .ccm-step-connector--done {
+        background-color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .ccm-step-connector,
+    html[data-theme='dark'] .ccm-or-divider hr,
+    html[data-theme='dark'] .ccm-richtext-wrapper,
+    html[data-theme='dark'] .ccm-richtext-toolbar,
+    html[data-theme='dark'] .ccm-footer,
+    html[data-theme='dark'] .ccm-system-option,
+    html[data-theme='dark'] .ccm-playlist-item,
+    html[data-theme='dark'] .ccm-textarea,
+    html[data-theme='dark'] .ccm-agenda-add,
+    html[data-theme='dark'] .ccm-agenda-input,
+    html[data-theme='dark'] .ccm-agenda-time {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .ccm-upload-btn,
+    html[data-theme='dark'] .ccm-playlist-add-btn,
+    html[data-theme='dark'] .ccm-richtext-toolbar,
+    html[data-theme='dark'] .ccm-agenda-add,
+    html[data-theme='dark'] .ccm-richtext-area,
+    html[data-theme='dark'] .ccm-textarea {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .ccm-field-label,
+    html[data-theme='dark'] .ccm-system-option-main,
+    html[data-theme='dark'] .ccm-playlist-item-title,
+    html[data-theme='dark'] .ccm-richtext-area,
+    html[data-theme='dark'] .ccm-textarea,
+    html[data-theme='dark'] .ccm-agenda-header span {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .ccm-field-hint,
+    html[data-theme='dark'] .ccm-char-count,
+    html[data-theme='dark'] .ccm-char-count--richtext,
+    html[data-theme='dark'] .ccm-playlist-empty-label,
+    html[data-theme='dark'] .ccm-step-label,
+    html[data-theme='dark'] .ccm-or-divider span,
+    html[data-theme='dark'] .ccm-btn-ghost,
+    html[data-theme='dark'] .ccm-playlist-edit-btn,
+    html[data-theme='dark'] .ccm-playlist-remove-btn,
+    html[data-theme='dark'] .ccm-richtext-tool,
+    html[data-theme='dark'] .ccm-agenda-calendar-icon,
+    html[data-theme='dark'] .ccm-agenda-add {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .ccm-textarea::placeholder,
+    html[data-theme='dark'] .ccm-richtext-area::placeholder {
+        color: var(--theme-text-subtle);
+    }
+
+    html[data-theme='dark'] .ccm-textarea:focus,
+    html[data-theme='dark'] .ccm-richtext-area:focus,
+    html[data-theme='dark'] .ccm-agenda-input:focus,
+    html[data-theme='dark'] .ccm-agenda-time:focus {
+        border-color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .ccm-upload-btn,
+    html[data-theme='dark'] .ccm-playlist-add-btn {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .ccm-upload-btn:hover,
+    html[data-theme='dark'] .ccm-playlist-add-btn:hover,
+    html[data-theme='dark'] .ccm-richtext-tool:hover,
+    html[data-theme='dark'] .ccm-playlist-edit-btn:hover,
+    html[data-theme='dark'] .ccm-playlist-remove-btn:hover,
+    html[data-theme='dark'] .ccm-close-btn:hover,
+    html[data-theme='dark'] .ccm-close-input:hover,
+    html[data-theme='dark'] .ccm-agenda-add:hover:not(:disabled) {
+        background-color: var(--theme-surface-strong);
+    }
+
+    html[data-theme='dark'] .ccm-playlist-add-btn {
+        border-color: var(--theme-accent);
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .ccm-playlist-add-btn:hover {
+        background-color: var(--theme-accent);
+        color: #07111f;
+    }
+
+    html[data-theme='dark'] .ccm-playlist-title-input,
+    html[data-theme='dark'] .ccm-playlist-url-input,
+    html[data-theme='dark'] .ccm-select,
+    html[data-theme='dark'] .ccm-input {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .ccm-playlist-title-input::placeholder,
+    html[data-theme='dark'] .ccm-playlist-url-input::placeholder {
+        color: var(--theme-text-subtle);
+    }
+
+    html[data-theme='dark'] .ccm-richtext-toolbar {
+        background-color: var(--theme-surface);
+    }
+
+    html[data-theme='dark'] .ccm-richtext-divider {
+        background-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .ccm-map-images-remove {
+        color: #ffffff;
+    }
+
+    html[data-theme='dark'] .ccm-btn-ghost:hover {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .ccm-playlist-confirm-btn:disabled {
+        background-color: var(--theme-surface-strong);
+        color: var(--theme-text-subtle);
+    }
+}

@@ -1,16 +1,19 @@
 'use client';
 import React, { useRef, useState } from 'react';
 import { postAuthenticateEmail } from '@/server/users/authenticate-email';
+import { handleOtpKeyDown, handleOtpPaste } from '@/utils/otpInputHelpers';
 import './styles/ActivationCodeModal.css';
 
 interface ActivationCodeModalProps {
     email: string;
     onClose: () => void;
+    onConfirmed: () => void;
 }
 
 export default function ActivationCodeModal({
     email,
     onClose,
+    onConfirmed,
 }: ActivationCodeModalProps): JSX.Element {
     const LENGTH = 6;
     const [digits, setDigits] = useState<string[]>(new Array(LENGTH).fill(''));
@@ -18,7 +21,7 @@ export default function ActivationCodeModal({
     const [loading, setLoading] = useState(false);
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-    const isComplete = digits.every((d) => d !== '');
+    const isComplete = digits.every((digit) => digit !== '');
 
     const handleChange = (value: string, index: number) => {
         if (!/^[a-zA-Z0-9]?$/.test(value)) return;
@@ -32,9 +35,14 @@ export default function ActivationCodeModal({
         }
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+    const handleKeyDown = (
+        event: React.KeyboardEvent<HTMLInputElement>,
+        index: number
+    ) => {
+        handleOtpKeyDown(event, index, '', 'alphanumeric');
+
         if (
-            (e.key === 'Backspace' || e.key === 'Delete') &&
+            (event.key === 'Backspace' || event.key === 'Delete') &&
             digits[index] === '' &&
             index > 0
         ) {
@@ -42,18 +50,9 @@ export default function ActivationCodeModal({
         }
     };
 
-    const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-        e.preventDefault();
-        const pasted = e.clipboardData
-            .getData('Text')
-            .replace(/\s/g, '')
-            .slice(0, LENGTH);
-        const updated = new Array(LENGTH).fill('');
-        pasted.split('').forEach((char, i) => {
-            updated[i] = char.toUpperCase();
-        });
-        setDigits(updated);
-        const nextEmpty = updated.findIndex((d) => d === '');
+    const onPasteFilled = (chars: string[]) => {
+        setDigits(chars);
+        const nextEmpty = chars.findIndex((digit) => digit === '');
         const focusIndex = nextEmpty === -1 ? LENGTH - 1 : nextEmpty;
         inputRefs.current[focusIndex]?.focus();
     };
@@ -62,9 +61,10 @@ export default function ActivationCodeModal({
         const code = digits.join('');
         setError('');
         setLoading(true);
+
         try {
             await postAuthenticateEmail(email, code);
-            window.location.replace('/');
+            onConfirmed();
         } catch (err: Error | any) {
             setError(err.message);
             setLoading(false);
@@ -72,29 +72,34 @@ export default function ActivationCodeModal({
     };
 
     return (
-        <div className="activation-modal-overlay" onClick={onClose}>
-            <div className="activation-modal-card" onClick={(e) => e.stopPropagation()}>
+        <div className="activation-modal-overlay">
+            <div
+                className="activation-modal-card"
+                onClick={(event) => event.stopPropagation()}
+            >
                 <h1 className="activation-modal-title font-L-semibold">
                     Ative sua conta
                 </h1>
                 <p className="activation-modal-description font-XS-regular">
-                    Insira o código de ativação enviado para o seu e-mail.
+                    Insira o codigo de ativacao enviado para o seu e-mail.
                 </p>
 
                 <div className="activation-modal-inputs">
                     {digits.map((digit, index) => (
                         <input
                             key={index}
-                            ref={(el) => {
-                                inputRefs.current[index] = el;
+                            ref={(element) => {
+                                inputRefs.current[index] = element;
                             }}
                             type="text"
                             maxLength={1}
                             value={digit}
                             className="activation-modal-digit input-default-light font-XS-regular"
-                            onChange={(e) => handleChange(e.target.value, index)}
-                            onKeyDown={(e) => handleKeyDown(e, index)}
-                            onPaste={handlePaste}
+                            onChange={(event) => handleChange(event.target.value, index)}
+                            onKeyDown={(event) => handleKeyDown(event, index)}
+                            onPaste={(event) =>
+                                handleOtpPaste(event, LENGTH, onPasteFilled)
+                            }
                         />
                     ))}
                 </div>

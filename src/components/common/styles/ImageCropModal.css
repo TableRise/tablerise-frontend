@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .icm-backdrop {
+        @apply fixed inset-0 z-[400] flex items-center justify-center bg-black/70 px-4 py-6;
+    }
+
+    .icm-modal {
+        @apply flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-[1.5rem] bg-color-greyScale/50;
+        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.28);
+    }
+
+    .icm-header {
+        @apply flex items-start justify-between gap-4 border-b border-color-greyScale/200 px-6 py-5;
+    }
+
+    .icm-header-copy {
+        @apply flex flex-col gap-1;
+    }
+
+    .icm-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .icm-description {
+        @apply text-color-greyScale/700;
+    }
+
+    .icm-close-btn {
+        @apply flex h-10 w-10 items-center justify-center rounded-full bg-transparent text-2xl text-color-greyScale/700 transition-opacity duration-150;
+    }
+
+    .icm-close-btn:hover {
+        opacity: 0.72;
+    }
+
+    .icm-body {
+        @apply flex-1 overflow-auto px-6 py-5;
+    }
+
+    .icm-cropper {
+        @apply mx-auto max-w-full;
+    }
+
+    .icm-image {
+        @apply block max-h-[60vh] max-w-full rounded-[1rem];
+    }
+
+    .icm-error {
+        @apply px-6 text-color-support/alert;
+    }
+
+    .icm-footer {
+        @apply flex flex-wrap justify-end gap-3 border-t border-color-greyScale/200 px-6 py-5;
+    }
+
+    .icm-btn-ghost {
+        @apply rounded-[0.9rem] border border-color-greyScale/300 bg-transparent px-5 py-3 text-color-greyScale/900;
+    }
+
+    .icm-btn-secondary {
+        @apply rounded-[0.9rem] border border-color-primary/default_900 bg-color-greyScale/50 px-5 py-3 text-color-primary/default_900;
+    }
+
+    .icm-btn-primary {
+        @apply px-5;
+    }
+
+    @media (max-width: 768px) {
+        .icm-backdrop {
+            @apply px-3 py-4;
+        }
+
+        .icm-modal {
+            @apply max-h-[94vh] rounded-[1.25rem];
+        }
+
+        .icm-header,
+        .icm-body,
+        .icm-footer {
+            @apply px-4;
+        }
+
+        .icm-header,
+        .icm-footer {
+            @apply py-4;
+        }
+
+        .icm-body {
+            @apply py-4;
+        }
+
+        .icm-image {
+            @apply max-h-[52vh];
+        }
+
+        .icm-footer {
+            @apply flex-col;
+        }
+
+        .icm-btn-ghost,
+        .icm-btn-secondary,
+        .icm-btn-primary {
+            @apply w-full justify-center;
+        }
+    }
+
+    html[data-theme='dark'] .icm-modal {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow-strong);
+    }
+
+    html[data-theme='dark'] .icm-header,
+    html[data-theme='dark'] .icm-footer {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .icm-description,
+    html[data-theme='dark'] .icm-close-btn,
+    html[data-theme='dark'] .icm-btn-ghost {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .icm-btn-secondary {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+        color: var(--theme-accent);
+    }
+}

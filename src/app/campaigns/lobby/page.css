@@ -1,0 +1,341 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .lobby-loading {
+        @apply mt-[12rem] flex items-center justify-center;
+    }
+
+    .lobby-wrapper {
+        @apply mt-[8.6rem] flex justify-center gap-6 px-6 py-8;
+    }
+
+    .lobby-content {
+        @apply w-[63rem] flex flex-col bg-color-greyScale/50 rounded-xl p-6;
+    }
+
+    .lobby-cover {
+        @apply relative w-full h-[18rem] rounded-lg overflow-hidden;
+    }
+
+    .lobby-title {
+        @apply mt-4 text-color-primary/default_900;
+    }
+
+    .lobby-description {
+        @apply my-2 text-color-greyScale/700;
+    }
+
+    .lobby-info-bar {
+        @apply mt-4 flex flex-col gap-3;
+    }
+
+    .lobby-info-bar-row {
+        @apply flex items-center gap-6 flex-wrap;
+    }
+
+    .lobby-info-item {
+        @apply flex items-center gap-1 text-color-primary/default_900;
+    }
+
+    .lobby-social-item {
+        @apply min-w-0 max-w-full;
+    }
+
+    .lobby-info-link {
+        @apply text-color-primary/500 underline;
+    }
+
+    .lobby-info-link--truncate {
+        @apply block min-w-0 max-w-[14rem] truncate;
+    }
+
+    .lobby-code-item {
+        @apply gap-2;
+    }
+
+    .lobby-copy-btn {
+        @apply flex h-6 w-6 items-center justify-center rounded-md transition-opacity;
+    }
+
+    .lobby-copy-btn:hover:not(:disabled) {
+        @apply opacity-70;
+    }
+
+    .lobby-copy-btn:disabled {
+        @apply cursor-not-allowed opacity-40;
+    }
+
+    .lobby-confirm-presence {
+        @apply px-4 py-2 rounded-lg bg-color-primary/default_900 text-color-greyScale/50 cursor-pointer transition-opacity;
+    }
+
+    .lobby-confirm-presence:hover {
+        @apply opacity-80;
+    }
+
+    .lobby-confirm-presence--confirmed {
+        @apply bg-color-greyScale/300 text-color-greyScale/50 cursor-pointer;
+    }
+
+    .lobby-confirm-presence--confirmed:hover {
+        @apply opacity-80;
+    }
+
+    .lobby-session-preview-btn {
+        @apply px-4 py-2 rounded-lg border border-color-primary/default_900 text-color-primary/default_900 bg-transparent cursor-pointer transition-opacity;
+    }
+
+    .lobby-session-preview-btn:hover {
+        @apply opacity-70;
+    }
+
+    .lobby-session-modal-overlay {
+        @apply fixed inset-0 z-50 flex items-center justify-center bg-black/50;
+    }
+
+    .lobby-session-modal {
+        @apply bg-color-greyScale/50 rounded-2xl p-6 w-[32rem] max-w-[90vw] shadow-xl flex flex-col gap-4;
+    }
+
+    .lobby-session-modal-header {
+        @apply flex items-center justify-between text-color-primary/default_900;
+    }
+
+    .lobby-session-modal-close {
+        @apply cursor-pointer text-color-greyScale/300 transition-colors;
+    }
+
+    .lobby-session-modal-close:hover {
+        @apply text-color-primary/default_900;
+    }
+
+    .lobby-session-modal-text {
+        @apply text-color-primary/default_900 leading-relaxed;
+    }
+
+    .lobby-characters {
+        @apply mt-6 flex flex-col;
+    }
+
+    .lobby-characters h2 {
+        @apply text-color-primary/default_900 mb-4;
+    }
+
+    .lobby-characters-slider {
+        @apply flex gap-4 overflow-x-auto pb-2;
+    }
+
+    .lobby-character {
+        @apply flex flex-col items-center gap-1 flex-shrink-0 cursor-pointer;
+    }
+
+    .lobby-confirmed-player-avatar {
+        @apply relative h-[8rem] w-[8rem] flex-shrink-0;
+    }
+
+    .lobby-character-avatar {
+        @apply relative h-[8rem] w-[8rem] flex-shrink-0;
+    }
+
+    .lobby-character span {
+        @apply text-color-greyScale/700 whitespace-nowrap;
+    }
+
+    .lobby-articles {
+        @apply mt-6 flex flex-col;
+    }
+
+    .lobby-articles h2 {
+        @apply text-color-primary/default_900 mb-4;
+    }
+
+    .lobby-articles-box {
+        @apply rounded-xl shadow-md bg-color-greyScale/50 overflow-hidden;
+    }
+
+    .lobby-ticker {
+        @apply flex items-center px-4 py-1 border-b border-color-greyScale/200 overflow-hidden;
+    }
+
+    .lobby-ticker-label {
+        @apply whitespace-nowrap text-color-primary/default_900 mr-2 flex-shrink-0;
+    }
+
+    .lobby-ticker-track {
+        @apply overflow-hidden flex-1;
+    }
+
+    .lobby-ticker-content {
+        @apply flex gap-8 whitespace-nowrap;
+        animation: ticker-scroll 15s linear infinite;
+    }
+
+    .lobby-ticker-item {
+        @apply text-color-greyScale/500;
+    }
+
+    @keyframes ticker-scroll {
+        0% {
+            transform: translateX(100%);
+        }
+        100% {
+            transform: translateX(-100%);
+        }
+    }
+
+    .lobby-articles-filters {
+        @apply flex gap-1 px-4 py-2 overflow-x-auto border-b border-color-greyScale/200;
+    }
+
+    .lobby-filter-btn {
+        @apply px-3 py-1 rounded-full whitespace-nowrap text-color-greyScale/500 cursor-pointer transition-colors;
+    }
+
+    .lobby-filter-btn:hover {
+        @apply text-color-primary/default_900;
+    }
+
+    .lobby-filter-btn-active {
+        @apply bg-color-primary/default_900 text-color-greyScale/50;
+    }
+
+    .lobby-filter-btn-active:hover {
+        @apply text-color-greyScale/50;
+    }
+
+    .lobby-articles-list {
+        @apply flex flex-col gap-4 max-h-[26rem] overflow-y-auto p-4;
+    }
+
+    .lobby-article {
+        @apply flex gap-4 p-3 rounded-lg cursor-pointer transition-shadow;
+    }
+
+    .lobby-article:hover {
+        @apply shadow-sm;
+    }
+
+    .lobby-article-thumbnail {
+        @apply relative w-[5rem] min-w-[5rem] rounded-lg overflow-hidden;
+    }
+
+    .lobby-article-info {
+        @apply flex flex-col justify-between flex-1;
+    }
+
+    .lobby-article-info h3 {
+        @apply text-color-primary/default_900;
+    }
+
+    .lobby-article-resume {
+        @apply text-color-greyScale/300;
+    }
+
+    .lobby-article-date {
+        @apply text-color-greyScale/200;
+    }
+
+    .lobby-articles-empty {
+        @apply text-color-greyScale/500 py-4 text-center;
+    }
+
+    @media (max-width: 1024px) {
+        .lobby-wrapper {
+            @apply gap-4 px-4;
+        }
+
+        .lobby-content {
+            @apply w-full;
+            max-width: 58rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .lobby-wrapper {
+            @apply mt-[7.25rem] flex-col px-3 py-6;
+        }
+
+        .lobby-content {
+            @apply p-5;
+        }
+
+        .lobby-cover {
+            @apply h-[13rem];
+        }
+
+        .lobby-info-bar-row {
+            @apply gap-3;
+        }
+
+        .lobby-info-link--truncate {
+            @apply max-w-full;
+        }
+
+        .lobby-character-avatar,
+        .lobby-confirmed-player-avatar {
+            @apply h-[6.5rem] w-[6.5rem];
+        }
+
+        .lobby-session-modal {
+            @apply p-5;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .lobby-wrapper {
+            @apply mt-[6.5rem] px-2 pb-5;
+        }
+
+        .lobby-content {
+            @apply rounded-[1rem] p-4;
+        }
+
+        .lobby-cover {
+            @apply h-[11rem];
+        }
+
+        .lobby-article {
+            @apply gap-3 px-0;
+        }
+    }
+
+    html[data-theme='dark'] .lobby-content,
+    html[data-theme='dark'] .lobby-articles-box,
+    html[data-theme='dark'] .lobby-session-modal {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .lobby-description,
+    html[data-theme='dark'] .lobby-character span,
+    html[data-theme='dark'] .lobby-ticker-item,
+    html[data-theme='dark'] .lobby-articles-empty {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .lobby-ticker,
+    html[data-theme='dark'] .lobby-articles-filters {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .lobby-article-resume,
+    html[data-theme='dark'] .lobby-article-date {
+        color: var(--theme-text-subtle);
+    }
+
+    html[data-theme='dark'] .lobby-title,
+    html[data-theme='dark'] .lobby-info-item,
+    html[data-theme='dark'] .lobby-session-preview-btn,
+    html[data-theme='dark'] .lobby-session-modal-header,
+    html[data-theme='dark'] .lobby-session-modal-close:hover,
+    html[data-theme='dark'] .lobby-session-modal-text,
+    html[data-theme='dark'] .lobby-characters h2,
+    html[data-theme='dark'] .lobby-articles h2,
+    html[data-theme='dark'] .lobby-ticker-label,
+    html[data-theme='dark'] .lobby-filter-btn:hover,
+    html[data-theme='dark'] .lobby-article-info h3 {
+        color: var(--theme-accent);
+    }
+}

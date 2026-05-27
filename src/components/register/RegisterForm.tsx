@@ -38,7 +38,7 @@ export default function RegisterForm(): JSX.Element {
 
         try {
             await postRegister(registerPayload);
-            router.push('/');
+            router.push('/login');
         } catch (error: any) {
             setError('confirmPassword', {
                 type: 'manual',
