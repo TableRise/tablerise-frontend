@@ -10,15 +10,24 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Install dependencies
-        run:  npm install
+        run:  npm ci
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_REGISTRY_PACKAGES }}
+
+      - name: Checking lint
+        run:  npm run lint
+
+      - name: Checking prettier
+        run:  npm run prettier
+
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
           build: npm run build
           start: npm start
+
       - uses: mshick/add-pr-comment@v2
         with:
           message: |
