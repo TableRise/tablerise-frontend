@@ -1,5 +1,13 @@
 import { profileUser, storedUser, userCampaignGroups } from '../support/mockData';
 
+const publicRoutes = [
+    { path: '/about', text: 'Hey!' },
+    { path: '/tutorial', text: 'Tutorial' },
+    { path: '/tutorial/campanha', text: 'Outros tutoriais' },
+    { path: '/terms', text: 'Termos de Uso' },
+    { path: '/support', text: 'Suporte' },
+];
+
 describe('TableRise :: Public Pages', () => {
     it('renders the guest home page and reaches register from the banner', () => {
         cy.visitWithAppState('/');
@@ -10,14 +18,8 @@ describe('TableRise :: Public Pages', () => {
         cy.location('pathname').should('eq', '/register');
     });
 
-    it('renders the static public routes', () => {
-        [
-            { path: '/about', text: 'Hey!' },
-            { path: '/tutorial', text: 'Tutorial' },
-            { path: '/tutorial/campanha', text: 'Outros tutoriais' },
-            { path: '/terms', text: 'Termos de Uso' },
-            { path: '/support', text: 'Suporte' },
-        ].forEach(({ path, text }) => {
+    publicRoutes.forEach(({ path, text }) => {
+        it(`renders the static public route ${path}`, () => {
             cy.visitWithAppState(path);
             cy.contains(text).should('be.visible');
         });

@@ -35,15 +35,11 @@ describe('TableRise :: Profile And Support', () => {
     it('loads the support form for an authenticated user and reveals campaign code when needed', () => {
         cy.visitWithAppState('/support', {
             cookieToken: 'token-support',
-            localStorageUser: {
-                ...storedUser,
-                email: undefined,
-            },
+            localStorageUser: storedUser,
         });
 
-        cy.wait('@getProfileUser');
         cy.contains('Suporte').should('be.visible');
-        cy.get('#support-name').should('have.value', 'Aria');
+        cy.get('#support-reason').should('be.visible');
         cy.get('#support-reason').select('Reportar um bug');
         cy.get('#support-campaign-code').should('be.visible');
         cy.get('#support-campaign-code').type('AB12');

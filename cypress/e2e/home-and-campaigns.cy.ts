@@ -24,9 +24,11 @@ describe('TableRise :: Logged Home And Campaigns', () => {
 
         cy.wait('@getUserCampaigns');
         cy.contains('button', 'Criar uma campanha').click();
+        cy.contains('Antes de criar sua campanha').should('be.visible');
+        cy.contains('.donation-support-modal-buttons button', 'Continuar').click();
 
         cy.get('.ccm-input').first().type('Rastros da Aurora');
-        cy.get('.ccm-textarea').type('Uma campanha de exploração com segredos antigos.');
+        cy.get('.ccm-textarea').type('Uma campanha de exploracao com segredos antigos.');
         cy.get('.ccm-input--password').type('QW12');
         cy.get('.ccm-footer button').last().click();
 
@@ -36,7 +38,7 @@ describe('TableRise :: Logged Home And Campaigns', () => {
         cy.get('.ccm-footer button').last().click();
 
         cy.get('.ccm-richtext-area').type(
-            'Os jogadores serão convocados por uma antiga ordem arcana.'
+            'Os jogadores serao convocados por uma antiga ordem arcana.'
         );
         cy.contains('button', 'Criar campanha').click();
 
@@ -64,6 +66,8 @@ describe('TableRise :: Logged Home And Campaigns', () => {
 
         cy.wait('@getUserCampaigns');
         cy.contains('button', 'Entrar em uma nova campanha').click();
+        cy.contains('Antes de entrar na campanha').should('be.visible');
+        cy.contains('.donation-support-modal-buttons button', 'Continuar').click();
 
         cy.get('.jcm-input-title').type('Guilda');
         cy.contains('button', 'Pesquisar').click();
