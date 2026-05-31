@@ -528,11 +528,13 @@ export default function MatchNotesModal({
                             onClick={handleSubmit}
                             disabled={submitting}
                         >
-                            {submitting
-                                ? <LoadingDots label="Salvando anotação" />
-                                : view === 'edit'
-                                ? 'Salvar alterações'
-                                : 'Salvar anotação'}
+                            {submitting ? (
+                                <LoadingDots label="Salvando anotação" />
+                            ) : view === 'edit' ? (
+                                'Salvar alterações'
+                            ) : (
+                                'Salvar anotação'
+                            )}
                         </button>
                         <button
                             className="mnm-cancel-btn font-XS-regular"

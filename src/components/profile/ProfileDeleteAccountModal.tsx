@@ -64,11 +64,7 @@ export default function ProfileDeleteAccountModal({
                         }}
                         className="font-S-bold button-L-fill profile-action-modal-button-danger w-full"
                     >
-                        {loading ? (
-                            <LoadingDots label="Excluindo conta" />
-                        ) : (
-                            'Confirmar'
-                        )}
+                        {loading ? <LoadingDots label="Excluindo conta" /> : 'Confirmar'}
                     </button>
                     {error ? (
                         <span className="font-XXS-regular profile-action-modal-error">

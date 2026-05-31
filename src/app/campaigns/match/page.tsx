@@ -3310,9 +3310,11 @@ export default function MatchPage(): JSX.Element {
                     >
                         <div className="cs-spell-picker-header">
                             <h2 className="font-S-bold text-base">
-                                {panelDetailLoading
-                                    ? <LoadingDots label="Carregando detalhes da magia" />
-                                    : panelDetailSpell?.name}
+                                {panelDetailLoading ? (
+                                    <LoadingDots label="Carregando detalhes da magia" />
+                                ) : (
+                                    panelDetailSpell?.name
+                                )}
                             </h2>
                             <button
                                 type="button"
@@ -3661,9 +3663,11 @@ export default function MatchPage(): JSX.Element {
                         </div>
                         <div className="match-journal-highlight-footer">
                             <span className="font-XXS-regular match-journal-highlight-footer-text">
-                                {journalHighlightSaving
-                                    ? <LoadingDots label="Salvando destaque" />
-                                    : 'Clique novamente em uma publicação destacada para remove-la.'}
+                                {journalHighlightSaving ? (
+                                    <LoadingDots label="Salvando destaque" />
+                                ) : (
+                                    'Clique novamente em uma publicação destacada para remove-la.'
+                                )}
                             </span>
                         </div>
                     </div>

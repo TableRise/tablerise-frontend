@@ -145,7 +145,11 @@ export default function ProfileBiographyModal({
                             disabled={loading}
                             className="font-S-bold button-L-fill bg-color-primary/default_900 text-color-greyScale/100 w-full"
                         >
-                            {loading ? <LoadingDots label="Salvando perfil" /> : 'Confirmar'}
+                            {loading ? (
+                                <LoadingDots label="Salvando perfil" />
+                            ) : (
+                                'Confirmar'
+                            )}
                         </button>
                         {error ? (
                             <span className="font-XXS-regular profile-action-modal-error">

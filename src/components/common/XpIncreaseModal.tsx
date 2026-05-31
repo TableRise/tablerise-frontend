@@ -220,7 +220,11 @@ export default function XpIncreaseModal({
                         disabled={!isValidXpToAdd || submitting}
                         onClick={handleConfirm}
                     >
-                        {submitting ? <LoadingDots label="Salvando experiência" /> : 'Confirmar'}
+                        {submitting ? (
+                            <LoadingDots label="Salvando experiência" />
+                        ) : (
+                            'Confirmar'
+                        )}
                     </button>
                 </div>
             </div>

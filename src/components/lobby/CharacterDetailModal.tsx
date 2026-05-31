@@ -950,13 +950,17 @@ export default function CharacterDetailModal({
                                                         activeTab === 'equipamentos')
                                                 }
                                             >
-                                                {isEditing
-                                                    ? saving
-                                                        ? <LoadingDots label="Salvando ficha" />
-                                                        : 'Salvar Ficha'
-                                                    : hideInventoryTab
-                                                    ? 'Deletar Personagem'
-                                                    : 'Atualizar Ficha'}
+                                                {isEditing ? (
+                                                    saving ? (
+                                                        <LoadingDots label="Salvando ficha" />
+                                                    ) : (
+                                                        'Salvar Ficha'
+                                                    )
+                                                ) : hideInventoryTab ? (
+                                                    'Deletar Personagem'
+                                                ) : (
+                                                    'Atualizar Ficha'
+                                                )}
                                             </button>
                                         )}
                                     </div>

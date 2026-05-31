@@ -31,8 +31,7 @@ export default function Button({
             {loading ? (
                 <LoadingDots
                     label={
-                        loadingLabel ??
-                        (typeof title === 'string' ? title : 'Carregando')
+                        loadingLabel ?? (typeof title === 'string' ? title : 'Carregando')
                     }
                 />
             ) : (

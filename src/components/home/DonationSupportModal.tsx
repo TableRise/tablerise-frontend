@@ -47,7 +47,9 @@ export default function DonationSupportModal({
                 onClick={(event) => event.stopPropagation()}
             >
                 <h1 className="donation-support-modal-title font-L-semibold">
-                    {mode === 'create' ? 'Antes de criar sua campanha' : 'Antes de entrar na campanha'}
+                    {mode === 'create'
+                        ? 'Antes de criar sua campanha'
+                        : 'Antes de entrar na campanha'}
                 </h1>
                 <p className="donation-support-modal-description font-XS-regular">
                     {DONATION_TEXT}

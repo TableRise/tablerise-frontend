@@ -112,7 +112,11 @@ export default function ActivationCodeModal({
                         onClick={handleConfirm}
                         className="font-S-bold button-L-fill bg-color-primary/default_900 text-color-greyScale/100 w-full"
                     >
-                        {loading ? <LoadingDots label="Confirmando código" /> : 'Confirmar'}
+                        {loading ? (
+                            <LoadingDots label="Confirmando código" />
+                        ) : (
+                            'Confirmar'
+                        )}
                     </button>
                     {error && (
                         <span className="font-XXS-regular text-color-support/alert">
