@@ -19,6 +19,7 @@ export default function SupportForm(): JSX.Element {
     const [resolvedUserId, setResolvedUserId] = useState('');
     const [accountError, setAccountError] = useState('');
     const [senderLoading, setSenderLoading] = useState(true);
+    const [selectedReason, setSelectedReason] = useState<string>('');
     const [statusMessage, setStatusMessage] = useState<{
         type: 'success' | 'error';
         message: string;
@@ -42,9 +43,8 @@ export default function SupportForm(): JSX.Element {
         },
     });
 
-    const reason = watch('reason');
     const requiresCampaignCode = supportReasonsWithCampaignCode.includes(
-        reason as (typeof supportReasonsWithCampaignCode)[number]
+        selectedReason as (typeof supportReasonsWithCampaignCode)[number]
     );
 
     useEffect(() => {
@@ -119,6 +119,7 @@ export default function SupportForm(): JSX.Element {
                 campaignCode: '',
                 requestMessage: '',
             });
+            setSelectedReason('');
             setStatusMessage({
                 type: 'success',
                 message:
@@ -153,7 +154,9 @@ export default function SupportForm(): JSX.Element {
                         errors.reason ? ' support-form-select--error' : ''
                     }`}
                     defaultValue=""
-                    {...register('reason')}
+                    {...register('reason', {
+                        onChange: (event) => setSelectedReason(event.target.value),
+                    })}
                 >
                     <option value="" disabled>
                         Selecione uma opção
