@@ -29,6 +29,31 @@
         @apply h-auto w-auto rounded-xl;
     }
 
+    .donation-support-modal-pix-block {
+        @apply flex w-full flex-col gap-2 rounded-2xl border border-color-greyScale/200 bg-color-greyScale/50 p-4;
+    }
+
+    .donation-support-modal-pix-header {
+        @apply flex items-center justify-between gap-3;
+    }
+
+    .donation-support-modal-copy-btn {
+        @apply flex h-7 w-7 items-center justify-center rounded-md transition-opacity;
+    }
+
+    .donation-support-modal-copy-btn:hover {
+        @apply opacity-70;
+    }
+
+    .donation-support-modal-pix-code {
+        @apply break-all text-color-greyScale/700;
+        line-height: 1.5;
+    }
+
+    .donation-support-modal-copy-feedback {
+        @apply text-color-greyScale/500;
+    }
+
     .donation-support-modal-checkbox-row {
         @apply flex w-full items-center gap-2 rounded-xl border border-color-greyScale/200 px-4 py-3;
     }
@@ -61,10 +86,17 @@
     }
 
     html[data-theme='dark'] .donation-support-modal-description,
-    html[data-theme='dark'] .donation-support-modal-checkbox-row span {
+    html[data-theme='dark'] .donation-support-modal-checkbox-row span,
+    html[data-theme='dark'] .donation-support-modal-pix-header span {
         color: var(--theme-text);
     }
 
+    html[data-theme='dark'] .donation-support-modal-pix-code,
+    html[data-theme='dark'] .donation-support-modal-copy-feedback {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .donation-support-modal-pix-block,
     html[data-theme='dark'] .donation-support-modal-qr-wrapper,
     html[data-theme='dark'] .donation-support-modal-checkbox-row {
         background-color: var(--theme-surface-muted);

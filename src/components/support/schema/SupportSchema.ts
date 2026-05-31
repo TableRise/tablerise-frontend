@@ -22,11 +22,6 @@ const supportSchema = z
             .trim()
             .max(120, { message: 'Código da campanha muito longo*' })
             .optional(),
-        name: z
-            .string()
-            .trim()
-            .min(1, { message: 'Informe o seu nome*' })
-            .max(120, { message: 'Nome muito longo*' }),
         requestMessage: z
             .string()
             .trim()

@@ -45,8 +45,6 @@ export const uploadMatchHighlightImages = async (
             withCredentials: true,
             headers: {
                 'Content-Type': 'multipart/form-data',
-                [process.env.NEXT_PUBLIC_TYPE_KEY as string]:
-                    process.env.NEXT_PUBLIC_API_ACCESS_KEY,
             },
             data: formData,
         });
