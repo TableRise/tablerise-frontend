@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import LoggedHeader from '@/components/common/LoggedHeader';
+import LoadingDots from '@/components/common/LoadingDots';
 import { type SheetPrincipalHandle } from '@/components/character-sheet/SheetPrincipal';
 import { type SheetCaracteristicasHandle } from '@/components/character-sheet/SheetCaracteristicas';
 import { type SheetMagiasHandle } from '@/components/character-sheet/SheetMagias';
@@ -149,7 +150,11 @@ export default function CharacterSheetPage(): JSX.Element {
                         disabled={submitLoading}
                         onClick={handleCreateCharacter}
                     >
-                        {submitLoading ? 'Criando...' : 'Criar Ficha de Personagem'}
+                        {submitLoading ? (
+                            <LoadingDots label="Criando ficha de personagem" />
+                        ) : (
+                            'Criar Ficha de Personagem'
+                        )}
                     </button>
                     <button
                         type="button"

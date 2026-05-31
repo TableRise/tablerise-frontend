@@ -7,6 +7,7 @@ import {
     LabelHTMLAttributes,
 } from 'react';
 import { FieldError } from 'react-hook-form';
+import LoadingDots from '@/components/common/LoadingDots';
 import './styles/Form.css';
 
 function Title(props: HTMLProps<HTMLHeadingElement>) {
@@ -56,14 +57,25 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 function ButtonSubmit(props: ButtonProps) {
+    const { loading = false, children, disabled, ...rest } = props;
+
     return (
         <button
             type="submit"
             className={`font-S-bold form-button-submit bg-color-primary/default_900
-                button-L-fill ${props.loading ? 'opacity-50' : 'opacity-100'}`}
-            disabled={props.loading}
-            {...props}
-        />
+                button-L-fill ${loading ? 'opacity-50' : 'opacity-100'}`}
+            disabled={loading || disabled}
+            aria-busy={loading || undefined}
+            {...rest}
+        >
+            {loading ? (
+                <LoadingDots
+                    label={typeof children === 'string' ? children : 'Carregando'}
+                />
+            ) : (
+                children
+            )}
+        </button>
     );
 }
 

@@ -12,11 +12,28 @@ import LoggedHeader from '@/components/common/LoggedHeader';
 import '@/app/page.css';
 import UserMasterCampaigns from '@/components/home/UserMasterCampaigns';
 import UserPlayerCampaigns from '@/components/home/UserPlayerCampaigns';
+import DonationSupportModal from '@/components/home/DonationSupportModal';
 import JoinCampaignModal from '@/components/home/JoinCampaignModal';
+import { shouldSkipDonationPrompt } from '@/components/home/helpers/donationPromptPreference';
 
 export default function Home(): JSX.Element {
     const { userLoggedToggle, userCampaigns } = useContext(TableriseContext);
     const [joinModalOpen, setJoinModalOpen] = useState(false);
+    const [joinDonationModalOpen, setJoinDonationModalOpen] = useState(false);
+
+    const handleJoinIntent = () => {
+        if (shouldSkipDonationPrompt()) {
+            setJoinModalOpen(true);
+            return;
+        }
+
+        setJoinDonationModalOpen(true);
+    };
+
+    const handleJoinDonationConfirm = () => {
+        setJoinDonationModalOpen(false);
+        setJoinModalOpen(true);
+    };
 
     const userNotLoggedPage = (
         <>
@@ -42,8 +59,15 @@ export default function Home(): JSX.Element {
                 <UserMasterCampaigns campaigns={userCampaigns.master} />
                 <UserPlayerCampaigns
                     campaigns={userCampaigns.player}
-                    onJoinClick={() => setJoinModalOpen(true)}
+                    onJoinClick={handleJoinIntent}
                 />
+                {joinDonationModalOpen && (
+                    <DonationSupportModal
+                        mode="join"
+                        onConfirm={handleJoinDonationConfirm}
+                        onClose={() => setJoinDonationModalOpen(false)}
+                    />
+                )}
                 {joinModalOpen && (
                     <JoinCampaignModal onClose={() => setJoinModalOpen(false)} />
                 )}

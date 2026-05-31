@@ -4,17 +4,20 @@ import CampaignCard from '@/components/common/CampaignCard';
 import BasicCreationCard from '@/components/common/BasicCreationCard';
 import CreateCampaignModal from '@/components/home/CreateCampaignModal';
 import CampaignPasswordModal from '@/components/home/CampaignPasswordModal';
+import DonationSupportModal from '@/components/home/DonationSupportModal';
 import ErrorModal from '@/components/home/ErrorModal';
 import { CampaignsToRender } from '@/types/modules/components/home/UserMasterCampaigns';
 import '@/components/home/styles/UserMasterCampaigns.css';
+import { shouldSkipDonationPrompt } from '@/components/home/helpers/donationPromptPreference';
 import { useJoinCampaign } from '@/components/home/helpers/useJoinCampaign';
 
 export default function UserMasterCampaigns({
     campaigns,
 }: CampaignsToRender): JSX.Element {
-    const [modalOpen, setModalOpen] = useState(false);
-    const openModal = () => setModalOpen(true);
-    const closeModal = () => setModalOpen(false);
+    const [createModalOpen, setCreateModalOpen] = useState(false);
+    const [donationModalOpen, setDonationModalOpen] = useState(false);
+    const openCreateModal = () => setCreateModalOpen(true);
+    const closeCreateModal = () => setCreateModalOpen(false);
     const {
         handleJoinClick,
         passwordModalOpen,
@@ -24,6 +27,20 @@ export default function UserMasterCampaigns({
         joinError,
         closeJoinError,
     } = useJoinCampaign();
+
+    const handleCreateIntent = () => {
+        if (shouldSkipDonationPrompt()) {
+            openCreateModal();
+            return;
+        }
+
+        setDonationModalOpen(true);
+    };
+
+    const handleDonationConfirm = () => {
+        setDonationModalOpen(false);
+        openCreateModal();
+    };
 
     return (
         <section className="user-master-campaigns">
@@ -39,7 +56,7 @@ export default function UserMasterCampaigns({
                     <button
                         className="button-L-fill font-XS-bold"
                         disabled={campaigns.length >= 2}
-                        onClick={openModal}
+                        onClick={handleCreateIntent}
                     >
                         Criar uma campanha
                     </button>
@@ -96,12 +113,23 @@ export default function UserMasterCampaigns({
                         }
                     />
                 ) : (
-                    <BasicCreationCard onClick={openModal} />
+                    <BasicCreationCard onClick={handleCreateIntent} />
                 )}
             </div>
 
-            {modalOpen && (
-                <CreateCampaignModal onClose={closeModal} onSuccess={closeModal} />
+            {donationModalOpen && (
+                <DonationSupportModal
+                    mode="create"
+                    onConfirm={handleDonationConfirm}
+                    onClose={() => setDonationModalOpen(false)}
+                />
+            )}
+
+            {createModalOpen && (
+                <CreateCampaignModal
+                    onClose={closeCreateModal}
+                    onSuccess={closeCreateModal}
+                />
             )}
 
             {passwordModalOpen && (

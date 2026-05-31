@@ -304,9 +304,7 @@
 
     .profile-carousel__arrow {
         @apply w-12 h-12 rounded-xl bg-color-greyScale/50 flex items-center justify-center;
-        box-shadow:
-            0px 0px 1px 0px rgba(12, 37, 95, 0.1),
-            4px 6px 12px -6px rgba(12, 37, 95, 0.08);
+        box-shadow: none;
     }
 
     .profile-carousel__arrow--prev img {
@@ -555,10 +553,14 @@
     html[data-theme='dark'] .profile-hero,
     html[data-theme='dark'] .profile-bio__card,
     html[data-theme='dark'] .profile-showcase,
-    html[data-theme='dark'] .profile-empty-state,
+    html[data-theme='dark'] .profile-empty-state {
+        background-color: var(--theme-surface);
+        box-shadow: none;
+    }
+
     html[data-theme='dark'] .profile-carousel__arrow {
         background-color: var(--theme-surface);
-        box-shadow: var(--theme-shadow);
+        box-shadow: none;
     }
 
     html[data-theme='dark'] .profile-empty-state {

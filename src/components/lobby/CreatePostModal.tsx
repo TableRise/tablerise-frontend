@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import LoadingDots from '@/components/common/LoadingDots';
 import {
     createJournalPost,
     updateCampaignJournalPost,
@@ -277,8 +278,8 @@ export default function CreatePostModal({
                     >
                         {submitting
                             ? isEditMode
-                                ? 'Salvando...'
-                                : 'Publicando...'
+                                ? <LoadingDots label="Salvando publicação" />
+                                : <LoadingDots label="Publicando" />
                             : isEditMode
                             ? 'Salvar alterações'
                             : 'Publicar'}

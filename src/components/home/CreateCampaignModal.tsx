@@ -16,6 +16,7 @@ import Step1 from '@/components/home/CreateCampaignModalFirstStep';
 import Step2 from '@/components/home/CreateCampaignModalSecondStep';
 import Step3 from '@/components/home/CreateCampaignModalThirdStep';
 import ImageCropModal from '@/components/common/ImageCropModal';
+import LoadingDots from '@/components/common/LoadingDots';
 import '@/components/home/styles/CreateCampaignModal.css';
 import type { ImageUploadIntent } from '@/utils/imageCrop';
 
@@ -326,7 +327,11 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
                             disabled={submitting}
                             onClick={handleSubmit}
                         >
-                            {submitting ? 'Criando...' : 'Criar campanha'}
+                            {submitting ? (
+                                <LoadingDots label="Criando campanha" />
+                            ) : (
+                                'Criar campanha'
+                            )}
                         </button>
                     )}
                 </div>

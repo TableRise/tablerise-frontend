@@ -150,7 +150,7 @@ export default function LobbyOverviewSection({
                         </div>
                         <p className="font-S-regular lobby-session-modal-text">
                             {campaign.nextSessionResume ||
-                                'Sem resumo disponÃ­vel para a próxima sessão.'}
+                                'Sem resumo disponí­vel para a próxima sessão.'}
                         </p>
                     </div>
                 </div>

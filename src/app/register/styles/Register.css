@@ -71,6 +71,10 @@
             @apply relative min-h-[16rem] w-full;
         }
 
+        .register-page .side-image-container .logo-container .image-logo {
+            @apply w-56;
+        }
+
         .register-page .side-form-container {
             @apply relative h-auto w-full px-5 py-8;
             border-radius: 1.5rem 1.5rem 0 0;
@@ -101,6 +105,10 @@
     html[data-theme='dark'] .register-page .side-form-container {
         background-color: var(--theme-surface);
         box-shadow: -24px 0 42px rgba(2, 6, 23, 0.28);
+    }
+
+    html[data-theme='dark'] .register-page .title-container .title-text {
+        color: #8ab5fc;
     }
 
     html[data-theme='dark'] .register-page .title-container .subtitle-text,

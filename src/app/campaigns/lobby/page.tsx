@@ -27,6 +27,7 @@ import {
 } from '@/server/characters/get-characters';
 import LobbyJournalSection from '@/app/campaigns/lobby/LobbyJournalSection';
 import LobbyOverviewSection from '@/app/campaigns/lobby/LobbyOverviewSection';
+import LoadingDots from '@/components/common/LoadingDots';
 import {
     CATEGORY_LABEL,
     mapCampaignData,
@@ -308,7 +309,9 @@ export default function CampaignLobby(): JSX.Element {
             <main>
                 <LoggedHeader />
                 <div className="lobby-loading">
-                    <span className="font-M-semibold">Carregando campanha...</span>
+                    <span className="font-M-semibold">
+                        <LoadingDots label="Carregando campanha" />
+                    </span>
                 </div>
             </main>
         );

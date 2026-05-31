@@ -7,6 +7,7 @@ import { deleteUser } from '@/server/users/delete-user';
 import { postLogout } from '@/server/users/logout';
 import { updateUser } from '@/server/users/update-user';
 import isAtLeastAge from '@/utils/isAtLeastAge';
+import LoadingDots from '@/components/common/LoadingDots';
 import completeOAuthUserSchema, {
     completeProfileUserSchema,
     type CompleteOAuthUserPayload,
@@ -133,7 +134,11 @@ export default function CompleteUserModal({
                                 onClick={handleUnderageConfirm}
                                 className="font-S-bold button-L-fill bg-color-primary/default_900 text-color-greyScale/100 w-full"
                             >
-                                Confirmar
+                                {loading ? (
+                                    <LoadingDots label="Confirmando" />
+                                ) : (
+                                    'Confirmar'
+                                )}
                             </button>
                         </div>
                     </>
@@ -199,7 +204,11 @@ export default function CompleteUserModal({
                                     disabled={loading}
                                     className="font-S-bold button-L-fill bg-color-primary/default_900 text-color-greyScale/100 w-full"
                                 >
-                                    {loading ? 'Salvando...' : 'Confirmar'}
+                                    {loading ? (
+                                        <LoadingDots label="Salvando perfil" />
+                                    ) : (
+                                        'Confirmar'
+                                    )}
                                 </button>
                                 {error && (
                                     <span className="font-XXS-regular text-color-support/alert">

@@ -30,4 +30,31 @@
     .activation-modal-buttons {
         @apply flex flex-col gap-2 w-full mt-2;
     }
+
+    html[data-theme='dark'] .activation-modal-card {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow-strong);
+    }
+
+    html[data-theme='dark'] .activation-modal-title {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .activation-modal-description {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .activation-modal-digit {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .activation-modal-digit::placeholder {
+        color: var(--theme-text-subtle);
+    }
+
+    html[data-theme='dark'] .activation-modal-buttons .form-button-cancel {
+        color: var(--theme-text-muted);
+    }
 }

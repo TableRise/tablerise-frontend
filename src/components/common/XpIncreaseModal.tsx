@@ -1,5 +1,6 @@
 'use client';
 import { useMemo, useState } from 'react';
+import LoadingDots from '@/components/common/LoadingDots';
 import '@/components/common/styles/XpIncreaseModal.css';
 import { applyXpGain } from '@/utils/characterXp';
 
@@ -219,7 +220,7 @@ export default function XpIncreaseModal({
                         disabled={!isValidXpToAdd || submitting}
                         onClick={handleConfirm}
                     >
-                        {submitting ? 'Salvando...' : 'Confirmar'}
+                        {submitting ? <LoadingDots label="Salvando experiência" /> : 'Confirmar'}
                     </button>
                 </div>
             </div>

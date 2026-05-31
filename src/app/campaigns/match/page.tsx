@@ -6,6 +6,7 @@ import DiceBoxThreejs from '@3d-dice/dice-box-threejs';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import LoadingDots from '@/components/common/LoadingDots';
 import RankedAvatarFrame from '@/components/common/RankedAvatarFrame';
 import TableriseContext from '@/context/TableriseContext';
 import { getCampaignById } from '@/server/campaigns/join-campaign';
@@ -2602,7 +2603,7 @@ export default function MatchPage(): JSX.Element {
 
                     {characterLoading && (
                         <span className="font-XS-regular match-char-empty">
-                            Carregando personagem...
+                            <LoadingDots label="Carregando personagem" />
                         </span>
                     )}
 
@@ -3073,8 +3074,8 @@ export default function MatchPage(): JSX.Element {
                         }`}
                         title={
                             playingMusicId
-                                ? 'Volume da mÃºsica'
-                                : 'Nenhuma mÃºsica em reprodução'
+                                ? 'Volume da música'
+                                : 'Nenhuma música em reprodução'
                         }
                         onClick={() => {
                             if (!playingMusicId) return;
@@ -3099,7 +3100,7 @@ export default function MatchPage(): JSX.Element {
                                 onChange={(event) =>
                                     setMusicVolume(Number(event.target.value))
                                 }
-                                aria-label="Controlar volume da mÃºsica"
+                                aria-label="Controlar volume da música"
                             />
                             <span className="match-volume-value font-XXS-regular">
                                 {musicVolume}%
@@ -3310,7 +3311,7 @@ export default function MatchPage(): JSX.Element {
                         <div className="cs-spell-picker-header">
                             <h2 className="font-S-bold text-base">
                                 {panelDetailLoading
-                                    ? 'Carregando...'
+                                    ? <LoadingDots label="Carregando detalhes da magia" />
                                     : panelDetailSpell?.name}
                             </h2>
                             <button
@@ -3323,7 +3324,9 @@ export default function MatchPage(): JSX.Element {
                         </div>
                         <div className="cs-spell-picker-list">
                             {panelDetailLoading && (
-                                <p className="text-center text-sm py-8">Carregando...</p>
+                                <p className="text-center text-sm py-8">
+                                    <LoadingDots label="Carregando detalhes da magia" />
+                                </p>
                             )}
                             {!panelDetailLoading && panelDetailSpell && (
                                 <div className="cs-spell-accordion-body border-none px-0">
@@ -3609,7 +3612,7 @@ export default function MatchPage(): JSX.Element {
                         <div className="match-journal-highlight-body">
                             {journalHighlightLoading || journalPostsLoading ? (
                                 <span className="font-XS-regular match-journal-highlight-empty">
-                                    Carregando publicaçÃµes...
+                                    <LoadingDots label="Carregando publicações" />
                                 </span>
                             ) : journalPosts.length === 0 ? (
                                 <span className="font-XS-regular match-journal-highlight-empty">
@@ -3659,7 +3662,7 @@ export default function MatchPage(): JSX.Element {
                         <div className="match-journal-highlight-footer">
                             <span className="font-XXS-regular match-journal-highlight-footer-text">
                                 {journalHighlightSaving
-                                    ? 'Salvando destaque...'
+                                    ? <LoadingDots label="Salvando destaque" />
                                     : 'Clique novamente em uma publicação destacada para remove-la.'}
                             </span>
                         </div>

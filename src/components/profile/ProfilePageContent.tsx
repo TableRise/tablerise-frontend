@@ -13,6 +13,7 @@ import type { DatabaseUserWithDetails } from '@/types/shared/entities';
 import TableriseContext from '@/context/TableriseContext';
 import CharacterDetailModal from '@/components/lobby/CharacterDetailModal';
 import ImageCropModal from '@/components/common/ImageCropModal';
+import LoadingDots from '@/components/common/LoadingDots';
 import CompleteUserModal from '@/components/login/CompleteUserModal';
 import ProfileBadgePopover from '@/components/profile/ProfileBadgePopover';
 import ProfileHeroSection from '@/components/profile/ProfileHeroSection';
@@ -269,7 +270,7 @@ export default function ProfilePageContent({
     if (loading) {
         return (
             <ProfileStateCard
-                title="Carregando perfil..."
+                title={<LoadingDots label="Carregando perfil" />}
                 description="Estamos buscando as informações deste aventureiro."
             />
         );
@@ -285,7 +286,7 @@ export default function ProfilePageContent({
         return (
             <ProfileStateCard
                 title="Perfil não encontrado"
-                description="não encontramos este perfil ou ele não está disponÃ­vel agora."
+                description="não encontramos este perfil ou ele não está disponí­vel agora."
             />
         );
     }
@@ -343,7 +344,7 @@ export default function ProfilePageContent({
                     {campaign.title}
                 </h3>
                 <p className="font-XS-regular profile-campaign-card__description">
-                    {campaign.description || 'Sem descriÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o disponÃ­vel.'}
+                    {campaign.description || 'Sem descrição disponível.'}
                 </p>
                 <div className="profile-campaign-card__meta">
                     <span className="font-XXS-bold">
@@ -402,7 +403,7 @@ export default function ProfilePageContent({
                     <span className="font-XXS-bold">{character.race}</span>
                 </div>
                 <span className="font-XS-regular text-color-greyScale/200">
-                    NÃ­vel {character.level}
+                    Ní­vel {character.level}
                 </span>
             </div>
         </article>
@@ -476,12 +477,12 @@ export default function ProfilePageContent({
                 subtitle={
                     campaigns.length > 0
                         ? `${campaigns.length} campanha(s) encontrada(s)`
-                        : 'Nenhuma campanha disponÃ­vel'
+                        : 'Nenhuma campanha disponí­vel'
                 }
                 items={campaignItems}
                 label="Campanhas do perfil"
                 variant="campaigns"
-                emptyMessage="Este usuário ainda não possui campanhas visÃ­veis."
+                emptyMessage="Este usuário ainda não possui campanhas visí­veis."
                 cardLayout={true}
             />
 
@@ -490,18 +491,18 @@ export default function ProfilePageContent({
                 subtitle={
                     characters.length > 0
                         ? `${characters.length} personagem(ns) encontrado(s)`
-                        : 'Nenhum personagem disponÃ­vel'
+                        : 'Nenhum personagem disponí­vel'
                 }
                 items={characterItems}
                 label="Personagens do perfil"
                 variant="characters"
-                emptyMessage="Este usuário ainda não criou personagens visÃ­veis."
+                emptyMessage="Este usuário ainda não criou personagens visí­veis."
                 cardLayout={true}
             />
 
             <ProfileShowcaseSection
                 title="BADGES"
-                subtitle="Coloridas para badges conquistadas, cinza para as restantes."
+                subtitle=""
                 items={badgeItems}
                 label="Badges do perfil"
                 variant="badges"

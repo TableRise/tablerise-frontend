@@ -1,8 +1,10 @@
 'use client';
 
+import { ReactNode } from 'react';
+
 type ProfileStateCardProps = {
-    title: string;
-    description: string;
+    title: ReactNode;
+    description: ReactNode;
 };
 
 export default function ProfileStateCard({

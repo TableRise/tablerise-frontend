@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import LoadingDots from '@/components/common/LoadingDots';
 import { updateUser } from '@/server/users/update-user';
 import '@/components/profile/styles/ProfileActionModal.css';
 
@@ -144,7 +145,7 @@ export default function ProfileBiographyModal({
                             disabled={loading}
                             className="font-S-bold button-L-fill bg-color-primary/default_900 text-color-greyScale/100 w-full"
                         >
-                            {loading ? 'Salvando...' : 'Confirmar'}
+                            {loading ? <LoadingDots label="Salvando perfil" /> : 'Confirmar'}
                         </button>
                         {error ? (
                             <span className="font-XXS-regular profile-action-modal-error">

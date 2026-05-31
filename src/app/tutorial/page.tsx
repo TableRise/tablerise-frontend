@@ -10,7 +10,7 @@ export default function Tutorial(): JSX.Element {
                     <h2 className="font-XXL-bold">Tutorial</h2>
                     <span>
                         Aprenda a configurar campanhas, personagens, mapas, trilhas
-                        sonoras e outras funçÃµes disponÃ­veis na sua sessão.
+                        sonoras e outras funçíµes disponí­veis na sua sessão.
                     </span>
                 </header>
                 <div className="tutorial-cards">

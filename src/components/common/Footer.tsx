@@ -81,10 +81,10 @@ export default function Footer(): JSX.Element {
                             <Link href="/terms">Termos de serviço</Link>
                         </li>
                         <li>
-                            <Link href="/">PolÃ­ticas de privacidade</Link>
+                            <Link href="/">Polí­ticas de privacidade</Link>
                         </li>
                         <li>
-                            <Link href="/">ConfiguraçÃµes de cookies</Link>
+                            <Link href="/">Configurações de cookies</Link>
                         </li>
                         <li>
                             <Link href="/">supporte</Link>

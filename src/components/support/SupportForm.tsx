@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Script from 'next/script';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import LoadingDots from '@/components/common/LoadingDots';
 import { getUser } from '@/server/users/get-user';
 import supportSchema, {
     supportReasonOptions,
@@ -359,7 +360,7 @@ export default function SupportForm({
 
                 {senderLoading && (
                     <span className="font-XXS-regular text-color-greyScale/500">
-                        Carregando os dados da sua conta...
+                        <LoadingDots label="Carregando os dados da sua conta" />
                     </span>
                 )}
 
@@ -398,7 +399,7 @@ export default function SupportForm({
                     className="button-L-fill support-form-submit text-color-greyScale/50"
                     disabled={submitDisabled}
                 >
-                    {isSubmitting ? 'Enviando...' : 'Enviar'}
+                    {isSubmitting ? <LoadingDots label="Enviando suporte" /> : 'Enviar'}
                 </button>
             </form>
         </>

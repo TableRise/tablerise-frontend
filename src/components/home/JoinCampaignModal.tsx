@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import CampaignCard from '@/components/common/CampaignCard';
+import LoadingDots from '@/components/common/LoadingDots';
 import ErrorModal from '@/components/home/ErrorModal';
 import CampaignPasswordModal from '@/components/home/CampaignPasswordModal';
 import { isCampaignPlayerPending } from '@/components/home/helpers/campaignPlayerStatus';
@@ -101,7 +102,7 @@ export default function JoinCampaignModal({ onClose }: Props): JSX.Element {
                     <input
                         className="jcm-input-title font-XS-regular"
                         type="text"
-                        placeholder="TÃ­tulo da campanha"
+                        placeholder="Tí­tulo da campanha"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                     />
@@ -117,7 +118,11 @@ export default function JoinCampaignModal({ onClose }: Props): JSX.Element {
                         onClick={handleSearch}
                         disabled={searching}
                     >
-                        {searching ? 'Buscando...' : 'Pesquisar'}
+                        {searching ? (
+                            <LoadingDots label="Buscando campanhas" />
+                        ) : (
+                            'Pesquisar'
+                        )}
                     </button>
                 </div>
 
