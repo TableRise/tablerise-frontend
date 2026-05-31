@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import LoadingDots from '@/components/common/LoadingDots';
 import {
     getCampaignPlayers,
     confirmCampaignPlayer,
@@ -186,7 +187,7 @@ export default function ParticipantsModal({
                     {loading ? (
                         <div className="pm-loading">
                             <span className="font-XS-regular">
-                                Carregando participantes...
+                                <LoadingDots label="Carregando participantes" />
                             </span>
                         </div>
                     ) : (

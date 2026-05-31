@@ -4,6 +4,7 @@ import Image from 'next/image';
 import EditIcon from '@assets/icons/sys/edit.svg?url';
 import ArrowBackIcon from '@assets/icons/nav/arrow-back.svg?url';
 import ArrowRightIcon from '@assets/icons/nav/arrow-right.svg?url';
+import LoadingDots from '@/components/common/LoadingDots';
 import {
     getCharacterById,
     type FullCharacterDnd,
@@ -84,7 +85,7 @@ const SKILL_LABELS: Record<string, string> = {
     insight: 'Intuição',
     medicine: 'Medicina',
     perception: 'Percepção',
-    survival: 'SobrevivÃªncia',
+    survival: 'Sobrevivíªncia',
     deception: 'Enganação',
     intimidation: 'Intimidação',
     performance: 'Atuação',
@@ -124,8 +125,8 @@ const CURRENCY_LABELS: Record<'cp' | 'sp' | 'ep' | 'gp' | 'pp', string> = {
 const MAGIC_CLASS_PT: Record<string, string> = {
     strength: 'Força',
     dexterity: 'Destreza',
-    constitution: 'ConstituiÃƒÂ§ÃƒÂ£o',
-    intelligence: 'InteligÃƒÂªncia',
+    constitution: 'ConstituiíƒÂ§íƒÂ£o',
+    intelligence: 'InteligíƒÂªncia',
     wisdom: 'Sabedoria',
     charisma: 'Carisma',
 };
@@ -879,7 +880,7 @@ export default function CharacterDetailModal({
 
                     {loading && (
                         <span className="font-XS-regular cdm-loading">
-                            Carregando ficha...
+                            <LoadingDots label="Carregando ficha" />
                         </span>
                     )}
 
@@ -949,13 +950,17 @@ export default function CharacterDetailModal({
                                                         activeTab === 'equipamentos')
                                                 }
                                             >
-                                                {isEditing
-                                                    ? saving
-                                                        ? 'Salvando...'
-                                                        : 'Salvar Ficha'
-                                                    : hideInventoryTab
-                                                    ? 'Deletar Personagem'
-                                                    : 'Atualizar Ficha'}
+                                                {isEditing ? (
+                                                    saving ? (
+                                                        <LoadingDots label="Salvando ficha" />
+                                                    ) : (
+                                                        'Salvar Ficha'
+                                                    )
+                                                ) : hideInventoryTab ? (
+                                                    'Deletar Personagem'
+                                                ) : (
+                                                    'Atualizar Ficha'
+                                                )}
                                             </button>
                                         )}
                                     </div>
@@ -1079,7 +1084,7 @@ export default function CharacterDetailModal({
                                             }}
                                             disabled={!canCloseNotifications}
                                         >
-                                            Ã—
+                                            í—
                                         </button>
                                     </div>
                                 </div>
@@ -1449,7 +1454,7 @@ export default function CharacterDetailModal({
                                             </div>
                                             <div className="cdm-info-box">
                                                 <span className="font-XXS-regular cdm-info-label">
-                                                    ProficiÃªncia
+                                                    Proficiíªncia
                                                 </span>
                                                 <span className="font-M-semibold">
                                                     +{stats.proficiencyBonus}
@@ -2062,7 +2067,7 @@ export default function CharacterDetailModal({
                                                 placeholder="0"
                                             />
                                             <span className="cs-field-label">
-                                                CD ResistÃªncia de Magia
+                                                CD Resistíªncia de Magia
                                             </span>
                                         </div>
                                         <div className="cs-spell-header-box">
@@ -2503,7 +2508,11 @@ export default function CharacterDetailModal({
                                 }}
                                 className="font-S-bold button-L-fill bg-color-primary/default_900 profile-action-modal-button-danger w-full"
                             >
-                                {deleteSubmitting ? 'Excluindo...' : 'Confirmar'}
+                                {deleteSubmitting ? (
+                                    <LoadingDots label="Excluindo personagem" />
+                                ) : (
+                                    'Confirmar'
+                                )}
                             </button>
                             {deleteError ? (
                                 <span className="font-XXS-regular profile-action-modal-error">

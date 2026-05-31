@@ -19,6 +19,10 @@
         @apply text-color-greyScale/800;
     }
 
+    .button-container .social-button .social-icon {
+        color: #464646;
+    }
+
     @media (max-width: 480px) {
         .button-container {
             @apply w-full flex-none;
@@ -32,5 +36,9 @@
 
     html[data-theme='dark'] .button-container .social-button .button-text {
         color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .button-container .social-button .social-icon {
+        color: #ffffff;
     }
 }

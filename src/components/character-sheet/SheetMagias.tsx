@@ -3,6 +3,7 @@ import { forwardRef, useContext, useImperativeHandle, useState } from 'react';
 import Image from 'next/image';
 import Book from '../../../assets/icons/nav/book.svg?url';
 import BookDark from '../../../assets/icons/nav/book-dark.svg?url';
+import LoadingDots from '@/components/common/LoadingDots';
 import TableriseContext from '@/context/TableriseContext';
 import {
     getDnd5eSpellsByLevel,
@@ -372,7 +373,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                         <div className="cs-spell-picker-list">
                             {pickerLoading && (
                                 <p className="text-center text-sm text-color-greyScale/500 py-8">
-                                    Carregando...
+                                    <LoadingDots label="Carregando magias" />
                                 </p>
                             )}
                             {!pickerLoading && filteredSpells.length === 0 && (
@@ -495,7 +496,11 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                     >
                         <div className="cs-spell-picker-header">
                             <h2 className="font-S-bold text-base">
-                                {detailLoading ? 'Carregando...' : detailSpell?.name}
+                                {detailLoading ? (
+                                    <LoadingDots label="Carregando detalhes da magia" />
+                                ) : (
+                                    detailSpell?.name
+                                )}
                             </h2>
                             <button
                                 type="button"
@@ -508,7 +513,9 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
 
                         <div className="cs-spell-picker-list">
                             {detailLoading && (
-                                <p className="text-center text-sm py-8">Carregando...</p>
+                                <p className="text-center text-sm py-8">
+                                    <LoadingDots label="Carregando detalhes da magia" />
+                                </p>
                             )}
                             {!detailLoading && detailSpell && (
                                 <div className="cs-spell-accordion-body border-none px-0">

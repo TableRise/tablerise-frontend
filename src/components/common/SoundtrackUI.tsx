@@ -7,6 +7,7 @@ import CloseSVG from '../../../assets/icons/nav/close-red.svg?url';
 import CheckSVG from '../../../assets/icons/sys/check-blue.svg?url';
 import EditSVG from '../../../assets/icons/sys/edit-blue.svg?url';
 import TrashSVG from '../../../assets/icons/sys/trash.svg?url';
+import LoadingDots from '@/components/common/LoadingDots';
 import SoundWave from '@/components/common/SoundWave';
 import { getYouTubeVideoDetails } from '@/server/youtube/get-video-details';
 import type { CampaignMusic } from '@/server/campaigns/create-campaign';
@@ -386,7 +387,7 @@ export default function SoundtrackUI({ musics, setMusics }: Props) {
                         disabled={loading || !videoUrl.trim()}
                     >
                         <Image src={AddSVG.src} alt="add" width={14} height={14} />
-                        {loading ? 'Buscando...' : 'Adicionar'}
+                        {loading ? <LoadingDots label="Buscando vídeo" /> : 'Adicionar'}
                     </button>
                     {inputError && (
                         <span className="font-XXS-regular ccm-playlist-input-error">

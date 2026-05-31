@@ -5,6 +5,7 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import EditSVG from '@assets/icons/sys/edit-blue.svg?url';
 import EditDarkSVG from '@assets/icons/sys/edit-dark.svg?url';
 import TrashSVG from '@assets/icons/sys/trash.svg?url';
+import LoadingDots from '@/components/common/LoadingDots';
 import formatDate from '@/utils/formatDate';
 import TableriseContext from '@/context/TableriseContext';
 import {
@@ -386,7 +387,7 @@ export default function MatchNotesModal({
 
                             {loading ? (
                                 <span className="font-XS-regular mnm-empty">
-                                    Carregando anotações...
+                                    <LoadingDots label="Carregando anotações" />
                                 </span>
                             ) : notes.length === 0 ? (
                                 <span className="font-XS-regular mnm-empty">
@@ -527,11 +528,13 @@ export default function MatchNotesModal({
                             onClick={handleSubmit}
                             disabled={submitting}
                         >
-                            {submitting
-                                ? 'Salvando...'
-                                : view === 'edit'
-                                ? 'Salvar alterações'
-                                : 'Salvar anotação'}
+                            {submitting ? (
+                                <LoadingDots label="Salvando anotação" />
+                            ) : view === 'edit' ? (
+                                'Salvar alterações'
+                            ) : (
+                                'Salvar anotação'
+                            )}
                         </button>
                         <button
                             className="mnm-cancel-btn font-XS-regular"

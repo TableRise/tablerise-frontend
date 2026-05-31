@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .donation-support-modal-overlay {
+        @apply fixed inset-0 z-[220] flex items-center justify-center bg-black/60 px-4;
+    }
+
+    .donation-support-modal-card {
+        @apply flex w-full max-w-[32rem] flex-col items-center gap-4 rounded-2xl bg-white p-8 shadow-xl;
+    }
+
+    .donation-support-modal-title {
+        @apply text-center text-color-primary/default_900;
+    }
+
+    .donation-support-modal-description {
+        @apply text-center text-color-greyScale/950;
+        max-width: 26rem;
+        line-height: 1.55;
+    }
+
+    .donation-support-modal-qr-wrapper {
+        @apply flex items-center justify-center rounded-2xl bg-color-greyScale/100 p-4;
+    }
+
+    .donation-support-modal-qr {
+        @apply h-auto w-auto rounded-xl;
+    }
+
+    .donation-support-modal-checkbox-row {
+        @apply flex w-full items-center gap-2 rounded-xl border border-color-greyScale/200 px-4 py-3;
+    }
+
+    .donation-support-modal-checkbox-row span {
+        @apply text-color-greyScale/950;
+    }
+
+    .donation-support-modal-buttons {
+        @apply flex w-full flex-col gap-2;
+    }
+
+    @media (max-width: 480px) {
+        .donation-support-modal-card {
+            @apply p-5;
+        }
+
+        .donation-support-modal-qr-wrapper {
+            @apply p-3;
+        }
+    }
+
+    html[data-theme='dark'] .donation-support-modal-card {
+        background-color: var(--theme-surface);
+        box-shadow: var(--theme-shadow-strong);
+    }
+
+    html[data-theme='dark'] .donation-support-modal-title {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .donation-support-modal-description,
+    html[data-theme='dark'] .donation-support-modal-checkbox-row span {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .donation-support-modal-qr-wrapper,
+    html[data-theme='dark'] .donation-support-modal-checkbox-row {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+    }
+}

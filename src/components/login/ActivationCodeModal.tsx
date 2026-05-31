@@ -1,5 +1,6 @@
 'use client';
 import React, { useRef, useState } from 'react';
+import LoadingDots from '@/components/common/LoadingDots';
 import { postAuthenticateEmail } from '@/server/users/authenticate-email';
 import { handleOtpKeyDown, handleOtpPaste } from '@/utils/otpInputHelpers';
 import './styles/ActivationCodeModal.css';
@@ -111,7 +112,11 @@ export default function ActivationCodeModal({
                         onClick={handleConfirm}
                         className="font-S-bold button-L-fill bg-color-primary/default_900 text-color-greyScale/100 w-full"
                     >
-                        Confirmar
+                        {loading ? (
+                            <LoadingDots label="Confirmando código" />
+                        ) : (
+                            'Confirmar'
+                        )}
                     </button>
                     {error && (
                         <span className="font-XXS-regular text-color-support/alert">

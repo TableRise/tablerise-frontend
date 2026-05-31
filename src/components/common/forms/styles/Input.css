@@ -8,7 +8,7 @@
     }
 
     .generic-form-input .generic-form-input-shell {
-        @apply relative;
+        @apply relative block w-full;
     }
 
     .generic-form-input .generic-form-input-shell input {
@@ -16,6 +16,6 @@
     }
 
     .generic-form-input .generic-form-input-shell button {
-        @apply absolute top-2 right-3;
+        @apply absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center;
     }
 }

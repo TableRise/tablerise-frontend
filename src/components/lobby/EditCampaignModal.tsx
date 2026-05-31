@@ -16,6 +16,7 @@ import { AGE_RATINGS } from '@/components/home/helpers/CreateCampaignModalHelper
 import { getCampaignPlayers } from '@/server/campaigns/get-campaign-players';
 import { getUser } from '@/server/users/get-user';
 import ImageCropModal from '@/components/common/ImageCropModal';
+import LoadingDots from '@/components/common/LoadingDots';
 import '@/components/lobby/styles/EditCampaignModal.css';
 import type { ImageUploadIntent } from '@/utils/imageCrop';
 
@@ -857,7 +858,11 @@ export default function EditCampaignModal({
                                 : handleSaveMusics
                         }
                     >
-                        {submitting ? 'Salvando...' : 'Salvar alterações'}
+                        {submitting ? (
+                            <LoadingDots label="Salvando alterações" />
+                        ) : (
+                            'Salvar alterações'
+                        )}
                     </button>
                 </div>
             </div>

@@ -22,4 +22,16 @@
     .checkbox-container .checkbox-label .checkbox-text .checkbox-link {
         @apply underline text-color-primary/800;
     }
+
+    html[data-theme='dark'] .checkbox-container .checkbox-label .checkbox-text {
+        color: #ffffff;
+    }
+
+    html[data-theme='dark']
+        .checkbox-container
+        .checkbox-label
+        .checkbox-text
+        .checkbox-link {
+        color: #8ab5fc;
+    }
 }

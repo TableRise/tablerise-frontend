@@ -42,7 +42,7 @@ export const CATEGORY_LABEL: Record<string, string> = {
     'characters-players': 'Personagens (Jogadores)',
     'characters-master': 'Personagens (Mestre)',
     environment: 'Ambiente',
-    'world-news': 'NotÃ­cias do Mundo',
+    'world-news': 'Notí­cias do Mundo',
     announcements: 'Anuncios',
 };
 

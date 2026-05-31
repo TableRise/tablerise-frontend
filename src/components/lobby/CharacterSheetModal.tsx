@@ -8,6 +8,7 @@ import {
     getCharactersByCampaignLobby,
     type CampaignCharacter,
 } from '@/server/characters/get-characters';
+import LoadingDots from '@/components/common/LoadingDots';
 import { removeCharacterFromCampaign } from '@/server/characters/create-character';
 import CharacterDetailModal from '@/components/lobby/CharacterDetailModal';
 import '@/components/lobby/styles/CharacterSheetModal.css';
@@ -123,7 +124,7 @@ export default function CharacterSheetModal({
                     <div className="csm-list">
                         {loading && (
                             <span className="font-XS-regular csm-loading">
-                                Carregando fichas...
+                                <LoadingDots label="Carregando fichas" />
                             </span>
                         )}
 

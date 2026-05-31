@@ -10,6 +10,7 @@ import {
     getDnd5eEquipment,
     type DndEquipmentRecord,
 } from '@/server/dungeons&dragons5e/equipment';
+import LoadingDots from '@/components/common/LoadingDots';
 import {
     updateCharacter,
     addCharacterEquipment,
@@ -194,7 +195,7 @@ export default function ShopModal({
 
         if (currentAmount < amount) {
             setBuyWarning(
-                'O personagem selecionado não possuÃ­ dinheiro para este item.'
+                'O personagem selecionado não possuí­ dinheiro para este item.'
             );
             return;
         }
@@ -238,7 +239,7 @@ export default function ShopModal({
             } catch (error: any) {
                 setBuyWarning(
                     error?.message ??
-                        'A compra foi concluÃ­da, mas não foi possível salvar no Histórico.'
+                        'A compra foi concluí­da, mas não foi possível salvar no Histórico.'
                 );
             }
         } catch (error: any) {
@@ -448,7 +449,7 @@ export default function ShopModal({
                                     colSpan={9}
                                     className="text-center py-8 text-color-greyScale/500"
                                 >
-                                    Carregando equipamentos...
+                                    <LoadingDots label="Carregando equipamentos" />
                                 </td>
                             </tr>
                         ) : filteredEquipment.length === 0 ? (
@@ -710,7 +711,9 @@ export default function ShopModal({
                     (selectedCharId || (canSeeHistory && userChars.length === 0)) && (
                         <>
                             {selectedCharId && charLoading ? (
-                                <p className="sm-loading">Carregando personagem...</p>
+                                <p className="sm-loading">
+                                    <LoadingDots label="Carregando personagem" />
+                                </p>
                             ) : (
                                 <>
                                     {/* Tabs */}

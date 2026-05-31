@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import LoadingDots from '@/components/common/LoadingDots';
 import {
     createJournalPost,
     updateCampaignJournalPost,
@@ -275,13 +276,17 @@ export default function CreatePostModal({
                         onClick={handleSubmit}
                         disabled={submitting}
                     >
-                        {submitting
-                            ? isEditMode
-                                ? 'Salvando...'
-                                : 'Publicando...'
-                            : isEditMode
-                            ? 'Salvar alterações'
-                            : 'Publicar'}
+                        {submitting ? (
+                            isEditMode ? (
+                                <LoadingDots label="Salvando publicação" />
+                            ) : (
+                                <LoadingDots label="Publicando" />
+                            )
+                        ) : isEditMode ? (
+                            'Salvar alterações'
+                        ) : (
+                            'Publicar'
+                        )}
                     </button>
                     <button className="cpm-cancel-btn font-XS-regular" onClick={onClose}>
                         Cancelar

@@ -105,6 +105,8 @@ export default function LoginFormCredentials(): JSX.Element {
                         buttonStyle="button-L-fill"
                         props="font-S-bold text-color-greyScale/50"
                         disabled={isSubmitting}
+                        loading={isSubmitting}
+                        loadingLabel="Entrando"
                     />
                     {errors.root && (
                         <span className="font-XXS-regular text-color-support/alert">

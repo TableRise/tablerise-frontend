@@ -1,6 +1,7 @@
 'use client';
 import { type ChangeEvent, useRef, useState } from 'react';
 import ImageCropModal from '@/components/common/ImageCropModal';
+import LoadingDots from '@/components/common/LoadingDots';
 import type { ImageObject } from '@/types/shared/general';
 import '@/components/match/styles/MatchImageHighlightModal.css';
 
@@ -113,7 +114,11 @@ export default function MatchImageHighlightManagerModal({
                             onClick={() => inputRef.current?.click()}
                             disabled={isBusy}
                         >
-                            {isUploading ? 'Enviando imagem...' : 'Enviar nova imagem'}
+                            {isUploading ? (
+                                <LoadingDots label="Enviando imagem" />
+                            ) : (
+                                'Enviar nova imagem'
+                            )}
                         </button>
                     </div>
 

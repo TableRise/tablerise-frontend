@@ -10,4 +10,8 @@
     .login-form-header h1 {
         @apply mb-1;
     }
+
+    html[data-theme='dark'] .login-form-header .login-form-header-register a {
+        color: #8ab5fc;
+    }
 }

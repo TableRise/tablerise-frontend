@@ -6,7 +6,7 @@ import { type LevelingSpecs } from '@/utils/characterLeveling';
 
 export const CHARACTER_SHEET_TABS = [
     'Principal',
-    'CaracterÃ­sticas',
+    'Caracterí­sticas',
     'Magias',
     'Habilidades',
 ] as const;

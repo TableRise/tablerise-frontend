@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .loading-dots {
+        @apply inline-flex items-center justify-center align-middle;
+        gap: 0.28em;
+        line-height: 1;
+    }
+
+    .loading-dots .loading-dots__dot {
+        width: 0.38em;
+        height: 0.38em;
+        border-radius: 9999px;
+        background-color: currentColor;
+        opacity: 0.35;
+        animation: loading-dots-bounce 1s infinite ease-in-out;
+    }
+
+    .loading-dots .loading-dots__dot:nth-child(2) {
+        animation-delay: 0.12s;
+    }
+
+    .loading-dots .loading-dots__dot:nth-child(3) {
+        animation-delay: 0.24s;
+    }
+
+    .loading-dots .loading-dots__dot:nth-child(4) {
+        animation-delay: 0.36s;
+    }
+
+    @keyframes loading-dots-bounce {
+        0%,
+        80%,
+        100% {
+            transform: translateY(0);
+            opacity: 0.35;
+        }
+
+        40% {
+            transform: translateY(-0.22em);
+            opacity: 1;
+        }
+    }
+}

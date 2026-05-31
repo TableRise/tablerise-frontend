@@ -57,7 +57,7 @@ export default function CharacterSheetPanels({
                     onSpellDataChange={onSpellDataChange}
                 />
             </div>
-            <div className={activeTab === 'CaracterÃ­sticas' ? '' : 'hidden'}>
+            <div className={activeTab === 'Caracterí­sticas' ? '' : 'hidden'}>
                 <SheetCaracteristicas
                     ref={characteristicsRef}
                     campaignId={campaignId}

@@ -18,8 +18,8 @@ export default function SocialLoginButton({
                 href={oauthHref}
                 className="social-button social-button-link button-M-outline-il"
             >
-                {socialType === 'discord' && <DiscordLogo style={{ color: '#464646' }} />}
-                {socialType === 'google' && <GoogleLogo style={{ color: '#464646' }} />}
+                {socialType === 'discord' && <DiscordLogo className="social-icon" />}
+                {socialType === 'google' && <GoogleLogo className="social-icon" />}
                 <span className="button-text font-XS-bold">{title}</span>
             </Link>
         </div>

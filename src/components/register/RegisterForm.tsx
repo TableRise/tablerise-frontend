@@ -107,6 +107,8 @@ export default function RegisterForm(): JSX.Element {
                 buttonStyle="button-L-fill"
                 props="font-S-bold text-color-greyScale/50"
                 disabled={isSubmitting}
+                loading={isSubmitting}
+                loadingLabel="Cadastrando"
             />
         </form>
     );
