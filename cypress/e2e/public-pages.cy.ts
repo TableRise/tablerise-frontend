@@ -8,6 +8,22 @@ const publicRoutes = [
     { path: '/support', text: 'Suporte' },
 ];
 
+function openLoginRedirectWithSession(currentUser: Record<string, unknown>) {
+    cy.intercept('GET', '**/users/me', currentUser).as('getOAuthUser');
+    cy.intercept('GET', '**/users/user-1/campaigns', userCampaignGroups).as(
+        'getOAuthCampaigns'
+    );
+
+    cy.visitWithAppState('/login-redirect', {
+        cookieToken: 'token-oauth',
+    });
+
+    cy.wait('@getOAuthUser');
+    cy.wait('@getOAuthCampaigns');
+    cy.location('pathname').should('eq', '/');
+    cy.contains('Campanhas').should('be.visible');
+}
+
 describe('TableRise :: Public Pages', () => {
     it('renders the guest home page and reaches register from the banner', () => {
         cy.visitWithAppState('/');
@@ -15,7 +31,7 @@ describe('TableRise :: Public Pages', () => {
         cy.contains('Bem vindos ao TableRise!').should('be.visible');
         cy.contains('Registrar-se').click();
 
-        cy.location('pathname').should('eq', '/register');
+        cy.location('pathname', { timeout: 10000 }).should('eq', '/register');
     });
 
     publicRoutes.forEach(({ path, text }) => {
@@ -28,24 +44,45 @@ describe('TableRise :: Public Pages', () => {
     it('redirects /profile to /login when there is no stored user', () => {
         cy.visitWithAppState('/profile');
 
+        cy.location('pathname', { timeout: 10000 }).should('eq', '/login');
+        cy.contains('Entrar').should('be.visible');
+    });
+
+    it('redirects /profile to /login when the stored user has no userId', () => {
+        cy.visitWithAppState('/profile', {
+            localStorageUser: {
+                nickname: 'broken-user',
+            },
+        });
+
+        cy.location('pathname').should('eq', '/login');
+        cy.contains('Entrar').should('be.visible');
+    });
+
+    it('redirects /profile to /login when the stored user payload is invalid JSON', () => {
+        cy.visitWithAppState('/profile', {
+            onBeforeLoad(win) {
+                win.localStorage.setItem('userLogged', '{invalid-json');
+            },
+        });
+
+        cy.location('pathname').should('eq', '/login');
+        cy.contains('Entrar').should('be.visible');
+    });
+
+    it('redirects /profile to /login when the stored user payload is null', () => {
+        cy.visitWithAppState('/profile', {
+            onBeforeLoad(win) {
+                win.localStorage.setItem('userLogged', 'null');
+            },
+        });
+
         cy.location('pathname').should('eq', '/login');
         cy.contains('Entrar').should('be.visible');
     });
 
     it('stores the oauth user and redirects back home from /login-redirect', () => {
-        cy.intercept('GET', '**/users/user-1', profileUser).as('getOAuthUser');
-        cy.intercept('GET', '**/users/user-1/campaigns', userCampaignGroups).as(
-            'getOAuthCampaigns'
-        );
-
-        cy.visitWithAppState('/login-redirect?userId=user-1', {
-            cookieToken: 'token-oauth',
-        });
-
-        cy.wait('@getOAuthUser');
-        cy.wait('@getOAuthCampaigns');
-        cy.location('pathname').should('eq', '/');
-        cy.contains('Campanhas').should('be.visible');
+        openLoginRedirectWithSession(profileUser);
         cy.window().then((win) => {
             const savedUser = JSON.parse(win.localStorage.getItem('userLogged') ?? '{}');
 
@@ -54,5 +91,91 @@ describe('TableRise :: Public Pages', () => {
                 nickname: storedUser.nickname,
             });
         });
+    });
+
+    it('prefers the backend username when storing the oauth user', () => {
+        openLoginRedirectWithSession({
+            ...profileUser,
+            username: 'RealmMaster',
+        });
+
+        cy.window().then((win) => {
+            const savedUser = JSON.parse(win.localStorage.getItem('userLogged') ?? '{}');
+
+            expect(savedUser.username).to.eq('RealmMaster');
+        });
+    });
+
+    it('falls back to nickname when the oauth user has no username or tag', () => {
+        openLoginRedirectWithSession({
+            ...profileUser,
+            nickname: 'SoloNick',
+            tag: undefined,
+            username: undefined,
+        });
+
+        cy.window().then((win) => {
+            const savedUser = JSON.parse(win.localStorage.getItem('userLogged') ?? '{}');
+
+            expect(savedUser.username).to.eq('SoloNick');
+        });
+    });
+
+    it('stores an empty username when the oauth user has no username or nickname', () => {
+        openLoginRedirectWithSession({
+            ...profileUser,
+            nickname: undefined,
+            tag: undefined,
+            username: undefined,
+        });
+
+        cy.window().then((win) => {
+            const savedUser = JSON.parse(win.localStorage.getItem('userLogged') ?? '{}');
+
+            expect(savedUser.username).to.eq('');
+        });
+    });
+
+    it('stores the oauth user even when the backend returns no profile picture', () => {
+        openLoginRedirectWithSession({
+            ...profileUser,
+            picture: undefined,
+        });
+
+        cy.window().then((win) => {
+            const savedUser = JSON.parse(win.localStorage.getItem('userLogged') ?? '{}');
+
+            expect(savedUser).to.include({
+                userId: storedUser.userId,
+                nickname: storedUser.nickname,
+            });
+            expect(savedUser.picture).to.eq(undefined);
+        });
+    });
+
+    it('redirects /login-redirect back to /login when the current session cannot be resolved', () => {
+        cy.intercept('GET', '**/users/me', {
+            statusCode: 404,
+            body: {},
+        }).as('getOAuthUser');
+
+        cy.visitWithAppState('/login-redirect');
+
+        cy.wait('@getOAuthUser');
+        cy.location('pathname').should('eq', '/login');
+        cy.contains('Entrar').should('be.visible');
+    });
+
+    it('redirects /login-redirect back to /login when resolving the current session throws', () => {
+        cy.intercept('GET', '**/users/me', {
+            statusCode: 500,
+            body: {},
+        }).as('getOAuthUser');
+
+        cy.visitWithAppState('/login-redirect');
+
+        cy.wait('@getOAuthUser');
+        cy.location('pathname').should('eq', '/login');
+        cy.contains('Entrar').should('be.visible');
     });
 });

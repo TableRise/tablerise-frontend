@@ -92,7 +92,7 @@ const SKILL_LABELS: Record<string, string> = {
     persuasion: 'Persuasão',
 };
 
-// maps skill key â†’ ability key (str/dex/con/int/wis/cha)
+// Maps skill key to ability key (str/dex/con/int/wis/cha).
 const SKILL_TO_ABILITY: Record<string, string> = {
     acrobatics: 'dex',
     arcana: 'int',
@@ -125,8 +125,8 @@ const CURRENCY_LABELS: Record<'cp' | 'sp' | 'ep' | 'gp' | 'pp', string> = {
 const MAGIC_CLASS_PT: Record<string, string> = {
     strength: 'Força',
     dexterity: 'Destreza',
-    constitution: 'ConstituiíƒÂ§íƒÂ£o',
-    intelligence: 'InteligíƒÂªncia',
+    constitution: 'Constituição',
+    intelligence: 'Inteligência',
     wisdom: 'Sabedoria',
     charisma: 'Carisma',
 };
@@ -471,7 +471,7 @@ export default function CharacterDetailModal({
         const success = await deleteCharacter(characterId);
 
         if (!success) {
-            setDeleteError('Nao foi possivel deletar o personagem agora.');
+            setDeleteError('Não foi possível deletar o personagem agora.');
             setDeleteSubmitting(false);
             return;
         }
@@ -495,7 +495,7 @@ export default function CharacterDetailModal({
             return;
         }
 
-        throw new Error('Nao foi possivel atualizar a imagem do personagem.');
+        throw new Error('Não foi possível atualizar a imagem do personagem.');
     };
 
     const handleXpIncrease = async (addedXp: number, hpGain: number) => {
@@ -892,7 +892,7 @@ export default function CharacterDetailModal({
 
                     {!loading && char && profile && stats && (
                         <>
-                            {/* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+                            {/* Header */}
                             <div className="cdm-header">
                                 <div className="cdm-picture-wrapper">
                                     <Image
@@ -1019,7 +1019,7 @@ export default function CharacterDetailModal({
                                     </div>
                                 </div>
                             </div>
-                            {/* â”€â”€ Tabs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+                            {/* Tabs */}
                             {xpSystem && activeNotification && (
                                 <div className="cdm-levelup-banner">
                                     <div className="cdm-levelup-copy">
@@ -1125,10 +1125,10 @@ export default function CharacterDetailModal({
                                     </button>
                                 )}
                             </div>
-                            {/* â”€â”€ Principal tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+                            {/* Principal tab */}
                             {activeTab === 'principal' && (
                                 <>
-                                    {/* â”€â”€ Atributos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+                                    {/* Atributos */}
                                     <div className="cdm-section">
                                         <div className="cdm-section-header">
                                             <h3 className="font-M-semibold cdm-section-title">
@@ -1208,7 +1208,7 @@ export default function CharacterDetailModal({
                                         </div>
                                     </div>
 
-                                    {/* â”€â”€ Perícias â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+                                    {/* Perícias */}
                                     <div className="cdm-section">
                                         <h3 className="font-M-semibold cdm-section-title">
                                             Perícias
@@ -1290,7 +1290,7 @@ export default function CharacterDetailModal({
                                         </div>
                                     </div>
 
-                                    {/* â”€â”€ Combate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+                                    {/* Combate */}
                                     <div className="cdm-section">
                                         <h3 className="font-M-semibold cdm-section-title">
                                             Combate
@@ -1487,7 +1487,7 @@ export default function CharacterDetailModal({
                                         </div>
                                     </div>
 
-                                    {/* â”€â”€ Proficiências & Habilidades â”€â”€â”€ */}
+                                    {/* Proficiências & Habilidades */}
                                     {(isEditing ||
                                         hasOtherSectionContent(
                                             profile.characteristics?.other
@@ -1596,7 +1596,7 @@ export default function CharacterDetailModal({
                                         </div>
                                     )}
 
-                                    {/* â”€â”€ Personalidade â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+                                    {/* Personalidade */}
                                     {(isMaster || hasPersonalityInfo) && (
                                         <div className="cdm-section">
                                             <h3 className="font-M-semibold cdm-section-title">
@@ -1666,7 +1666,7 @@ export default function CharacterDetailModal({
                                         </div>
                                     )}
 
-                                    {/* â”€â”€ Aparência â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+                                    {/* Aparência */}
                                     {(isEditing || appearance) && (
                                         <div className="cdm-section">
                                             <h3 className="font-M-semibold cdm-section-title">
@@ -1774,7 +1774,7 @@ export default function CharacterDetailModal({
                                         </div>
                                     )}
 
-                                    {/* â”€â”€ Ataques â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+                                    {/* Ataques */}
                                     {char.data.attacks?.length > 0 && (
                                         <div className="cdm-section">
                                             <h3 className="font-M-semibold cdm-section-title">
@@ -1812,7 +1812,7 @@ export default function CharacterDetailModal({
                                         </div>
                                     )}
 
-                                    {/* â”€â”€ Histórico â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+                                    {/* Histórico */}
                                     {(isEditing ||
                                         profile.characteristics?.backstory ||
                                         profile.characteristics?.alliesAndOrgs ||
@@ -1886,7 +1886,7 @@ export default function CharacterDetailModal({
                                 </>
                             )}{' '}
                             {/* end principal tab */}
-                            {/* â”€â”€ Equipamentos tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+                            {/* Equipamentos tab */}
                             {!hideInventoryTab && activeTab === 'equipamentos' && (
                                 <div className="cdm-tab-content">
                                     <div className="cdm-section">
@@ -2033,7 +2033,7 @@ export default function CharacterDetailModal({
                                     </div>
                                 </div>
                             )}
-                            {/* â”€â”€ Magias tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+                            {/* Magias tab */}
                             {activeTab === 'magias' && !isEditing && (
                                 <div className="cdm-tab-content">
                                     <div className="cs-spell-header">
@@ -2252,7 +2252,7 @@ export default function CharacterDetailModal({
                                         </div>
                                     );
                                 })()}
-                            {/* â”€â”€ Habilidades tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+                            {/* Habilidades tab */}
                             {activeTab === 'habilidades' && !isEditing && (
                                 <div className="cdm-tab-content">
                                     <div className="cs-spell-header">
@@ -2450,7 +2450,7 @@ export default function CharacterDetailModal({
                                     <span className="font-XS-bold">
                                         {sellAmount} {unit}
                                     </span>{' '}
-                                    (âˆ’10%)
+                                    (-10%)
                                 </p>
                                 <div className="cdm-sell-confirm-actions">
                                     <button
@@ -2495,7 +2495,7 @@ export default function CharacterDetailModal({
                             Deletar personagem
                         </h1>
                         <p className="profile-action-modal-description font-XS-regular">
-                            Tem certeza que deseja deletar este personagem? Esta acao nao
+                            Tem certeza que deseja deletar este personagem? Esta ação não
                             pode ser desfeita.
                         </p>
 

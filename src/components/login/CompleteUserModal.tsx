@@ -108,7 +108,7 @@ export default function CompleteUserModal({
                 return;
             }
 
-            window.location.replace(`/login-redirect?userId=${userId}`);
+            window.location.replace('/login-redirect');
         } catch (err: Error | any) {
             setError(err.message);
             setLoading(false);

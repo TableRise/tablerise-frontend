@@ -13,7 +13,7 @@ export default function SupportPage(): JSX.Element {
         <section className="support-page-card">
             <div className="support-page-copy">
                 <p className="font-S-regular text-color-greyScale/700">
-                    Envie sua solicitacao e retornaremos o mais rapido possivel.
+                    Envie sua solicitação e retornaremos o mais rápido possível.
                 </p>
             </div>
 

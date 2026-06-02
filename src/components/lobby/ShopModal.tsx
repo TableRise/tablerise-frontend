@@ -19,7 +19,7 @@ import { createCampaignBuy } from '@/server/campaigns/create-campaign-buy';
 import type { DatabaseCampaignBuyRecord } from '@/types/shared/entities';
 import '@/components/lobby/styles/ShopModal.css';
 
-// â”€â”€ Currency helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Currency helpers
 
 type MoneyKey = 'cp' | 'sp' | 'ep' | 'gp' | 'pp';
 
@@ -76,9 +76,9 @@ function calcConversion(
     return { gross, tax, net };
 }
 
-// â”€â”€ Purchase history â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Purchase history
 
-// â”€â”€ Props â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Props
 
 interface ShopModalProps {
     campaignId: string;
@@ -92,7 +92,7 @@ interface ShopModalProps {
     onClose: () => void;
 }
 
-// â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Component
 
 export default function ShopModal({
     campaignId,
@@ -110,7 +110,7 @@ export default function ShopModal({
         [lobbyCharacters, userId]
     );
 
-    // â”€â”€ Character selection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // Character selection
     const [selectedCharId, setSelectedCharId] = useState<string | null>(null);
     const [selectedChar, setSelectedChar] = useState<FullCharacterDnd | null>(null);
     const [charLoading, setCharLoading] = useState(false);
@@ -141,7 +141,7 @@ export default function ShopModal({
         [selectedChar]
     );
 
-    // â”€â”€ Equipment data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // Equipment data
     const [equipment, setEquipment] = useState<DndEquipmentRecord[]>([]);
     const [equipLoading, setEquipLoading] = useState(true);
 
@@ -151,7 +151,7 @@ export default function ShopModal({
             .finally(() => setEquipLoading(false));
     }, []);
 
-    // â”€â”€ Shop tab state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // Shop tab state
     const [activeTab, setActiveTab] = useState<'shop' | 'vault' | 'history'>('shop');
     const [searchQuery, setSearchQuery] = useState('');
     const [typeFilter, setTypeFilter] = useState('all');
@@ -259,7 +259,7 @@ export default function ShopModal({
         userNickname,
     ]);
 
-    // â”€â”€ Vault tab state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // Vault tab state
     const [fromCurrency, setFromCurrency] = useState<MoneyKey>('gp');
     const [toCurrency, setToCurrency] = useState<MoneyKey>('sp');
     const [convertAmount, setConvertAmount] = useState('');
@@ -329,7 +329,7 @@ export default function ShopModal({
         loadChar,
     ]);
 
-    // â”€â”€ Render helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // Render helpers
 
     const renderMoneyBar = () => (
         <div className="sm-money-bar">
@@ -647,7 +647,7 @@ export default function ShopModal({
         </div>
     );
 
-    // â”€â”€ Main render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // Main render
 
     return (
         <div className="sm-overlay">

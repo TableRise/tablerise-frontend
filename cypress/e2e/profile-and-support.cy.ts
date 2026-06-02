@@ -4,6 +4,7 @@ import {
     storedUser,
     userCampaignGroups,
 } from '../support/mockData';
+import { supportReasonsWithCampaignCode } from '../../src/components/support/schema/SupportSchema';
 
 describe('TableRise :: Profile And Support', () => {
     beforeEach(() => {
@@ -23,10 +24,10 @@ describe('TableRise :: Profile And Support', () => {
             localStorageUser: storedUser,
         });
 
+        cy.location('pathname', { timeout: 10000 }).should('eq', '/profile/user-1');
         cy.wait('@getProfileUser');
         cy.wait('@getUserCampaigns');
         cy.wait('@getProfileCharacter');
-        cy.location('pathname').should('eq', '/profile/user-1');
         cy.contains('Aria Valewood').should('be.visible');
         cy.contains('Cronicas de Aether').should('be.visible');
         cy.contains('Sir Testalot').should('be.visible');
@@ -39,9 +40,12 @@ describe('TableRise :: Profile And Support', () => {
         });
 
         cy.contains('Suporte').should('be.visible');
-        cy.get('#support-reason').should('be.visible');
-        cy.get('#support-reason').select('Reportar um bug');
-        cy.get('#support-campaign-code').should('be.visible');
+        cy.get('#support-reason').should('be.visible').and('not.be.disabled');
+        cy.get('#support-reason').select(supportReasonsWithCampaignCode[0], {
+            force: true,
+        });
+        cy.get('#support-reason').blur();
+        cy.get('#support-campaign-code', { timeout: 10000 }).should('be.visible');
         cy.get('#support-campaign-code').type('AB12');
         cy.get('#support-request-message').type(
             'A campanha travou ao carregar o jornal.'

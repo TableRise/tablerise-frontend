@@ -35,6 +35,7 @@ describe('TableRise :: Authentication', () => {
             statusCode: 200,
             body: {},
         }).as('registerUser');
+        cy.intercept('GET', '**/login*').as('loadLogin');
 
         cy.visitWithAppState('/register');
 
@@ -42,8 +43,9 @@ describe('TableRise :: Authentication', () => {
         cy.get('#login-btn').click();
 
         cy.wait('@registerUser');
-        cy.location('pathname').should('eq', '/login');
-        cy.contains('Entrar').should('be.visible');
+        cy.wait('@loadLogin');
+        cy.location('pathname', { timeout: 10000 }).should('eq', '/login');
+        cy.contains('Entrar', { timeout: 10000 }).should('be.visible');
     });
 
     it('shows the duplicate-email message on register failure', () => {

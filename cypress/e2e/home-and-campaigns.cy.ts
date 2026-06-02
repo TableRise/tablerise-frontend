@@ -1,6 +1,7 @@
 import { searchableCampaign, storedUser, userCampaignGroups } from '../support/mockData';
 
 const searchCampaignsRoute = /\/campaigns\/?\?.*(title=Guilda|code=AURO).*/;
+const donationPromptPreferenceKey = 'tablerise:dismiss-donation-prompt';
 
 describe('TableRise :: Logged Home And Campaigns', () => {
     beforeEach(() => {
@@ -85,5 +86,36 @@ describe('TableRise :: Logged Home And Campaigns', () => {
 
         cy.wait('@joinCampaign');
         cy.get('.cpm-modal').should('not.exist');
+    });
+
+    it('closes the join donation modal without opening the join flow', () => {
+        cy.visitWithAppState('/', {
+            cookieToken: 'token-home',
+            localStorageUser: storedUser,
+        });
+
+        cy.wait('@getUserCampaigns');
+        cy.contains('button', 'Entrar em uma nova campanha').click();
+        cy.contains('Antes de entrar na campanha').should('be.visible');
+        cy.contains('.donation-support-modal-buttons button', 'Cancelar').click();
+
+        cy.contains('Antes de entrar na campanha').should('not.exist');
+        cy.get('.jcm-card').should('not.exist');
+    });
+
+    it('opens the join flow directly when the donation prompt has been dismissed', () => {
+        cy.visitWithAppState('/', {
+            cookieToken: 'token-home',
+            localStorageUser: storedUser,
+            onBeforeLoad(win) {
+                win.localStorage.setItem(donationPromptPreferenceKey, 'true');
+            },
+        });
+
+        cy.wait('@getUserCampaigns');
+        cy.contains('button', 'Entrar em uma nova campanha').click();
+
+        cy.contains('Antes de entrar na campanha').should('not.exist');
+        cy.get('.jcm-modal').should('be.visible');
     });
 });

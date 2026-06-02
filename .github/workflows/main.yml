@@ -41,7 +41,7 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           build: npm run build
-          start: npm start
+          start: npm run coverage:cy
 
       - uses: mshick/add-pr-comment@v2
         with:
