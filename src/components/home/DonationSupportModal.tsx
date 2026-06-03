@@ -1,7 +1,10 @@
 'use client';
 
+import CopyBlueSVG from '@assets/icons/sys/copy-blue.svg?url';
+import CopyDarkSVG from '@assets/icons/sys/copy-dark.svg?url';
+import TableriseContext from '@/context/TableriseContext';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
     setSkipDonationPromptPreference,
     shouldSkipDonationPrompt,
@@ -15,14 +18,26 @@ type DonationSupportModalProps = {
 };
 
 const DONATION_TEXT =
-    'Tablerise é um projeto gratuíto e sem fins lucrativos, se desejar pode contribuir com qualquer valor para mantermos o site funcionando.';
+    'Tablerise é um projeto gratuíto sem fins lucrativos, pensado para conectar jogadores e ser a base de incríveis campanhas, se desejar pode contribuir para mantermos o site funcionando, cada 1R$ já ajuda :)';
+const PIX_CODE =
+    '00020126580014br.gov.bcb.pix013690a52958-005f-46a7-abc0-af86563423d75204000053039865802BR5918GOMESOLIVEIRAADSON6009Sao Paulo610901227-20062230519daqr5130573944010316304EB8D';
 
 export default function DonationSupportModal({
     mode,
     onConfirm,
     onClose,
 }: DonationSupportModalProps): JSX.Element {
+    const { themeMode } = useContext(TableriseContext);
     const [skipNextTime, setSkipNextTime] = useState(shouldSkipDonationPrompt());
+    const [copied, setCopied] = useState(false);
+
+    useEffect(() => {
+        if (!copied) return;
+
+        const timeoutId = window.setTimeout(() => setCopied(false), 1800);
+
+        return () => window.clearTimeout(timeoutId);
+    }, [copied]);
 
     const handleClose = () => {
         if (skipNextTime) {
@@ -38,6 +53,15 @@ export default function DonationSupportModal({
         }
 
         onConfirm();
+    };
+
+    const handleCopyPixCode = async () => {
+        try {
+            await navigator.clipboard.writeText(PIX_CODE);
+            setCopied(true);
+        } catch {
+            setCopied(false);
+        }
     };
 
     return (
@@ -63,6 +87,35 @@ export default function DonationSupportModal({
                         height={220}
                         className="donation-support-modal-qr"
                     />
+                </div>
+
+                <div className="donation-support-modal-pix-block">
+                    <div className="donation-support-modal-pix-header">
+                        <span className="font-XS-bold">Código PIX</span>
+                        <button
+                            type="button"
+                            className="donation-support-modal-copy-btn"
+                            onClick={handleCopyPixCode}
+                            aria-label="Copiar código PIX"
+                        >
+                            <Image
+                                src={
+                                    themeMode === 'dark'
+                                        ? CopyDarkSVG.src
+                                        : CopyBlueSVG.src
+                                }
+                                alt="Copiar código PIX"
+                                width={18}
+                                height={18}
+                            />
+                        </button>
+                    </div>
+                    <p className="donation-support-modal-pix-code font-XXS-regular">
+                        {PIX_CODE}
+                    </p>
+                    <span className="donation-support-modal-copy-feedback font-XXS-regular">
+                        {copied ? 'Código PIX copiado.' : 'Toque no ícone para copiar.'}
+                    </span>
                 </div>
 
                 <label className="donation-support-modal-checkbox-row">

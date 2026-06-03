@@ -1,6 +1,7 @@
 import { searchableCampaign, storedUser, userCampaignGroups } from '../support/mockData';
 
 const searchCampaignsRoute = /\/campaigns\/?\?.*(title=Guilda|code=AURO).*/;
+const donationPromptPreferenceKey = 'tablerise:dismiss-donation-prompt';
 
 describe('TableRise :: Logged Home And Campaigns', () => {
     beforeEach(() => {
@@ -24,9 +25,11 @@ describe('TableRise :: Logged Home And Campaigns', () => {
 
         cy.wait('@getUserCampaigns');
         cy.contains('button', 'Criar uma campanha').click();
+        cy.contains('Antes de criar sua campanha').should('be.visible');
+        cy.contains('.donation-support-modal-buttons button', 'Continuar').click();
 
         cy.get('.ccm-input').first().type('Rastros da Aurora');
-        cy.get('.ccm-textarea').type('Uma campanha de exploração com segredos antigos.');
+        cy.get('.ccm-textarea').type('Uma campanha de exploracao com segredos antigos.');
         cy.get('.ccm-input--password').type('QW12');
         cy.get('.ccm-footer button').last().click();
 
@@ -36,7 +39,7 @@ describe('TableRise :: Logged Home And Campaigns', () => {
         cy.get('.ccm-footer button').last().click();
 
         cy.get('.ccm-richtext-area').type(
-            'Os jogadores serão convocados por uma antiga ordem arcana.'
+            'Os jogadores serao convocados por uma antiga ordem arcana.'
         );
         cy.contains('button', 'Criar campanha').click();
 
@@ -64,6 +67,8 @@ describe('TableRise :: Logged Home And Campaigns', () => {
 
         cy.wait('@getUserCampaigns');
         cy.contains('button', 'Entrar em uma nova campanha').click();
+        cy.contains('Antes de entrar na campanha').should('be.visible');
+        cy.contains('.donation-support-modal-buttons button', 'Continuar').click();
 
         cy.get('.jcm-input-title').type('Guilda');
         cy.contains('button', 'Pesquisar').click();
@@ -81,5 +86,36 @@ describe('TableRise :: Logged Home And Campaigns', () => {
 
         cy.wait('@joinCampaign');
         cy.get('.cpm-modal').should('not.exist');
+    });
+
+    it('closes the join donation modal without opening the join flow', () => {
+        cy.visitWithAppState('/', {
+            cookieToken: 'token-home',
+            localStorageUser: storedUser,
+        });
+
+        cy.wait('@getUserCampaigns');
+        cy.contains('button', 'Entrar em uma nova campanha').click();
+        cy.contains('Antes de entrar na campanha').should('be.visible');
+        cy.contains('.donation-support-modal-buttons button', 'Cancelar').click();
+
+        cy.contains('Antes de entrar na campanha').should('not.exist');
+        cy.get('.jcm-card').should('not.exist');
+    });
+
+    it('opens the join flow directly when the donation prompt has been dismissed', () => {
+        cy.visitWithAppState('/', {
+            cookieToken: 'token-home',
+            localStorageUser: storedUser,
+            onBeforeLoad(win) {
+                win.localStorage.setItem(donationPromptPreferenceKey, 'true');
+            },
+        });
+
+        cy.wait('@getUserCampaigns');
+        cy.contains('button', 'Entrar em uma nova campanha').click();
+
+        cy.contains('Antes de entrar na campanha').should('not.exist');
+        cy.get('.jcm-modal').should('be.visible');
     });
 });

@@ -1,0 +1,22 @@
+{
+    "all": true,
+    "cache": false,
+    "check-coverage": false,
+    "exclude": [
+        "cypress/**",
+        "src/app/api/coverage/**",
+        "src/components/character-sheet/**",
+        "src/components/match/**",
+        "src/components/profile/**",
+        "src/components/common/ImageCropModal.tsx",
+        "src/components/common/SoundtrackUI.tsx",
+        "src/components/common/XpIncreaseModal.tsx",
+        "src/components/lobby/CharacterDetailModal.tsx",
+        "**/*.d.ts"
+    ],
+    "extension": [".js", ".jsx", ".ts", ".tsx"],
+    "include": ["src/**/*.ts", "src/**/*.tsx"],
+    "report-dir": "coverage",
+    "reporter": ["text-summary", "html", "lcov"],
+    "temp-dir": ".nyc_output"
+}

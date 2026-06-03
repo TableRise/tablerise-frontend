@@ -9,10 +9,10 @@ export const questions = [
     },
     {
         question: 'Quais modos de jogo existem?',
-        answer: 'Em um primeiro momento é possível jogar apenas D&D, sem precisar adquirir um livro, porém já está planejado desenvolvermos um modo mais geral, que se encaixa com qualquer sistema de RPG.',
+        answer: 'Em um primeiro momento é possível jogar apenas D&D, porém temos plano para implementar um modo mais abrangente que não seja limitado a um sistema específico.',
     },
     {
         question: 'O conteúdo do D&D é original da Wizard?',
-        answer: 'Por sermos um projeto sem fins lucrativos utilizamos o conteúdo disponibilizado pela Wizard para utilização gratuita (CC), porém o conteúdo do SRD da Wizard não é suficiente para uma campanha real, por isso em alguns pontos nos do TableRise tomamos a liberdade de adicionarmos alguns conteúdos autorais. A proporção é de 70% Wizard para 30% TableRise.',
+        answer: 'Por sermos um projeto sem fins lucrativos utilizamos o conteúdo disponibilizado pela Wizard para utilização gratuita (CC), temos apenas alguns poucos conteúdos homebrew para complementar o sistema.',
     },
 ];

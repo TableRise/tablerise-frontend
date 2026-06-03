@@ -4,6 +4,10 @@
 
 @layer base {
     /* ── Shared container ────────────────────────────────────── */
+    .about-page {
+        @apply flex w-full flex-col items-stretch;
+    }
+
     .about-container {
         @apply mx-auto;
         width: min(calc(100% - 2rem), 70.5rem);
@@ -11,15 +15,19 @@
 
     /* ── Hey! ─────────────────────────────────────────────────── */
     .about-hey-section {
-        @apply py-16;
+        @apply w-full py-16;
+    }
+
+    .about-hey-section .about-container {
+        @apply flex flex-col items-start text-left;
     }
 
     .about-hey-title {
-        @apply mb-4 text-color-primary/950;
+        @apply mb-4 self-start text-left text-color-primary/950;
     }
 
     .about-hey-text {
-        @apply text-color-greyScale/900 leading-relaxed max-w-3xl;
+        @apply max-w-3xl self-start text-left leading-relaxed text-color-greyScale/900;
     }
 
     /* ── Timeline ─────────────────────────────────────────────── */
@@ -91,6 +99,14 @@
         @apply text-color-primary/default_900 mb-8;
     }
 
+    .about-team-intro {
+        @apply mb-8 max-w-3xl leading-relaxed text-color-greyScale/900;
+    }
+
+    .about-team-intro-link {
+        @apply underline underline-offset-4;
+    }
+
     .about-team-grid {
         @apply grid grid-cols-3 gap-6;
     }
@@ -104,7 +120,11 @@
     }
 
     .about-team-avatar {
-        @apply w-14 h-14 rounded-full bg-color-greyScale/300 flex-shrink-0;
+        @apply relative w-14 h-14 rounded-full overflow-hidden bg-color-greyScale/300 flex-shrink-0;
+    }
+
+    .about-team-avatar-image {
+        object-fit: cover;
     }
 
     .about-team-card-info {
@@ -134,6 +154,14 @@
     .about-team-link-btn {
         @apply flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-color-greyScale/300
                text-color-greyScale/700 transition-colors;
+    }
+
+    .about-team-link-icon--dark {
+        display: none;
+    }
+
+    .about-team-link-icon--light {
+        display: block;
     }
 
     .about-team-link-btn:hover {
@@ -185,20 +213,33 @@
         }
     }
 
-    html[data-theme='dark'] .about-hey-text,
-    html[data-theme='dark'] .about-team-description,
-    html[data-theme='dark'] .about-team-link-btn {
-        color: var(--theme-text-muted);
-    }
-
     html[data-theme='dark'] .about-team-card,
     html[data-theme='dark'] .about-timeline-card {
         background-color: var(--theme-surface);
         box-shadow: var(--theme-shadow);
     }
 
+    html[data-theme='dark'] .about-hey-title,
+    html[data-theme='dark'] .about-hey-text,
+    html[data-theme='dark'] .about-team-heading,
+    html[data-theme='dark'] .about-team-intro,
+    html[data-theme='dark'] .about-team-name,
+    html[data-theme='dark'] .about-team-description,
+    html[data-theme='dark'] .about-team-link-btn,
+    html[data-theme='dark'] .about-timeline-card-text {
+        color: var(--theme-text);
+    }
+
     html[data-theme='dark'] .about-team-link-btn {
         border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .about-team-link-icon--dark {
+        display: block;
+    }
+
+    html[data-theme='dark'] .about-team-link-icon--light {
+        display: none;
     }
 
     html[data-theme='dark'] .about-team-link-btn:hover {

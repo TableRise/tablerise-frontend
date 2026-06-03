@@ -1,4 +1,8 @@
+import path from 'node:path';
+
 /** @type {import('next').NextConfig} */
+const coverageEnabled = process.env.CYPRESS_COVERAGE === 'true';
+
 const nextConfig = {
     images: {
         remotePatterns: [
@@ -44,6 +48,42 @@ const nextConfig = {
 
         // Modify the file loader rule to ignore *.svg, since we have it handled now.
         fileLoaderRule.exclude = /\.svg$/i;
+
+        if (coverageEnabled) {
+            config.module.rules.push({
+                test: /\.[jt]sx?$/,
+                include: [path.join(process.cwd(), 'src')],
+                exclude: [
+                    /node_modules/,
+                    /\.d\.ts$/,
+                    /cypress/,
+                    /src[\\/]+app[\\/]+api[\\/]+coverage[\\/]/,
+                ],
+                enforce: 'post',
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        babelrc: false,
+                        configFile: false,
+                        compact: false,
+                        plugins: [
+                            [
+                                'babel-plugin-istanbul',
+                                {
+                                    extension: ['.js', '.jsx', '.ts', '.tsx'],
+                                    exclude: [
+                                        '**/*.d.ts',
+                                        '**/*.cy.*',
+                                        'cypress/**/*',
+                                        'src/app/api/coverage/**',
+                                    ],
+                                },
+                            ],
+                        ],
+                    },
+                },
+            });
+        }
 
         return config;
     },

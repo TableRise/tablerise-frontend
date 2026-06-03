@@ -116,7 +116,7 @@ export default function LobbyOverviewSection({
                     onClick={onTogglePresence}
                 >
                     {presenceConfirmed
-                        ? 'âœ“ Presença Confirmada'
+                        ? '\u2713 Presença Confirmada'
                         : 'Clique aqui para confirmar a presença na próxima sessão'}
                 </button>
                 <button

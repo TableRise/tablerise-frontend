@@ -16,10 +16,6 @@ export default function FAQ() {
                     />
                 ))}
             </ul>
-            <div className="faq-extra">
-                <p>Ainda com dúvidas?</p>
-                <MoreDetailsBtn />
-            </div>
         </section>
     );
 }

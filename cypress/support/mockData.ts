@@ -75,7 +75,7 @@ export const masterCampaign = {
         ],
     },
     musics: [],
-    buys: [],
+    buys: [] as unknown[],
     configurations: {
         xpSystem: true,
         shopSystem: true,
@@ -119,7 +119,7 @@ export const playerCampaign = {
         logs: [],
     },
     musics: [],
-    buys: [],
+    buys: [] as unknown[],
     configurations: {
         xpSystem: true,
         shopSystem: false,
@@ -161,7 +161,7 @@ export const searchableCampaign = {
         logs: [],
     },
     musics: [],
-    buys: [],
+    buys: [] as unknown[],
     configurations: {
         xpSystem: true,
         shopSystem: true,

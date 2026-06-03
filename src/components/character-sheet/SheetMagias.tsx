@@ -200,7 +200,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
 
     return (
         <>
-            {/* â”€â”€ Spellcasting header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+            {/* Spellcasting header */}
             <div className="cs-spell-header">
                 <div className="cs-spell-header-box">
                     <input
@@ -240,7 +240,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                 </div>
             </div>
 
-            {/* â”€â”€ Spell levels grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+            {/* Spell levels grid */}
             <div className="cs-spell-grid">
                 {SPELL_LEVELS.map((sl) => (
                     <div key={sl.level} className="cs-spell-level-box">
@@ -338,7 +338,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                 ))}
             </div>
 
-            {/* â”€â”€ Spell picker modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+            {/* Spell picker modal */}
             {pickerLevel !== null && (
                 <div className="cs-spell-picker-overlay" onClick={closePicker}>
                     <div
@@ -487,7 +487,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                 </div>
             )}
 
-            {/* â”€â”€ Spell detail modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+            {/* Spell detail modal */}
             {(detailSpell !== null || detailLoading) && (
                 <div className="cs-spell-picker-overlay" onClick={closeDetail}>
                     <div

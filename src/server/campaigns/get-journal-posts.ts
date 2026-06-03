@@ -141,8 +141,8 @@ export const deleteCampaignJournalPost = async (
     try {
         await apiCall({
             baseUrl: campaignsBaseUrl,
-            endpoint: `${campaignId}/journal/delete`,
-            method: 'PATCH',
+            endpoint: `${campaignId}/delete/journal`,
+            method: 'DELETE',
             params: { userId, postId: post.postId },
         });
         return true;

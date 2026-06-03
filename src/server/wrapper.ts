@@ -44,7 +44,6 @@ export const apiCall = async (data: WrapperPayload) => {
             headers: {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*',
-                [process.env.TYPE_KEY as string]: process.env.API_ACCESS_KEY,
             },
             data: requestData,
             params,
