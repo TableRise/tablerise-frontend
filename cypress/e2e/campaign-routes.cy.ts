@@ -391,8 +391,8 @@ function setupLobbyState() {
             typeof userToMasterQuery === 'string'
                 ? userToMasterQuery
                 : Array.isArray(userToMasterQuery)
-                  ? String(userToMasterQuery[0] ?? '')
-                  : '';
+                ? String(userToMasterQuery[0] ?? '')
+                : '';
 
         currentCampaign.campaignPlayers = currentCampaign.campaignPlayers.map(
             (player: any) => {
