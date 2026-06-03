@@ -386,10 +386,13 @@ function setupLobbyState() {
         req.reply({ statusCode: 200, body: true });
     }).as('removePlayer');
     cy.intercept('PATCH', '**/campaigns/camp-1/update/player/dungeon-master*', (req) => {
+        const userToMasterQuery = req.query.userToMaster;
         const userToMaster =
-            typeof req.query.userToMaster === 'string'
-                ? req.query.userToMaster
-                : req.query.userToMaster?.[0] ?? '';
+            typeof userToMasterQuery === 'string'
+                ? userToMasterQuery
+                : Array.isArray(userToMasterQuery)
+                  ? String(userToMasterQuery[0] ?? '')
+                  : '';
 
         currentCampaign.campaignPlayers = currentCampaign.campaignPlayers.map(
             (player: any) => {
