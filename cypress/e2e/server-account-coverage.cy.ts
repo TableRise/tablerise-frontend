@@ -411,9 +411,9 @@ describe('TableRise :: Server Account Coverage', () => {
         cy.then(async () => {
             expect(
                 await updateUser('user-1', {
-                    nickname: 'aria',
                     firstName: 'Aria',
                     lastName: 'Moon',
+                    birthday: '1998-10-20',
                     biography: 'Bard of the north',
                 })
             ).to.eq(undefined);
@@ -425,7 +425,7 @@ describe('TableRise :: Server Account Coverage', () => {
             body: {},
         }).as('updateUser400');
         cy.then(() =>
-            expectRejectedIncludes(updateUser('user-1', { nickname: '' }), [
+            expectRejectedIncludes(updateUser('user-1', { firstName: '' }), [
                 'Dados',
                 'campos',
             ])
@@ -437,7 +437,7 @@ describe('TableRise :: Server Account Coverage', () => {
             body: {},
         }).as('updateUser404');
         cy.then(() =>
-            expectRejectedIncludes(updateUser('user-1', { nickname: 'aria' }), [
+            expectRejectedIncludes(updateUser('user-1', { firstName: 'Aria' }), [
                 'Usu',
                 'encontrado',
             ])
@@ -449,7 +449,7 @@ describe('TableRise :: Server Account Coverage', () => {
             body: {},
         }).as('updateUser500');
         cy.then(() =>
-            expectRejectedIncludes(updateUser('user-1', { nickname: 'aria' }), [
+            expectRejectedIncludes(updateUser('user-1', { firstName: 'Aria' }), [
                 'Erro no servidor',
             ])
         );
@@ -460,7 +460,7 @@ describe('TableRise :: Server Account Coverage', () => {
             body: {},
         }).as('updateUser418');
         cy.then(() =>
-            expectRejectedIncludes(updateUser('user-1', { nickname: 'aria' }), [
+            expectRejectedIncludes(updateUser('user-1', { firstName: 'Aria' }), [
                 'Algo',
                 'novamente',
             ])
