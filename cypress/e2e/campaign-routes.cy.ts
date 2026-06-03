@@ -368,8 +368,8 @@ function setupLobbyState() {
             typeof userToRemoveQuery === 'string'
                 ? userToRemoveQuery
                 : Array.isArray(userToRemoveQuery)
-                  ? String(userToRemoveQuery[0] ?? '')
-                  : '';
+                ? String(userToRemoveQuery[0] ?? '')
+                : '';
 
         if (userToRemove) {
             currentParticipantPlayers = currentParticipantPlayers.filter(
