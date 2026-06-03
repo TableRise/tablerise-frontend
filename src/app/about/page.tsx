@@ -1,12 +1,128 @@
+import Image from 'next/image';
 import { projectDescription, timeline, team } from '@/app/about/data';
+import LinkedinSVG from '@assets/icons/social-midia/linkedin.svg?url';
+import LinkedinLightSVG from '@assets/icons/social-midia/linkedin-light.svg?url';
+import GithubSVG from '@assets/icons/social-midia/github.svg?url';
+import GithubLightSVG from '@assets/icons/social-midia/github-light.svg?url';
+import GoogleSVG from '@assets/icons/social-midia/google.svg?url';
+import GoogleLightSVG from '@assets/icons/social-midia/google-light.svg?url';
+import DiscordSVG from '@assets/icons/social-midia/discord.svg?url';
+import DiscordLightSVG from '@assets/icons/social-midia/discord-light.svg?url';
+import FacebookSVG from '@assets/icons/social-midia/facebook.svg?url';
+import FacebookLightSVG from '@assets/icons/social-midia/facebook-light.svg?url';
+import InstagramSVG from '@assets/icons/social-midia/instagram.svg?url';
+import InstagramLightSVG from '@assets/icons/social-midia/instagram-light.svg?url';
+import TwitchSVG from '@assets/icons/social-midia/twitch.svg?url';
+import TwitchLightSVG from '@assets/icons/social-midia/twitch-light.svg?url';
+import XSVG from '@assets/icons/social-midia/x.svg?url';
+import XLightSVG from '@assets/icons/social-midia/x-light.svg?url';
+import WebSVG from '@assets/icons/social-midia/web.svg?url';
+import WebLightSVG from '@assets/icons/social-midia/web-light.svg?url';
 import '@/app/about/styles/page.css';
+
+const SOCIAL_LINKS = [
+    {
+        id: 'linkedin',
+        label: 'LinkedIn',
+        iconDark: LinkedinSVG,
+        iconLight: LinkedinLightSVG,
+    },
+    {
+        id: 'github',
+        label: 'GitHub',
+        iconDark: GithubSVG,
+        iconLight: GithubLightSVG,
+    },
+    {
+        id: 'google',
+        label: 'Google',
+        iconDark: GoogleSVG,
+        iconLight: GoogleLightSVG,
+    },
+    {
+        id: 'discord',
+        label: 'Discord',
+        iconDark: DiscordSVG,
+        iconLight: DiscordLightSVG,
+    },
+    {
+        id: 'facebook',
+        label: 'Facebook',
+        iconDark: FacebookSVG,
+        iconLight: FacebookLightSVG,
+    },
+    {
+        id: 'instagram',
+        label: 'Instagram',
+        iconDark: InstagramSVG,
+        iconLight: InstagramLightSVG,
+    },
+    {
+        id: 'twitch',
+        label: 'Twitch',
+        iconDark: TwitchSVG,
+        iconLight: TwitchLightSVG,
+    },
+    {
+        id: 'x',
+        label: 'X',
+        iconDark: XSVG,
+        iconLight: XLightSVG,
+    },
+];
+
+type ResolvedSocialLink = {
+    href: string;
+    label: string;
+    iconDark: string;
+    iconLight: string;
+};
+
+function resolveSocialLink(rawLink: string): ResolvedSocialLink | null {
+    const href = rawLink.trim();
+
+    if (href === '') return null;
+
+    const normalizedLink = href.toLowerCase();
+
+    if (normalizedLink.startsWith('mailto:')) {
+        return {
+            href,
+            label: 'Google',
+            iconDark: GoogleSVG,
+            iconLight: GoogleLightSVG,
+        };
+    }
+
+    if (!normalizedLink.startsWith('http://') && !normalizedLink.startsWith('https://')) {
+        return null;
+    }
+
+    const matchedSocial = SOCIAL_LINKS.find(({ id }) => normalizedLink.includes(id));
+
+    if (!matchedSocial) {
+        return {
+            href,
+            label: 'Website',
+            iconDark: WebSVG,
+            iconLight: WebLightSVG,
+        };
+    }
+
+    return {
+        href,
+        label: matchedSocial.label,
+        iconDark: matchedSocial.iconDark,
+        iconLight: matchedSocial.iconLight,
+    };
+}
 
 export default function About(): JSX.Element {
     return (
         <main className="about-page">
             <section className="about-hey-section">
                 <div className="about-container">
-                    <h2 className="font-XL-bold about-hey-title">Hey!</h2>
+                    <h2 className="font-XL-bold about-hey-title">Sobre nós</h2>
                     <p className="font-M-regular about-hey-text">{projectDescription}</p>
                 </div>
             </section>
@@ -70,13 +186,42 @@ export default function About(): JSX.Element {
 
             <section className="about-team-section">
                 <div className="about-container">
-                    <h2 className="font-XL-bold about-team-heading">Nossa equipe</h2>
+                    <h2 className="font-XL-bold about-team-heading">
+                        Quem construiu o Tablerise?
+                    </h2>
+                    <p className="font-S-regular about-team-intro">
+                        Tivemos muitos colaboradores na nossa jornada, pode conferir
+                        melhor no nosso{' '}
+                        <a
+                            href="https://github.com/TableRise"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="about-team-intro-link"
+                        >
+                            github
+                        </a>
+                        , abaixo você encontra os que mais ajudaram a construir nosso
+                        Tablerise.
+                    </p>
 
                     <div className="about-team-grid">
-                        {team.map((member) => (
-                            <div key={member.name} className="about-team-card">
+                        {team.map((member, index) => (
+                            <div
+                                key={`${member.name}-${member.avatar}-${index}`}
+                                className="about-team-card"
+                            >
                                 <div className="about-team-card-header">
-                                    <div className="about-team-avatar" />
+                                    <div className="about-team-avatar">
+                                        {member.avatar ? (
+                                            <Image
+                                                src={member.avatar}
+                                                alt={member.name}
+                                                fill
+                                                sizes="56px"
+                                                className="about-team-avatar-image"
+                                            />
+                                        ) : null}
+                                    </div>
                                     <div className="about-team-card-info">
                                         <span className="font-M-semibold about-team-name">
                                             {member.name}
@@ -94,29 +239,53 @@ export default function About(): JSX.Element {
                                     </div>
                                 </div>
 
-                                <p className="font-S-regular about-team-description">
+                                <p className="font-XS-regular about-team-description">
                                     {member.description}
                                 </p>
 
                                 <div className="about-team-links">
-                                    {member.links.map((link) => (
-                                        <button
-                                            key={`${member.name}-${link}`}
-                                            className="font-XS-bold about-team-link-btn"
-                                        >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 24 24"
-                                                fill="currentColor"
-                                                width="16"
-                                                height="16"
-                                                aria-hidden="true"
+                                    {member.links
+                                        .map((link) => ({
+                                            rawLink: link,
+                                            socialLink: resolveSocialLink(link),
+                                        }))
+                                        .filter(
+                                            (
+                                                entry
+                                            ): entry is {
+                                                rawLink: string;
+                                                socialLink: ResolvedSocialLink;
+                                            } => entry.socialLink !== null
+                                        )
+                                        .map(({ rawLink, socialLink }) => (
+                                            <a
+                                                key={`${member.name}-${rawLink}`}
+                                                href={socialLink.href}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                title={socialLink.label}
+                                                aria-label={socialLink.label}
+                                                className="font-XS-bold about-team-link-btn"
                                             >
-                                                <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
-                                            </svg>
-                                            {link}
-                                        </button>
-                                    ))}
+                                                <Image
+                                                    src={socialLink.iconDark}
+                                                    alt=""
+                                                    width={16}
+                                                    height={16}
+                                                    aria-hidden="true"
+                                                    className="about-team-link-icon about-team-link-icon--dark"
+                                                />
+                                                <Image
+                                                    src={socialLink.iconLight}
+                                                    alt=""
+                                                    width={16}
+                                                    height={16}
+                                                    aria-hidden="true"
+                                                    className="about-team-link-icon about-team-link-icon--light"
+                                                />
+                                                {socialLink.label}
+                                            </a>
+                                        ))}
                                 </div>
                             </div>
                         ))}

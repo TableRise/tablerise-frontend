@@ -16,7 +16,7 @@
 }
 
 .logo {
-    @apply w-[18px] h-[17.7px] mt-[3px] ml-[3px];
+    @apply w-8 h-8;
 }
 
 .footer-links {
