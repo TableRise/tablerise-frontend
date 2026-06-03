@@ -363,10 +363,13 @@ function setupLobbyState() {
         req.reply({ statusCode: 200, body: true });
     }).as('confirmPlayer');
     cy.intercept('POST', '**/campaigns/camp-1/update/player/remove*', (req) => {
+        const userToRemoveQuery = req.query.userToRemove;
         const userToRemove =
-            typeof req.query.userToRemove === 'string'
-                ? req.query.userToRemove
-                : req.query.userToRemove?.[0] ?? '';
+            typeof userToRemoveQuery === 'string'
+                ? userToRemoveQuery
+                : Array.isArray(userToRemoveQuery)
+                  ? String(userToRemoveQuery[0] ?? '')
+                  : '';
 
         if (userToRemove) {
             currentParticipantPlayers = currentParticipantPlayers.filter(
