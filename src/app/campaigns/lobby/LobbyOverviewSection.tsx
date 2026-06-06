@@ -28,6 +28,88 @@ type LobbyOverviewSectionProps = {
     onCloseCampaignHistory: () => void;
 };
 
+function normalizeRichTextContent(content: string): string[] {
+    return content
+        .replace(/\\r\\n/g, '\n')
+        .replace(/\\n/g, '\n')
+        .replace(/\r\n/g, '\n')
+        .split('\n');
+}
+
+function renderInline(text: string, keyOffset: number): React.ReactNode[] {
+    const parts: React.ReactNode[] = [];
+    const regex = /(\*\*[^*]+\*\*|\*[^*]+\*|~~[^~]+~~)/g;
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+    let currentKey = keyOffset;
+
+    while ((match = regex.exec(text)) !== null) {
+        if (match.index > lastIndex) {
+            parts.push(text.slice(lastIndex, match.index));
+        }
+
+        const token = match[0];
+
+        if (token.startsWith('**')) {
+            parts.push(<strong key={currentKey++}>{token.slice(2, -2)}</strong>);
+        } else if (token.startsWith('~~')) {
+            parts.push(<del key={currentKey++}>{token.slice(2, -2)}</del>);
+        } else if (token.startsWith('*')) {
+            parts.push(<em key={currentKey++}>{token.slice(1, -1)}</em>);
+        }
+
+        lastIndex = match.index + token.length;
+    }
+
+    if (lastIndex < text.length) {
+        parts.push(text.slice(lastIndex));
+    }
+
+    return parts;
+}
+
+function renderRichTextLine(line: string, index: number): React.ReactNode {
+    if (!line.trim()) {
+        return (
+            <div key={index} className="lobby-session-modal-break" aria-hidden="true" />
+        );
+    }
+
+    const h1 = line.match(/^#\s(.+)/);
+    const h2 = line.match(/^##\s(.+)/);
+    const h3 = line.match(/^###\s(.+)/);
+
+    if (h3) {
+        return (
+            <h3 key={index} className="font-S-bold lobby-session-modal-text">
+                {renderInline(h3[1], index * 100)}
+            </h3>
+        );
+    }
+
+    if (h2) {
+        return (
+            <h2 key={index} className="font-M-semibold lobby-session-modal-text">
+                {renderInline(h2[1], index * 100)}
+            </h2>
+        );
+    }
+
+    if (h1) {
+        return (
+            <h1 key={index} className="font-L-bold lobby-session-modal-text">
+                {renderInline(h1[1], index * 100)}
+            </h1>
+        );
+    }
+
+    return (
+        <p key={index} className="font-S-regular lobby-session-modal-text">
+            {renderInline(line, index * 100)}
+        </p>
+    );
+}
+
 export default function LobbyOverviewSection({
     campaign,
     themeMode,
@@ -44,6 +126,8 @@ export default function LobbyOverviewSection({
     onOpenCampaignHistory,
     onCloseCampaignHistory,
 }: LobbyOverviewSectionProps): JSX.Element {
+    const campaignHistoryLines = normalizeRichTextContent(campaign.mainHistory ?? '');
+
     return (
         <>
             <div className="lobby-cover">
@@ -173,10 +257,17 @@ export default function LobbyOverviewSection({
                                 &times;
                             </button>
                         </div>
-                        <p className="font-S-regular lobby-session-modal-text">
-                            {campaign.mainHistory ||
-                                'Sem hist\u00f3ria dispon\u00edvel para esta campanha.'}
-                        </p>
+                        {campaign.mainHistory ? (
+                            <div className="lobby-session-modal-copy">
+                                {campaignHistoryLines.map((line, index) =>
+                                    renderRichTextLine(line, index)
+                                )}
+                            </div>
+                        ) : (
+                            <p className="font-S-regular lobby-session-modal-text">
+                                {'Sem hist\u00f3ria dispon\u00edvel para esta campanha.'}
+                            </p>
+                        )}
                     </div>
                 </div>
             ) : null}

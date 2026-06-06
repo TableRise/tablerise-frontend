@@ -340,7 +340,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
 
             {/* Spell picker modal */}
             {pickerLevel !== null && (
-                <div className="cs-spell-picker-overlay" onClick={closePicker}>
+                <div className="cs-spell-picker-overlay">
                     <div
                         className="cs-spell-picker-modal"
                         onClick={(e) => e.stopPropagation()}
@@ -489,7 +489,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
 
             {/* Spell detail modal */}
             {(detailSpell !== null || detailLoading) && (
-                <div className="cs-spell-picker-overlay" onClick={closeDetail}>
+                <div className="cs-spell-picker-overlay">
                     <div
                         className="cs-spell-picker-modal"
                         onClick={(e) => e.stopPropagation()}

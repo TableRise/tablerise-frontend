@@ -47,7 +47,7 @@ export default function GenerateScoresModal({
         !selectionEnabled || availableScoreIndexes[index] !== false;
 
     return (
-        <div className="gsm-backdrop" onClick={onClose}>
+        <div className="gsm-backdrop">
             <div className="gsm-modal" onClick={(e) => e.stopPropagation()}>
                 <h2 className="gsm-header font-M-semibold text-color-primary/default_900">
                     Gerar Valores e Modificadores

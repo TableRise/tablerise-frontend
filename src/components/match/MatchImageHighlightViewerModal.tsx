@@ -12,7 +12,7 @@ export default function MatchImageHighlightViewerModal({
     onClose,
 }: MatchImageHighlightViewerModalProps): JSX.Element {
     return (
-        <div className="mhiv-overlay" onClick={onClose}>
+        <div className="mhiv-overlay">
             <div className="mhiv-modal" onClick={(event) => event.stopPropagation()}>
                 <button
                     type="button"

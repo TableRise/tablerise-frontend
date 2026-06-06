@@ -551,12 +551,22 @@
         font-style: italic;
     }
 
-    .ccm-richtext-tool--underline {
-        text-decoration: underline;
+    .ccm-richtext-tool--strike {
+        text-decoration: line-through;
     }
 
     .ccm-richtext-divider {
         @apply w-px h-5 bg-color-greyScale/300 mx-1;
+    }
+
+    .ccm-richtext-select {
+        @apply px-2 py-1 rounded border border-color-greyScale/300
+            bg-color-greyScale/50 text-color-greyScale/700 cursor-pointer
+            outline-none transition-colors;
+    }
+
+    .ccm-richtext-select:hover {
+        @apply border-color-greyScale/500;
     }
 
     .ccm-richtext-area {
@@ -699,6 +709,7 @@
     html[data-theme='dark'] .ccm-playlist-add-btn,
     html[data-theme='dark'] .ccm-richtext-toolbar,
     html[data-theme='dark'] .ccm-agenda-add,
+    html[data-theme='dark'] .ccm-richtext-select,
     html[data-theme='dark'] .ccm-richtext-area,
     html[data-theme='dark'] .ccm-textarea {
         background-color: var(--theme-surface-muted);
@@ -734,8 +745,13 @@
         color: var(--theme-text-subtle);
     }
 
+    html[data-theme='dark'] .ccm-richtext-select {
+        color: var(--theme-text);
+    }
+
     html[data-theme='dark'] .ccm-textarea:focus,
     html[data-theme='dark'] .ccm-richtext-area:focus,
+    html[data-theme='dark'] .ccm-richtext-select:focus,
     html[data-theme='dark'] .ccm-agenda-input:focus,
     html[data-theme='dark'] .ccm-agenda-time:focus {
         border-color: var(--theme-accent);

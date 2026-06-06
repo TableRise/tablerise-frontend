@@ -169,10 +169,7 @@ export default function CharacterSheetPage(): JSX.Element {
             </div>
 
             {showSpellModal ? (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
-                    onClick={() => setShowSpellModal(false)}
-                >
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
                     <div
                         className="bg-color-greyScale/900 text-color-greyScale/50 rounded-xl p-8 max-w-lg mx-4 shadow-2xl"
                         onClick={(event) => event.stopPropagation()}

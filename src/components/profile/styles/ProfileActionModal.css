@@ -4,11 +4,17 @@
 
 @layer base {
     .profile-action-modal-overlay {
-        @apply fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4;
+        @apply fixed inset-0 z-[300] flex items-center justify-center bg-black/60 px-4;
     }
 
     .profile-action-modal-card {
         @apply flex w-full max-w-[30rem] flex-col items-center gap-4 rounded-2xl bg-white p-8 shadow-xl;
+    }
+
+    .profile-action-modal-card--cover {
+        @apply max-w-[42rem] items-stretch;
+        max-height: min(90vh, 48rem);
+        overflow-y: auto;
     }
 
     .profile-action-modal-title {
@@ -89,8 +95,47 @@
         @apply bg-color-support/alert text-color-greyScale/50;
     }
 
+    .profile-action-modal-button-subtle {
+        background-color: transparent;
+        color: var(--theme-text);
+    }
+
+    .profile-action-modal-button-subtle:hover:enabled {
+        background-color: rgba(7, 23, 63, 0.22);
+    }
+
+    .profile-action-modal-button-subtle--danger {
+        @apply text-color-support/alert;
+    }
+
+    .profile-action-modal-button-option:hover:enabled {
+        background-color: rgb(7 40 95);
+    }
+
     .profile-action-modal-button-danger:hover:enabled {
         filter: brightness(0.95);
+    }
+
+    .profile-action-modal-cover-preview {
+        @apply relative min-h-[14rem] overflow-hidden rounded-2xl border border-color-greyScale/300 bg-color-greyScale/100;
+    }
+
+    .profile-action-modal-cover-preview-image {
+        @apply h-full w-full;
+        min-height: 14rem;
+        object-fit: cover;
+    }
+
+    .profile-action-modal-cover-preview-overlay {
+        @apply absolute inset-0 bg-black/45;
+    }
+
+    .profile-action-modal-cover-empty {
+        @apply flex min-h-[14rem] items-center justify-center px-6 text-center text-color-greyScale/500;
+    }
+
+    .profile-action-modal-cover-meta {
+        @apply flex flex-col gap-1;
     }
 
     html[data-theme='dark'] .profile-action-modal-card {
@@ -111,5 +156,22 @@
         background-color: var(--theme-surface-muted);
         border-color: var(--theme-border);
         color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .profile-action-modal-cover-preview {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .profile-action-modal-cover-empty {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .profile-action-modal-button-subtle {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .profile-action-modal-button-subtle:hover:enabled {
+        background-color: rgba(255, 255, 255, 0.06);
     }
 }

@@ -25,6 +25,7 @@ import {
     formatBadgeName,
     formatBirthday,
     formatCampaignDate,
+    getBadgeProgress,
     handleCardKeyDown,
     mapCharacter,
     mergeCampaigns,
@@ -730,6 +731,74 @@ describe('TableRise :: Logic Coverage', () => {
         expect(formatAccountStatus('pending')).to.eq('Pendente');
         expect(formatBadgeName('badge_campaigns_10')).to.eq('campanhas 10');
         expect(formatBadgeName('badge_sorcerer_master')).to.eq('Sorcerer Master');
+        expect(
+            getBadgeProgress('student_badge', {
+                campaignsJoinedAmount: 3,
+            })
+        ).to.deep.eq({
+            hasAutomaticRule: true,
+            current: 3,
+            target: 5,
+            percent: 60,
+            statusLabel: 'Em progresso',
+            progressLabel: '3 / 5 campanhas participadas',
+        });
+        expect(
+            getBadgeProgress('cleric_badge', {
+                campaignsCreatedAmount: 4,
+            })
+        ).to.deep.eq({
+            hasAutomaticRule: true,
+            current: 4,
+            target: 2,
+            percent: 100,
+            statusLabel: 'Conquistada',
+            progressLabel: '4 / 2 campanhas criadas',
+        });
+        expect(
+            getBadgeProgress('warrior_arcane_badge', {
+                campaignsClosedAmount: undefined,
+            })
+        ).to.deep.eq({
+            hasAutomaticRule: true,
+            current: 0,
+            target: 10,
+            percent: 0,
+            statusLabel: 'Em progresso',
+            progressLabel: '0 / 10 campanhas encerradas',
+        });
+        expect(
+            getBadgeProgress('imp_with_glasses_and_money', {
+                equipBoughtAmount: 35,
+            })
+        ).to.deep.eq({
+            hasAutomaticRule: true,
+            current: 35,
+            target: 70,
+            percent: 50,
+            statusLabel: 'Em progresso',
+            progressLabel: '35 / 70 equipamentos comprados',
+        });
+        expect(
+            getBadgeProgress('donate_rare', {
+                donateAmount: 80,
+            })
+        ).to.deep.eq({
+            hasAutomaticRule: true,
+            current: 80,
+            target: 50,
+            percent: 100,
+            statusLabel: 'Conquistada',
+            progressLabel: '80 / 50 doado',
+        });
+        expect(getBadgeProgress('staff_badge')).to.deep.eq({
+            hasAutomaticRule: false,
+            current: 0,
+            target: 1,
+            percent: 0,
+            statusLabel: 'Sem progresso automatico no momento',
+            progressLabel: '0 / 1 progresso automatico',
+        });
 
         expect(formatCampaignDate()).to.eq('Em aberto');
         expect(formatCampaignDate('no-date')).to.eq('Em aberto');

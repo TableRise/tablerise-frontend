@@ -3303,7 +3303,7 @@ export default function MatchPage(): JSX.Element {
             )}
 
             {(panelDetailSpell !== null || panelDetailLoading) && (
-                <div className="cs-spell-picker-overlay" onClick={closeSpellDetail}>
+                <div className="cs-spell-picker-overlay">
                     <div
                         className="cs-spell-picker-modal"
                         onClick={(e) => e.stopPropagation()}
@@ -3443,13 +3443,7 @@ export default function MatchPage(): JSX.Element {
             )}
 
             {cloneLifeEditor && (
-                <div
-                    className="match-clone-life-overlay"
-                    onClick={() => {
-                        setCloneLifeEditor(null);
-                        setCloneLifeInput('');
-                    }}
-                >
+                <div className="match-clone-life-overlay">
                     <div
                         className="match-clone-life-modal"
                         onClick={(event) => event.stopPropagation()}
@@ -3571,13 +3565,7 @@ export default function MatchPage(): JSX.Element {
             )}
 
             {journalHighlightModalOpen && (
-                <div
-                    className="match-journal-highlight-overlay"
-                    onClick={() => {
-                        if (journalHighlightSaving) return;
-                        setJournalHighlightModalOpen(false);
-                    }}
-                >
+                <div className="match-journal-highlight-overlay">
                     <div
                         className="match-journal-highlight-modal"
                         onClick={(event) => event.stopPropagation()}
@@ -3675,10 +3663,7 @@ export default function MatchPage(): JSX.Element {
             )}
 
             {journalHighlightNoticeOpen && (
-                <div
-                    className="match-journal-highlight-overlay"
-                    onClick={() => setJournalHighlightNoticeOpen(false)}
-                >
+                <div className="match-journal-highlight-overlay">
                     <div
                         className="match-journal-highlight-notice"
                         onClick={(event) => event.stopPropagation()}

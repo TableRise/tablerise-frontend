@@ -1,10 +1,12 @@
-import { useRef } from 'react';
+import { useContext, useRef } from 'react';
 import Image from 'next/image';
 import UploadSVG from '../../../assets/icons/sys/upload-gray.svg?url';
 import HelpSVG from '../../../assets/icons/sys/help-blue.svg?url';
+import HelpDarkSVG from '../../../assets/icons/sys/help-dark.svg?url';
 import type { CampaignMusic } from '@/server/campaigns/create-campaign';
 import { AGE_RATINGS } from '@/components/home/helpers/CreateCampaignModalHelpers';
 import SoundtrackUI from '@/components/common/SoundtrackUI';
+import TableriseContext from '@/context/TableriseContext';
 
 const SYSTEM_TOOLTIPS = {
     xpSystem: `Sistema de gerenciamento de XP:
@@ -43,6 +45,7 @@ export default function CreateCampaignModalSecondStep({
     shopSystem,
     setShopSystem,
 }: any) {
+    const { themeMode } = useContext(TableriseContext);
     const mapInputRef = useRef<HTMLInputElement>(null);
 
     return (
@@ -153,7 +156,11 @@ export default function CreateCampaignModalSecondStep({
                                 aria-label="Ajuda sobre sistema de gerenciamento de XP"
                             >
                                 <Image
-                                    src={HelpSVG.src}
+                                    src={
+                                        themeMode === 'dark'
+                                            ? HelpDarkSVG.src
+                                            : HelpSVG.src
+                                    }
                                     alt="Ajuda sobre sistema de gerenciamento de XP"
                                     width={18}
                                     height={18}
@@ -184,7 +191,11 @@ export default function CreateCampaignModalSecondStep({
                                 aria-label="Ajuda sobre sistema de loja de itens"
                             >
                                 <Image
-                                    src={HelpSVG.src}
+                                    src={
+                                        themeMode === 'dark'
+                                            ? HelpDarkSVG.src
+                                            : HelpSVG.src
+                                    }
                                     alt="Ajuda sobre sistema de loja de itens"
                                     width={18}
                                     height={18}

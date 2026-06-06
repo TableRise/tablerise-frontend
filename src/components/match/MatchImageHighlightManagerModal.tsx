@@ -70,7 +70,7 @@ export default function MatchImageHighlightManagerModal({
     };
 
     return (
-        <div className="mhim-overlay" onClick={onClose}>
+        <div className="mhim-overlay">
             <div className="mhim-modal" onClick={(event) => event.stopPropagation()}>
                 <div className="mhim-header">
                     <div>

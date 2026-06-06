@@ -180,7 +180,7 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
     }
 
     return (
-        <div className="ccm-backdrop" onClick={onClose}>
+        <div className="ccm-backdrop">
             <div className="ccm-modal" onClick={(e) => e.stopPropagation()}>
                 {/* ── header ──────────────────────────────── */}
                 <div className="ccm-modal-header">

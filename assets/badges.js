@@ -1,109 +1,244 @@
-const badges = {
+const rawBadges = {
+    donate_normal: {
+        colorful: '/images/badges/donate-normal.webp',
+        blackandwhite: '/images/badges/donate-normal-bw.webp',
+        description: 'Concedida ao doar 10 ou mais para apoiar o TableRise.',
+        progress: {
+            counter: 'donateAmount',
+            target: 10,
+            label: 'doado',
+        },
+    },
     cleric_badge: {
         colorful: '/images/badges/cleric.webp',
         blackandwhite: '/images/badges/cleric-bw.webp',
-        description: '',
+        description: 'Concedida ao criar 2 campanhas.',
+        progress: {
+            counter: 'campaignsCreatedAmount',
+            target: 2,
+            label: 'campanhas criadas',
+        },
     },
     dragon_badge: {
         colorful: '/images/badges/dragon.webp',
         blackandwhite: '/images/badges/dragon-bw.webp',
-        description: '',
+        description: 'Concedida ao entrar em 50 campanhas.',
+        progress: {
+            counter: 'campaignsJoinedAmount',
+            target: 50,
+            label: 'campanhas participadas',
+        },
+    },
+    warrior_ancient_badge: {
+        colorful: '/images/badges/warrior-ancient.webp',
+        blackandwhite: '/images/badges/warrior-ancient-bw.webp',
+        description: 'Concedida ao encerrar 50 campanhas.',
+        progress: {
+            counter: 'campaignsClosedAmount',
+            target: 50,
+            label: 'campanhas encerradas',
+        },
     },
     enthusiast_badge: {
         colorful: '/images/badges/enthusiat.webp',
         blackandwhite: '/images/badges/enthusiast-bw.webp',
-        description: '',
+        description: 'Concedida ao entrar em 2 campanhas.',
+        progress: {
+            counter: 'campaignsJoinedAmount',
+            target: 2,
+            label: 'campanhas participadas',
+        },
     },
     high_cleric_badge: {
         colorful: '/images/badges/high-cleric.webp',
         blackandwhite: '/images/badges/high-cleric-bw.webp',
-        description: '',
-    },
-    high_sorcerer_badge: {
-        colorful: '/images/badges/high-sorcerer.webp',
-        blackandwhite: '/images/badges/high-sorcerer-bw.webp',
-        description: '',
-    },
-    imp_badge: {
-        colorful: '/images/badges/imp.webp',
-        blackandwhite: '/images/badges/imp-bw.webp',
-        description: '',
+        description: 'Concedida ao criar 5 campanhas.',
+        progress: {
+            counter: 'campaignsCreatedAmount',
+            target: 5,
+            label: 'campanhas criadas',
+        },
     },
     imp_king_rich_badge: {
         colorful: '/images/badges/imp-king-rich.webp',
         blackandwhite: '/images/badges/imp-king-rich-bw.webp',
-        description: '',
+        description: 'Concedida ao comprar 90 equipamentos.',
+        progress: {
+            counter: 'equipBoughtAmount',
+            target: 90,
+            label: 'equipamentos comprados',
+        },
     },
-    imp_rich_badge: {
-        colorful: '/images/badges/imp-rich.webp',
-        blackandwhite: '/images/badges/imp-rich-bw.webp',
-        description: '',
+    donate_rare: {
+        colorful: '/images/badges/donate-rare.webp',
+        blackandwhite: '/images/badges/donate-rare-bw.webp',
+        description: 'Concedida ao doar 50 ou mais para apoiar o TableRise.',
+        progress: {
+            counter: 'donateAmount',
+            target: 50,
+            label: 'doado',
+        },
     },
-    imp_very_rich_badge: {
-        colorful: '/images/badges/imp-very-rich.webp',
-        blackandwhite: '/images/badges/imp-very-rich-bw.webp',
-        description: '',
+    high_sorcerer_badge: {
+        colorful: '/images/badges/high-sorcerer.webp',
+        blackandwhite: '/images/badges/high-sorcerer-bw.webp',
+        description: 'Concedida ao criar 30 campanhas.',
+        progress: {
+            counter: 'campaignsCreatedAmount',
+            target: 30,
+            label: 'campanhas criadas',
+        },
     },
-    imp_with_glasses_and_money_badge: {
-        colorful: '/images/badges/imp-with-glasses-and-money.webp',
-        blackandwhite: '/images/badges/imp-with-glasses-and-money-bw.webp',
-        description: '',
-    },
-    mage_badge: {
-        colorful: '/images/badges/mage.webp',
-        blackandwhite: '/images/badges/mage-bw.webp',
-        description: '',
-    },
-    necromant_badge: {
-        colorful: '/images/badges/necromant.webp',
-        blackandwhite: '/images/badges/necromant-bw.webp',
-        description: '',
-    },
-    sorcerer_badge: {
-        colorful: '/images/badges/sorcerer.webp',
-        blackandwhite: '/images/badges/sorcerer-bw.webp',
-        description: '',
-    },
-    staff_badge: {
-        colorful: '/images/badges/staff.webp',
-        blackandwhite: '/images/badges/staff-bw.webp',
-        description: '',
-    },
-    student_badge: {
-        colorful: '/images/badges/student.webp',
-        blackandwhite: '/images/badges/student-bw.webp',
-        description: '',
-    },
-    supreme_sorcerer_cleric_badge: {
-        colorful: '/images/badges/supreme-sorcerer-cleric.webp',
-        blackandwhite: '/images/badges/supreme-sorcerer-cleric-bw.webp',
-        description: '',
-    },
-    warrior_arcane_badge: {
-        colorful: '/images/badges/warrior-arcane.webp',
-        blackandwhite: '/images/badges/warrior-arcane-bw.webp',
-        description: '',
-    },
-    warrior_badge: {
-        colorful: '/images/badges/warrior.webp',
-        blackandwhite: '/images/badges/warrior-bw.webp',
-        description: '',
-    },
-    warrior_darkness_badge: {
-        colorful: '/images/badges/warrior-darkness.webp',
-        blackandwhite: '/images/badges/warrior-darkness-bw.webp',
-        description: '',
-    },
-    warrior_two_swords_badge: {
-        colorful: '/images/badges/warrior-two-swords.webp',
-        blackandwhite: '/images/badges/warrior-two-swords-bw.webp',
-        description: '',
+    imp_badge: {
+        colorful: '/images/badges/imp.webp',
+        blackandwhite: '/images/badges/imp-bw.webp',
+        description: 'Concedida ao comprar 10 equipamentos.',
+        progress: {
+            counter: 'equipBoughtAmount',
+            target: 10,
+            label: 'equipamentos comprados',
+        },
     },
     warrior_young_badge: {
         colorful: '/images/badges/warrior-young.webp',
         blackandwhite: '/images/badges/warrior-young-bw.webp',
-        description: '',
+        description: 'Concedida ao encerrar 5 campanhas.',
+        progress: {
+            counter: 'campaignsClosedAmount',
+            target: 5,
+            label: 'campanhas encerradas',
+        },
+    },
+    imp_rich_badge: {
+        colorful: '/images/badges/imp-rich.webp',
+        blackandwhite: '/images/badges/imp-rich-bw.webp',
+        description: 'Concedida ao comprar 30 equipamentos.',
+        progress: {
+            counter: 'equipBoughtAmount',
+            target: 30,
+            label: 'equipamentos comprados',
+        },
+    },
+    donate_super_rare: {
+        colorful: '/images/badges/donate-super-rare.webp',
+        blackandwhite: '/images/badges/donate-super-rare-bw.webp',
+        description: 'Concedida ao doar 100 ou mais para apoiar o TableRise.',
+        progress: {
+            counter: 'donateAmount',
+            target: 100,
+            label: 'doado',
+        },
+    },
+    imp_very_rich_badge: {
+        colorful: '/images/badges/imp-very-rich.webp',
+        blackandwhite: '/images/badges/imp-very-rich-bw.webp',
+        description: 'Concedida ao comprar 50 equipamentos.',
+        progress: {
+            counter: 'equipBoughtAmount',
+            target: 50,
+            label: 'equipamentos comprados',
+        },
+    },
+    warrior_darkness_badge: {
+        colorful: '/images/badges/warrior-darkness.webp',
+        blackandwhite: '/images/badges/warrior-darkness-bw.webp',
+        description: 'Concedida ao encerrar 30 campanhas.',
+        progress: {
+            counter: 'campaignsClosedAmount',
+            target: 30,
+            label: 'campanhas encerradas',
+        },
+    },
+    mage_badge: {
+        colorful: '/images/badges/mage.webp',
+        blackandwhite: '/images/badges/mage-bw.webp',
+        description: 'Concedida ao entrar em 10 campanhas.',
+        progress: {
+            counter: 'campaignsJoinedAmount',
+            target: 10,
+            label: 'campanhas participadas',
+        },
+    },
+    necromant_badge: {
+        colorful: '/images/badges/necromant.webp',
+        blackandwhite: '/images/badges/necromant-bw.webp',
+        description: 'Concedida ao entrar em 30 campanhas.',
+        progress: {
+            counter: 'campaignsJoinedAmount',
+            target: 30,
+            label: 'campanhas participadas',
+        },
+    },
+    warrior_badge: {
+        colorful: '/images/badges/warrior.webp',
+        blackandwhite: '/images/badges/warrior-bw.webp',
+        description: 'Concedida ao encerrar 2 campanhas.',
+        progress: {
+            counter: 'campaignsClosedAmount',
+            target: 2,
+            label: 'campanhas encerradas',
+        },
+    },
+    sorcerer_badge: {
+        colorful: '/images/badges/sorcerer.webp',
+        blackandwhite: '/images/badges/sorcerer-bw.webp',
+        description: 'Concedida ao criar 10 campanhas.',
+        progress: {
+            counter: 'campaignsCreatedAmount',
+            target: 10,
+            label: 'campanhas criadas',
+        },
+    },
+    imp_with_glasses_and_money_badge: {
+        colorful: '/images/badges/imp-with-glasses-and-money.webp',
+        blackandwhite: '/images/badges/imp-with-glasses-and-money-bw.webp',
+        description: 'Concedida ao comprar 70 equipamentos.',
+        progress: {
+            counter: 'equipBoughtAmount',
+            target: 70,
+            label: 'equipamentos comprados',
+        },
+    },
+    staff_badge: {
+        colorful: '/images/badges/staff.webp',
+        blackandwhite: '/images/badges/staff-bw.webp',
+        description: 'Badge sem regra automatica de conquista ativa no backend.',
+    },
+    student_badge: {
+        colorful: '/images/badges/student.webp',
+        blackandwhite: '/images/badges/student-bw.webp',
+        description: 'Concedida ao entrar em 5 campanhas.',
+        progress: {
+            counter: 'campaignsJoinedAmount',
+            target: 5,
+            label: 'campanhas participadas',
+        },
+    },
+    supreme_sorcerer_cleric_badge: {
+        colorful: '/images/badges/supreme-sorcerer-cleric.webp',
+        blackandwhite: '/images/badges/supreme-sorcerer-cleric-bw.webp',
+        description: 'Concedida ao criar 50 campanhas.',
+        progress: {
+            counter: 'campaignsCreatedAmount',
+            target: 50,
+            label: 'campanhas criadas',
+        },
+    },
+    warrior_arcane_badge: {
+        colorful: '/images/badges/warrior-arcane.webp',
+        blackandwhite: '/images/badges/warrior-arcane-bw.webp',
+        description: 'Concedida ao encerrar 10 campanhas.',
+        progress: {
+            counter: 'campaignsClosedAmount',
+            target: 10,
+            label: 'campanhas encerradas',
+        },
     },
 };
 
-export default badges;
+Object.defineProperty(rawBadges, 'imp_with_glasses_and_money', {
+    value: rawBadges.imp_with_glasses_and_money_badge,
+    enumerable: false,
+});
+
+export default rawBadges;

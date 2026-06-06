@@ -1,7 +1,7 @@
 import { profileUser, storedUser, userCampaignGroups } from '../support/mockData';
 
 const publicRoutes = [
-    { path: '/about', text: 'Hey!' },
+    { path: '/about', text: 'Sobre nós' },
     { path: '/tutorial', text: 'Tutorial' },
     { path: '/tutorial/campanha', text: 'Outros tutoriais' },
     { path: '/terms', text: 'Termos de Uso' },

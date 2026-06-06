@@ -92,7 +92,7 @@ export default function JoinCampaignModal({ onClose }: Props): JSX.Element {
     }
 
     return (
-        <div className="jcm-backdrop" onClick={onClose}>
+        <div className="jcm-backdrop">
             <div className="jcm-modal" onClick={(e) => e.stopPropagation()}>
                 <h2 className="jcm-title font-L-semibold text-color-primary/default_900">
                     Entrar em uma campanha

@@ -1,15 +1,18 @@
 'use client';
 
-import { type RefObject } from 'react';
+import { type RefObject, useContext } from 'react';
 import Image from 'next/image';
 import EditIcon from '@assets/icons/sys/edit.svg?url';
+import EditDarkIcon from '@assets/icons/sys/edit-dark.svg?url';
 import RankedAvatarFrame from '@/components/common/RankedAvatarFrame';
 import ProfileBadgePopover from '@/components/profile/ProfileBadgePopover';
 import type { DatabaseUserWithDetails } from '@/types/shared/entities';
+import TableriseContext from '@/context/TableriseContext';
 import {
     badgeMap,
     defaultProfileImage,
     formatBadgeName,
+    getBadgeProgress,
 } from '@/components/profile/profilePageHelpers';
 import { getUserRank } from '@/utils/userRank';
 
@@ -18,6 +21,7 @@ type ProfileHeroSectionProps = {
     profileName: string;
     profileHandle: string;
     biography: string;
+    profileCover: string;
     accountStatus: string;
     accountStatusClass: string;
     isOwnProfile: boolean;
@@ -30,11 +34,7 @@ type ProfileHeroSectionProps = {
     onCloseBadgePopover: () => void;
     onPictureClick: () => void;
     onSelectImage: (file: File) => void;
-    onEditBiography: () => void;
-    onRequestEmailUpdate: () => void;
-    onRequestPasswordUpdate: () => void;
-    onRequestToggleTwoFactor: () => void;
-    onRequestDeleteAccount: () => void;
+    onOpenProfileControls: () => void;
 };
 
 function buildBadgePopoverId(scope: 'hero', badgeKey: string): string {
@@ -46,6 +46,7 @@ export default function ProfileHeroSection({
     profileName,
     profileHandle,
     biography,
+    profileCover,
     accountStatus,
     accountStatusClass,
     isOwnProfile,
@@ -58,17 +59,26 @@ export default function ProfileHeroSection({
     onCloseBadgePopover,
     onPictureClick,
     onSelectImage,
-    onEditBiography,
-    onRequestEmailUpdate,
-    onRequestPasswordUpdate,
-    onRequestToggleTwoFactor,
-    onRequestDeleteAccount,
+    onOpenProfileControls,
 }: ProfileHeroSectionProps): JSX.Element {
-    const hasExternalProvider = user.providerId !== null && user.providerId !== undefined;
+    const { themeMode } = useContext(TableriseContext);
 
     return (
-        <section className="profile-hero">
-            <div className="profile-hero__cover" />
+        <section
+            className={`profile-hero${profileCover ? ' profile-hero--has-cover' : ''}`}
+        >
+            {profileCover ? (
+                <div className="profile-hero__cover" aria-hidden="true">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                        src={profileCover}
+                        alt=""
+                        className="profile-hero__cover-image"
+                    />
+                    <div className="profile-hero__cover-overlay" />
+                    <div className="profile-hero__cover-fade" />
+                </div>
+            ) : null}
             <div className="profile-hero__panel">
                 <div className="profile-hero__media">
                     <div
@@ -92,7 +102,14 @@ export default function ProfileHeroSection({
                                     disabled={pictureUploading}
                                     aria-label="Editar foto do perfil"
                                 >
-                                    <Image src={EditIcon} alt="" width={32} height={32} />
+                                    <Image
+                                        src={
+                                            themeMode === 'dark' ? EditDarkIcon : EditIcon
+                                        }
+                                        alt=""
+                                        width={32}
+                                        height={32}
+                                    />
                                 </button>
                                 <input
                                     ref={pictureInputRef}
@@ -131,79 +148,21 @@ export default function ProfileHeroSection({
                             <div className="profile-hero__actions">
                                 <button
                                     type="button"
-                                    className="font-XS-regular profile-hero__action"
-                                    onClick={onEditBiography}
+                                    className="font-XS-regular profile-hero__action underline"
+                                    onClick={onOpenProfileControls}
                                 >
-                                    Atualizar biografia e nome
-                                </button>
-                                <span
-                                    className="font-XS-regular profile-hero__actions-separator"
-                                    aria-hidden="true"
-                                >
-                                    |
-                                </span>
-                                {!hasExternalProvider ? (
-                                    <>
-                                        <button
-                                            type="button"
-                                            className="font-XS-regular profile-hero__action"
-                                            onClick={onRequestEmailUpdate}
-                                        >
-                                            Atualizar email
-                                        </button>
-                                        <span
-                                            className="font-XS-regular profile-hero__actions-separator"
-                                            aria-hidden="true"
-                                        >
-                                            |
-                                        </span>
-                                        <button
-                                            type="button"
-                                            className="font-XS-regular profile-hero__action"
-                                            onClick={onRequestPasswordUpdate}
-                                        >
-                                            Atualizar senha
-                                        </button>
-                                        <span
-                                            className="font-XS-regular profile-hero__actions-separator"
-                                            aria-hidden="true"
-                                        >
-                                            |
-                                        </span>
-                                    </>
-                                ) : null}
-                                <button
-                                    type="button"
-                                    className="font-XS-regular profile-hero__action"
-                                    onClick={onRequestToggleTwoFactor}
-                                >
-                                    {user.twoFactorSecret?.active
-                                        ? 'Desabilitar dois fatores'
-                                        : 'Habilitar dois fatores'}
-                                </button>
-                                <span
-                                    className="font-XS-regular profile-hero__actions-separator"
-                                    aria-hidden="true"
-                                >
-                                    |
-                                </span>
-                                <button
-                                    type="button"
-                                    className="font-XS-regular profile-hero__action profile-hero__action--danger"
-                                    onClick={onRequestDeleteAccount}
-                                >
-                                    Deletar conta
+                                    Controle de Perfil
                                 </button>
                             </div>
                         ) : null}
                         <p className="font-XS-bold profile-hero__handle">
                             {profileHandle || 'Sem nickname'}
                         </p>
-                        <p className="font-XS-regular">
+                        <p className="font-XS-regular profile-hero__status">
                             <strong>Status da conta:</strong>{' '}
                             <span className={accountStatusClass}>{accountStatus}</span>
                         </p>
-                        <p className="font-S-regular text-color-greyScale/700">
+                        <p className="font-S-regular text-color-greyScale/700 profile-hero__biography">
                             {biography ||
                                 'Este aventureiro ainda não adicionou uma biografia.'}
                         </p>
@@ -221,6 +180,10 @@ export default function ProfileHeroSection({
                                         label={formatBadgeName(badgeKey)}
                                         imageSrc={badgeMap[badgeKey].colorful}
                                         description={badgeMap[badgeKey].description}
+                                        progress={getBadgeProgress(
+                                            badgeKey,
+                                            user.details?.gameInfo
+                                        )}
                                         variant="hero"
                                         isOpen={openBadgePopoverId === popoverId}
                                         onOpen={onOpenBadgePopover}

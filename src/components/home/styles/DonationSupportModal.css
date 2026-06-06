@@ -11,6 +11,10 @@
         @apply flex w-full max-w-[32rem] flex-col items-center gap-4 rounded-2xl bg-white p-8 shadow-xl;
     }
 
+    .donation-support-modal-card--qr {
+        @apply max-w-[24rem];
+    }
+
     .donation-support-modal-title {
         @apply text-center text-color-primary/default_900;
     }
@@ -19,6 +23,14 @@
         @apply text-center text-color-greyScale/950;
         max-width: 26rem;
         line-height: 1.55;
+    }
+
+    .donation-support-modal-show-qr-btn {
+        @apply w-full rounded-xl border border-color-primary/default_900 px-4 py-3 text-color-primary/default_900 transition-colors;
+    }
+
+    .donation-support-modal-show-qr-btn:hover {
+        @apply bg-color-primary/default_900 text-color-greyScale/50;
     }
 
     .donation-support-modal-qr-wrapper {
@@ -66,6 +78,10 @@
         @apply flex w-full flex-col gap-2;
     }
 
+    .donation-support-modal-overlay--secondary {
+        @apply z-[221];
+    }
+
     @media (max-width: 480px) {
         .donation-support-modal-card {
             @apply p-5;
@@ -87,7 +103,8 @@
 
     html[data-theme='dark'] .donation-support-modal-description,
     html[data-theme='dark'] .donation-support-modal-checkbox-row span,
-    html[data-theme='dark'] .donation-support-modal-pix-header span {
+    html[data-theme='dark'] .donation-support-modal-pix-header span,
+    html[data-theme='dark'] .donation-support-modal-show-qr-btn {
         color: var(--theme-text);
     }
 
@@ -101,5 +118,14 @@
     html[data-theme='dark'] .donation-support-modal-checkbox-row {
         background-color: var(--theme-surface-muted);
         border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .donation-support-modal-show-qr-btn {
+        border-color: var(--theme-border);
+        background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .donation-support-modal-show-qr-btn:hover {
+        background-color: var(--theme-surface);
     }
 }

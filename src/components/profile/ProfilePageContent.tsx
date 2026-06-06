@@ -26,6 +26,8 @@ import ProfileBiographyModal from '@/components/profile/ProfileBiographyModal';
 import ProfileDeleteAccountModal from '@/components/profile/ProfileDeleteAccountModal';
 import ProfileDeleteAccountVerificationModal from '@/components/profile/ProfileDeleteAccountVerificationModal';
 import ProfileEmailUpdateModal from '@/components/profile/ProfileEmailUpdateModal';
+import ProfileCoverModal from '@/components/profile/ProfileCoverModal';
+import ProfileControlModal from '@/components/profile/ProfileControlModal';
 import ProfilePasswordUpdateModal from '@/components/profile/ProfilePasswordUpdateModal';
 import {
     badgeEntries,
@@ -34,6 +36,7 @@ import {
     formatAccountStatus,
     formatBadgeName,
     formatCampaignDate,
+    getBadgeProgress,
     handleCardKeyDown,
     mapCharacter,
     mergeCampaigns,
@@ -47,6 +50,7 @@ import {
     type StoredUser,
 } from '@/components/profile/profilePageHelpers';
 import { updateUserPicture } from '@/server/users/update-user-picture';
+import { removeUserCover } from '@/server/users/update-user-cover';
 import type { ImageUploadIntent } from '@/utils/imageCrop';
 
 type ProfilePageContentProps = {
@@ -76,6 +80,8 @@ export default function ProfilePageContent({
         useState(false);
     const [emailModalOpen, setEmailModalOpen] = useState(false);
     const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+    const [coverModalOpen, setCoverModalOpen] = useState(false);
+    const [profileControlModalOpen, setProfileControlModalOpen] = useState(false);
     const [disableTwoFactorModalOpen, setDisableTwoFactorModalOpen] = useState(false);
     const [manualTwoFactorActivationOpen, setManualTwoFactorActivationOpen] =
         useState(false);
@@ -83,6 +89,8 @@ export default function ProfilePageContent({
         useState<PendingProfileFlowWarning | null>(null);
     const [pictureUploading, setPictureUploading] = useState(false);
     const [pictureFeedback, setPictureFeedback] = useState('');
+    const [coverActionLoading, setCoverActionLoading] = useState(false);
+    const [coverFeedback, setCoverFeedback] = useState('');
     const [pendingImageCrop, setPendingImageCrop] = useState<{
         file: File;
         intent: ImageUploadIntent;
@@ -235,6 +243,63 @@ export default function ProfilePageContent({
         pictureInputRef.current?.click();
     };
 
+    const handleOpenProfileControls = () => {
+        setCoverFeedback('');
+        setProfileControlModalOpen(true);
+    };
+
+    const handleEditBiography = () => {
+        setProfileControlModalOpen(false);
+        setBiographyModalOpen(true);
+    };
+
+    const handleRequestEmailUpdate = () => {
+        setProfileControlModalOpen(false);
+        setPendingFlowWarning('update-email');
+    };
+
+    const handleRequestPasswordUpdate = () => {
+        setProfileControlModalOpen(false);
+        setPendingFlowWarning('update-password');
+    };
+
+    const handleRequestToggleTwoFactor = () => {
+        setProfileControlModalOpen(false);
+
+        if (user?.twoFactorSecret?.active) {
+            setDisableTwoFactorModalOpen(true);
+            return;
+        }
+
+        setPendingFlowWarning('enable-two-factor');
+    };
+
+    const handleCoverAction = () => {
+        setCoverFeedback('');
+
+        if (!profileCover) {
+            setProfileControlModalOpen(false);
+            setCoverModalOpen(true);
+            return;
+        }
+
+        void (async () => {
+            setCoverActionLoading(true);
+
+            try {
+                await removeUserCover(userId);
+                await refreshProfileUser();
+            } catch (error: Error | any) {
+                setCoverFeedback(
+                    error?.message ??
+                        'Nao foi possivel remover o plano de fundo do perfil.'
+                );
+            } finally {
+                setCoverActionLoading(false);
+            }
+        })();
+    };
+
     const handleProfilePictureUpload = async (file: File) => {
         setPictureUploading(true);
         setPictureFeedback('');
@@ -296,6 +361,7 @@ export default function ProfilePageContent({
     }`.trim();
     const profileHandle = `${user.nickname ?? ''}${user.tag ?? ''}`;
     const biography = userDetails.biography?.trim() ?? '';
+    const profileCover = userDetails.cover?.link?.trim() ?? '';
     const accountStatus = formatAccountStatus(user.inProgress?.status);
     const accountStatusClass =
         user.inProgress?.status === 'done'
@@ -420,6 +486,7 @@ export default function ProfilePageContent({
                 label={formatBadgeName(badgeKey)}
                 imageSrc={earned ? badgeVariant.colorful : badgeVariant.blackandwhite}
                 description={badgeVariant.description}
+                progress={getBadgeProgress(badgeKey, userDetails?.gameInfo)}
                 variant="card"
                 isOpen={openBadgePopoverId === popoverId}
                 onOpen={setOpenBadgePopoverId}
@@ -438,223 +505,269 @@ export default function ProfilePageContent({
             : 'Habilitar dois fatores';
 
     return (
-        <div className="profile-content">
-            <ProfileHeroSection
-                user={user}
-                profileName={profileName}
-                profileHandle={profileHandle}
-                biography={biography}
-                accountStatus={accountStatus}
-                accountStatusClass={accountStatusClass}
-                isOwnProfile={isOwnProfile}
-                pictureUploading={pictureUploading}
-                pictureFeedback={pictureFeedback}
-                earnedBadgeKeys={earnedBadgeKeys}
-                openBadgePopoverId={openBadgePopoverId}
-                pictureInputRef={pictureInputRef}
-                onOpenBadgePopover={setOpenBadgePopoverId}
-                onCloseBadgePopover={() => setOpenBadgePopoverId(null)}
-                onPictureClick={handleProfilePictureClick}
-                onSelectImage={(file) =>
-                    setPendingImageCrop({ file, intent: 'profile-avatar' })
-                }
-                onEditBiography={() => setBiographyModalOpen(true)}
-                onRequestEmailUpdate={() => setPendingFlowWarning('update-email')}
-                onRequestPasswordUpdate={() => setPendingFlowWarning('update-password')}
-                onRequestToggleTwoFactor={() => {
-                    if (user.twoFactorSecret?.active) {
-                        setDisableTwoFactorModalOpen(true);
-                        return;
-                    }
-
-                    setPendingFlowWarning('enable-two-factor');
-                }}
-                onRequestDeleteAccount={() => setPendingFlowWarning('delete-user')}
-            />
-
-            <ProfileShowcaseSection
-                title="CAMPANHAS"
-                subtitle={
-                    campaigns.length > 0
-                        ? `${campaigns.length} campanha(s) encontrada(s)`
-                        : 'Nenhuma campanha disponí­vel'
-                }
-                items={campaignItems}
-                label="Campanhas do perfil"
-                variant="campaigns"
-                emptyMessage="Este usuário ainda não possui campanhas visí­veis."
-                cardLayout={true}
-            />
-
-            <ProfileShowcaseSection
-                title="PERSONAGENS CRIADOS"
-                subtitle={
-                    characters.length > 0
-                        ? `${characters.length} personagem(ns) encontrado(s)`
-                        : 'Nenhum personagem disponí­vel'
-                }
-                items={characterItems}
-                label="Personagens do perfil"
-                variant="characters"
-                emptyMessage="Este usuário ainda não criou personagens visí­veis."
-                cardLayout={true}
-            />
-
-            <ProfileShowcaseSection
-                title="BADGES"
-                subtitle=""
-                items={badgeItems}
-                label="Badges do perfil"
-                variant="badges"
-            />
-
-            {selectedCharacterId ? (
-                <CharacterDetailModal
-                    characterId={selectedCharacterId}
-                    campaignId=""
-                    hideInventoryTab={true}
-                    onDeleted={() => {
-                        const deletedCharacterId = selectedCharacterId;
-                        setSelectedCharacterId(null);
-                        setCharacters((previous) =>
-                            previous.filter(
-                                (character) =>
-                                    character.characterId !== deletedCharacterId
-                            )
-                        );
-                    }}
-                    onBack={() => setSelectedCharacterId(null)}
-                />
+        <div
+            className={`profile-content-shell${
+                profileCover ? ' profile-content-shell--with-cover' : ''
+            }`}
+        >
+            {profileCover ? (
+                <div className="profile-content-top-cover" aria-hidden="true">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                        src={profileCover}
+                        alt=""
+                        className="profile-content-top-cover__image"
+                    />
+                    <div className="profile-content-top-cover__overlay" />
+                    <div className="profile-content-top-cover__fade" />
+                </div>
             ) : null}
 
-            {gateStep === 'complete-profile' ? (
-                <CompleteUserModal
-                    userId={userId}
-                    mode="profile-complete"
-                    defaultValues={{
-                        firstName: userDetails.firstName ?? '',
-                        lastName: userDetails.lastName ?? '',
-                        birthday: normalizeBirthdayInput(userDetails.birthday),
-                    }}
-                    onSuccess={async () => {
-                        await refreshProfileUser();
-                    }}
-                    onCancel={() => router.push('/')}
-                />
-            ) : null}
-
-            {pendingFlowWarning ? (
-                <ProfileFlowWarningModal
-                    flowLabel={warningFlowLabel}
-                    onClose={() => setPendingFlowWarning(null)}
-                    onConfirm={() => {
-                        if (pendingFlowWarning === 'update-email') {
-                            setEmailModalOpen(true);
-                        } else if (pendingFlowWarning === 'update-password') {
-                            setPasswordModalOpen(true);
-                        } else if (pendingFlowWarning === 'delete-user') {
-                            setDeleteAccountVerificationModalOpen(true);
-                        } else {
-                            setManualTwoFactorActivationOpen(true);
-                        }
-
-                        setPendingFlowWarning(null);
-                    }}
-                />
-            ) : null}
-
-            {manualTwoFactorActivationOpen ? (
-                <ProfileTwoFactorActivationModal
+            <div className="profile-content">
+                <ProfileHeroSection
                     user={user}
-                    onRefreshUser={refreshProfileUser}
-                    onCancel={() => {
-                        setManualTwoFactorActivationOpen(false);
-                    }}
-                    onCompleted={() => {
-                        setManualTwoFactorActivationOpen(false);
-                    }}
-                />
-            ) : null}
-
-            {biographyModalOpen ? (
-                <ProfileBiographyModal
-                    userId={userId}
-                    firstName={userDetails.firstName ?? ''}
-                    lastName={userDetails.lastName ?? ''}
+                    profileName={profileName}
+                    profileHandle={profileHandle}
                     biography={biography}
-                    onClose={() => setBiographyModalOpen(false)}
-                    onSaved={async () => {
-                        await refreshProfileUser();
-                        setBiographyModalOpen(false);
-                    }}
+                    profileCover={profileCover}
+                    accountStatus={accountStatus}
+                    accountStatusClass={accountStatusClass}
+                    isOwnProfile={isOwnProfile}
+                    pictureUploading={pictureUploading}
+                    pictureFeedback={pictureFeedback}
+                    earnedBadgeKeys={earnedBadgeKeys}
+                    openBadgePopoverId={openBadgePopoverId}
+                    pictureInputRef={pictureInputRef}
+                    onOpenBadgePopover={setOpenBadgePopoverId}
+                    onCloseBadgePopover={() => setOpenBadgePopoverId(null)}
+                    onPictureClick={handleProfilePictureClick}
+                    onSelectImage={(file) =>
+                        setPendingImageCrop({ file, intent: 'profile-avatar' })
+                    }
+                    onOpenProfileControls={handleOpenProfileControls}
                 />
-            ) : null}
 
-            {deleteAccountModalOpen ? (
-                <ProfileDeleteAccountModal
-                    userId={user.userId}
-                    onClose={() => setDeleteAccountModalOpen(false)}
-                    onDeleted={() => {
-                        setDeleteAccountModalOpen(false);
-                        window.location.replace('/');
-                    }}
-                />
-            ) : null}
+                {profileControlModalOpen ? (
+                    <ProfileControlModal
+                        hasExternalProvider={
+                            user.providerId !== null && user.providerId !== undefined
+                        }
+                        hasActiveTwoFactor={Boolean(user.twoFactorSecret?.active)}
+                        hasCover={Boolean(profileCover)}
+                        coverActionLoading={coverActionLoading}
+                        coverFeedback={coverFeedback}
+                        onClose={() => {
+                            setCoverFeedback('');
+                            setProfileControlModalOpen(false);
+                        }}
+                        onEditBiography={handleEditBiography}
+                        onRequestEmailUpdate={handleRequestEmailUpdate}
+                        onRequestPasswordUpdate={handleRequestPasswordUpdate}
+                        onRequestToggleTwoFactor={handleRequestToggleTwoFactor}
+                        onRequestCoverUpdate={handleCoverAction}
+                        onRequestDeleteAccount={() => {
+                            setProfileControlModalOpen(false);
+                            setPendingFlowWarning('delete-user');
+                        }}
+                    />
+                ) : null}
 
-            {deleteAccountVerificationModalOpen ? (
-                <ProfileDeleteAccountVerificationModal
-                    email={user.email}
-                    onClose={() => setDeleteAccountVerificationModalOpen(false)}
-                    onVerified={() => {
-                        setDeleteAccountVerificationModalOpen(false);
-                        setDeleteAccountModalOpen(true);
-                    }}
+                <ProfileShowcaseSection
+                    title="CAMPANHAS"
+                    subtitle={
+                        campaigns.length > 0
+                            ? `${campaigns.length} campanha(s) encontrada(s)`
+                            : 'Nenhuma campanha disponí­vel'
+                    }
+                    items={campaignItems}
+                    label="Campanhas do perfil"
+                    variant="campaigns"
+                    emptyMessage="Este usuário ainda não possui campanhas visí­veis."
+                    cardLayout={true}
                 />
-            ) : null}
 
-            {emailModalOpen ? (
-                <ProfileEmailUpdateModal
-                    userId={userId}
-                    email={user.email}
-                    onClose={() => setEmailModalOpen(false)}
-                    onSaved={async () => {
-                        await refreshProfileUser();
-                        setEmailModalOpen(false);
-                    }}
+                <ProfileShowcaseSection
+                    title="FICHAS"
+                    subtitle={
+                        characters.length > 0
+                            ? `${characters.length} personagem(ns) encontrado(s)`
+                            : 'Nenhum personagem disponí­vel'
+                    }
+                    items={characterItems}
+                    label="Personagens do perfil"
+                    variant="characters"
+                    emptyMessage="Este usuário ainda não criou personagens visí­veis."
+                    cardLayout={true}
                 />
-            ) : null}
 
-            {passwordModalOpen ? (
-                <ProfilePasswordUpdateModal
-                    email={user.email}
-                    onClose={() => setPasswordModalOpen(false)}
-                    onSaved={async () => {
-                        setPasswordModalOpen(false);
-                    }}
+                <ProfileShowcaseSection
+                    title="BADGES"
+                    subtitle=""
+                    items={badgeItems}
+                    label="Badges do perfil"
+                    variant="badges"
                 />
-            ) : null}
 
-            {disableTwoFactorModalOpen ? (
-                <ProfileTwoFactorDisableModal
-                    userId={user.userId}
-                    email={user.email}
-                    onClose={() => setDisableTwoFactorModalOpen(false)}
-                    onSaved={async () => {
-                        await refreshProfileUser();
-                        setDisableTwoFactorModalOpen(false);
-                    }}
-                />
-            ) : null}
+                {selectedCharacterId ? (
+                    <CharacterDetailModal
+                        characterId={selectedCharacterId}
+                        campaignId=""
+                        hideInventoryTab={true}
+                        onDeleted={() => {
+                            const deletedCharacterId = selectedCharacterId;
+                            setSelectedCharacterId(null);
+                            setCharacters((previous) =>
+                                previous.filter(
+                                    (character) =>
+                                        character.characterId !== deletedCharacterId
+                                )
+                            );
+                        }}
+                        onBack={() => setSelectedCharacterId(null)}
+                    />
+                ) : null}
 
-            {pendingImageCrop ? (
-                <ImageCropModal
-                    file={pendingImageCrop.file}
-                    intent={pendingImageCrop.intent}
-                    onConfirm={handleProfilePictureUpload}
-                    onUseOriginal={handleProfilePictureUpload}
-                    onClose={() => setPendingImageCrop(null)}
-                />
-            ) : null}
+                {gateStep === 'complete-profile' ? (
+                    <CompleteUserModal
+                        userId={userId}
+                        mode="profile-complete"
+                        defaultValues={{
+                            firstName: userDetails.firstName ?? '',
+                            lastName: userDetails.lastName ?? '',
+                            birthday: normalizeBirthdayInput(userDetails.birthday),
+                        }}
+                        onSuccess={async () => {
+                            await refreshProfileUser();
+                        }}
+                        onCancel={() => router.push('/')}
+                    />
+                ) : null}
+
+                {pendingFlowWarning ? (
+                    <ProfileFlowWarningModal
+                        flowLabel={warningFlowLabel}
+                        onClose={() => setPendingFlowWarning(null)}
+                        onConfirm={() => {
+                            if (pendingFlowWarning === 'update-email') {
+                                setEmailModalOpen(true);
+                            } else if (pendingFlowWarning === 'update-password') {
+                                setPasswordModalOpen(true);
+                            } else if (pendingFlowWarning === 'delete-user') {
+                                setDeleteAccountVerificationModalOpen(true);
+                            } else {
+                                setManualTwoFactorActivationOpen(true);
+                            }
+
+                            setPendingFlowWarning(null);
+                        }}
+                    />
+                ) : null}
+
+                {manualTwoFactorActivationOpen ? (
+                    <ProfileTwoFactorActivationModal
+                        user={user}
+                        onRefreshUser={refreshProfileUser}
+                        onCancel={() => {
+                            setManualTwoFactorActivationOpen(false);
+                        }}
+                        onCompleted={() => {
+                            setManualTwoFactorActivationOpen(false);
+                        }}
+                    />
+                ) : null}
+
+                {biographyModalOpen ? (
+                    <ProfileBiographyModal
+                        userId={userId}
+                        firstName={userDetails.firstName ?? ''}
+                        lastName={userDetails.lastName ?? ''}
+                        biography={biography}
+                        onClose={() => setBiographyModalOpen(false)}
+                        onSaved={async () => {
+                            await refreshProfileUser();
+                            setBiographyModalOpen(false);
+                        }}
+                    />
+                ) : null}
+
+                {deleteAccountModalOpen ? (
+                    <ProfileDeleteAccountModal
+                        userId={user.userId}
+                        onClose={() => setDeleteAccountModalOpen(false)}
+                        onDeleted={() => {
+                            setDeleteAccountModalOpen(false);
+                            window.location.replace('/');
+                        }}
+                    />
+                ) : null}
+
+                {deleteAccountVerificationModalOpen ? (
+                    <ProfileDeleteAccountVerificationModal
+                        email={user.email}
+                        onClose={() => setDeleteAccountVerificationModalOpen(false)}
+                        onVerified={() => {
+                            setDeleteAccountVerificationModalOpen(false);
+                            setDeleteAccountModalOpen(true);
+                        }}
+                    />
+                ) : null}
+
+                {emailModalOpen ? (
+                    <ProfileEmailUpdateModal
+                        userId={userId}
+                        email={user.email}
+                        onClose={() => setEmailModalOpen(false)}
+                        onSaved={async () => {
+                            await refreshProfileUser();
+                            setEmailModalOpen(false);
+                        }}
+                    />
+                ) : null}
+
+                {passwordModalOpen ? (
+                    <ProfilePasswordUpdateModal
+                        email={user.email}
+                        onClose={() => setPasswordModalOpen(false)}
+                        onSaved={async () => {
+                            setPasswordModalOpen(false);
+                        }}
+                    />
+                ) : null}
+
+                {coverModalOpen ? (
+                    <ProfileCoverModal
+                        userId={userId}
+                        onClose={() => setCoverModalOpen(false)}
+                        onSaved={async () => {
+                            setCoverFeedback('');
+                            await refreshProfileUser();
+                            setCoverModalOpen(false);
+                        }}
+                    />
+                ) : null}
+
+                {disableTwoFactorModalOpen ? (
+                    <ProfileTwoFactorDisableModal
+                        userId={user.userId}
+                        email={user.email}
+                        onClose={() => setDisableTwoFactorModalOpen(false)}
+                        onSaved={async () => {
+                            await refreshProfileUser();
+                            setDisableTwoFactorModalOpen(false);
+                        }}
+                    />
+                ) : null}
+
+                {pendingImageCrop ? (
+                    <ImageCropModal
+                        file={pendingImageCrop.file}
+                        intent={pendingImageCrop.intent}
+                        onConfirm={handleProfilePictureUpload}
+                        onUseOriginal={handleProfilePictureUpload}
+                        onClose={() => setPendingImageCrop(null)}
+                    />
+                ) : null}
+            </div>
         </div>
     );
 }

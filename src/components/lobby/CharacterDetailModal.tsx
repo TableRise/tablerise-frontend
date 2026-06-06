@@ -1,7 +1,8 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import EditIcon from '@assets/icons/sys/edit.svg?url';
+import EditDarkIcon from '@assets/icons/sys/edit-dark.svg?url';
 import ArrowBackIcon from '@assets/icons/nav/arrow-back.svg?url';
 import ArrowRightIcon from '@assets/icons/nav/arrow-right.svg?url';
 import LoadingDots from '@/components/common/LoadingDots';
@@ -41,6 +42,7 @@ import {
     hasAnySpellProgression,
     type LevelUpNotification,
 } from '@/utils/characterLeveling';
+import TableriseContext from '@/context/TableriseContext';
 import type { ImageUploadIntent } from '@/utils/imageCrop';
 
 interface CharacterDetailModalProps {
@@ -231,6 +233,7 @@ export default function CharacterDetailModal({
     onBack,
     onDeleted,
 }: CharacterDetailModalProps): JSX.Element {
+    const { themeMode } = useContext(TableriseContext);
     const [char, setChar] = useState<FullCharacterDnd | null>(null);
     const [loading, setLoading] = useState(true);
     const [classRecord, setClassRecord] = useState<DndClassRecord | null>(null);
@@ -907,7 +910,11 @@ export default function CharacterDetailModal({
                                             onClick={handlePictureClick}
                                         >
                                             <Image
-                                                src={EditIcon}
+                                                src={
+                                                    themeMode === 'dark'
+                                                        ? EditDarkIcon
+                                                        : EditIcon
+                                                }
                                                 alt="edit"
                                                 width={32}
                                                 height={32}
@@ -2430,10 +2437,7 @@ export default function CharacterDetailModal({
                     const unit = String(sellConfirmItem.price[1] ?? '');
                     const sellAmount = Math.floor(rawAmount * 0.9);
                     return (
-                        <div
-                            className="cdm-overlay"
-                            onClick={() => setSellConfirmItem(null)}
-                        >
+                        <div className="cdm-overlay">
                             <div
                                 className="cdm-sell-confirm-modal"
                                 onClick={(e) => e.stopPropagation()}
@@ -2479,14 +2483,7 @@ export default function CharacterDetailModal({
                 })()}
 
             {deleteConfirmOpen && (
-                <div
-                    className="cdm-overlay"
-                    onClick={() => {
-                        if (deleteSubmitting) return;
-                        setDeleteConfirmOpen(false);
-                        setDeleteError('');
-                    }}
-                >
+                <div className="cdm-overlay">
                     <div
                         className="profile-action-modal-card"
                         onClick={(event) => event.stopPropagation()}

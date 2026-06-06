@@ -115,6 +115,14 @@
         @apply text-color-primary/default_900 leading-relaxed;
     }
 
+    .lobby-session-modal-copy {
+        @apply flex flex-col gap-3;
+    }
+
+    .lobby-session-modal-break {
+        @apply h-2;
+    }
+
     .lobby-characters {
         @apply mt-6 flex flex-col;
     }

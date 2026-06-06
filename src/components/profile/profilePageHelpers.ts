@@ -13,6 +13,33 @@ export type BadgeVariant = {
     colorful: string;
     blackandwhite: string;
     description: string;
+    progress?: BadgeProgressRule;
+};
+
+export type BadgeProgressCounterKey =
+    | 'campaignsJoinedAmount'
+    | 'campaignsCreatedAmount'
+    | 'campaignsClosedAmount'
+    | 'equipBoughtAmount'
+    | 'donateAmount';
+
+export type BadgeProgressRule = {
+    counter: BadgeProgressCounterKey;
+    target: number;
+    label: string;
+};
+
+export type BadgeProgressSnapshot = Partial<
+    Record<BadgeProgressCounterKey, number | null | undefined>
+>;
+
+export type BadgeProgressModel = {
+    hasAutomaticRule: boolean;
+    current: number;
+    target: number;
+    percent: number;
+    statusLabel: string;
+    progressLabel: string;
 };
 
 export type ProfileCampaign = {
@@ -101,6 +128,43 @@ export function formatBadgeName(key: string): string {
             return part.charAt(0).toUpperCase() + part.slice(1);
         })
         .join(' ');
+}
+
+export function getBadgeProgress(
+    badgeKey: string,
+    gameInfo?: BadgeProgressSnapshot | null
+): BadgeProgressModel {
+    const badge = badgeMap[badgeKey];
+    const progressRule = badge?.progress;
+
+    if (!progressRule) {
+        return {
+            hasAutomaticRule: false,
+            current: 0,
+            target: 1,
+            percent: 0,
+            statusLabel: 'Sem progresso automatico no momento',
+            progressLabel: '0 / 1 progresso automatico',
+        };
+    }
+
+    const rawCurrent = gameInfo?.[progressRule.counter];
+    const current =
+        typeof rawCurrent === 'number' && Number.isFinite(rawCurrent) && rawCurrent > 0
+            ? rawCurrent
+            : 0;
+    const target = progressRule.target;
+    const percent = Math.min((current / target) * 100, 100);
+    const earned = current >= target;
+
+    return {
+        hasAutomaticRule: true,
+        current,
+        target,
+        percent,
+        statusLabel: earned ? 'Conquistada' : 'Em progresso',
+        progressLabel: `${current} / ${target} ${progressRule.label}`,
+    };
 }
 
 export function formatCampaignDate(dateString?: string): string {
