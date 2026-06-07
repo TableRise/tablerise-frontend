@@ -2,6 +2,11 @@ import { AxiosError, AxiosResponse } from 'axios';
 import axios from 'axios';
 import { apiCall, campaignsBaseUrl } from '../wrapper';
 import type { ImageObject } from '@/types/shared/general';
+import {
+    appendMultiUploadImageValues,
+    appendUploadImageValue,
+    type UploadImageValue,
+} from '@/utils/imageUploadPayload';
 
 function normalizeImagesResponse(data: any): ImageObject[] {
     if (Array.isArray(data)) {
@@ -33,10 +38,10 @@ function normalizeHighlightedImageResponse(data: any): ImageObject | null {
 
 export const uploadMatchHighlightImages = async (
     campaignId: string,
-    image: File
+    image: UploadImageValue
 ): Promise<ImageObject[]> => {
     const formData = new FormData();
-    formData.append('images', image);
+    appendMultiUploadImageValues(formData, 'images', [image]);
 
     try {
         const { data }: AxiosResponse = await axios({

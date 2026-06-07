@@ -8,7 +8,7 @@ import ArrowRightGraySVG from '../../../assets/icons/nav/arrow-right-gray.svg?ur
 type ProfileCarouselProps = {
     items: ReactNode[];
     label: string;
-    variant?: 'campaigns' | 'characters' | 'badges';
+    variant?: 'campaigns' | 'characters' | 'badges' | 'friends';
 };
 
 export default function ProfileCarousel({

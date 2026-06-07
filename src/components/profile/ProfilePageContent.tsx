@@ -3,6 +3,7 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import WhiteRotateSVG from '@assets/icons/sys/white-rotate.svg?url';
 import { getUser } from '@/server/users/get-user';
 import { getCampaignsByUserId } from '@/server/campaigns/get-campaigns';
 import {
@@ -26,7 +27,15 @@ import ProfileBiographyModal from '@/components/profile/ProfileBiographyModal';
 import ProfileDeleteAccountModal from '@/components/profile/ProfileDeleteAccountModal';
 import ProfileDeleteAccountVerificationModal from '@/components/profile/ProfileDeleteAccountVerificationModal';
 import ProfileEmailUpdateModal from '@/components/profile/ProfileEmailUpdateModal';
+import ProfileCoverModal from '@/components/profile/ProfileCoverModal';
+import ProfileControlModal from '@/components/profile/ProfileControlModal';
 import ProfilePasswordUpdateModal from '@/components/profile/ProfilePasswordUpdateModal';
+import ProfileFriendCard from '@/components/profile/ProfileFriendCard';
+import ProfileFriendsListModal from '@/components/profile/ProfileFriendsListModal';
+import ProfileGalleryModal from '@/components/profile/ProfileGalleryModal';
+import ProfileMessagesModal from '@/components/profile/ProfileMessagesModal';
+import ProfileFriendRequestModal from '@/components/profile/ProfileFriendRequestModal';
+import ProfileFriendRequestsInboxModal from '@/components/profile/ProfileFriendRequestsInboxModal';
 import {
     badgeEntries,
     badgeMap,
@@ -34,6 +43,7 @@ import {
     formatAccountStatus,
     formatBadgeName,
     formatCampaignDate,
+    getBadgeProgress,
     handleCardKeyDown,
     mapCharacter,
     mergeCampaigns,
@@ -46,8 +56,24 @@ import {
     type ProfileGateStep,
     type StoredUser,
 } from '@/components/profile/profilePageHelpers';
+import {
+    getUserFriends,
+    getUserMessages,
+    removeUserFriend,
+    respondToUserFriendRequest,
+    sendUserFriendRequest,
+    toggleUserFriendFavorite,
+    type UserFriendRecord,
+    type UserMessageRecord,
+    type UserFriendStatus,
+} from '@/server/users/collections';
 import { updateUserPicture } from '@/server/users/update-user-picture';
+import { removeUserCover } from '@/server/users/update-user-cover';
 import type { ImageUploadIntent } from '@/utils/imageCrop';
+import { useUserGallery } from '@/hooks/useUserGallery';
+import ImageSourceChoiceModal from '@/components/common/ImageSourceChoiceModal';
+import UserGalleryPickerModal from '@/components/common/UserGalleryPickerModal';
+import type { UploadImageValue } from '@/utils/imageUploadPayload';
 
 type ProfilePageContentProps = {
     userId: string;
@@ -55,6 +81,32 @@ type ProfilePageContentProps = {
 
 function buildBadgePopoverId(scope: 'catalog', badgeKey: string): string {
     return `${scope}:${badgeKey}`;
+}
+
+function sortFriendRecords(
+    records: UserFriendRecord[],
+    favoritesFirst = false
+): UserFriendRecord[] {
+    return [...records].sort((left, right) => {
+        if (favoritesFirst) {
+            const favoriteDifference =
+                Number(right.favorite === true) - Number(left.favorite === true);
+
+            if (favoriteDifference !== 0) return favoriteDifference;
+        }
+
+        const nicknameDifference = (left.nickname || '').localeCompare(
+            right.nickname || ''
+        );
+
+        if (nicknameDifference !== 0) return nicknameDifference;
+
+        return left.userId.localeCompare(right.userId);
+    });
+}
+
+function isUnreadMessage(message: UserMessageRecord): boolean {
+    return message.status === 'not-read';
 }
 
 export default function ProfilePageContent({
@@ -76,6 +128,8 @@ export default function ProfilePageContent({
         useState(false);
     const [emailModalOpen, setEmailModalOpen] = useState(false);
     const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+    const [coverModalOpen, setCoverModalOpen] = useState(false);
+    const [profileControlModalOpen, setProfileControlModalOpen] = useState(false);
     const [disableTwoFactorModalOpen, setDisableTwoFactorModalOpen] = useState(false);
     const [manualTwoFactorActivationOpen, setManualTwoFactorActivationOpen] =
         useState(false);
@@ -83,15 +137,40 @@ export default function ProfilePageContent({
         useState<PendingProfileFlowWarning | null>(null);
     const [pictureUploading, setPictureUploading] = useState(false);
     const [pictureFeedback, setPictureFeedback] = useState('');
+    const [coverActionLoading, setCoverActionLoading] = useState(false);
+    const [coverFeedback, setCoverFeedback] = useState('');
     const [pendingImageCrop, setPendingImageCrop] = useState<{
         file: File;
         intent: ImageUploadIntent;
     } | null>(null);
     const [openBadgePopoverId, setOpenBadgePopoverId] = useState<string | null>(null);
+    const [ownerFriendRecords, setOwnerFriendRecords] = useState<UserFriendRecord[]>([]);
+    const [ownerMessages, setOwnerMessages] = useState<UserMessageRecord[]>([]);
+    const [friendsError, setFriendsError] = useState('');
+    const [removingFriendId, setRemovingFriendId] = useState<string | null>(null);
+    const [favoriteLoadingFriendId, setFavoriteLoadingFriendId] = useState<string | null>(
+        null
+    );
+    const [friendsListModalOpen, setFriendsListModalOpen] = useState(false);
+    const [messagesModalOpen, setMessagesModalOpen] = useState(false);
+    const [galleryModalOpen, setGalleryModalOpen] = useState(false);
+    const [friendRequestModalOpen, setFriendRequestModalOpen] = useState(false);
+    const [friendRequestsInboxModalOpen, setFriendRequestsInboxModalOpen] =
+        useState(false);
+    const [viewerFriendStatus, setViewerFriendStatus] = useState<UserFriendStatus | null>(
+        null
+    );
+    const [checkingViewerFriendStatus, setCheckingViewerFriendStatus] = useState(false);
+    const [profilePictureChoiceOpen, setProfilePictureChoiceOpen] = useState(false);
+    const [profilePictureGalleryOpen, setProfilePictureGalleryOpen] = useState(false);
+    const [isLandscapeViewport, setIsLandscapeViewport] = useState(true);
     const pictureInputRef = useRef<HTMLInputElement>(null);
     const isOwnProfile =
         Boolean(currentUserId) &&
         (currentUserId === userId || currentUserId === (user?.userId ?? '').trim());
+    const { galleryImages, loadingGallery, refreshGallery } = useUserGallery(
+        isOwnProfile ? currentUserId : undefined
+    );
 
     useEffect(() => {
         try {
@@ -103,6 +182,21 @@ export default function ProfilePageContent({
         } catch {
             setCurrentUserId('');
         }
+    }, []);
+
+    useEffect(() => {
+        function syncViewportOrientation() {
+            setIsLandscapeViewport(window.innerWidth >= window.innerHeight);
+        }
+
+        syncViewportOrientation();
+        window.addEventListener('resize', syncViewportOrientation);
+        window.addEventListener('orientationchange', syncViewportOrientation);
+
+        return () => {
+            window.removeEventListener('resize', syncViewportOrientation);
+            window.removeEventListener('orientationchange', syncViewportOrientation);
+        };
     }, []);
 
     useEffect(() => {
@@ -232,16 +326,86 @@ export default function ProfilePageContent({
 
     const handleProfilePictureClick = () => {
         if (pictureUploading) return;
+        if (loadingGallery) {
+            setPictureFeedback('Carregando galeria...');
+            return;
+        }
+
+        if (galleryImages.length > 0) {
+            setPictureFeedback('');
+            setProfilePictureChoiceOpen(true);
+            return;
+        }
+
         pictureInputRef.current?.click();
     };
 
-    const handleProfilePictureUpload = async (file: File) => {
+    const handleOpenProfileControls = () => {
+        setCoverFeedback('');
+        setProfileControlModalOpen(true);
+    };
+
+    const handleEditBiography = () => {
+        setProfileControlModalOpen(false);
+        setBiographyModalOpen(true);
+    };
+
+    const handleRequestEmailUpdate = () => {
+        setProfileControlModalOpen(false);
+        setPendingFlowWarning('update-email');
+    };
+
+    const handleRequestPasswordUpdate = () => {
+        setProfileControlModalOpen(false);
+        setPendingFlowWarning('update-password');
+    };
+
+    const handleRequestToggleTwoFactor = () => {
+        setProfileControlModalOpen(false);
+
+        if (user?.twoFactorSecret?.active) {
+            setDisableTwoFactorModalOpen(true);
+            return;
+        }
+
+        setPendingFlowWarning('enable-two-factor');
+    };
+
+    const handleCoverAction = () => {
+        setCoverFeedback('');
+
+        if (!profileCover) {
+            setProfileControlModalOpen(false);
+            setCoverModalOpen(true);
+            return;
+        }
+
+        void (async () => {
+            setCoverActionLoading(true);
+
+            try {
+                await removeUserCover(userId);
+                await refreshProfileUser();
+                await refreshGallery();
+            } catch (error: Error | any) {
+                setCoverFeedback(
+                    error?.message ??
+                        'Nao foi possivel remover o plano de fundo do perfil.'
+                );
+            } finally {
+                setCoverActionLoading(false);
+            }
+        })();
+    };
+
+    const handleProfilePictureUpload = async (file: UploadImageValue) => {
         setPictureUploading(true);
         setPictureFeedback('');
 
         try {
             await updateUserPicture(userId, file);
             await refreshProfileUser();
+            await refreshGallery();
             setPendingImageCrop(null);
         } catch (error: Error | any) {
             setPictureFeedback(
@@ -266,6 +430,104 @@ export default function ProfilePageContent({
 
         setGateStep('none');
     }, [isOwnProfile, user, userDetails]);
+
+    useEffect(() => {
+        let mounted = true;
+
+        async function loadFriends() {
+            setFriendsError('');
+
+            try {
+                const allFriends = await getUserFriends(userId);
+
+                if (!mounted) return;
+
+                setOwnerFriendRecords(allFriends);
+            } catch (error: Error | any) {
+                if (!mounted) return;
+
+                setOwnerFriendRecords([]);
+                setFriendsError(
+                    error?.message ?? 'Nao foi possivel carregar a lista de amigos.'
+                );
+            }
+        }
+
+        void loadFriends();
+
+        return () => {
+            mounted = false;
+        };
+    }, [userId]);
+
+    useEffect(() => {
+        if (!isOwnProfile) {
+            setOwnerMessages([]);
+            return;
+        }
+
+        let mounted = true;
+
+        async function loadMessages() {
+            try {
+                const inboxMessages = await getUserMessages(userId);
+
+                if (!mounted) return;
+
+                setOwnerMessages(inboxMessages);
+            } catch {
+                if (!mounted) return;
+
+                setOwnerMessages([]);
+            }
+        }
+
+        void loadMessages();
+
+        return () => {
+            mounted = false;
+        };
+    }, [isOwnProfile, userId]);
+
+    useEffect(() => {
+        if (!currentUserId || isOwnProfile) {
+            setViewerFriendStatus(null);
+            setCheckingViewerFriendStatus(false);
+            return;
+        }
+
+        let mounted = true;
+
+        async function loadViewerFriendStatus() {
+            setCheckingViewerFriendStatus(true);
+
+            try {
+                const viewerFriends = await getUserFriends(currentUserId);
+
+                if (!mounted) return;
+
+                const existingFriend = viewerFriends.find(
+                    (friend) => friend.userId === userId
+                );
+
+                setViewerFriendStatus(existingFriend?.status ?? null);
+            } catch {
+                if (!mounted) return;
+
+                setViewerFriendStatus(null);
+            } finally {
+                if (mounted) {
+                    setCheckingViewerFriendStatus(false);
+                }
+            }
+        }
+
+        void loadViewerFriendStatus();
+
+        return () => {
+            mounted = false;
+        };
+    }, [currentUserId, isOwnProfile, userId]);
 
     if (loading) {
         return (
@@ -296,6 +558,7 @@ export default function ProfilePageContent({
     }`.trim();
     const profileHandle = `${user.nickname ?? ''}${user.tag ?? ''}`;
     const biography = userDetails.biography?.trim() ?? '';
+    const profileCover = userDetails.cover?.link?.trim() ?? '';
     const accountStatus = formatAccountStatus(user.inProgress?.status);
     const accountStatusClass =
         user.inProgress?.status === 'done'
@@ -420,6 +683,7 @@ export default function ProfilePageContent({
                 label={formatBadgeName(badgeKey)}
                 imageSrc={earned ? badgeVariant.colorful : badgeVariant.blackandwhite}
                 description={badgeVariant.description}
+                progress={getBadgeProgress(badgeKey, userDetails?.gameInfo)}
                 variant="card"
                 isOpen={openBadgePopoverId === popoverId}
                 onOpen={setOpenBadgePopoverId}
@@ -437,224 +701,494 @@ export default function ProfilePageContent({
             ? 'Deletar conta'
             : 'Habilitar dois fatores';
 
+    const handleRemoveFriend = (targetUserId: string) => {
+        void (async () => {
+            setRemovingFriendId(targetUserId);
+            setFriendsError('');
+
+            try {
+                await removeUserFriend(userId, targetUserId);
+                setOwnerFriendRecords((previous) =>
+                    previous.filter((friendItem) => friendItem.userId !== targetUserId)
+                );
+            } catch (error: Error | any) {
+                setFriendsError(error?.message ?? 'Nao foi possivel desfazer a amizade.');
+            } finally {
+                setRemovingFriendId(null);
+            }
+        })();
+    };
+
+    const handleSendFriendRequest = async () => {
+        await sendUserFriendRequest(currentUserId, userId);
+        setViewerFriendStatus('pending');
+        setFriendRequestModalOpen(false);
+    };
+
+    const handleToggleFavoriteFriend = (targetUserId: string) => {
+        void (async () => {
+            setFavoriteLoadingFriendId(targetUserId);
+            setFriendsError('');
+
+            try {
+                await toggleUserFriendFavorite(userId, targetUserId);
+                const refreshedFriends = await getUserFriends(userId);
+                setOwnerFriendRecords(refreshedFriends);
+            } catch (error: Error | any) {
+                setFriendsError(
+                    error?.message ?? 'Nao foi possivel atualizar o favorito.'
+                );
+            } finally {
+                setFavoriteLoadingFriendId(null);
+            }
+        })();
+    };
+
+    const handleAcceptFriendRequest = async (targetUserId: string) => {
+        await respondToUserFriendRequest(userId, targetUserId, false);
+        const refreshedFriends = await getUserFriends(userId);
+        setOwnerFriendRecords(refreshedFriends);
+    };
+
+    const handleRejectFriendRequest = async (targetUserId: string) => {
+        await respondToUserFriendRequest(userId, targetUserId, true);
+        const refreshedFriends = await getUserFriends(userId);
+        setOwnerFriendRecords(refreshedFriends);
+    };
+
+    const activeFriends = sortFriendRecords(
+        ownerFriendRecords.filter((friend) => friend.status === 'active'),
+        true
+    );
+    const pendingFriendRequests = sortFriendRecords(
+        ownerFriendRecords.filter((friend) => friend.status === 'pending')
+    );
+    const unreadMessagesCount = ownerMessages.filter(isUnreadMessage).length;
+
+    const friendItems = activeFriends.map((friend) => (
+        <ProfileFriendCard
+            key={friend.userId}
+            friend={friend}
+            currentUserId={currentUserId}
+            isRemoving={removingFriendId === friend.userId}
+            isFavoriteLoading={favoriteLoadingFriendId === friend.userId}
+            canRemoveFriend={isOwnProfile}
+            canFavoriteFriend={isOwnProfile}
+            onRemoveFriend={handleRemoveFriend}
+            onToggleFavorite={handleToggleFavoriteFriend}
+        />
+    ));
+    const friendSubtitle = friendsError
+        ? friendsError
+        : activeFriends.length > 0
+        ? `${activeFriends.length} amigo(s) ativo(s)`
+        : 'Nenhum amigo ativo encontrado';
+    const canOpenMessages =
+        Boolean(currentUserId) &&
+        (isOwnProfile ||
+            (!checkingViewerFriendStatus && viewerFriendStatus === 'active'));
+    const showFriendRequestAction =
+        Boolean(currentUserId) &&
+        !isOwnProfile &&
+        !checkingViewerFriendStatus &&
+        viewerFriendStatus === null;
+
     return (
-        <div className="profile-content">
-            <ProfileHeroSection
-                user={user}
-                profileName={profileName}
-                profileHandle={profileHandle}
-                biography={biography}
-                accountStatus={accountStatus}
-                accountStatusClass={accountStatusClass}
-                isOwnProfile={isOwnProfile}
-                pictureUploading={pictureUploading}
-                pictureFeedback={pictureFeedback}
-                earnedBadgeKeys={earnedBadgeKeys}
-                openBadgePopoverId={openBadgePopoverId}
-                pictureInputRef={pictureInputRef}
-                onOpenBadgePopover={setOpenBadgePopoverId}
-                onCloseBadgePopover={() => setOpenBadgePopoverId(null)}
-                onPictureClick={handleProfilePictureClick}
-                onSelectImage={(file) =>
-                    setPendingImageCrop({ file, intent: 'profile-avatar' })
-                }
-                onEditBiography={() => setBiographyModalOpen(true)}
-                onRequestEmailUpdate={() => setPendingFlowWarning('update-email')}
-                onRequestPasswordUpdate={() => setPendingFlowWarning('update-password')}
-                onRequestToggleTwoFactor={() => {
-                    if (user.twoFactorSecret?.active) {
-                        setDisableTwoFactorModalOpen(true);
-                        return;
-                    }
-
-                    setPendingFlowWarning('enable-two-factor');
-                }}
-                onRequestDeleteAccount={() => setPendingFlowWarning('delete-user')}
-            />
-
-            <ProfileShowcaseSection
-                title="CAMPANHAS"
-                subtitle={
-                    campaigns.length > 0
-                        ? `${campaigns.length} campanha(s) encontrada(s)`
-                        : 'Nenhuma campanha disponí­vel'
-                }
-                items={campaignItems}
-                label="Campanhas do perfil"
-                variant="campaigns"
-                emptyMessage="Este usuário ainda não possui campanhas visí­veis."
-                cardLayout={true}
-            />
-
-            <ProfileShowcaseSection
-                title="PERSONAGENS CRIADOS"
-                subtitle={
-                    characters.length > 0
-                        ? `${characters.length} personagem(ns) encontrado(s)`
-                        : 'Nenhum personagem disponí­vel'
-                }
-                items={characterItems}
-                label="Personagens do perfil"
-                variant="characters"
-                emptyMessage="Este usuário ainda não criou personagens visí­veis."
-                cardLayout={true}
-            />
-
-            <ProfileShowcaseSection
-                title="BADGES"
-                subtitle=""
-                items={badgeItems}
-                label="Badges do perfil"
-                variant="badges"
-            />
-
-            {selectedCharacterId ? (
-                <CharacterDetailModal
-                    characterId={selectedCharacterId}
-                    campaignId=""
-                    hideInventoryTab={true}
-                    onDeleted={() => {
-                        const deletedCharacterId = selectedCharacterId;
-                        setSelectedCharacterId(null);
-                        setCharacters((previous) =>
-                            previous.filter(
-                                (character) =>
-                                    character.characterId !== deletedCharacterId
-                            )
-                        );
-                    }}
-                    onBack={() => setSelectedCharacterId(null)}
-                />
+        <div
+            className={`profile-content-shell${
+                profileCover ? ' profile-content-shell--with-cover' : ''
+            }`}
+        >
+            {!isLandscapeViewport ? (
+                <div className="profile-orientation-overlay">
+                    <div className="profile-orientation-overlay-content">
+                        <Image
+                            src={WhiteRotateSVG.src}
+                            alt=""
+                            width={WhiteRotateSVG.width}
+                            height={WhiteRotateSVG.height}
+                            aria-hidden="true"
+                        />
+                        <p className="font-M-semibold profile-orientation-overlay-text">
+                            Por favor rotacione a tela para acessar o perfil
+                        </p>
+                    </div>
+                </div>
             ) : null}
 
-            {gateStep === 'complete-profile' ? (
-                <CompleteUserModal
-                    userId={userId}
-                    mode="profile-complete"
-                    defaultValues={{
-                        firstName: userDetails.firstName ?? '',
-                        lastName: userDetails.lastName ?? '',
-                        birthday: normalizeBirthdayInput(userDetails.birthday),
-                    }}
-                    onSuccess={async () => {
-                        await refreshProfileUser();
-                    }}
-                    onCancel={() => router.push('/')}
-                />
+            {profileCover ? (
+                <div className="profile-content-top-cover" aria-hidden="true">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                        src={profileCover}
+                        alt=""
+                        className="profile-content-top-cover__image"
+                    />
+                    <div className="profile-content-top-cover__overlay" />
+                    <div className="profile-content-top-cover__fade" />
+                </div>
             ) : null}
 
-            {pendingFlowWarning ? (
-                <ProfileFlowWarningModal
-                    flowLabel={warningFlowLabel}
-                    onClose={() => setPendingFlowWarning(null)}
-                    onConfirm={() => {
-                        if (pendingFlowWarning === 'update-email') {
-                            setEmailModalOpen(true);
-                        } else if (pendingFlowWarning === 'update-password') {
-                            setPasswordModalOpen(true);
-                        } else if (pendingFlowWarning === 'delete-user') {
-                            setDeleteAccountVerificationModalOpen(true);
-                        } else {
-                            setManualTwoFactorActivationOpen(true);
-                        }
-
-                        setPendingFlowWarning(null);
-                    }}
-                />
-            ) : null}
-
-            {manualTwoFactorActivationOpen ? (
-                <ProfileTwoFactorActivationModal
+            <div className="profile-content">
+                <ProfileHeroSection
                     user={user}
-                    onRefreshUser={refreshProfileUser}
-                    onCancel={() => {
-                        setManualTwoFactorActivationOpen(false);
-                    }}
-                    onCompleted={() => {
-                        setManualTwoFactorActivationOpen(false);
-                    }}
-                />
-            ) : null}
-
-            {biographyModalOpen ? (
-                <ProfileBiographyModal
-                    userId={userId}
-                    firstName={userDetails.firstName ?? ''}
-                    lastName={userDetails.lastName ?? ''}
+                    profileName={profileName}
+                    profileHandle={profileHandle}
                     biography={biography}
-                    onClose={() => setBiographyModalOpen(false)}
-                    onSaved={async () => {
-                        await refreshProfileUser();
-                        setBiographyModalOpen(false);
-                    }}
+                    profileCover={profileCover}
+                    accountStatus={accountStatus}
+                    accountStatusClass={accountStatusClass}
+                    isOwnProfile={isOwnProfile}
+                    pictureUploading={pictureUploading}
+                    pictureFeedback={pictureFeedback}
+                    earnedBadgeKeys={earnedBadgeKeys}
+                    openBadgePopoverId={openBadgePopoverId}
+                    pictureInputRef={pictureInputRef}
+                    onOpenBadgePopover={setOpenBadgePopoverId}
+                    onCloseBadgePopover={() => setOpenBadgePopoverId(null)}
+                    onPictureClick={handleProfilePictureClick}
+                    onSelectImage={(file) =>
+                        setPendingImageCrop({ file, intent: 'profile-avatar' })
+                    }
+                    onOpenProfileControls={handleOpenProfileControls}
+                    showMessageAction={canOpenMessages}
+                    messageBadgeCount={isOwnProfile ? unreadMessagesCount : 0}
+                    onOpenMessages={() => setMessagesModalOpen(true)}
+                    showFriendRequestsInboxAction={isOwnProfile}
+                    friendRequestsBadgeCount={pendingFriendRequests.length}
+                    onOpenFriendRequestsInbox={() =>
+                        setFriendRequestsInboxModalOpen(true)
+                    }
+                    showProfileControlsAction={isOwnProfile}
+                    showGalleryAction={isOwnProfile}
+                    onOpenGallery={() => setGalleryModalOpen(true)}
+                    showFriendRequestAction={showFriendRequestAction}
+                    onOpenFriendRequest={() => setFriendRequestModalOpen(true)}
                 />
-            ) : null}
 
-            {deleteAccountModalOpen ? (
-                <ProfileDeleteAccountModal
-                    userId={user.userId}
-                    onClose={() => setDeleteAccountModalOpen(false)}
-                    onDeleted={() => {
-                        setDeleteAccountModalOpen(false);
-                        window.location.replace('/');
-                    }}
-                />
-            ) : null}
+                {profileControlModalOpen ? (
+                    <ProfileControlModal
+                        hasExternalProvider={
+                            user.providerId !== null && user.providerId !== undefined
+                        }
+                        hasActiveTwoFactor={Boolean(user.twoFactorSecret?.active)}
+                        hasCover={Boolean(profileCover)}
+                        coverActionLoading={coverActionLoading}
+                        coverFeedback={coverFeedback}
+                        onClose={() => {
+                            setCoverFeedback('');
+                            setProfileControlModalOpen(false);
+                        }}
+                        onEditBiography={handleEditBiography}
+                        onRequestEmailUpdate={handleRequestEmailUpdate}
+                        onRequestPasswordUpdate={handleRequestPasswordUpdate}
+                        onRequestToggleTwoFactor={handleRequestToggleTwoFactor}
+                        onRequestCoverUpdate={handleCoverAction}
+                        onRequestDeleteAccount={() => {
+                            setProfileControlModalOpen(false);
+                            setPendingFlowWarning('delete-user');
+                        }}
+                    />
+                ) : null}
 
-            {deleteAccountVerificationModalOpen ? (
-                <ProfileDeleteAccountVerificationModal
-                    email={user.email}
-                    onClose={() => setDeleteAccountVerificationModalOpen(false)}
-                    onVerified={() => {
-                        setDeleteAccountVerificationModalOpen(false);
-                        setDeleteAccountModalOpen(true);
-                    }}
+                <ProfileShowcaseSection
+                    title="LISTA DE AMIZADES"
+                    subtitle={friendSubtitle}
+                    items={friendItems}
+                    label="Amigos do perfil"
+                    variant="friends"
+                    emptyMessage={
+                        isOwnProfile
+                            ? 'Sua lista de amigos ainda esta vazia.'
+                            : 'Este usuário ainda nao possui amigos visíveis.'
+                    }
+                    headerAction={
+                        activeFriends.length > 0 ? (
+                            <button
+                                type="button"
+                                className="font-XS-regular profile-showcase__link"
+                                onClick={() => setFriendsListModalOpen(true)}
+                            >
+                                Ver mais
+                            </button>
+                        ) : null
+                    }
                 />
-            ) : null}
 
-            {emailModalOpen ? (
-                <ProfileEmailUpdateModal
-                    userId={userId}
-                    email={user.email}
-                    onClose={() => setEmailModalOpen(false)}
-                    onSaved={async () => {
-                        await refreshProfileUser();
-                        setEmailModalOpen(false);
-                    }}
+                <ProfileShowcaseSection
+                    title="CAMPANHAS"
+                    subtitle={
+                        campaigns.length > 0
+                            ? `${campaigns.length} campanha(s) encontrada(s)`
+                            : 'Nenhuma campanha disponí­vel'
+                    }
+                    items={campaignItems}
+                    label="Campanhas do perfil"
+                    variant="campaigns"
+                    emptyMessage="Este usuário ainda não possui campanhas visí­veis."
+                    cardLayout={true}
                 />
-            ) : null}
 
-            {passwordModalOpen ? (
-                <ProfilePasswordUpdateModal
-                    email={user.email}
-                    onClose={() => setPasswordModalOpen(false)}
-                    onSaved={async () => {
-                        setPasswordModalOpen(false);
-                    }}
+                <ProfileShowcaseSection
+                    title="FICHAS"
+                    subtitle={
+                        characters.length > 0
+                            ? `${characters.length} personagem(ns) encontrado(s)`
+                            : 'Nenhum personagem disponí­vel'
+                    }
+                    items={characterItems}
+                    label="Personagens do perfil"
+                    variant="characters"
+                    emptyMessage="Este usuário ainda não criou personagens visí­veis."
+                    cardLayout={true}
                 />
-            ) : null}
 
-            {disableTwoFactorModalOpen ? (
-                <ProfileTwoFactorDisableModal
-                    userId={user.userId}
-                    email={user.email}
-                    onClose={() => setDisableTwoFactorModalOpen(false)}
-                    onSaved={async () => {
-                        await refreshProfileUser();
-                        setDisableTwoFactorModalOpen(false);
-                    }}
+                <ProfileShowcaseSection
+                    title="BADGES"
+                    subtitle=""
+                    items={badgeItems}
+                    label="Badges do perfil"
+                    variant="badges"
                 />
-            ) : null}
 
-            {pendingImageCrop ? (
-                <ImageCropModal
-                    file={pendingImageCrop.file}
-                    intent={pendingImageCrop.intent}
-                    onConfirm={handleProfilePictureUpload}
-                    onUseOriginal={handleProfilePictureUpload}
-                    onClose={() => setPendingImageCrop(null)}
-                />
-            ) : null}
+                {selectedCharacterId ? (
+                    <CharacterDetailModal
+                        characterId={selectedCharacterId}
+                        campaignId=""
+                        hideInventoryTab={true}
+                        onDeleted={() => {
+                            const deletedCharacterId = selectedCharacterId;
+                            setSelectedCharacterId(null);
+                            setCharacters((previous) =>
+                                previous.filter(
+                                    (character) =>
+                                        character.characterId !== deletedCharacterId
+                                )
+                            );
+                        }}
+                        onBack={() => setSelectedCharacterId(null)}
+                    />
+                ) : null}
+
+                {gateStep === 'complete-profile' ? (
+                    <CompleteUserModal
+                        userId={userId}
+                        mode="profile-complete"
+                        defaultValues={{
+                            firstName: userDetails.firstName ?? '',
+                            lastName: userDetails.lastName ?? '',
+                            birthday: normalizeBirthdayInput(userDetails.birthday),
+                        }}
+                        onSuccess={async () => {
+                            await refreshProfileUser();
+                        }}
+                        onCancel={() => router.push('/')}
+                    />
+                ) : null}
+
+                {pendingFlowWarning ? (
+                    <ProfileFlowWarningModal
+                        flowLabel={warningFlowLabel}
+                        onClose={() => setPendingFlowWarning(null)}
+                        onConfirm={() => {
+                            if (pendingFlowWarning === 'update-email') {
+                                setEmailModalOpen(true);
+                            } else if (pendingFlowWarning === 'update-password') {
+                                setPasswordModalOpen(true);
+                            } else if (pendingFlowWarning === 'delete-user') {
+                                setDeleteAccountVerificationModalOpen(true);
+                            } else {
+                                setManualTwoFactorActivationOpen(true);
+                            }
+
+                            setPendingFlowWarning(null);
+                        }}
+                    />
+                ) : null}
+
+                {manualTwoFactorActivationOpen ? (
+                    <ProfileTwoFactorActivationModal
+                        user={user}
+                        onRefreshUser={refreshProfileUser}
+                        onCancel={() => {
+                            setManualTwoFactorActivationOpen(false);
+                        }}
+                        onCompleted={() => {
+                            setManualTwoFactorActivationOpen(false);
+                        }}
+                    />
+                ) : null}
+
+                {biographyModalOpen ? (
+                    <ProfileBiographyModal
+                        userId={userId}
+                        firstName={userDetails.firstName ?? ''}
+                        lastName={userDetails.lastName ?? ''}
+                        biography={biography}
+                        onClose={() => setBiographyModalOpen(false)}
+                        onSaved={async () => {
+                            await refreshProfileUser();
+                            setBiographyModalOpen(false);
+                        }}
+                    />
+                ) : null}
+
+                {deleteAccountModalOpen ? (
+                    <ProfileDeleteAccountModal
+                        userId={user.userId}
+                        onClose={() => setDeleteAccountModalOpen(false)}
+                        onDeleted={() => {
+                            setDeleteAccountModalOpen(false);
+                            window.location.replace('/');
+                        }}
+                    />
+                ) : null}
+
+                {deleteAccountVerificationModalOpen ? (
+                    <ProfileDeleteAccountVerificationModal
+                        email={user.email}
+                        onClose={() => setDeleteAccountVerificationModalOpen(false)}
+                        onVerified={() => {
+                            setDeleteAccountVerificationModalOpen(false);
+                            setDeleteAccountModalOpen(true);
+                        }}
+                    />
+                ) : null}
+
+                {emailModalOpen ? (
+                    <ProfileEmailUpdateModal
+                        userId={userId}
+                        email={user.email}
+                        onClose={() => setEmailModalOpen(false)}
+                        onSaved={async () => {
+                            await refreshProfileUser();
+                            setEmailModalOpen(false);
+                        }}
+                    />
+                ) : null}
+
+                {passwordModalOpen ? (
+                    <ProfilePasswordUpdateModal
+                        email={user.email}
+                        onClose={() => setPasswordModalOpen(false)}
+                        onSaved={async () => {
+                            setPasswordModalOpen(false);
+                        }}
+                    />
+                ) : null}
+
+                {coverModalOpen ? (
+                    <ProfileCoverModal
+                        userId={userId}
+                        onClose={() => setCoverModalOpen(false)}
+                        onSaved={async () => {
+                            setCoverFeedback('');
+                            await refreshProfileUser();
+                            setCoverModalOpen(false);
+                        }}
+                    />
+                ) : null}
+
+                {disableTwoFactorModalOpen ? (
+                    <ProfileTwoFactorDisableModal
+                        userId={user.userId}
+                        email={user.email}
+                        onClose={() => setDisableTwoFactorModalOpen(false)}
+                        onSaved={async () => {
+                            await refreshProfileUser();
+                            setDisableTwoFactorModalOpen(false);
+                        }}
+                    />
+                ) : null}
+
+                {messagesModalOpen ? (
+                    <ProfileMessagesModal
+                        mode={isOwnProfile ? 'inbox' : 'compose'}
+                        ownerUserId={userId}
+                        currentUserId={currentUserId}
+                        recipientLabel={profileName || user.nickname || 'este usuário'}
+                        onMessagesChange={isOwnProfile ? setOwnerMessages : undefined}
+                        onClose={() => setMessagesModalOpen(false)}
+                    />
+                ) : null}
+
+                {friendRequestModalOpen ? (
+                    <ProfileFriendRequestModal
+                        recipientLabel={profileName || user.nickname || 'este usuário'}
+                        onClose={() => setFriendRequestModalOpen(false)}
+                        onConfirm={handleSendFriendRequest}
+                    />
+                ) : null}
+
+                {friendRequestsInboxModalOpen ? (
+                    <ProfileFriendRequestsInboxModal
+                        requests={pendingFriendRequests}
+                        onClose={() => setFriendRequestsInboxModalOpen(false)}
+                        onAccept={handleAcceptFriendRequest}
+                        onReject={handleRejectFriendRequest}
+                    />
+                ) : null}
+
+                {galleryModalOpen ? (
+                    <ProfileGalleryModal
+                        images={galleryImages}
+                        onClose={() => setGalleryModalOpen(false)}
+                    />
+                ) : null}
+
+                {friendsListModalOpen ? (
+                    <ProfileFriendsListModal
+                        friends={activeFriends}
+                        currentUserId={currentUserId}
+                        removingFriendId={removingFriendId}
+                        favoriteLoadingFriendId={favoriteLoadingFriendId}
+                        canRemoveFriend={isOwnProfile}
+                        canFavoriteFriend={isOwnProfile}
+                        onRemoveFriend={handleRemoveFriend}
+                        onToggleFavorite={handleToggleFavoriteFriend}
+                        onClose={() => setFriendsListModalOpen(false)}
+                    />
+                ) : null}
+
+                {profilePictureChoiceOpen ? (
+                    <ImageSourceChoiceModal
+                        title="Selecionar foto do perfil"
+                        description="Escolha se deseja enviar uma nova imagem ou usar uma que ja esta na sua galeria."
+                        onClose={() => setProfilePictureChoiceOpen(false)}
+                        onSelectLocal={() => {
+                            setProfilePictureChoiceOpen(false);
+                            pictureInputRef.current?.click();
+                        }}
+                        onSelectGallery={() => {
+                            setProfilePictureChoiceOpen(false);
+                            setProfilePictureGalleryOpen(true);
+                        }}
+                    />
+                ) : null}
+
+                {profilePictureGalleryOpen ? (
+                    <UserGalleryPickerModal
+                        title="Selecionar foto do perfil"
+                        description="Escolha uma imagem da sua galeria para usar como avatar."
+                        images={galleryImages}
+                        onClose={() => setProfilePictureGalleryOpen(false)}
+                        onSelect={(image) => {
+                            setProfilePictureGalleryOpen(false);
+                            void handleProfilePictureUpload(image).catch(() => undefined);
+                        }}
+                    />
+                ) : null}
+
+                {pendingImageCrop ? (
+                    <ImageCropModal
+                        file={pendingImageCrop.file}
+                        intent={pendingImageCrop.intent}
+                        onConfirm={handleProfilePictureUpload}
+                        onUseOriginal={handleProfilePictureUpload}
+                        onClose={() => setPendingImageCrop(null)}
+                    />
+                ) : null}
+            </div>
         </div>
     );
 }

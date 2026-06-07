@@ -2,7 +2,12 @@
 import { type ChangeEvent, useRef, useState } from 'react';
 import ImageCropModal from '@/components/common/ImageCropModal';
 import LoadingDots from '@/components/common/LoadingDots';
+import ImageSourceChoiceModal from '@/components/common/ImageSourceChoiceModal';
+import UserGalleryPickerModal from '@/components/common/UserGalleryPickerModal';
+import { useStoredUser, normalizeStoredUserId } from '@/hooks/useStoredUser';
+import { useUserGallery } from '@/hooks/useUserGallery';
 import type { ImageObject } from '@/types/shared/general';
+import type { UploadImageValue } from '@/utils/imageUploadPayload';
 import '@/components/match/styles/MatchImageHighlightModal.css';
 
 interface MatchImageHighlightManagerModalProps {
@@ -11,7 +16,7 @@ interface MatchImageHighlightManagerModalProps {
     isUploading: boolean;
     selectingImageId: string | null;
     onClose: () => void;
-    onUpload: (file: File) => Promise<void>;
+    onUpload: (file: UploadImageValue) => Promise<void>;
     onSelect: (imageId: string, remove?: boolean) => Promise<void>;
 }
 
@@ -24,13 +29,18 @@ export default function MatchImageHighlightManagerModal({
     onUpload,
     onSelect,
 }: MatchImageHighlightManagerModalProps): JSX.Element {
+    const { storedUser } = useStoredUser();
+    const currentUserId = normalizeStoredUserId(storedUser);
+    const { galleryImages, loadingGallery } = useUserGallery(currentUserId);
     const inputRef = useRef<HTMLInputElement>(null);
     const [error, setError] = useState('');
     const [pendingCropFile, setPendingCropFile] = useState<File | null>(null);
+    const [sourceChoiceOpen, setSourceChoiceOpen] = useState(false);
+    const [galleryPickerOpen, setGalleryPickerOpen] = useState(false);
 
     const isBusy = isUploading || selectingImageId !== null;
 
-    const uploadFile = async (file: File) => {
+    const uploadFile = async (file: UploadImageValue) => {
         setError('');
 
         try {
@@ -69,8 +79,23 @@ export default function MatchImageHighlightManagerModal({
         }
     };
 
+    const handleRequestUpload = () => {
+        if (isBusy) return;
+        if (loadingGallery) {
+            setError('A galeria ainda esta carregando.');
+            return;
+        }
+
+        if (galleryImages.length > 0) {
+            setSourceChoiceOpen(true);
+            return;
+        }
+
+        inputRef.current?.click();
+    };
+
     return (
-        <div className="mhim-overlay" onClick={onClose}>
+        <div className="mhim-overlay">
             <div className="mhim-modal" onClick={(event) => event.stopPropagation()}>
                 <div className="mhim-header">
                     <div>
@@ -111,7 +136,7 @@ export default function MatchImageHighlightManagerModal({
                         <button
                             type="button"
                             className="mhim-upload-btn font-XS-bold"
-                            onClick={() => inputRef.current?.click()}
+                            onClick={handleRequestUpload}
                             disabled={isBusy}
                         >
                             {isUploading ? (
@@ -203,6 +228,35 @@ export default function MatchImageHighlightManagerModal({
                     }}
                 />
             )}
+
+            {sourceChoiceOpen ? (
+                <ImageSourceChoiceModal
+                    title="Selecionar imagem"
+                    description="Escolha uma imagem local ou uma imagem salva na sua galeria."
+                    onClose={() => setSourceChoiceOpen(false)}
+                    onSelectLocal={() => {
+                        setSourceChoiceOpen(false);
+                        inputRef.current?.click();
+                    }}
+                    onSelectGallery={() => {
+                        setSourceChoiceOpen(false);
+                        setGalleryPickerOpen(true);
+                    }}
+                />
+            ) : null}
+
+            {galleryPickerOpen ? (
+                <UserGalleryPickerModal
+                    title="Selecionar imagem da galeria"
+                    description="Escolha uma imagem salva na sua galeria para enviar ao match."
+                    images={galleryImages}
+                    onClose={() => setGalleryPickerOpen(false)}
+                    onSelect={(image) => {
+                        setGalleryPickerOpen(false);
+                        void uploadFile(image).catch(() => undefined);
+                    }}
+                />
+            ) : null}
         </div>
     );
 }

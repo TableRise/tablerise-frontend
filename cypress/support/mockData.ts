@@ -24,12 +24,57 @@ export const profileUser = {
         birthday: '2000-05-20',
         biography: 'Mestra curiosa e colecionadora de campanhas.',
         gameInfo: {
-            badges: ['badge_student'],
+            badges: ['student_badge', 'cleric_badge', 'staff_badge'],
             characters: ['char-1'],
             campaigns: ['camp-1', 'camp-2'],
+            campaignsJoinedAmount: 7,
+            campaignsCreatedAmount: 2,
+            campaignsClosedAmount: 1,
+            equipBoughtAmount: 42,
+            donateAmount: 12,
         },
     },
 };
+
+export const profileUserWithCover = {
+    ...profileUser,
+    details: {
+        ...profileUser.details,
+        cover: {
+            link: '/images/SideImageBackground.svg',
+        },
+    },
+};
+
+export const profileFriends = [
+    {
+        userId: 'friend-1',
+        nickname: 'Bianca',
+        tag: '#0101',
+        picture: '/images/SideImageBackground.svg',
+        rank: 'silver',
+        status: 'active' as const,
+        favorite: false,
+    },
+    {
+        userId: 'friend-2',
+        nickname: 'Caio',
+        tag: '#0102',
+        picture: '/images/SideImageBackground.svg',
+        rank: 'gold',
+        status: 'active' as const,
+        favorite: false,
+    },
+    {
+        userId: 'friend-3',
+        nickname: 'Dora',
+        tag: '#0103',
+        picture: '/images/SideImageBackground.svg',
+        rank: 'bronze',
+        status: 'active' as const,
+        favorite: false,
+    },
+];
 
 export const masterCampaign = {
     campaignId: 'camp-1',

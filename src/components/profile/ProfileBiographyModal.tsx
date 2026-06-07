@@ -47,11 +47,6 @@ export default function ProfileBiographyModal({
             return;
         }
 
-        if (!trimmedValue) {
-            setError('*Digite uma biografia para continuar.');
-            return;
-        }
-
         if (trimmedValue.length > BIOGRAPHY_MAX_LENGTH) {
             setError('*A biografia deve ter no maximo 300 caracteres.');
             return;

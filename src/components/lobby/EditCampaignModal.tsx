@@ -17,8 +17,14 @@ import { getCampaignPlayers } from '@/server/campaigns/get-campaign-players';
 import { getUser } from '@/server/users/get-user';
 import ImageCropModal from '@/components/common/ImageCropModal';
 import LoadingDots from '@/components/common/LoadingDots';
+import ImageSourceChoiceModal from '@/components/common/ImageSourceChoiceModal';
+import UserGalleryPickerModal from '@/components/common/UserGalleryPickerModal';
+import { normalizeStoredUserId, useStoredUser } from '@/hooks/useStoredUser';
+import { useUserGallery } from '@/hooks/useUserGallery';
 import '@/components/lobby/styles/EditCampaignModal.css';
 import type { ImageUploadIntent } from '@/utils/imageCrop';
+import type { ImageObject } from '@/types/shared/general';
+import { isGalleryImageObject, type UploadImageValue } from '@/utils/imageUploadPayload';
 
 interface InitialData {
     title: string;
@@ -55,6 +61,9 @@ export default function EditCampaignModal({
     onClose,
     onSaved,
 }: Props): JSX.Element {
+    const { storedUser } = useStoredUser();
+    const currentUserId = normalizeStoredUserId(storedUser);
+    const { galleryImages, loadingGallery } = useUserGallery(currentUserId);
     const { date: initDate, start: initStart } = parseMatchDate(
         initialData.nextMatchDate
     );
@@ -80,9 +89,9 @@ export default function EditCampaignModal({
         'settings'
     );
     const [musics, setMusics] = useState<CampaignMusic[]>(initialData.musics);
-    const [coverFile, setCoverFile] = useState<File | null>(null);
+    const [coverFile, setCoverFile] = useState<UploadImageValue | null>(null);
     const [coverRemoved, setCoverRemoved] = useState(false);
-    const [newMapFiles, setNewMapFiles] = useState<File[]>([]);
+    const [newMapFiles, setNewMapFiles] = useState<UploadImageValue[]>([]);
     const [removedMapIndexes, setRemovedMapIndexes] = useState<number[]>([]);
     const [playerOptions, setPlayerOptions] = useState<
         { userId: string; nickname: string }[]
@@ -94,6 +103,12 @@ export default function EditCampaignModal({
         intent: ImageUploadIntent;
         target: 'cover' | 'map';
     } | null>(null);
+    const [sourceChoiceTarget, setSourceChoiceTarget] = useState<'cover' | 'map' | null>(
+        null
+    );
+    const [galleryPickerTarget, setGalleryPickerTarget] = useState<
+        'cover' | 'map' | null
+    >(null);
 
     useEffect(() => {
         (async () => {
@@ -124,6 +139,25 @@ export default function EditCampaignModal({
     const coverInputRef = useRef<HTMLInputElement>(null);
     const mapInputRef = useRef<HTMLInputElement>(null);
 
+    function handleRequestImageSelection(target: 'cover' | 'map') {
+        if (loadingGallery) {
+            setError('A galeria ainda esta carregando.');
+            return;
+        }
+
+        if (galleryImages.length > 0) {
+            setSourceChoiceTarget(target);
+            return;
+        }
+
+        if (target === 'cover') {
+            coverInputRef.current?.click();
+            return;
+        }
+
+        mapInputRef.current?.click();
+    }
+
     function handleCoverImageSelected(file: File) {
         setPendingImageCrop({
             file,
@@ -151,6 +185,17 @@ export default function EditCampaignModal({
         }
 
         setPendingImageCrop(null);
+    }
+
+    function handleGalleryImageSelected(image: ImageObject) {
+        if (galleryPickerTarget === 'cover') {
+            setCoverFile(image);
+            setCoverRemoved(false);
+        } else if (galleryPickerTarget === 'map') {
+            setNewMapFiles((prev) => [...prev, image]);
+        }
+
+        setGalleryPickerTarget(null);
     }
 
     async function handleSave() {
@@ -646,7 +691,11 @@ export default function EditCampaignModal({
                                             <img
                                                 src={
                                                     coverFile
-                                                        ? URL.createObjectURL(coverFile)
+                                                        ? isGalleryImageObject(coverFile)
+                                                            ? coverFile.link
+                                                            : URL.createObjectURL(
+                                                                  coverFile
+                                                              )
                                                         : initialData.cover
                                                 }
                                                 alt="Preview capa"
@@ -657,7 +706,9 @@ export default function EditCampaignModal({
                                                     type="button"
                                                     className="font-XS-bold ecm-upload-btn"
                                                     onClick={() =>
-                                                        coverInputRef.current?.click()
+                                                        handleRequestImageSelection(
+                                                            'cover'
+                                                        )
                                                     }
                                                 >
                                                     <Image
@@ -684,7 +735,9 @@ export default function EditCampaignModal({
                                         <button
                                             type="button"
                                             className="font-XS-bold ecm-upload-btn"
-                                            onClick={() => coverInputRef.current?.click()}
+                                            onClick={() =>
+                                                handleRequestImageSelection('cover')
+                                            }
                                         >
                                             <Image
                                                 src={UploadSVG.src}
@@ -763,9 +816,13 @@ export default function EditCampaignModal({
                                                     >
                                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                                         <img
-                                                            src={URL.createObjectURL(
-                                                                file
-                                                            )}
+                                                            src={
+                                                                isGalleryImageObject(file)
+                                                                    ? file.link
+                                                                    : URL.createObjectURL(
+                                                                          file
+                                                                      )
+                                                            }
                                                             alt={`Novo mapa ${idx + 1}`}
                                                             className="ecm-map-images-thumb"
                                                         />
@@ -790,7 +847,7 @@ export default function EditCampaignModal({
                                                 type="button"
                                                 className="font-XS-bold ecm-upload-btn"
                                                 onClick={() =>
-                                                    mapInputRef.current?.click()
+                                                    handleRequestImageSelection('map')
                                                 }
                                             >
                                                 <Image
@@ -806,7 +863,9 @@ export default function EditCampaignModal({
                                         <button
                                             type="button"
                                             className="font-XS-bold ecm-upload-btn"
-                                            onClick={() => mapInputRef.current?.click()}
+                                            onClick={() =>
+                                                handleRequestImageSelection('map')
+                                            }
                                         >
                                             <Image
                                                 src={UploadSVG.src}
@@ -874,6 +933,47 @@ export default function EditCampaignModal({
                     onConfirm={handleCroppedImageResolved}
                     onUseOriginal={handleCroppedImageResolved}
                     onClose={() => setPendingImageCrop(null)}
+                />
+            ) : null}
+
+            {sourceChoiceTarget ? (
+                <ImageSourceChoiceModal
+                    title={
+                        sourceChoiceTarget === 'cover'
+                            ? 'Selecionar imagem de capa'
+                            : 'Selecionar mapa'
+                    }
+                    description="Escolha uma imagem local ou uma imagem ja salva na sua galeria."
+                    onClose={() => setSourceChoiceTarget(null)}
+                    onSelectLocal={() => {
+                        const target = sourceChoiceTarget;
+                        setSourceChoiceTarget(null);
+
+                        if (target === 'cover') {
+                            coverInputRef.current?.click();
+                            return;
+                        }
+
+                        mapInputRef.current?.click();
+                    }}
+                    onSelectGallery={() => {
+                        setGalleryPickerTarget(sourceChoiceTarget);
+                        setSourceChoiceTarget(null);
+                    }}
+                />
+            ) : null}
+
+            {galleryPickerTarget ? (
+                <UserGalleryPickerModal
+                    title={
+                        galleryPickerTarget === 'cover'
+                            ? 'Selecionar imagem de capa'
+                            : 'Selecionar mapa'
+                    }
+                    description="Escolha uma imagem da sua galeria para reutilizar nesta campanha."
+                    images={galleryImages}
+                    onClose={() => setGalleryPickerTarget(null)}
+                    onSelect={handleGalleryImageSelected}
                 />
             ) : null}
         </div>

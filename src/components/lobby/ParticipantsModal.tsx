@@ -131,10 +131,7 @@ export default function ParticipantsModal({
     return (
         <>
             {pendingRemoveId && (
-                <div
-                    className="pm-remove-overlay"
-                    onClick={() => setPendingRemoveId(null)}
-                >
+                <div className="pm-remove-overlay">
                     <div
                         className="pm-remove-dialog"
                         onClick={(e) => e.stopPropagation()}

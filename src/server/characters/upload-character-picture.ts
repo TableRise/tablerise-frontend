@@ -1,13 +1,17 @@
 import axios from 'axios';
 import { charactersBaseUrl } from '../wrapper';
+import {
+    appendUploadImageValue,
+    type UploadImageValue,
+} from '@/utils/imageUploadPayload';
 
 export const uploadCharacterPicture = async (
     characterId: string,
-    file: File
+    file: UploadImageValue
 ): Promise<boolean> => {
     try {
         const formData = new FormData();
-        formData.append('picture', file);
+        appendUploadImageValue(formData, 'picture', file);
 
         await axios({
             method: 'POST',

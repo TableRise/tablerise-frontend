@@ -31,7 +31,7 @@ export const deactivateUserTwoFactor = async (userId: string): Promise<void> => 
             method: 'PATCH',
         });
     } catch ({ response }: AxiosError | any) {
-        if (response?.status === 404) throw new Error('*Usuario nao encontrado.');
+        if (response?.status === 404) throw new Error('*usuário nao encontrado.');
         if (response?.status === 500)
             throw new Error('*Erro no servidor. Tente novamente.');
         throw new Error('*Nao foi possivel desabilitar os dois fatores.');

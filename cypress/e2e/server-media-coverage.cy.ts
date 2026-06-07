@@ -719,7 +719,7 @@ describe('TableRise :: Server Media Coverage', () => {
         }).as('updateUserPicture404');
         cy.then(() =>
             expectRejectedIncludes(updateUserPicture('user-404', picture), [
-                'Usuario',
+                'usuário',
                 'encontrado',
             ])
         );

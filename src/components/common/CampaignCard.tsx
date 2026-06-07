@@ -53,6 +53,9 @@ export default function CampaignCard(cardProps: CampaignCardProps): JSX.Element 
     const playerCount = campaignPlayers.filter(
         (p) => p.role === 'player' || p.role === 'admin_player'
     ).length;
+    const isPendingApprovalButton =
+        buttonTitle.includes('Aguardando aprova') ||
+        buttonTitle.includes('Aguardando aprovaÃ§Ã£o');
 
     return (
         <div
@@ -110,7 +113,11 @@ export default function CampaignCard(cardProps: CampaignCardProps): JSX.Element 
 
                 <div className="card-buttons">
                     <button
-                        className={`${buttonColorCSS} ${buttonTextColorCSS}`}
+                        className={`${buttonColorCSS} ${buttonTextColorCSS} ${
+                            isPendingApprovalButton
+                                ? 'font-XXS-bold campaign-card__pending-button'
+                                : 'font-XS-bold'
+                        }`}
                         onClick={onButtonClick}
                         disabled={buttonDisabled}
                     >

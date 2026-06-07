@@ -1,7 +1,8 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import EditIcon from '@assets/icons/sys/edit.svg?url';
+import EditDarkIcon from '@assets/icons/sys/edit-dark.svg?url';
 import ArrowBackIcon from '@assets/icons/nav/arrow-back.svg?url';
 import ArrowRightIcon from '@assets/icons/nav/arrow-right.svg?url';
 import LoadingDots from '@/components/common/LoadingDots';
@@ -41,7 +42,13 @@ import {
     hasAnySpellProgression,
     type LevelUpNotification,
 } from '@/utils/characterLeveling';
+import TableriseContext from '@/context/TableriseContext';
 import type { ImageUploadIntent } from '@/utils/imageCrop';
+import ImageSourceChoiceModal from '@/components/common/ImageSourceChoiceModal';
+import UserGalleryPickerModal from '@/components/common/UserGalleryPickerModal';
+import { normalizeStoredUserId, useStoredUser } from '@/hooks/useStoredUser';
+import { useUserGallery } from '@/hooks/useUserGallery';
+import type { UploadImageValue } from '@/utils/imageUploadPayload';
 
 interface CharacterDetailModalProps {
     characterId: string;
@@ -231,6 +238,11 @@ export default function CharacterDetailModal({
     onBack,
     onDeleted,
 }: CharacterDetailModalProps): JSX.Element {
+    const { themeMode } = useContext(TableriseContext);
+    const { storedUser } = useStoredUser();
+    const currentUserId = normalizeStoredUserId(storedUser);
+    const { galleryImages, loadingGallery, refreshGallery } =
+        useUserGallery(currentUserId);
     const [char, setChar] = useState<FullCharacterDnd | null>(null);
     const [loading, setLoading] = useState(true);
     const [classRecord, setClassRecord] = useState<DndClassRecord | null>(null);
@@ -252,6 +264,8 @@ export default function CharacterDetailModal({
         file: File;
         intent: ImageUploadIntent;
     } | null>(null);
+    const [pictureSourceChoiceOpen, setPictureSourceChoiceOpen] = useState(false);
+    const [pictureGalleryOpen, setPictureGalleryOpen] = useState(false);
 
     // Edit form states
     const [editAbilityScores, setEditAbilityScores] = useState<
@@ -461,6 +475,12 @@ export default function CharacterDetailModal({
     };
 
     const handlePictureClick = () => {
+        if (loadingGallery) return;
+        if (galleryImages.length > 0) {
+            setPictureSourceChoiceOpen(true);
+            return;
+        }
+
         pictureInputRef.current?.click();
     };
 
@@ -486,11 +506,12 @@ export default function CharacterDetailModal({
         onBack();
     };
 
-    const handleCharacterPictureUpload = async (file: File) => {
+    const handleCharacterPictureUpload = async (file: UploadImageValue) => {
         const success = await uploadCharacterPicture(characterId, file);
 
         if (success) {
             await loadCharacterModalData();
+            await refreshGallery();
             setPendingImageCrop(null);
             return;
         }
@@ -907,7 +928,11 @@ export default function CharacterDetailModal({
                                             onClick={handlePictureClick}
                                         >
                                             <Image
-                                                src={EditIcon}
+                                                src={
+                                                    themeMode === 'dark'
+                                                        ? EditDarkIcon
+                                                        : EditIcon
+                                                }
                                                 alt="edit"
                                                 width={32}
                                                 height={32}
@@ -2430,10 +2455,7 @@ export default function CharacterDetailModal({
                     const unit = String(sellConfirmItem.price[1] ?? '');
                     const sellAmount = Math.floor(rawAmount * 0.9);
                     return (
-                        <div
-                            className="cdm-overlay"
-                            onClick={() => setSellConfirmItem(null)}
-                        >
+                        <div className="cdm-overlay">
                             <div
                                 className="cdm-sell-confirm-modal"
                                 onClick={(e) => e.stopPropagation()}
@@ -2479,14 +2501,7 @@ export default function CharacterDetailModal({
                 })()}
 
             {deleteConfirmOpen && (
-                <div
-                    className="cdm-overlay"
-                    onClick={() => {
-                        if (deleteSubmitting) return;
-                        setDeleteConfirmOpen(false);
-                        setDeleteError('');
-                    }}
-                >
+                <div className="cdm-overlay">
                     <div
                         className="profile-action-modal-card"
                         onClick={(event) => event.stopPropagation()}
@@ -2589,6 +2604,35 @@ export default function CharacterDetailModal({
                     onConfirm={handleCharacterPictureUpload}
                     onUseOriginal={handleCharacterPictureUpload}
                     onClose={() => setPendingImageCrop(null)}
+                />
+            ) : null}
+
+            {pictureSourceChoiceOpen ? (
+                <ImageSourceChoiceModal
+                    title="Selecionar retrato do personagem"
+                    description="Escolha uma imagem local ou uma imagem ja salva na sua galeria."
+                    onClose={() => setPictureSourceChoiceOpen(false)}
+                    onSelectLocal={() => {
+                        setPictureSourceChoiceOpen(false);
+                        pictureInputRef.current?.click();
+                    }}
+                    onSelectGallery={() => {
+                        setPictureSourceChoiceOpen(false);
+                        setPictureGalleryOpen(true);
+                    }}
+                />
+            ) : null}
+
+            {pictureGalleryOpen ? (
+                <UserGalleryPickerModal
+                    title="Selecionar retrato do personagem"
+                    description="Escolha uma imagem da sua galeria para usar no personagem."
+                    images={galleryImages}
+                    onClose={() => setPictureGalleryOpen(false)}
+                    onSelect={(image) => {
+                        setPictureGalleryOpen(false);
+                        void handleCharacterPictureUpload(image).catch(() => undefined);
+                    }}
                 />
             ) : null}
         </>

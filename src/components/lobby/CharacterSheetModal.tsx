@@ -223,10 +223,7 @@ export default function CharacterSheetModal({
             )}
 
             {confirmDeleteId && (
-                <div
-                    className="csm-confirm-overlay"
-                    onClick={() => setConfirmDeleteId(null)}
-                >
+                <div className="csm-confirm-overlay">
                     <div
                         className="csm-confirm-modal"
                         onClick={(e) => e.stopPropagation()}

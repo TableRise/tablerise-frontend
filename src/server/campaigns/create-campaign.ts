@@ -1,6 +1,10 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import axios from 'axios';
 import { campaignsBaseUrl } from '../wrapper';
+import {
+    appendCampaignCreateImageValues,
+    type UploadImageValue,
+} from '@/utils/imageUploadPayload';
 
 const CAMPAIGN_DESCRIPTION_MAX_LENGTH = 240;
 
@@ -18,8 +22,8 @@ export interface CreateCampaignPayload {
     visibility: string;
     password: string;
     musics: CampaignMusic[];
-    coverImage?: File | null;
-    mapImages: File[];
+    coverImage?: UploadImageValue | null;
+    mapImages: UploadImageValue[];
     mainHistory: string;
     nextMatchDate: string[];
     playerAmountLimit: number;
@@ -46,13 +50,13 @@ export const createCampaign = async (payload: CreateCampaignPayload) => {
         formData.append('playerAmountLimit', String(payload.playerAmountLimit));
         formData.append('configurations', JSON.stringify(payload.configurations));
         formData.append('password', payload.password);
-        if (payload.coverImage) formData.append('cover', payload.coverImage);
+        appendCampaignCreateImageValues(formData, {
+            coverImage: payload.coverImage,
+            mapImages: payload.mapImages,
+        });
         if (payload.nextMatchDate.length > 0) {
             formData.append('nextMatchDate', JSON.stringify(payload.nextMatchDate[0]));
         }
-        payload.mapImages.forEach((file) => {
-            formData.append('mapImages', file);
-        });
         if (Object.values(payload.socialMedia).some((v) => v)) {
             formData.append('socialMedia', JSON.stringify(payload.socialMedia));
         }

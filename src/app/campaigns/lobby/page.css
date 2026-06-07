@@ -113,6 +113,20 @@
 
     .lobby-session-modal-text {
         @apply text-color-primary/default_900 leading-relaxed;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        white-space: pre-wrap;
+    }
+
+    .lobby-session-modal-copy {
+        @apply flex flex-col gap-3;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        white-space: pre-wrap;
+    }
+
+    .lobby-session-modal-break {
+        @apply h-2;
     }
 
     .lobby-characters {

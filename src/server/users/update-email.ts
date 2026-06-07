@@ -52,7 +52,7 @@ export const updateUserEmail = async (userId: string, email: string): Promise<vo
             throw new Error('*Email invalido. Verifique o endereco informado.');
         if (response?.status === 409)
             throw new Error('*Este e-mail ja esta em uso por outra conta.');
-        if (response?.status === 404) throw new Error('*Usuario nao encontrado.');
+        if (response?.status === 404) throw new Error('*usuário nao encontrado.');
         if (response?.status === 500)
             throw new Error('*Erro no servidor. Tente novamente.');
         throw new Error('*Nao foi possivel atualizar o e-mail.');

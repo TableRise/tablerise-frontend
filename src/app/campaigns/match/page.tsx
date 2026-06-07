@@ -67,6 +67,7 @@ import type {
     TokenWrappedPayload,
 } from '@/types/shared/socket';
 import type { ImageObject } from '@/types/shared/general';
+import type { UploadImageValue } from '@/utils/imageUploadPayload';
 import LogoLightSVG from '../../../../assets/icons/logo-blue.svg?url';
 import LogoDarkSVG from '../../../../assets/icons/logo-dark.svg?url';
 import SheetLightSVG from '../../../../assets/icons/menu-panel-lobby/sheet.svg?url';
@@ -160,6 +161,14 @@ const TOKEN_SHELL_ASPECT_RATIO = 56 / 52;
 const TOKEN_INFO_HEIGHT_PX = 44;
 const DRAG_CLICK_THRESHOLD_PX = 6;
 const MATCH_DICE_BOX_HOST_ID = 'match-dice-box-host';
+
+function requiresLandscapeViewportOnDevice(): boolean {
+    if (typeof window === 'undefined') {
+        return false;
+    }
+
+    return window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+}
 
 function getUserRank(user: any): string | undefined {
     const rank = user?.details?.rank ?? user?.result?.details?.rank;
@@ -371,6 +380,9 @@ export default function MatchPage(): JSX.Element {
     const [backgroundImage, setBackgroundImage] = useState<string>(
         SideImageBackground.src
     );
+    const [requiresLandscapeViewport, setRequiresLandscapeViewport] = useState<boolean>(
+        () => requiresLandscapeViewportOnDevice()
+    );
     const [isLandscapeViewport, setIsLandscapeViewport] = useState<boolean>(() => {
         if (typeof window === 'undefined') {
             return true;
@@ -480,6 +492,7 @@ export default function MatchPage(): JSX.Element {
 
     useEffect(() => {
         function syncViewportOrientation() {
+            setRequiresLandscapeViewport(requiresLandscapeViewportOnDevice());
             setIsLandscapeViewport(window.innerWidth >= window.innerHeight);
         }
 
@@ -1548,9 +1561,9 @@ export default function MatchPage(): JSX.Element {
                 setIsPlayer(role === 'player' || role === 'admin_player');
             }
         });
-    }, [campaignId]);
+    }, [campaignId, userInfo?.userId]);
 
-    const handleUploadMatchImage = async (file: File) => {
+    const handleUploadMatchImage = async (file: UploadImageValue) => {
         setImageHighlightUploading(true);
 
         try {
@@ -2366,7 +2379,7 @@ export default function MatchPage(): JSX.Element {
                 backgroundSize: 'cover',
             }}
         >
-            {!isLandscapeViewport && (
+            {requiresLandscapeViewport && !isLandscapeViewport && (
                 <div className="match-orientation-overlay">
                     <div className="match-orientation-overlay-content">
                         <Image
@@ -3303,7 +3316,7 @@ export default function MatchPage(): JSX.Element {
             )}
 
             {(panelDetailSpell !== null || panelDetailLoading) && (
-                <div className="cs-spell-picker-overlay" onClick={closeSpellDetail}>
+                <div className="cs-spell-picker-overlay">
                     <div
                         className="cs-spell-picker-modal"
                         onClick={(e) => e.stopPropagation()}
@@ -3443,13 +3456,7 @@ export default function MatchPage(): JSX.Element {
             )}
 
             {cloneLifeEditor && (
-                <div
-                    className="match-clone-life-overlay"
-                    onClick={() => {
-                        setCloneLifeEditor(null);
-                        setCloneLifeInput('');
-                    }}
-                >
+                <div className="match-clone-life-overlay">
                     <div
                         className="match-clone-life-modal"
                         onClick={(event) => event.stopPropagation()}
@@ -3571,13 +3578,7 @@ export default function MatchPage(): JSX.Element {
             )}
 
             {journalHighlightModalOpen && (
-                <div
-                    className="match-journal-highlight-overlay"
-                    onClick={() => {
-                        if (journalHighlightSaving) return;
-                        setJournalHighlightModalOpen(false);
-                    }}
-                >
+                <div className="match-journal-highlight-overlay">
                     <div
                         className="match-journal-highlight-modal"
                         onClick={(event) => event.stopPropagation()}
@@ -3675,10 +3676,7 @@ export default function MatchPage(): JSX.Element {
             )}
 
             {journalHighlightNoticeOpen && (
-                <div
-                    className="match-journal-highlight-overlay"
-                    onClick={() => setJournalHighlightNoticeOpen(false)}
-                >
+                <div className="match-journal-highlight-overlay">
                     <div
                         className="match-journal-highlight-notice"
                         onClick={(event) => event.stopPropagation()}

@@ -26,6 +26,11 @@ describe('TableRise :: Logged Home And Campaigns', () => {
         cy.wait('@getUserCampaigns');
         cy.contains('button', 'Criar uma campanha').click();
         cy.contains('Antes de criar sua campanha').should('be.visible');
+        cy.contains('button', 'Mostrar QRCode').click();
+        cy.get('.donation-support-modal-card--qr').should('be.visible');
+        cy.get('img[alt="QR Code para doacao ao Tablerise"]').should('be.visible');
+        cy.contains('.donation-support-modal-card--qr button', 'Fechar').click();
+        cy.get('.donation-support-modal-card--qr').should('not.exist');
         cy.contains('.donation-support-modal-buttons button', 'Continuar').click();
 
         cy.get('.ccm-input').first().type('Rastros da Aurora');

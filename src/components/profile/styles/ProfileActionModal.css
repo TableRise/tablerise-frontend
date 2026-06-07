@@ -4,11 +4,25 @@
 
 @layer base {
     .profile-action-modal-overlay {
-        @apply fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4;
+        @apply fixed inset-0 z-[300] flex items-center justify-center bg-black/60 px-4;
     }
 
     .profile-action-modal-card {
         @apply flex w-full max-w-[30rem] flex-col items-center gap-4 rounded-2xl bg-white p-8 shadow-xl;
+    }
+
+    .profile-action-modal-card--cover {
+        @apply max-w-[42rem] items-stretch;
+        max-height: min(90vh, 48rem);
+        overflow-y: auto;
+    }
+
+    .profile-action-modal-card--gallery-picker,
+    .profile-action-modal-card--friends-list,
+    .profile-action-modal-card--messages {
+        @apply max-w-[64rem] items-stretch;
+        max-height: min(90vh, 48rem);
+        overflow-y: auto;
     }
 
     .profile-action-modal-title {
@@ -89,8 +103,143 @@
         @apply bg-color-support/alert text-color-greyScale/50;
     }
 
+    .profile-action-modal-button-subtle {
+        background-color: transparent;
+        color: var(--theme-text);
+    }
+
+    .profile-action-modal-button-subtle:hover:enabled {
+        background-color: rgba(7, 23, 63, 0.22);
+    }
+
+    .profile-action-modal-button-subtle--danger {
+        @apply text-color-support/alert;
+    }
+
+    .profile-action-modal-button-option:hover:enabled {
+        background-color: rgb(7 40 95);
+    }
+
     .profile-action-modal-button-danger:hover:enabled {
         filter: brightness(0.95);
+    }
+
+    .profile-action-modal-cover-preview {
+        @apply relative min-h-[14rem] overflow-hidden rounded-2xl border border-color-greyScale/300 bg-color-greyScale/100;
+    }
+
+    .profile-action-modal-cover-preview-image {
+        @apply h-full w-full;
+        min-height: 14rem;
+        object-fit: cover;
+    }
+
+    .profile-action-modal-cover-preview-overlay {
+        @apply absolute inset-0 bg-black/45;
+    }
+
+    .profile-action-modal-cover-empty {
+        @apply flex min-h-[14rem] items-center justify-center px-6 text-center text-color-greyScale/500;
+    }
+
+    .profile-action-modal-cover-meta {
+        @apply flex flex-col gap-1;
+    }
+
+    .profile-gallery-picker__header {
+        @apply flex items-start justify-between gap-4;
+    }
+
+    .profile-gallery-picker__copy {
+        @apply flex flex-col gap-2;
+    }
+
+    .profile-gallery-picker__close {
+        @apply flex h-10 w-10 items-center justify-center rounded-xl bg-transparent text-color-greyScale/700 transition-colors duration-150;
+    }
+
+    .profile-gallery-picker__close:hover {
+        background-color: rgba(12, 37, 95, 0.08);
+    }
+
+    .profile-gallery-picker__grid {
+        @apply mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4;
+    }
+
+    .profile-gallery-picker__item {
+        @apply flex flex-col gap-2 rounded-2xl border border-color-greyScale/200 bg-color-greyScale/50 p-3 text-left transition-transform duration-150;
+    }
+
+    .profile-gallery-picker__item:hover {
+        transform: translateY(-2px);
+    }
+
+    .profile-gallery-picker__image {
+        @apply h-36 w-full rounded-xl object-cover;
+    }
+
+    .profile-gallery-picker__label {
+        @apply text-color-greyScale/900;
+    }
+
+    .profile-gallery-picker__empty {
+        @apply mt-4 flex min-h-[12rem] items-center justify-center rounded-2xl border border-color-greyScale/200 bg-color-greyScale/50 px-6 text-center;
+    }
+
+    .profile-friends-modal__grid {
+        @apply mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4;
+    }
+
+    .profile-friend-requests-modal__list {
+        @apply mt-4 flex flex-col gap-3;
+    }
+
+    .profile-friend-requests-modal__item {
+        @apply flex flex-col gap-4 rounded-2xl border border-color-greyScale/200 bg-color-greyScale/50 p-4 lg:flex-row lg:items-center lg:justify-between;
+    }
+
+    .profile-friend-requests-modal__identity {
+        @apply flex items-center gap-3;
+    }
+
+    .profile-friend-requests-modal__avatar {
+        @apply h-16 w-16 flex-shrink-0;
+    }
+
+    .profile-friend-requests-modal__copy {
+        @apply flex min-w-0 flex-col;
+    }
+
+    .profile-friend-requests-modal__copy span:first-child {
+        @apply text-color-greyScale/950;
+    }
+
+    .profile-friend-requests-modal__actions {
+        @apply flex flex-wrap gap-2;
+    }
+
+    .profile-friend-requests-modal__button {
+        @apply rounded-xl px-4 py-2 transition-colors duration-150;
+    }
+
+    .profile-friend-requests-modal__button:disabled {
+        @apply cursor-not-allowed opacity-70;
+    }
+
+    .profile-friend-requests-modal__button--accept {
+        @apply bg-color-primary/default_900 text-color-greyScale/50;
+    }
+
+    .profile-friend-requests-modal__button--accept:hover:enabled {
+        background-color: rgb(7 40 95);
+    }
+
+    .profile-friend-requests-modal__button--reject {
+        @apply bg-color-greyScale/100 text-color-greyScale/950;
+    }
+
+    .profile-friend-requests-modal__button--reject:hover:enabled {
+        background-color: rgba(255, 89, 89, 0.08);
     }
 
     html[data-theme='dark'] .profile-action-modal-card {
@@ -111,5 +260,58 @@
         background-color: var(--theme-surface-muted);
         border-color: var(--theme-border);
         color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .profile-action-modal-cover-preview {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .profile-action-modal-cover-empty {
+        color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .profile-gallery-picker__close {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .profile-gallery-picker__close:hover {
+        background-color: rgba(255, 255, 255, 0.06);
+    }
+
+    html[data-theme='dark'] .profile-gallery-picker__item,
+    html[data-theme='dark'] .profile-gallery-picker__empty {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .profile-friend-requests-modal__item {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .profile-friend-requests-modal__copy span:first-child,
+    html[data-theme='dark'] .profile-friend-requests-modal__button--reject {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .profile-friend-requests-modal__button--reject {
+        background-color: rgba(255, 255, 255, 0.04);
+    }
+
+    html[data-theme='dark'] .profile-friend-requests-modal__button--reject:hover:enabled {
+        background-color: rgba(255, 89, 89, 0.12);
+    }
+
+    html[data-theme='dark'] .profile-gallery-picker__label {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .profile-action-modal-button-subtle {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .profile-action-modal-button-subtle:hover:enabled {
+        background-color: rgba(255, 255, 255, 0.06);
     }
 }

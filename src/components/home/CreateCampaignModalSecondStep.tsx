@@ -1,10 +1,18 @@
-import { useRef } from 'react';
+import { useContext, useRef, useState } from 'react';
 import Image from 'next/image';
 import UploadSVG from '../../../assets/icons/sys/upload-gray.svg?url';
 import HelpSVG from '../../../assets/icons/sys/help-blue.svg?url';
+import HelpDarkSVG from '../../../assets/icons/sys/help-dark.svg?url';
 import type { CampaignMusic } from '@/server/campaigns/create-campaign';
 import { AGE_RATINGS } from '@/components/home/helpers/CreateCampaignModalHelpers';
 import SoundtrackUI from '@/components/common/SoundtrackUI';
+import TableriseContext from '@/context/TableriseContext';
+import ImageSourceChoiceModal from '@/components/common/ImageSourceChoiceModal';
+import UserGalleryPickerModal from '@/components/common/UserGalleryPickerModal';
+import { normalizeStoredUserId, useStoredUser } from '@/hooks/useStoredUser';
+import { useUserGallery } from '@/hooks/useUserGallery';
+import type { ImageObject } from '@/types/shared/general';
+import { isGalleryImageObject, type UploadImageValue } from '@/utils/imageUploadPayload';
 
 const SYSTEM_TOOLTIPS = {
     xpSystem: `Sistema de gerenciamento de XP:
@@ -32,6 +40,7 @@ export default function CreateCampaignModalSecondStep({
     mapImages,
     setMapImages,
     onSelectMapImage,
+    onSelectMapGalleryImage,
     discordLink,
     setDiscordLink,
     twitterLink,
@@ -43,7 +52,23 @@ export default function CreateCampaignModalSecondStep({
     shopSystem,
     setShopSystem,
 }: any) {
+    const { themeMode } = useContext(TableriseContext);
+    const { storedUser } = useStoredUser();
+    const currentUserId = normalizeStoredUserId(storedUser);
+    const { galleryImages, loadingGallery } = useUserGallery(currentUserId);
     const mapInputRef = useRef<HTMLInputElement>(null);
+    const [choiceOpen, setChoiceOpen] = useState(false);
+    const [galleryOpen, setGalleryOpen] = useState(false);
+
+    function handleRequestImageSelection() {
+        if (loadingGallery) return;
+        if (galleryImages.length > 0) {
+            setChoiceOpen(true);
+            return;
+        }
+
+        mapInputRef.current?.click();
+    }
 
     return (
         <div className="ccm-step-content">
@@ -153,7 +178,11 @@ export default function CreateCampaignModalSecondStep({
                                 aria-label="Ajuda sobre sistema de gerenciamento de XP"
                             >
                                 <Image
-                                    src={HelpSVG.src}
+                                    src={
+                                        themeMode === 'dark'
+                                            ? HelpDarkSVG.src
+                                            : HelpSVG.src
+                                    }
                                     alt="Ajuda sobre sistema de gerenciamento de XP"
                                     width={18}
                                     height={18}
@@ -184,7 +213,11 @@ export default function CreateCampaignModalSecondStep({
                                 aria-label="Ajuda sobre sistema de loja de itens"
                             >
                                 <Image
-                                    src={HelpSVG.src}
+                                    src={
+                                        themeMode === 'dark'
+                                            ? HelpDarkSVG.src
+                                            : HelpSVG.src
+                                    }
                                     alt="Ajuda sobre sistema de loja de itens"
                                     width={18}
                                     height={18}
@@ -228,11 +261,15 @@ export default function CreateCampaignModalSecondStep({
                     {mapImages.length > 0 ? (
                         <div className="ccm-map-images">
                             <div className="ccm-map-images-grid">
-                                {mapImages.map((file: File, idx: number) => (
+                                {mapImages.map((file: UploadImageValue, idx: number) => (
                                     <div key={idx} className="ccm-map-images-item">
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
-                                            src={URL.createObjectURL(file)}
+                                            src={
+                                                isGalleryImageObject(file)
+                                                    ? file.link
+                                                    : URL.createObjectURL(file)
+                                            }
                                             alt={`Mapa ${idx + 1}`}
                                             className="ccm-map-images-thumb"
                                         />
@@ -240,9 +277,12 @@ export default function CreateCampaignModalSecondStep({
                                             type="button"
                                             className="ccm-map-images-remove bg-color-greyScale/500"
                                             onClick={() =>
-                                                setMapImages((prev: File[]) =>
+                                                setMapImages((prev: UploadImageValue[]) =>
                                                     prev.filter(
-                                                        (_: File, i: number) => i !== idx
+                                                        (
+                                                            _: UploadImageValue,
+                                                            i: number
+                                                        ) => i !== idx
                                                     )
                                                 )
                                             }
@@ -256,7 +296,7 @@ export default function CreateCampaignModalSecondStep({
                                 <button
                                     type="button"
                                     className="font-XS-bold ccm-upload-btn"
-                                    onClick={() => mapInputRef.current?.click()}
+                                    onClick={handleRequestImageSelection}
                                 >
                                     <Image
                                         src={UploadSVG.src}
@@ -273,7 +313,7 @@ export default function CreateCampaignModalSecondStep({
                             <button
                                 type="button"
                                 className="font-XS-bold ccm-upload-btn"
-                                onClick={() => mapInputRef.current?.click()}
+                                onClick={handleRequestImageSelection}
                             >
                                 <Image
                                     src={UploadSVG.src}
@@ -335,6 +375,35 @@ export default function CreateCampaignModalSecondStep({
                     </label>
                 </div>
             </div>
+
+            {choiceOpen ? (
+                <ImageSourceChoiceModal
+                    title="Selecionar mapa"
+                    description="Escolha uma imagem local ou uma imagem ja salva na sua galeria."
+                    onClose={() => setChoiceOpen(false)}
+                    onSelectLocal={() => {
+                        setChoiceOpen(false);
+                        mapInputRef.current?.click();
+                    }}
+                    onSelectGallery={() => {
+                        setChoiceOpen(false);
+                        setGalleryOpen(true);
+                    }}
+                />
+            ) : null}
+
+            {galleryOpen ? (
+                <UserGalleryPickerModal
+                    title="Selecionar mapa"
+                    description="Escolha uma imagem da sua galeria para usar como mapa."
+                    images={galleryImages}
+                    onClose={() => setGalleryOpen(false)}
+                    onSelect={(image: ImageObject) => {
+                        setGalleryOpen(false);
+                        onSelectMapGalleryImage(image);
+                    }}
+                />
+            ) : null}
         </div>
     );
 }

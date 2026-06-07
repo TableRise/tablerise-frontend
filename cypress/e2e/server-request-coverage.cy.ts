@@ -101,7 +101,7 @@ describe('TableRise :: Server Request Coverage', () => {
         }).as('login404');
         cy.then(() =>
             expectRejectedIncludes(postLogin({ email: 'a', password: 'b' } as any), [
-                'Usuario',
+                'usuário',
                 'cadastrado',
             ])
         );

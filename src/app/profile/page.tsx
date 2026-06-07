@@ -1,37 +1,32 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { normalizeStoredUserId, type StoredUserRecord } from '@/hooks/useStoredUser';
 import '@/app/profile/page.css';
 
-type StoredUser = {
-    userId?: string;
-};
-
 export default function ProfileRedirectPage(): JSX.Element {
-    const router = useRouter();
-
     useEffect(() => {
         try {
             const storedUserRaw = localStorage.getItem('userLogged');
 
             if (!storedUserRaw) {
-                router.replace('/login');
+                window.location.replace('/login');
                 return;
             }
 
-            const storedUser = JSON.parse(storedUserRaw) as StoredUser | null;
+            const storedUser = JSON.parse(storedUserRaw) as StoredUserRecord | null;
+            const normalizedUserId = normalizeStoredUserId(storedUser);
 
-            if (!storedUser?.userId) {
-                router.replace('/login');
+            if (!normalizedUserId) {
+                window.location.replace('/login');
                 return;
             }
 
-            router.replace(`/profile/${storedUser.userId}`);
+            window.location.replace(`/profile/${normalizedUserId}`);
         } catch {
-            router.replace('/login');
+            window.location.replace('/login');
         }
-    }, [router]);
+    }, []);
 
     return (
         <main className="profile-redirect-page">

@@ -5,7 +5,7 @@
 @layer base {
     .mhim-overlay,
     .mhiv-overlay {
-        @apply fixed inset-0 z-[220] flex items-center justify-center bg-black/65 px-4;
+        @apply fixed inset-0 z-[340] flex items-center justify-center bg-black/65 px-4;
     }
 
     .mhim-modal,

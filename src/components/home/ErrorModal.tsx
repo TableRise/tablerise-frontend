@@ -8,7 +8,7 @@ interface Props {
 
 export default function ErrorModal({ message, onClose }: Props): JSX.Element {
     return (
-        <div className="err-backdrop" onClick={onClose}>
+        <div className="err-backdrop">
             <div className="err-modal" onClick={(e) => e.stopPropagation()}>
                 <button className="err-close-btn" onClick={onClose}>
                     &times;

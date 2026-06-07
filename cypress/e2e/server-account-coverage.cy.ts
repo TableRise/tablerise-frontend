@@ -22,6 +22,7 @@ import {
 } from '../../src/server/users/disable-two-factor';
 import { postLogout } from '../../src/server/users/logout';
 import { postRegister } from '../../src/server/users/register';
+import { toggleUserFriendFavorite } from '../../src/server/users/collections';
 import {
     confirmUpdateEmailCode,
     sendUpdateEmailCode,
@@ -373,7 +374,7 @@ describe('TableRise :: Server Account Coverage', () => {
         }).as('updateUserEmail404');
         cy.then(() =>
             expectRejectedIncludes(updateUserEmail('user-1', 'new@tablerise.dev'), [
-                'Usuario',
+                'usuário',
                 'encontrado',
             ])
         );
@@ -492,7 +493,7 @@ describe('TableRise :: Server Account Coverage', () => {
             body: {},
         }).as('deleteUser404');
         cy.then(() =>
-            expectRejectedIncludes(deleteUser('user-1'), ['Usuario', 'encontrado'])
+            expectRejectedIncludes(deleteUser('user-1'), ['usuário', 'encontrado'])
         );
         cy.wait('@deleteUser404');
 
@@ -1150,7 +1151,7 @@ describe('TableRise :: Server Account Coverage', () => {
         }).as('deactivateUserTwoFactor404');
         cy.then(() =>
             expectRejectedIncludes(deactivateUserTwoFactor('user-404'), [
-                'Usuario',
+                'usuário',
                 'encontrado',
             ])
         );
@@ -1618,5 +1619,51 @@ describe('TableRise :: Server Account Coverage', () => {
             )
         );
         cy.wait('@createUserCampaignNote418');
+    });
+
+    it('covers the friend favorite helper', () => {
+        cy.intercept('PATCH', `${usersApi}/user-1/friends/friend-2/favorite`, {
+            statusCode: 200,
+            body: {},
+        }).as('toggleUserFriendFavoriteSuccess');
+        cy.then(async () => {
+            expect(await toggleUserFriendFavorite('user-1', 'friend-2')).to.eq(undefined);
+        });
+        cy.wait('@toggleUserFriendFavoriteSuccess');
+
+        cy.intercept('PATCH', `${usersApi}/user-1/friends/friend-404/favorite`, {
+            statusCode: 404,
+            body: {},
+        }).as('toggleUserFriendFavorite404');
+        cy.then(() =>
+            expectRejectedIncludes(toggleUserFriendFavorite('user-1', 'friend-404'), [
+                'Amizade',
+                'encontrada',
+            ])
+        );
+        cy.wait('@toggleUserFriendFavorite404');
+
+        cy.intercept('PATCH', `${usersApi}/user-1/friends/friend-500/favorite`, {
+            statusCode: 500,
+            body: {},
+        }).as('toggleUserFriendFavorite500');
+        cy.then(() =>
+            expectRejectedIncludes(toggleUserFriendFavorite('user-1', 'friend-500'), [
+                'Erro no servidor',
+            ])
+        );
+        cy.wait('@toggleUserFriendFavorite500');
+
+        cy.intercept('PATCH', `${usersApi}/user-1/friends/friend-418/favorite`, {
+            statusCode: 418,
+            body: {},
+        }).as('toggleUserFriendFavorite418');
+        cy.then(() =>
+            expectRejectedIncludes(toggleUserFriendFavorite('user-1', 'friend-418'), [
+                'atualizar',
+                'favorito',
+            ])
+        );
+        cy.wait('@toggleUserFriendFavorite418');
     });
 });

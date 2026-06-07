@@ -18,7 +18,7 @@ type DonationSupportModalProps = {
 };
 
 const DONATION_TEXT =
-    'Tablerise é um projeto gratuíto sem fins lucrativos, pensado para conectar jogadores e ser a base de incríveis campanhas, se desejar pode contribuir para mantermos o site funcionando, cada 1R$ já ajuda :)';
+    'Tablerise é um projeto gratuito sem fins lucrativos, pensado para conectar jogadores e ser a base de incriveis campanhas, se desejar pode contribuir com qualquer quantia para nos ajudar a manter o site funcionando.';
 const PIX_CODE =
     '00020126580014br.gov.bcb.pix013690a52958-005f-46a7-abc0-af86563423d75204000053039865802BR5918GOMESOLIVEIRAADSON6009Sao Paulo610901227-20062230519daqr5130573944010316304EB8D';
 
@@ -30,6 +30,7 @@ export default function DonationSupportModal({
     const { themeMode } = useContext(TableriseContext);
     const [skipNextTime, setSkipNextTime] = useState(shouldSkipDonationPrompt());
     const [copied, setCopied] = useState(false);
+    const [isQrCodeModalOpen, setIsQrCodeModalOpen] = useState(false);
 
     useEffect(() => {
         if (!copied) return;
@@ -65,7 +66,7 @@ export default function DonationSupportModal({
     };
 
     return (
-        <div className="donation-support-modal-overlay" onClick={handleClose}>
+        <div className="donation-support-modal-overlay">
             <div
                 className="donation-support-modal-card"
                 onClick={(event) => event.stopPropagation()}
@@ -79,24 +80,22 @@ export default function DonationSupportModal({
                     {DONATION_TEXT}
                 </p>
 
-                <div className="donation-support-modal-qr-wrapper">
-                    <Image
-                        src="/images/donate-qrcode.png"
-                        alt="QR Code para doação ao Tablerise"
-                        width={220}
-                        height={220}
-                        className="donation-support-modal-qr"
-                    />
-                </div>
+                <button
+                    type="button"
+                    className="donation-support-modal-show-qr-btn font-S-bold"
+                    onClick={() => setIsQrCodeModalOpen(true)}
+                >
+                    Mostrar QRCode
+                </button>
 
                 <div className="donation-support-modal-pix-block">
                     <div className="donation-support-modal-pix-header">
-                        <span className="font-XS-bold">Código PIX</span>
+                        <span className="font-XS-bold">Codigo PIX</span>
                         <button
                             type="button"
                             className="donation-support-modal-copy-btn"
                             onClick={handleCopyPixCode}
-                            aria-label="Copiar código PIX"
+                            aria-label="Copiar codigo PIX"
                         >
                             <Image
                                 src={
@@ -104,7 +103,7 @@ export default function DonationSupportModal({
                                         ? CopyDarkSVG.src
                                         : CopyBlueSVG.src
                                 }
-                                alt="Copiar código PIX"
+                                alt="Copiar codigo PIX"
                                 width={18}
                                 height={18}
                             />
@@ -114,7 +113,7 @@ export default function DonationSupportModal({
                         {PIX_CODE}
                     </p>
                     <span className="donation-support-modal-copy-feedback font-XXS-regular">
-                        {copied ? 'Código PIX copiado.' : 'Toque no ícone para copiar.'}
+                        {copied ? 'Codigo PIX copiado.' : 'Toque no icone para copiar.'}
                     </span>
                 </div>
 
@@ -125,7 +124,7 @@ export default function DonationSupportModal({
                         checked={skipNextTime}
                         onChange={(event) => setSkipNextTime(event.target.checked)}
                     />
-                    <span className="font-XS-regular">Não mostrar novamente</span>
+                    <span className="font-XS-regular">Nao mostrar novamente</span>
                 </label>
 
                 <div className="donation-support-modal-buttons">
@@ -145,6 +144,32 @@ export default function DonationSupportModal({
                     </button>
                 </div>
             </div>
+
+            {isQrCodeModalOpen && (
+                <div className="donation-support-modal-overlay donation-support-modal-overlay--secondary">
+                    <div
+                        className="donation-support-modal-card donation-support-modal-card--qr"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <div className="donation-support-modal-qr-wrapper">
+                            <Image
+                                src="/images/donate-qrcode.png"
+                                alt="QR Code para doacao ao Tablerise"
+                                width={260}
+                                height={260}
+                                className="donation-support-modal-qr"
+                            />
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setIsQrCodeModalOpen(false)}
+                            className="font-S-bold form-button-cancel button-L-fill w-full"
+                        >
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

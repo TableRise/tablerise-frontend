@@ -28,7 +28,7 @@ export default function CampaignPasswordModal({
     }
 
     return (
-        <div className="cpm-backdrop" onClick={onClose}>
+        <div className="cpm-backdrop">
             <div className="cpm-modal" onClick={(e) => e.stopPropagation()}>
                 <h3 className="cpm-title font-M-semibold text-color-primary/default_900">
                     Informe a senha da campanha

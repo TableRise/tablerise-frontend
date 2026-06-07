@@ -253,13 +253,7 @@ export default function LeaveCampaignModal({
                 )}
             </div>
             {deleteConfirmOpen && (
-                <div
-                    className="ecm-confirm-overlay"
-                    onClick={() => {
-                        if (deleting) return;
-                        setDeleteConfirmOpen(false);
-                    }}
-                >
+                <div className="ecm-confirm-overlay">
                     <div
                         className="ecm-confirm-modal"
                         onClick={(e) => e.stopPropagation()}

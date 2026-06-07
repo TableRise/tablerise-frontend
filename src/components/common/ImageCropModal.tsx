@@ -81,13 +81,7 @@ export default function ImageCropModal({
     }
 
     return (
-        <div
-            className="icm-backdrop"
-            onClick={(event) => {
-                event.stopPropagation();
-                if (!submitting) onClose();
-            }}
-        >
+        <div className="icm-backdrop">
             <div className="icm-modal" onClick={(event) => event.stopPropagation()}>
                 <div className="icm-header">
                     <div className="icm-header-copy">
