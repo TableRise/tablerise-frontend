@@ -1,17 +1,19 @@
 import {
     profileCharacter,
+    profileFriends,
     profileUser,
     profileUserWithCover,
     storedUser,
     userCampaignGroups,
 } from '../support/mockData';
-import { supportReasonsWithCampaignCode } from '../../src/components/support/schema/SupportSchema';
 
 describe('TableRise :: Profile And Support', () => {
     let currentProfileUser: typeof profileUser;
+    let currentProfileFriends: typeof profileFriends;
 
     beforeEach(() => {
         currentProfileUser = Cypress._.cloneDeep(profileUser);
+        currentProfileFriends = Cypress._.cloneDeep(profileFriends);
 
         cy.intercept('GET', '**/users/user-1', (req) => {
             req.reply({
@@ -19,6 +21,20 @@ describe('TableRise :: Profile And Support', () => {
                 body: currentProfileUser,
             });
         }).as('getProfileUser');
+        cy.intercept('GET', '**/users/user-1/friends', (req) => {
+            req.reply({
+                statusCode: 200,
+                body: currentProfileFriends,
+            });
+        }).as('getProfileFriends');
+        cy.intercept('GET', '**/users/user-1/messages', {
+            statusCode: 200,
+            body: [],
+        }).as('getProfileMessages');
+        cy.intercept('GET', '**/users/user-1/gallery', {
+            statusCode: 200,
+            body: [],
+        }).as('getProfileGallery');
         cy.intercept('GET', '**/users/user-1/campaigns', userCampaignGroups).as(
             'getUserCampaigns'
         );
@@ -37,7 +53,9 @@ describe('TableRise :: Profile And Support', () => {
         cy.location('pathname', { timeout: 10000 }).should('eq', '/profile/user-1');
         cy.wait('@getProfileUser');
         cy.contains('Aria Valewood').should('be.visible');
-        cy.contains('.profile-hero__action', 'Controle de Perfil').should('be.visible');
+        cy.get('.profile-hero__settings-button')
+            .should('be.visible')
+            .and('have.attr', 'aria-label', 'Abrir controle de perfil');
         cy.get('.profile-hero').should('not.have.class', 'profile-hero--has-cover');
         cy.contains('Cronicas de Aether').should('be.visible');
         cy.contains('Sir Testalot').should('be.visible');
@@ -50,6 +68,96 @@ describe('TableRise :: Profile And Support', () => {
             cy.contains('12 / 10 doado').should('exist');
             cy.contains('100%').should('exist');
         });
+    });
+
+    it('allows the owner to favorite and unfavorite friends and keeps favorites first', () => {
+        cy.intercept('PATCH', '**/users/user-1/friends/friend-3/favorite', (req) => {
+            currentProfileFriends = currentProfileFriends.map((friend) =>
+                friend.userId === 'friend-3'
+                    ? {
+                          ...friend,
+                          favorite: !friend.favorite,
+                      }
+                    : friend
+            );
+            req.reply({
+                statusCode: 200,
+                body: true,
+            });
+        }).as('toggleFriendFavorite');
+
+        cy.visitWithAppState('/profile', {
+            cookieToken: 'token-profile',
+            localStorageUser: storedUser,
+        });
+
+        cy.location('pathname', { timeout: 10000 }).should('eq', '/profile/user-1');
+        cy.wait('@getProfileUser');
+        cy.wait('@getProfileFriends');
+
+        cy.get('.profile-carousel--friends .profile-friend-card__label')
+            .eq(0)
+            .should('have.text', 'Bianca');
+        cy.get('.profile-carousel--friends .profile-friend-card__label')
+            .eq(1)
+            .should('have.text', 'Caio');
+        cy.get('.profile-carousel--friends .profile-friend-card__label')
+            .eq(2)
+            .should('have.text', 'Dora');
+
+        cy.contains('.profile-carousel--friends .profile-friend-card', 'Dora').within(
+            () => {
+                cy.get('.profile-friend-card__avatar-button').click();
+            }
+        );
+        cy.contains('.profile-friend-card__popover-action', 'Favoritar').click();
+        cy.wait('@toggleFriendFavorite');
+        cy.wait('@getProfileFriends');
+
+        cy.get('.profile-carousel--friends .profile-friend-card__label')
+            .eq(0)
+            .should('have.text', 'Dora');
+        cy.get('.profile-carousel--friends .profile-friend-card__label')
+            .eq(1)
+            .should('have.text', 'Bianca');
+        cy.get('.profile-carousel--friends .profile-friend-card__label')
+            .eq(2)
+            .should('have.text', 'Caio');
+
+        cy.contains('button', 'Ver mais').click();
+        cy.get('.profile-friends-modal__grid .profile-friend-card__label')
+            .eq(0)
+            .should('have.text', 'Dora');
+        cy.get('.profile-friends-modal__grid .profile-friend-card__label')
+            .eq(1)
+            .should('have.text', 'Bianca');
+        cy.get('.profile-friends-modal__grid .profile-friend-card__label')
+            .eq(2)
+            .should('have.text', 'Caio');
+
+        cy.contains('.profile-friends-modal__grid .profile-friend-card', 'Dora').within(
+            () => {
+                cy.get('.profile-friend-card__avatar-button').click();
+            }
+        );
+        cy.contains('.profile-friend-card__popover-action', 'Desfavoritar').click();
+        cy.wait('@toggleFriendFavorite');
+        cy.wait('@getProfileFriends');
+
+        cy.get('.profile-friends-modal__grid .profile-friend-card__label')
+            .eq(0)
+            .should('have.text', 'Bianca');
+        cy.get('.profile-friends-modal__grid .profile-friend-card__label')
+            .eq(1)
+            .should('have.text', 'Caio');
+        cy.get('.profile-friends-modal__grid .profile-friend-card__label')
+            .eq(2)
+            .should('have.text', 'Dora');
+
+        cy.get('.profile-gallery-picker__close').click();
+        cy.get('.profile-carousel--friends .profile-friend-card__label')
+            .eq(0)
+            .should('have.text', 'Bianca');
     });
 
     it('allows the owner to validate, save, and remove a profile background', () => {
@@ -78,7 +186,7 @@ describe('TableRise :: Profile And Support', () => {
         cy.wait('@getProfileUser');
         cy.contains('Aria Valewood').should('be.visible');
 
-        cy.contains('.profile-hero__action', 'Controle de Perfil').click();
+        cy.get('.profile-hero__settings-button').click();
         cy.contains('.profile-action-modal-title', 'Controle de Perfil').should(
             'be.visible'
         );
@@ -125,14 +233,14 @@ describe('TableRise :: Profile And Support', () => {
         cy.wait('@getProfileUser');
         cy.get('.profile-hero').should('have.class', 'profile-hero--has-cover');
         cy.get('.profile-hero__cover-image')
-            .should('have.attr', 'style')
+            .should('have.attr', 'src')
             .and('contain', '/images/SideImageBackground.svg');
         cy.get('.profile-hero__cover-overlay').should('exist');
         cy.contains('.profile-action-modal-title', 'Definir plano de fundo').should(
             'not.exist'
         );
 
-        cy.contains('.profile-hero__action', 'Controle de Perfil').click();
+        cy.get('.profile-hero__settings-button').click();
         cy.contains('.profile-action-modal-title', 'Controle de Perfil').should(
             'be.visible'
         );
@@ -149,6 +257,14 @@ describe('TableRise :: Profile And Support', () => {
 
     it('renders the saved profile background for public viewers without the edit action', () => {
         currentProfileUser = Cypress._.cloneDeep(profileUserWithCover);
+        currentProfileFriends = currentProfileFriends.map((friend) =>
+            friend.userId === 'friend-3'
+                ? {
+                      ...friend,
+                      favorite: true,
+                  }
+                : friend
+        );
 
         cy.visitWithAppState('/profile/user-1');
 
@@ -156,9 +272,26 @@ describe('TableRise :: Profile And Support', () => {
         cy.contains('Aria Valewood').should('be.visible');
         cy.get('.profile-hero').should('have.class', 'profile-hero--has-cover');
         cy.get('.profile-hero__cover-image')
-            .should('have.attr', 'style')
+            .should('have.attr', 'src')
             .and('contain', '/images/SideImageBackground.svg');
-        cy.contains('Controle de Perfil').should('not.exist');
+        cy.get('.profile-hero__settings-button').should('not.exist');
+        cy.get('.profile-carousel--friends .profile-friend-card__label')
+            .eq(0)
+            .should('have.text', 'Dora');
+        cy.contains('.profile-carousel--friends .profile-friend-card', 'Dora').within(
+            () => {
+                cy.get('.profile-friend-card__avatar-button').click();
+            }
+        );
+        cy.contains('.profile-friend-card__popover-action', 'Ver perfil').should(
+            'be.visible'
+        );
+        cy.contains('.profile-friend-card__popover-action', 'Favoritar').should(
+            'not.exist'
+        );
+        cy.contains('.profile-friend-card__popover-action', 'Desfavoritar').should(
+            'not.exist'
+        );
     });
 
     it('loads the support form for an authenticated user and reveals campaign code when needed', () => {
@@ -169,10 +302,14 @@ describe('TableRise :: Profile And Support', () => {
 
         cy.contains('Suporte').should('be.visible');
         cy.get('#support-reason').should('be.visible').and('not.be.disabled');
-        cy.get('#support-reason').select(supportReasonsWithCampaignCode[0], {
-            force: true,
+        cy.get('#support-reason').then(($select) => {
+            const selectElement = $select[0] as HTMLSelectElement;
+            const optionValue = String($select.find('option').eq(1).val() ?? '');
+
+            selectElement.value = optionValue;
+            selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+            selectElement.dispatchEvent(new Event('blur', { bubbles: true }));
         });
-        cy.get('#support-reason').blur();
         cy.get('#support-campaign-code', { timeout: 10000 }).should('be.visible');
         cy.get('#support-campaign-code').type('AB12');
         cy.get('#support-request-message').type(

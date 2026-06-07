@@ -16,6 +16,7 @@ type RankedAvatarFrameProps = {
     variant: RankedAvatarVariant;
     className?: string;
     sizes?: string;
+    priority?: boolean;
 };
 
 function normalizeRank(rank?: string | null): RankKey | null {
@@ -38,6 +39,7 @@ export default function RankedAvatarFrame({
     variant,
     className,
     sizes = '8rem',
+    priority = false,
 }: RankedAvatarFrameProps): JSX.Element {
     const normalizedRank = normalizeRank(rank);
     const frameImage = normalizedRank ? shapes[normalizedRank][variant] : null;
@@ -57,6 +59,7 @@ export default function RankedAvatarFrame({
                         src={image}
                         alt={alt}
                         fill
+                        priority={priority}
                         unoptimized
                         sizes={sizes}
                         className="ranked-avatar-frame__image"
@@ -70,6 +73,7 @@ export default function RankedAvatarFrame({
                         src={frameImage}
                         alt=""
                         fill
+                        priority={priority}
                         unoptimized
                         sizes={sizes}
                         className="ranked-avatar-frame__frame-image"

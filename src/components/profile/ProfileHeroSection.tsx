@@ -4,6 +4,12 @@ import { type RefObject, useContext } from 'react';
 import Image from 'next/image';
 import EditIcon from '@assets/icons/sys/edit.svg?url';
 import EditDarkIcon from '@assets/icons/sys/edit-dark.svg?url';
+import MailDarkIcon from '@assets/icons/sys/mail-dark.svg?url';
+import AddFriendLightIcon from '@assets/icons/social/add-friend-light.svg?url';
+import AddFriendDarkIcon from '@assets/icons/social/add-friend-dark.svg?url';
+import FriendRequestsIcon from '@assets/icons/social/friends-request.svg?url';
+import SettingsDarkIcon from '@assets/icons/menu-panel-lobby/settings-dark.svg?url';
+import GalleryIcon from '@assets/icons/sys/gallery.svg?url';
 import RankedAvatarFrame from '@/components/common/RankedAvatarFrame';
 import ProfileBadgePopover from '@/components/profile/ProfileBadgePopover';
 import type { DatabaseUserWithDetails } from '@/types/shared/entities';
@@ -35,6 +41,17 @@ type ProfileHeroSectionProps = {
     onPictureClick: () => void;
     onSelectImage: (file: File) => void;
     onOpenProfileControls: () => void;
+    showMessageAction: boolean;
+    messageBadgeCount?: number;
+    onOpenMessages: () => void;
+    showFriendRequestsInboxAction: boolean;
+    friendRequestsBadgeCount?: number;
+    onOpenFriendRequestsInbox: () => void;
+    showProfileControlsAction: boolean;
+    showGalleryAction: boolean;
+    onOpenGallery: () => void;
+    showFriendRequestAction: boolean;
+    onOpenFriendRequest: () => void;
 };
 
 function buildBadgePopoverId(scope: 'hero', badgeKey: string): string {
@@ -60,8 +77,24 @@ export default function ProfileHeroSection({
     onPictureClick,
     onSelectImage,
     onOpenProfileControls,
+    showMessageAction,
+    messageBadgeCount = 0,
+    onOpenMessages,
+    showFriendRequestsInboxAction,
+    friendRequestsBadgeCount = 0,
+    onOpenFriendRequestsInbox,
+    showProfileControlsAction,
+    showGalleryAction,
+    onOpenGallery,
+    showFriendRequestAction,
+    onOpenFriendRequest,
 }: ProfileHeroSectionProps): JSX.Element {
     const { themeMode } = useContext(TableriseContext);
+
+    const formatBadgeCount = (count: number): string => {
+        if (count > 99) return '99+';
+        return String(count);
+    };
 
     return (
         <section
@@ -80,6 +113,114 @@ export default function ProfileHeroSection({
                 </div>
             ) : null}
             <div className="profile-hero__panel">
+                {showMessageAction ||
+                showFriendRequestsInboxAction ||
+                showProfileControlsAction ||
+                showGalleryAction ||
+                showFriendRequestAction ? (
+                    <div className="profile-hero__quick-actions">
+                        {showMessageAction ? (
+                            <div className="profile-hero__action-shell">
+                                <button
+                                    type="button"
+                                    className="profile-hero__mail-button"
+                                    onClick={onOpenMessages}
+                                    aria-label="Abrir mensagens"
+                                >
+                                    <Image
+                                        src={MailDarkIcon}
+                                        alt=""
+                                        width={22}
+                                        height={22}
+                                    />
+                                </button>
+                                {messageBadgeCount > 0 ? (
+                                    <span className="font-XXS-bold profile-hero__action-badge">
+                                        {formatBadgeCount(messageBadgeCount)}
+                                    </span>
+                                ) : null}
+                            </div>
+                        ) : null}
+                        {showFriendRequestsInboxAction ? (
+                            <div className="profile-hero__action-shell">
+                                <button
+                                    type="button"
+                                    className="profile-hero__requests-button"
+                                    onClick={onOpenFriendRequestsInbox}
+                                    aria-label="Abrir solicitações de amizade"
+                                >
+                                    <Image
+                                        src={FriendRequestsIcon}
+                                        alt=""
+                                        width={22}
+                                        height={22}
+                                    />
+                                </button>
+                                {friendRequestsBadgeCount > 0 ? (
+                                    <span className="font-XXS-bold profile-hero__action-badge">
+                                        {formatBadgeCount(friendRequestsBadgeCount)}
+                                    </span>
+                                ) : null}
+                            </div>
+                        ) : null}
+                        {showProfileControlsAction ? (
+                            <div className="profile-hero__action-shell">
+                                <button
+                                    type="button"
+                                    className="profile-hero__settings-button"
+                                    onClick={onOpenProfileControls}
+                                    aria-label="Abrir controle de perfil"
+                                >
+                                    <Image
+                                        src={SettingsDarkIcon}
+                                        alt=""
+                                        width={22}
+                                        height={22}
+                                    />
+                                </button>
+                            </div>
+                        ) : null}
+                        {showGalleryAction ? (
+                            <div className="profile-hero__action-shell">
+                                <button
+                                    type="button"
+                                    className="profile-hero__gallery-button"
+                                    onClick={onOpenGallery}
+                                    aria-label="Abrir galeria"
+                                >
+                                    <Image
+                                        src={GalleryIcon}
+                                        alt=""
+                                        width={22}
+                                        height={22}
+                                    />
+                                </button>
+                            </div>
+                        ) : null}
+                        {showFriendRequestAction ? (
+                            <div className="profile-hero__action-shell">
+                                <button
+                                    type="button"
+                                    className="profile-hero__friend-button"
+                                    onClick={onOpenFriendRequest}
+                                    aria-label="Enviar solicitação de amizade"
+                                >
+                                    <Image
+                                        src={
+                                            themeMode === 'dark'
+                                                ? AddFriendDarkIcon
+                                                : AddFriendLightIcon
+                                        }
+                                        alt=""
+                                        width={22}
+                                        height={22}
+                                    />
+                                </button>
+                            </div>
+                        ) : null}
+                    </div>
+                ) : null}
+
                 <div className="profile-hero__media">
                     <div
                         className={`profile-hero__avatar${
@@ -92,6 +233,7 @@ export default function ProfileHeroSection({
                             rank={getUserRank(user)}
                             variant="profile"
                             sizes="(max-width: 768px) 14rem, 16rem"
+                            priority={true}
                         />
                         {isOwnProfile ? (
                             <>
@@ -144,17 +286,6 @@ export default function ProfileHeroSection({
                                 {user.email}
                             </p>
                         ) : null}
-                        {isOwnProfile ? (
-                            <div className="profile-hero__actions">
-                                <button
-                                    type="button"
-                                    className="font-XS-regular profile-hero__action underline"
-                                    onClick={onOpenProfileControls}
-                                >
-                                    Controle de Perfil
-                                </button>
-                            </div>
-                        ) : null}
                         <p className="font-XS-bold profile-hero__handle">
                             {profileHandle || 'Sem nickname'}
                         </p>
@@ -162,7 +293,7 @@ export default function ProfileHeroSection({
                             <strong>Status da conta:</strong>{' '}
                             <span className={accountStatusClass}>{accountStatus}</span>
                         </p>
-                        <p className="font-S-regular text-color-greyScale/700 profile-hero__biography">
+                        <p className="font-S-regular profile-hero__biography">
                             {biography ||
                                 'Este aventureiro ainda não adicionou uma biografia.'}
                         </p>

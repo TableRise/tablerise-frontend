@@ -50,6 +50,11 @@
         line-height: 1.2rem;
     }
 
+    .campaign-card .card-infos .card-buttons button.campaign-card__pending-button {
+        font-size: 0.8rem;
+        line-height: 1rem;
+    }
+
     .campaign-card .card-infos .card-buttons .card-menu {
         @apply flex justify-center items-center w-10 h-10 border border-color-greyScale/300 rounded-lg cursor-pointer;
     }

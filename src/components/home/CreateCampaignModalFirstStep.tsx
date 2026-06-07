@@ -1,7 +1,13 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
 import UploadSVG from '../../../assets/icons/sys/upload-gray.svg?url';
 import { CAMPAIGN_DESCRIPTION_MAX_LENGTH } from '@/components/home/helpers/CreateCampaignModalHelpers';
+import ImageSourceChoiceModal from '@/components/common/ImageSourceChoiceModal';
+import UserGalleryPickerModal from '@/components/common/UserGalleryPickerModal';
+import { normalizeStoredUserId, useStoredUser } from '@/hooks/useStoredUser';
+import { useUserGallery } from '@/hooks/useUserGallery';
+import type { ImageObject } from '@/types/shared/general';
+import { isGalleryImageObject, type UploadImageValue } from '@/utils/imageUploadPayload';
 
 export default function CreateCampaignModalFirstStep({
     title,
@@ -15,8 +21,31 @@ export default function CreateCampaignModalFirstStep({
     passwordError,
     coverImage,
     onSelectCoverImage,
+    onSelectCoverGalleryImage,
 }: any) {
+    const { storedUser } = useStoredUser();
+    const currentUserId = normalizeStoredUserId(storedUser);
+    const { galleryImages, loadingGallery } = useUserGallery(currentUserId);
     const coverInputRef = useRef<HTMLInputElement>(null);
+    const [choiceOpen, setChoiceOpen] = useState(false);
+    const [galleryOpen, setGalleryOpen] = useState(false);
+
+    const coverPreview =
+        coverImage && isGalleryImageObject(coverImage)
+            ? coverImage.link
+            : coverImage instanceof File
+            ? URL.createObjectURL(coverImage)
+            : '';
+
+    function handleRequestImageSelection() {
+        if (loadingGallery) return;
+        if (galleryImages.length > 0) {
+            setChoiceOpen(true);
+            return;
+        }
+
+        coverInputRef.current?.click();
+    }
 
     return (
         <div className="ccm-step-content">
@@ -104,14 +133,14 @@ export default function CreateCampaignModalFirstStep({
                         <div className="ccm-cover-preview">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
-                                src={URL.createObjectURL(coverImage)}
+                                src={coverPreview}
                                 alt="Preview capa"
                                 className="ccm-cover-preview-img"
                             />
                             <button
                                 type="button"
                                 className="font-XS-bold ccm-upload-btn"
-                                onClick={() => coverInputRef.current?.click()}
+                                onClick={handleRequestImageSelection}
                             >
                                 <Image
                                     src={UploadSVG.src}
@@ -127,7 +156,7 @@ export default function CreateCampaignModalFirstStep({
                             <button
                                 type="button"
                                 className="font-XS-bold ccm-upload-btn"
-                                onClick={() => coverInputRef.current?.click()}
+                                onClick={handleRequestImageSelection}
                             >
                                 <Image
                                     src={UploadSVG.src}
@@ -149,6 +178,35 @@ export default function CreateCampaignModalFirstStep({
                     )}
                 </div>
             </div>
+
+            {choiceOpen ? (
+                <ImageSourceChoiceModal
+                    title="Selecionar capa da campanha"
+                    description="Escolha uma imagem local ou uma imagem ja salva na sua galeria."
+                    onClose={() => setChoiceOpen(false)}
+                    onSelectLocal={() => {
+                        setChoiceOpen(false);
+                        coverInputRef.current?.click();
+                    }}
+                    onSelectGallery={() => {
+                        setChoiceOpen(false);
+                        setGalleryOpen(true);
+                    }}
+                />
+            ) : null}
+
+            {galleryOpen ? (
+                <UserGalleryPickerModal
+                    title="Selecionar capa da campanha"
+                    description="Escolha uma imagem da sua galeria para usar como capa."
+                    images={galleryImages}
+                    onClose={() => setGalleryOpen(false)}
+                    onSelect={(image: ImageObject) => {
+                        setGalleryOpen(false);
+                        onSelectCoverGalleryImage(image);
+                    }}
+                />
+            ) : null}
         </div>
     );
 }

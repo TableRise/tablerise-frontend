@@ -1,9 +1,16 @@
 import axios, { AxiosError } from 'axios';
 import { usersBaseUrl } from '../wrapper';
+import {
+    appendUploadImageValue,
+    type UploadImageValue,
+} from '@/utils/imageUploadPayload';
 
-export const updateUserPicture = async (userId: string, picture: File): Promise<void> => {
+export const updateUserPicture = async (
+    userId: string,
+    picture: UploadImageValue
+): Promise<void> => {
     const formData = new FormData();
-    formData.append('picture', picture);
+    appendUploadImageValue(formData, 'picture', picture);
 
     try {
         await axios({
@@ -18,7 +25,7 @@ export const updateUserPicture = async (userId: string, picture: File): Promise<
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
 
-        if (status === 404) throw new Error('Usuario nao encontrado');
+        if (status === 404) throw new Error('usuário nao encontrado');
         if (status === 413) throw new Error('A imagem selecionada e muito grande');
         if (status === 415) throw new Error('Formato de imagem nao suportado');
         if (status === 500) throw new Error('Erro no servidor');

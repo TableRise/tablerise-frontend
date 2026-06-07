@@ -5,11 +5,11 @@ const termsSections = [
         title: '1. Aceitacao dos Termos',
         paragraphs: [
             'Ao acessar ou utilizar a plataforma TableRise, voce concorda com estes Termos de Uso. Caso nao concorde com qualquer disposicao deste documento, voce nao deve utilizar a plataforma.',
-            'Estes Termos se aplicam a visitantes, usuarios cadastrados, mestres, jogadores e quaisquer outras pessoas que utilizem os recursos disponibilizados pelo TableRise.',
+            'Estes Termos se aplicam a visitantes, usuários cadastrados, mestres, jogadores e quaisquer outras pessoas que utilizem os recursos disponibilizados pelo TableRise.',
         ],
     },
     {
-        title: '2. Cadastro e Conta do Usuario',
+        title: '2. Cadastro e Conta do usuário',
         paragraphs: [
             'Para acessar determinadas funcionalidades, pode ser necessario criar uma conta. Voce se compromete a fornecer informacoes verdadeiras, completas e atualizadas durante o cadastro e ao longo do uso da plataforma.',
             'Voce e responsavel por manter a confidencialidade de suas credenciais de acesso e por todas as atividades realizadas em sua conta. Caso identifique uso nao autorizado, voce deve nos avisar o quanto antes.',
@@ -19,7 +19,7 @@ const termsSections = [
         title: '3. Uso Permitido da Plataforma',
         paragraphs: [
             'O TableRise pode ser utilizado para criar, organizar e participar de campanhas, personagens, anotacoes, midias e demais recursos relacionados a RPG de mesa.',
-            'Voce concorda em utilizar a plataforma de forma licita, etica e em conformidade com a legislacao aplicavel, sem praticar atos que prejudiquem outros usuarios, a plataforma ou terceiros.',
+            'Voce concorda em utilizar a plataforma de forma licita, etica e em conformidade com a legislacao aplicavel, sem praticar atos que prejudiquem outros usuários, a plataforma ou terceiros.',
         ],
         bullets: [
             'publicar conteudo ilegal, ofensivo, discriminatorio, violento ou que viole direitos de terceiros;',
@@ -29,9 +29,9 @@ const termsSections = [
         ],
     },
     {
-        title: '4. Conteudo do Usuario',
+        title: '4. Conteudo do usuário',
         paragraphs: [
-            'O usuario permanece titular do conteudo que criar ou enviar para a plataforma, incluindo textos, imagens, fichas, campanhas e outros materiais.',
+            'O usuário permanece titular do conteudo que criar ou enviar para a plataforma, incluindo textos, imagens, fichas, campanhas e outros materiais.',
             'Ao publicar conteudo no TableRise, voce declara que possui os direitos necessarios para utiliza-lo e nos concede uma licenca nao exclusiva para hospedar, armazenar, processar e exibir esse conteudo apenas na medida necessaria para operar a plataforma.',
         ],
     },
@@ -58,14 +58,14 @@ const termsSections = [
     {
         title: '8. Suspensao e Encerramento',
         paragraphs: [
-            'Podemos suspender ou encerrar contas, limitar acessos ou remover conteudos que violem estes Termos, a legislacao aplicavel ou a seguranca da plataforma e de seus usuarios.',
+            'Podemos suspender ou encerrar contas, limitar acessos ou remover conteudos que violem estes Termos, a legislacao aplicavel ou a seguranca da plataforma e de seus usuários.',
             'Voce tambem pode deixar de utilizar a plataforma a qualquer momento. O encerramento da conta nao elimina obrigacoes anteriores nem responsabilidades decorrentes de uso indevido.',
         ],
     },
     {
         title: '9. Limitacao de Responsabilidade',
         paragraphs: [
-            'Na maxima extensao permitida pela lei, o TableRise nao se responsabiliza por danos indiretos, lucros cessantes, perda de dados, indisponibilidade temporaria, falhas causadas por terceiros ou por conteudos inseridos pelos usuarios.',
+            'Na maxima extensao permitida pela lei, o TableRise nao se responsabiliza por danos indiretos, lucros cessantes, perda de dados, indisponibilidade temporaria, falhas causadas por terceiros ou por conteudos inseridos pelos usuários.',
             'Nada nestes Termos exclui responsabilidades que nao possam ser limitadas ou afastadas por lei.',
         ],
     },

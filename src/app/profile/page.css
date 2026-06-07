@@ -41,6 +41,23 @@
         @apply relative;
     }
 
+    .profile-orientation-overlay {
+        @apply fixed inset-0 z-[320] flex items-center justify-center bg-black/75 px-6;
+        backdrop-filter: blur(4px);
+    }
+
+    .profile-orientation-overlay-content {
+        @apply flex max-w-[18rem] flex-col items-center gap-5 text-center;
+    }
+
+    .profile-orientation-overlay-content img {
+        @apply h-16 w-16;
+    }
+
+    .profile-orientation-overlay-text {
+        @apply text-color-greyScale/50;
+    }
+
     .profile-content-top-cover {
         @apply pointer-events-none absolute top-0 overflow-hidden;
         left: calc(50% - 50vw);
@@ -148,8 +165,41 @@
         @apply relative z-[1] flex items-start gap-6 p-8;
     }
 
+    .profile-hero__quick-actions {
+        @apply absolute right-8 top-8 flex flex-col items-center gap-2;
+    }
+
+    .profile-hero__action-shell {
+        @apply relative;
+    }
+
     .profile-hero__media {
         @apply flex flex-col gap-3;
+    }
+
+    .profile-hero__mail-button,
+    .profile-hero__requests-button,
+    .profile-hero__friend-button,
+    .profile-hero__settings-button,
+    .profile-hero__gallery-button {
+        @apply flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 transition-transform duration-150;
+        background-color: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(8px);
+    }
+
+    .profile-hero__mail-button:hover,
+    .profile-hero__requests-button:hover,
+    .profile-hero__friend-button:hover,
+    .profile-hero__settings-button:hover,
+    .profile-hero__gallery-button:hover {
+        transform: translateY(-1px);
+    }
+
+    .profile-hero__action-badge {
+        @apply absolute bottom-[-0.25rem] right-[-0.25rem] flex min-h-[1.25rem] min-w-[1.25rem] items-center justify-center rounded-full px-1 text-color-greyScale/50;
+        background-color: #0a358a;
+        box-shadow: 0 0 0 2px rgba(17, 27, 43, 0.88);
+        line-height: 1;
     }
 
     .profile-hero__avatar {
@@ -193,7 +243,7 @@
     }
 
     .profile-hero__email {
-        color: #8ab5fc;
+        color: #b8c5de;
     }
 
     .profile-hero__handle {
@@ -205,7 +255,7 @@
     }
 
     .profile-hero__biography {
-        color: #b8c5de !important;
+        color: #b8c5de;
     }
 
     .profile-hero__actions {
@@ -419,6 +469,23 @@
         @apply flex items-end justify-between gap-4 flex-wrap;
     }
 
+    .profile-showcase__heading {
+        @apply flex flex-col gap-1;
+    }
+
+    .profile-showcase__action {
+        @apply flex items-center;
+    }
+
+    .profile-showcase__link {
+        @apply bg-transparent p-0 underline transition-opacity duration-150;
+        color: rgb(10 53 138);
+    }
+
+    .profile-showcase__link:hover {
+        opacity: 0.72;
+    }
+
     .profile-showcase--cards .profile-carousel__viewport {
         @apply rounded-[1.4rem];
     }
@@ -459,6 +526,11 @@
         display: flex;
         position: relative;
         overflow: visible;
+    }
+
+    .profile-carousel--friends .profile-carousel__slide {
+        width: 9rem;
+        margin-right: 1rem;
     }
 
     .profile-carousel--badges .profile-carousel__viewport {
@@ -579,6 +651,154 @@
         @apply text-color-greyScale/900 text-center uppercase tracking-[0.08em];
     }
 
+    .profile-friend-card {
+        @apply relative flex flex-col items-center gap-3 rounded-[1.4rem] bg-color-greyScale/100 p-4 text-center;
+    }
+
+    .profile-friend-card--grid {
+        min-height: 11.5rem;
+    }
+
+    .profile-friend-card__avatar-button {
+        @apply inline-flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-full bg-transparent p-0;
+    }
+
+    .profile-friend-card__label {
+        @apply text-color-greyScale/900;
+    }
+
+    .profile-friend-card__popover {
+        @apply absolute left-1/2 top-3 z-20 flex min-w-[10.5rem] -translate-x-1/2 flex-col gap-1 rounded-2xl border border-white/10 bg-black/80 p-2 text-left;
+        box-shadow: 0 18px 32px rgba(0, 0, 0, 0.24);
+        backdrop-filter: blur(10px);
+    }
+
+    .profile-friend-card__popover-action {
+        @apply rounded-xl px-3 py-2 text-color-greyScale/50 transition-colors duration-150;
+    }
+
+    .profile-friend-card__popover-action:hover:enabled {
+        background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .profile-friend-card__popover-action:disabled {
+        @apply cursor-not-allowed opacity-60;
+    }
+
+    .profile-friend-card__popover-action--danger {
+        color: #ff8e8e;
+    }
+
+    .profile-message-modal__layout {
+        @apply mt-4 grid gap-4 lg:grid-cols-[18rem_minmax(0,1fr)];
+        min-height: 28rem;
+    }
+
+    .profile-message-modal__list {
+        @apply flex flex-col gap-2 overflow-y-auto rounded-2xl border border-color-greyScale/200 bg-color-greyScale/50 p-3;
+        max-height: 28rem;
+    }
+
+    .profile-message-modal__item {
+        @apply flex items-center gap-3 rounded-2xl border border-transparent bg-white p-3 text-left transition-colors duration-150;
+    }
+
+    .profile-message-modal__item:hover,
+    .profile-message-modal__item--active {
+        border-color: rgba(10, 53, 138, 0.16);
+        background-color: rgba(10, 53, 138, 0.08);
+    }
+
+    .profile-message-modal__item-avatar {
+        @apply h-12 w-12 flex-shrink-0;
+    }
+
+    .profile-message-modal__item-copy {
+        @apply flex min-w-0 flex-1 flex-col;
+    }
+
+    .profile-message-modal__item-copy span:first-child {
+        @apply truncate text-color-greyScale/950;
+    }
+
+    .profile-message-modal__detail {
+        @apply flex min-h-[28rem] flex-col rounded-2xl border border-color-greyScale/200 bg-color-greyScale/50 p-4;
+    }
+
+    .profile-message-modal__detail-header {
+        @apply flex items-start justify-between gap-4 border-b border-color-greyScale/200 pb-4;
+    }
+
+    .profile-message-modal__detail-meta {
+        @apply flex items-center gap-3;
+    }
+
+    .profile-message-modal__detail-avatar {
+        @apply h-16 w-16 flex-shrink-0;
+    }
+
+    .profile-message-modal__detail-copy {
+        @apply flex flex-col gap-1;
+    }
+
+    .profile-message-modal__detail-copy h2 {
+        @apply text-color-greyScale/950;
+    }
+
+    .profile-message-modal__delete {
+        @apply flex h-10 w-10 items-center justify-center rounded-xl bg-transparent transition-colors duration-150;
+    }
+
+    .profile-message-modal__delete:hover:enabled {
+        background-color: rgba(255, 89, 89, 0.08);
+    }
+
+    .profile-message-modal__body {
+        @apply mt-4 flex-1 overflow-y-auto;
+    }
+
+    .profile-message-modal__paragraph {
+        @apply mb-2 text-color-greyScale/900;
+        line-height: 1.55;
+    }
+
+    .profile-message-modal__line-break {
+        @apply h-4;
+    }
+
+    .profile-message-modal__empty,
+    .profile-message-modal__loading {
+        @apply flex min-h-[18rem] items-center justify-center text-center;
+    }
+
+    .profile-message-modal__compose {
+        @apply mt-4 flex flex-col gap-3;
+    }
+
+    .profile-message-modal__toolbar {
+        @apply mt-2 flex flex-wrap items-center gap-2 rounded-xl border border-color-greyScale/200 bg-color-greyScale/50 p-2;
+    }
+
+    .profile-message-modal__tool {
+        @apply flex h-9 w-9 items-center justify-center rounded-lg bg-white text-color-greyScale/950 transition-colors duration-150;
+    }
+
+    .profile-message-modal__tool:hover {
+        background-color: rgba(10, 53, 138, 0.08);
+    }
+
+    .profile-message-modal__tool--italic {
+        font-style: italic;
+    }
+
+    .profile-message-modal__tool-select {
+        @apply rounded-lg border border-color-greyScale/200 bg-white px-3 py-2 text-color-greyScale/900;
+    }
+
+    .profile-message-modal__success {
+        @apply text-center text-color-support/success;
+    }
+
     @media (hover: hover) and (pointer: fine) {
         .profile-carousel--badges .profile-carousel__slide:hover,
         .profile-carousel--badges .profile-carousel__slide:focus-within {
@@ -644,6 +864,10 @@
             @apply flex-col p-5;
         }
 
+        .profile-hero__quick-actions {
+            @apply right-5 top-5;
+        }
+
         .profile-hero__avatar {
             @apply w-36 h-36;
         }
@@ -703,6 +927,10 @@
             width: min(18rem, 80vw);
         }
 
+        .profile-carousel--friends .profile-carousel__slide {
+            width: 8rem;
+        }
+
         .profile-carousel--badges .profile-carousel__slide {
             width: 9.5rem;
         }
@@ -716,6 +944,16 @@
 
         .profile-carousel__controls {
             @apply justify-between;
+        }
+
+        .profile-message-modal__layout {
+            @apply grid-cols-1;
+        }
+
+        .profile-message-modal__list,
+        .profile-message-modal__detail {
+            max-height: none;
+            min-height: 0;
         }
     }
 
@@ -745,6 +983,10 @@
             @apply p-4;
         }
 
+        .profile-hero__quick-actions {
+            @apply right-4 top-4;
+        }
+
         .profile-carousel__arrow {
             @apply h-10 w-10;
         }
@@ -766,6 +1008,19 @@
 
     html[data-theme='dark'] .profile-empty-state {
         border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .profile-hero__mail-button,
+    html[data-theme='dark'] .profile-hero__requests-button,
+    html[data-theme='dark'] .profile-hero__friend-button,
+    html[data-theme='dark'] .profile-hero__settings-button,
+    html[data-theme='dark'] .profile-hero__gallery-button {
+        background-color: rgba(255, 255, 255, 0.14);
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    html[data-theme='dark'] .profile-hero__action-badge {
+        box-shadow: 0 0 0 2px rgba(7, 17, 31, 0.92);
     }
 
     html[data-theme='dark'] .profile-state-title,
@@ -796,5 +1051,45 @@
 
     html[data-theme='dark'] .profile-badge-popover__progress-label {
         color: var(--theme-text-muted);
+    }
+
+    html[data-theme='dark'] .profile-showcase__link {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .profile-friend-card,
+    html[data-theme='dark'] .profile-message-modal__list,
+    html[data-theme='dark'] .profile-message-modal__detail,
+    html[data-theme='dark'] .profile-message-modal__toolbar {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .profile-friend-card__label,
+    html[data-theme='dark'] .profile-message-modal__detail-copy h2,
+    html[data-theme='dark'] .profile-message-modal__paragraph,
+    html[data-theme='dark'] .profile-message-modal__item-copy span:first-child {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .profile-message-modal__item {
+        background-color: rgba(255, 255, 255, 0.03);
+    }
+
+    html[data-theme='dark'] .profile-message-modal__item:hover,
+    html[data-theme='dark'] .profile-message-modal__item--active {
+        background-color: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    html[data-theme='dark'] .profile-message-modal__detail-header {
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .profile-message-modal__tool,
+    html[data-theme='dark'] .profile-message-modal__tool-select {
+        background-color: var(--theme-surface);
+        border-color: var(--theme-border);
+        color: var(--theme-text);
     }
 }

@@ -1,10 +1,17 @@
 import { AxiosError } from 'axios';
 import axios from 'axios';
 import { apiCall, usersBaseUrl } from '../wrapper';
+import {
+    appendUploadImageValue,
+    type UploadImageValue,
+} from '@/utils/imageUploadPayload';
 
-export const updateUserCover = async (userId: string, image: File): Promise<void> => {
+export const updateUserCover = async (
+    userId: string,
+    image: UploadImageValue
+): Promise<void> => {
     const formData = new FormData();
-    formData.append('image', image);
+    appendUploadImageValue(formData, 'image', image);
 
     try {
         await axios({
@@ -19,7 +26,7 @@ export const updateUserCover = async (userId: string, image: File): Promise<void
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
 
-        if (status === 404) throw new Error('Usuario nao encontrado');
+        if (status === 404) throw new Error('usuário nao encontrado');
         if (status === 413) throw new Error('A imagem selecionada e muito grande');
         if (status === 415) throw new Error('Formato de imagem nao suportado');
         if (status === 500) throw new Error('Erro no servidor');
@@ -38,7 +45,7 @@ export const removeUserCover = async (userId: string): Promise<void> => {
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
 
-        if (status === 404) throw new Error('Usuario nao encontrado');
+        if (status === 404) throw new Error('usuário nao encontrado');
         if (status === 500) throw new Error('Erro no servidor');
 
         throw new Error('Nao foi possivel remover o plano de fundo do perfil');

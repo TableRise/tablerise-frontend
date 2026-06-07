@@ -3,7 +3,14 @@
 import { useEffect, useRef, useState } from 'react';
 import LoadingDots from '@/components/common/LoadingDots';
 import { updateUserCover } from '@/server/users/update-user-cover';
+import ImageSourceChoiceModal from '@/components/common/ImageSourceChoiceModal';
+import UserGalleryPickerModal from '@/components/common/UserGalleryPickerModal';
+import { useStoredUser, normalizeStoredUserId } from '@/hooks/useStoredUser';
+import { useUserGallery } from '@/hooks/useUserGallery';
 import '@/components/profile/styles/ProfileActionModal.css';
+import type { ImageObject } from '@/types/shared/general';
+import type { UploadImageValue } from '@/utils/imageUploadPayload';
+import { isGalleryImageObject } from '@/utils/imageUploadPayload';
 
 const MIN_COVER_WIDTH = 1280;
 const MIN_COVER_HEIGHT = 720;
@@ -50,15 +57,25 @@ export default function ProfileCoverModal({
     onClose,
     onSaved,
 }: ProfileCoverModalProps): JSX.Element {
+    const { storedUser } = useStoredUser();
+    const currentUserId = normalizeStoredUserId(storedUser);
+    const { galleryImages, loadingGallery } = useUserGallery(currentUserId);
     const inputRef = useRef<HTMLInputElement>(null);
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [selectedFile, setSelectedFile] = useState<UploadImageValue | null>(null);
     const [previewUrl, setPreviewUrl] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [sourceChoiceOpen, setSourceChoiceOpen] = useState(false);
+    const [galleryPickerOpen, setGalleryPickerOpen] = useState(false);
 
     useEffect(() => {
         if (!selectedFile) {
             setPreviewUrl('');
+            return;
+        }
+
+        if (isGalleryImageObject(selectedFile)) {
+            setPreviewUrl(selectedFile.link ?? '');
             return;
         }
 
@@ -70,6 +87,29 @@ export default function ProfileCoverModal({
         };
     }, [selectedFile]);
 
+    const handleSelectedImage = async (file: UploadImageValue): Promise<void> => {
+        setError('');
+
+        try {
+            if (!isGalleryImageObject(file)) {
+                const { width, height } = await getImageDimensions(file);
+
+                if (width < MIN_COVER_WIDTH || height < MIN_COVER_HEIGHT) {
+                    setSelectedFile(null);
+                    setError(
+                        `*A imagem deve ter no minimo ${MIN_COVER_WIDTH}x${MIN_COVER_HEIGHT} pixels.`
+                    );
+                    return;
+                }
+            }
+
+            setSelectedFile(file);
+        } catch (dimensionError: Error | any) {
+            setSelectedFile(null);
+            setError(dimensionError?.message ?? '*Nao foi possivel validar a imagem.');
+        }
+    };
+
     const handleFileChange = async (
         event: React.ChangeEvent<HTMLInputElement>
     ): Promise<void> => {
@@ -77,26 +117,23 @@ export default function ProfileCoverModal({
 
         if (!file) return;
 
-        setError('');
+        await handleSelectedImage(file);
+        event.target.value = '';
+    };
 
-        try {
-            const { width, height } = await getImageDimensions(file);
-
-            if (width < MIN_COVER_WIDTH || height < MIN_COVER_HEIGHT) {
-                setSelectedFile(null);
-                setError(
-                    `*A imagem deve ter no minimo ${MIN_COVER_WIDTH}x${MIN_COVER_HEIGHT} pixels.`
-                );
-                event.target.value = '';
-                return;
-            }
-
-            setSelectedFile(file);
-        } catch (dimensionError: Error | any) {
-            setSelectedFile(null);
-            setError(dimensionError?.message ?? '*Nao foi possivel validar a imagem.');
-            event.target.value = '';
+    const handleRequestImageSelection = () => {
+        if (loading) return;
+        if (loadingGallery) {
+            setError('*A galeria ainda esta carregando.');
+            return;
         }
+
+        if (galleryImages.length > 0) {
+            setSourceChoiceOpen(true);
+            return;
+        }
+
+        inputRef.current?.click();
     };
 
     const handleSubmit = async (): Promise<void> => {
@@ -160,7 +197,11 @@ export default function ProfileCoverModal({
                     </span>
                     {selectedFile ? (
                         <span className="font-XXS-regular profile-action-modal-helper">
-                            Arquivo selecionado: {selectedFile.name}
+                            {isGalleryImageObject(selectedFile)
+                                ? `Imagem da galeria: ${
+                                      selectedFile.title || 'Sem titulo'
+                                  }`
+                                : `Arquivo selecionado: ${selectedFile.name}`}
                         </span>
                     ) : null}
                 </div>
@@ -178,7 +219,7 @@ export default function ProfileCoverModal({
                 <div className="profile-action-modal-buttons">
                     <button
                         type="button"
-                        onClick={() => inputRef.current?.click()}
+                        onClick={handleRequestImageSelection}
                         disabled={loading}
                         className="font-S-bold button-L-fill bg-color-primary/default_900 text-color-greyScale/100 w-full"
                     >
@@ -213,6 +254,35 @@ export default function ProfileCoverModal({
                     </button>
                 </div>
             </div>
+
+            {sourceChoiceOpen ? (
+                <ImageSourceChoiceModal
+                    title="Selecionar plano de fundo"
+                    description="Escolha uma imagem local ou use uma ja salva na sua galeria."
+                    onClose={() => setSourceChoiceOpen(false)}
+                    onSelectLocal={() => {
+                        setSourceChoiceOpen(false);
+                        inputRef.current?.click();
+                    }}
+                    onSelectGallery={() => {
+                        setSourceChoiceOpen(false);
+                        setGalleryPickerOpen(true);
+                    }}
+                />
+            ) : null}
+
+            {galleryPickerOpen ? (
+                <UserGalleryPickerModal
+                    title="Selecionar plano de fundo"
+                    description="Escolha uma imagem da sua galeria para usar no topo do perfil."
+                    images={galleryImages}
+                    onClose={() => setGalleryPickerOpen(false)}
+                    onSelect={(image: ImageObject) => {
+                        setGalleryPickerOpen(false);
+                        void handleSelectedImage(image);
+                    }}
+                />
+            ) : null}
         </div>
     );
 }

@@ -1,13 +1,18 @@
 import { AxiosError } from 'axios';
 import axios from 'axios';
 import { apiCall, campaignsBaseUrl } from '../wrapper';
+import {
+    appendMultiUploadImageValues,
+    appendUploadImageValue,
+    type UploadImageValue,
+} from '@/utils/imageUploadPayload';
 
 export const updateCampaignCover = async (
     campaignId: string,
-    cover: File
+    cover: UploadImageValue
 ): Promise<void> => {
     const formData = new FormData();
-    formData.append('picture', cover);
+    appendUploadImageValue(formData, 'picture', cover);
 
     try {
         await axios({
@@ -29,10 +34,10 @@ export const updateCampaignCover = async (
 
 export const updateCampaignMapImages = async (
     campaignId: string,
-    mapImages: File[]
+    mapImages: UploadImageValue[]
 ): Promise<void> => {
     const formData = new FormData();
-    mapImages.forEach((file) => formData.append('mapImages', file));
+    appendMultiUploadImageValues(formData, 'mapImages', mapImages);
 
     try {
         await axios({

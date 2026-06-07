@@ -8,9 +8,10 @@ type ProfileShowcaseSectionProps = {
     subtitle: string;
     items: ReactNode[];
     label: string;
-    variant: 'campaigns' | 'characters' | 'badges';
+    variant: 'campaigns' | 'characters' | 'badges' | 'friends';
     emptyMessage?: string;
     cardLayout?: boolean;
+    headerAction?: ReactNode;
 };
 
 export default function ProfileShowcaseSection({
@@ -21,14 +22,20 @@ export default function ProfileShowcaseSection({
     variant,
     emptyMessage,
     cardLayout = false,
+    headerAction,
 }: ProfileShowcaseSectionProps): JSX.Element {
     return (
         <section
             className={`profile-showcase${cardLayout ? ' profile-showcase--cards' : ''}`}
         >
             <div className="profile-showcase__header">
-                <h2 className="font-L-bold text-color-greyScale/50">{title}</h2>
-                <p className="font-XS-regular text-color-greyScale/200">{subtitle}</p>
+                <div className="profile-showcase__heading">
+                    <h2 className="font-M-semibold text-color-greyScale/50">{title}</h2>
+                    <p className="font-XS-regular text-color-greyScale/300">{subtitle}</p>
+                </div>
+                {headerAction ? (
+                    <div className="profile-showcase__action">{headerAction}</div>
+                ) : null}
             </div>
 
             {items.length > 0 ? (

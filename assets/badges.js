@@ -9,7 +9,7 @@ const rawBadges = {
             label: 'doado',
         },
     },
-    cleric_badge: {
+    cleric: {
         colorful: '/images/badges/cleric.webp',
         blackandwhite: '/images/badges/cleric-bw.webp',
         description: 'Concedida ao criar 2 campanhas.',
@@ -19,7 +19,7 @@ const rawBadges = {
             label: 'campanhas criadas',
         },
     },
-    dragon_badge: {
+    dragon: {
         colorful: '/images/badges/dragon.webp',
         blackandwhite: '/images/badges/dragon-bw.webp',
         description: 'Concedida ao entrar em 50 campanhas.',
@@ -29,7 +29,7 @@ const rawBadges = {
             label: 'campanhas participadas',
         },
     },
-    warrior_ancient_badge: {
+    warrior_ancient: {
         colorful: '/images/badges/warrior-ancient.webp',
         blackandwhite: '/images/badges/warrior-ancient-bw.webp',
         description: 'Concedida ao encerrar 50 campanhas.',
@@ -39,7 +39,7 @@ const rawBadges = {
             label: 'campanhas encerradas',
         },
     },
-    enthusiast_badge: {
+    enthusiast: {
         colorful: '/images/badges/enthusiat.webp',
         blackandwhite: '/images/badges/enthusiast-bw.webp',
         description: 'Concedida ao entrar em 2 campanhas.',
@@ -49,7 +49,7 @@ const rawBadges = {
             label: 'campanhas participadas',
         },
     },
-    high_cleric_badge: {
+    high_cleric: {
         colorful: '/images/badges/high-cleric.webp',
         blackandwhite: '/images/badges/high-cleric-bw.webp',
         description: 'Concedida ao criar 5 campanhas.',
@@ -59,7 +59,7 @@ const rawBadges = {
             label: 'campanhas criadas',
         },
     },
-    imp_king_rich_badge: {
+    imp_king_rich: {
         colorful: '/images/badges/imp-king-rich.webp',
         blackandwhite: '/images/badges/imp-king-rich-bw.webp',
         description: 'Concedida ao comprar 90 equipamentos.',
@@ -79,7 +79,7 @@ const rawBadges = {
             label: 'doado',
         },
     },
-    high_sorcerer_badge: {
+    high_sorcerer: {
         colorful: '/images/badges/high-sorcerer.webp',
         blackandwhite: '/images/badges/high-sorcerer-bw.webp',
         description: 'Concedida ao criar 30 campanhas.',
@@ -89,7 +89,7 @@ const rawBadges = {
             label: 'campanhas criadas',
         },
     },
-    imp_badge: {
+    imp: {
         colorful: '/images/badges/imp.webp',
         blackandwhite: '/images/badges/imp-bw.webp',
         description: 'Concedida ao comprar 10 equipamentos.',
@@ -99,7 +99,7 @@ const rawBadges = {
             label: 'equipamentos comprados',
         },
     },
-    warrior_young_badge: {
+    warrior_young: {
         colorful: '/images/badges/warrior-young.webp',
         blackandwhite: '/images/badges/warrior-young-bw.webp',
         description: 'Concedida ao encerrar 5 campanhas.',
@@ -109,7 +109,7 @@ const rawBadges = {
             label: 'campanhas encerradas',
         },
     },
-    imp_rich_badge: {
+    imp_rich: {
         colorful: '/images/badges/imp-rich.webp',
         blackandwhite: '/images/badges/imp-rich-bw.webp',
         description: 'Concedida ao comprar 30 equipamentos.',
@@ -129,7 +129,7 @@ const rawBadges = {
             label: 'doado',
         },
     },
-    imp_very_rich_badge: {
+    imp_very_rich: {
         colorful: '/images/badges/imp-very-rich.webp',
         blackandwhite: '/images/badges/imp-very-rich-bw.webp',
         description: 'Concedida ao comprar 50 equipamentos.',
@@ -139,7 +139,7 @@ const rawBadges = {
             label: 'equipamentos comprados',
         },
     },
-    warrior_darkness_badge: {
+    warrior_darkness: {
         colorful: '/images/badges/warrior-darkness.webp',
         blackandwhite: '/images/badges/warrior-darkness-bw.webp',
         description: 'Concedida ao encerrar 30 campanhas.',
@@ -149,7 +149,7 @@ const rawBadges = {
             label: 'campanhas encerradas',
         },
     },
-    mage_badge: {
+    mage: {
         colorful: '/images/badges/mage.webp',
         blackandwhite: '/images/badges/mage-bw.webp',
         description: 'Concedida ao entrar em 10 campanhas.',
@@ -159,7 +159,7 @@ const rawBadges = {
             label: 'campanhas participadas',
         },
     },
-    necromant_badge: {
+    necromant: {
         colorful: '/images/badges/necromant.webp',
         blackandwhite: '/images/badges/necromant-bw.webp',
         description: 'Concedida ao entrar em 30 campanhas.',
@@ -169,7 +169,7 @@ const rawBadges = {
             label: 'campanhas participadas',
         },
     },
-    warrior_badge: {
+    warrior: {
         colorful: '/images/badges/warrior.webp',
         blackandwhite: '/images/badges/warrior-bw.webp',
         description: 'Concedida ao encerrar 2 campanhas.',
@@ -179,7 +179,7 @@ const rawBadges = {
             label: 'campanhas encerradas',
         },
     },
-    sorcerer_badge: {
+    sorcerer: {
         colorful: '/images/badges/sorcerer.webp',
         blackandwhite: '/images/badges/sorcerer-bw.webp',
         description: 'Concedida ao criar 10 campanhas.',
@@ -189,7 +189,7 @@ const rawBadges = {
             label: 'campanhas criadas',
         },
     },
-    imp_with_glasses_and_money_badge: {
+    imp_with_glasses_and_money: {
         colorful: '/images/badges/imp-with-glasses-and-money.webp',
         blackandwhite: '/images/badges/imp-with-glasses-and-money-bw.webp',
         description: 'Concedida ao comprar 70 equipamentos.',
@@ -199,12 +199,12 @@ const rawBadges = {
             label: 'equipamentos comprados',
         },
     },
-    staff_badge: {
+    staff: {
         colorful: '/images/badges/staff.webp',
         blackandwhite: '/images/badges/staff-bw.webp',
         description: 'Badge sem regra automatica de conquista ativa no backend.',
     },
-    student_badge: {
+    student: {
         colorful: '/images/badges/student.webp',
         blackandwhite: '/images/badges/student-bw.webp',
         description: 'Concedida ao entrar em 5 campanhas.',
@@ -214,7 +214,7 @@ const rawBadges = {
             label: 'campanhas participadas',
         },
     },
-    supreme_sorcerer_cleric_badge: {
+    supreme_sorcerer_cleric: {
         colorful: '/images/badges/supreme-sorcerer-cleric.webp',
         blackandwhite: '/images/badges/supreme-sorcerer-cleric-bw.webp',
         description: 'Concedida ao criar 50 campanhas.',
@@ -224,7 +224,7 @@ const rawBadges = {
             label: 'campanhas criadas',
         },
     },
-    warrior_arcane_badge: {
+    warrior_arcane: {
         colorful: '/images/badges/warrior-arcane.webp',
         blackandwhite: '/images/badges/warrior-arcane-bw.webp',
         description: 'Concedida ao encerrar 10 campanhas.',
@@ -237,8 +237,22 @@ const rawBadges = {
 };
 
 Object.defineProperty(rawBadges, 'imp_with_glasses_and_money', {
-    value: rawBadges.imp_with_glasses_and_money_badge,
+    value: rawBadges.imp_with_glasses_and_money,
     enumerable: false,
+});
+
+const legacyBadgeAliases = {
+    student_badge: 'student',
+    cleric_badge: 'cleric',
+    staff_badge: 'staff',
+    warrior_arcane_badge: 'warrior_arcane',
+};
+
+Object.entries(legacyBadgeAliases).forEach(([legacyKey, canonicalKey]) => {
+    Object.defineProperty(rawBadges, legacyKey, {
+        value: rawBadges[canonicalKey],
+        enumerable: false,
+    });
 });
 
 export default rawBadges;

@@ -46,6 +46,36 @@ export const profileUserWithCover = {
     },
 };
 
+export const profileFriends = [
+    {
+        userId: 'friend-1',
+        nickname: 'Bianca',
+        tag: '#0101',
+        picture: '/images/SideImageBackground.svg',
+        rank: 'silver',
+        status: 'active' as const,
+        favorite: false,
+    },
+    {
+        userId: 'friend-2',
+        nickname: 'Caio',
+        tag: '#0102',
+        picture: '/images/SideImageBackground.svg',
+        rank: 'gold',
+        status: 'active' as const,
+        favorite: false,
+    },
+    {
+        userId: 'friend-3',
+        nickname: 'Dora',
+        tag: '#0103',
+        picture: '/images/SideImageBackground.svg',
+        rank: 'bronze',
+        status: 'active' as const,
+        favorite: false,
+    },
+];
+
 export const masterCampaign = {
     campaignId: 'camp-1',
     title: 'Cronicas de Aether',

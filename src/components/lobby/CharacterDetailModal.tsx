@@ -44,6 +44,11 @@ import {
 } from '@/utils/characterLeveling';
 import TableriseContext from '@/context/TableriseContext';
 import type { ImageUploadIntent } from '@/utils/imageCrop';
+import ImageSourceChoiceModal from '@/components/common/ImageSourceChoiceModal';
+import UserGalleryPickerModal from '@/components/common/UserGalleryPickerModal';
+import { normalizeStoredUserId, useStoredUser } from '@/hooks/useStoredUser';
+import { useUserGallery } from '@/hooks/useUserGallery';
+import type { UploadImageValue } from '@/utils/imageUploadPayload';
 
 interface CharacterDetailModalProps {
     characterId: string;
@@ -234,6 +239,10 @@ export default function CharacterDetailModal({
     onDeleted,
 }: CharacterDetailModalProps): JSX.Element {
     const { themeMode } = useContext(TableriseContext);
+    const { storedUser } = useStoredUser();
+    const currentUserId = normalizeStoredUserId(storedUser);
+    const { galleryImages, loadingGallery, refreshGallery } =
+        useUserGallery(currentUserId);
     const [char, setChar] = useState<FullCharacterDnd | null>(null);
     const [loading, setLoading] = useState(true);
     const [classRecord, setClassRecord] = useState<DndClassRecord | null>(null);
@@ -255,6 +264,8 @@ export default function CharacterDetailModal({
         file: File;
         intent: ImageUploadIntent;
     } | null>(null);
+    const [pictureSourceChoiceOpen, setPictureSourceChoiceOpen] = useState(false);
+    const [pictureGalleryOpen, setPictureGalleryOpen] = useState(false);
 
     // Edit form states
     const [editAbilityScores, setEditAbilityScores] = useState<
@@ -464,6 +475,12 @@ export default function CharacterDetailModal({
     };
 
     const handlePictureClick = () => {
+        if (loadingGallery) return;
+        if (galleryImages.length > 0) {
+            setPictureSourceChoiceOpen(true);
+            return;
+        }
+
         pictureInputRef.current?.click();
     };
 
@@ -489,11 +506,12 @@ export default function CharacterDetailModal({
         onBack();
     };
 
-    const handleCharacterPictureUpload = async (file: File) => {
+    const handleCharacterPictureUpload = async (file: UploadImageValue) => {
         const success = await uploadCharacterPicture(characterId, file);
 
         if (success) {
             await loadCharacterModalData();
+            await refreshGallery();
             setPendingImageCrop(null);
             return;
         }
@@ -2586,6 +2604,35 @@ export default function CharacterDetailModal({
                     onConfirm={handleCharacterPictureUpload}
                     onUseOriginal={handleCharacterPictureUpload}
                     onClose={() => setPendingImageCrop(null)}
+                />
+            ) : null}
+
+            {pictureSourceChoiceOpen ? (
+                <ImageSourceChoiceModal
+                    title="Selecionar retrato do personagem"
+                    description="Escolha uma imagem local ou uma imagem ja salva na sua galeria."
+                    onClose={() => setPictureSourceChoiceOpen(false)}
+                    onSelectLocal={() => {
+                        setPictureSourceChoiceOpen(false);
+                        pictureInputRef.current?.click();
+                    }}
+                    onSelectGallery={() => {
+                        setPictureSourceChoiceOpen(false);
+                        setPictureGalleryOpen(true);
+                    }}
+                />
+            ) : null}
+
+            {pictureGalleryOpen ? (
+                <UserGalleryPickerModal
+                    title="Selecionar retrato do personagem"
+                    description="Escolha uma imagem da sua galeria para usar no personagem."
+                    images={galleryImages}
+                    onClose={() => setPictureGalleryOpen(false)}
+                    onSelect={(image) => {
+                        setPictureGalleryOpen(false);
+                        void handleCharacterPictureUpload(image).catch(() => undefined);
+                    }}
                 />
             ) : null}
         </>

@@ -19,6 +19,8 @@ import ImageCropModal from '@/components/common/ImageCropModal';
 import LoadingDots from '@/components/common/LoadingDots';
 import '@/components/home/styles/CreateCampaignModal.css';
 import type { ImageUploadIntent } from '@/utils/imageCrop';
+import type { ImageObject } from '@/types/shared/general';
+import type { UploadImageValue } from '@/utils/imageUploadPayload';
 
 interface Props {
     onClose: () => void;
@@ -46,7 +48,7 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [password, setPassword] = useState('');
-    const [coverImage, setCoverImage] = useState<File | null>(null);
+    const [coverImage, setCoverImage] = useState<UploadImageValue | null>(null);
 
     /* ── step 2 fields ── */
     const [system, setSystem] = useState('');
@@ -54,7 +56,7 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
     const [visibility, setVisibility] = useState('');
     const [playerAmountLimit, setPlayerAmountLimit] = useState(1);
     const [musics, setMusics] = useState<CampaignMusic[]>([]);
-    const [mapImages, setMapImages] = useState<File[]>([]);
+    const [mapImages, setMapImages] = useState<UploadImageValue[]>([]);
     const [discordLink, setDiscordLink] = useState('');
     const [twitterLink, setTwitterLink] = useState('');
     const [youtubeLink, setYoutubeLink] = useState('');
@@ -132,6 +134,14 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
         }
 
         setPendingImageCrop(null);
+    }
+
+    function handleCoverGalleryImageSelected(image: ImageObject) {
+        setCoverImage(image);
+    }
+
+    function handleMapGalleryImageSelected(image: ImageObject) {
+        setMapImages((prev) => (prev.length >= 3 ? prev : [...prev, image]));
     }
 
     async function handleSubmit() {
@@ -249,6 +259,7 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
                             passwordError={passwordError}
                             coverImage={coverImage}
                             onSelectCoverImage={handleCoverImageSelected}
+                            onSelectCoverGalleryImage={handleCoverGalleryImageSelected}
                         />
                     )}
                     {step === 1 && (
@@ -269,6 +280,7 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
                             mapImages={mapImages}
                             setMapImages={setMapImages}
                             onSelectMapImage={handleMapImageSelected}
+                            onSelectMapGalleryImage={handleMapGalleryImageSelected}
                             discordLink={discordLink}
                             setDiscordLink={setDiscordLink}
                             twitterLink={twitterLink}

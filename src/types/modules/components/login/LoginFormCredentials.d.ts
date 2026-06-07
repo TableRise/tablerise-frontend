@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 const registerZodSchema = z
     .object({
-        nickname: z.string().min(3, { message: 'Nome do usuario não informado*' }),
+        nickname: z.string().min(3, { message: 'Nome do usuário não informado*' }),
         email: z.string().email({ message: 'Endereço de e-mail inválido*' }),
         password: z.string().regex(/^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*\d).{8,32}$/, {
             message:

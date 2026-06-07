@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import LoadingDots from '@/components/common/LoadingDots';
+import { normalizeStoredUserId, type StoredUserRecord } from '@/hooks/useStoredUser';
 import { postSupport } from '@/server/users/post-support';
 import supportSchema, {
     supportReasonOptions,
@@ -11,28 +12,23 @@ import supportSchema, {
     type SupportFormPayload,
 } from '@/components/support/schema/SupportSchema';
 
-type StoredUser = {
-    userId?: string;
-};
-
 export default function SupportForm(): JSX.Element {
     const [resolvedUserId, setResolvedUserId] = useState('');
     const [accountError, setAccountError] = useState('');
     const [senderLoading, setSenderLoading] = useState(true);
+    const [selectedReason, setSelectedReason] = useState('');
     const [statusMessage, setStatusMessage] = useState<{
         type: 'success' | 'error';
         message: string;
     } | null>(null);
 
     const {
-        control,
         register,
         handleSubmit,
         reset,
         setError,
         setValue,
         clearErrors,
-        watch,
         formState: { errors, isSubmitting },
     } = useForm<SupportFormPayload>({
         resolver: zodResolver(supportSchema),
@@ -43,10 +39,7 @@ export default function SupportForm(): JSX.Element {
         },
     });
 
-    const selectedReason = watch('reason') ?? '';
-    const requiresCampaignCode = supportReasonsWithCampaignCode.includes(
-        selectedReason as (typeof supportReasonsWithCampaignCode)[number]
-    );
+    const requiresCampaignCode = selectedReason.trim().length > 0;
 
     useEffect(() => {
         if (!requiresCampaignCode) {
@@ -63,23 +56,24 @@ export default function SupportForm(): JSX.Element {
 
             try {
                 const storedUserRaw = localStorage.getItem('userLogged');
-                const storedUser: StoredUser | null = storedUserRaw
+                const storedUser: StoredUserRecord | null = storedUserRaw
                     ? JSON.parse(storedUserRaw)
                     : null;
+                const normalizedUserId = normalizeStoredUserId(storedUser);
 
                 if (!storedUser) {
                     setAccountError('Faça login para enviar uma solicitação de suporte.');
                     return;
                 }
 
-                if (!storedUser.userId) {
+                if (!normalizedUserId) {
                     setAccountError(
                         'Não foi possível identificar a sua conta para enviar a solicitação.'
                     );
                     return;
                 }
 
-                setResolvedUserId(storedUser.userId);
+                setResolvedUserId(normalizedUserId);
             } catch {
                 setAccountError(
                     'Não foi possível carregar os dados da sua conta no momento. Tente novamente em instantes.'
@@ -120,6 +114,7 @@ export default function SupportForm(): JSX.Element {
                 campaignCode: '',
                 requestMessage: '',
             });
+            setSelectedReason('');
 
             setStatusMessage({
                 type: 'success',
@@ -149,30 +144,37 @@ export default function SupportForm(): JSX.Element {
                 >
                     Qual o motivo do contato?
                 </label>
-                <Controller
-                    name="reason"
-                    control={control}
-                    render={({ field }) => (
-                        <select
-                            {...field}
-                            id="support-reason"
-                            className={`support-form-select input-default-light font-S-regular${
-                                errors.reason ? ' support-form-select--error' : ''
-                            }`}
-                            disabled={senderLoading}
-                            value={field.value ?? ''}
-                        >
-                            <option value="" disabled>
-                                Selecione uma opção
-                            </option>
-                            {supportReasonOptions.map((option) => (
-                                <option key={option} value={option}>
-                                    {option}
-                                </option>
-                            ))}
-                        </select>
-                    )}
-                />
+                <select
+                    id="support-reason"
+                    className={`support-form-select input-default-light font-S-regular${
+                        errors.reason ? ' support-form-select--error' : ''
+                    }`}
+                    disabled={Boolean(accountError)}
+                    value={selectedReason}
+                    {...register('reason', {
+                        onChange: (event) => {
+                            const nextReason = String(event.target.value ?? '');
+                            setSelectedReason(nextReason);
+                            setValue(
+                                'reason',
+                                nextReason as SupportFormPayload['reason'],
+                                {
+                                    shouldValidate: true,
+                                    shouldDirty: true,
+                                }
+                            );
+                        },
+                    })}
+                >
+                    <option value="" disabled>
+                        Selecione uma opção
+                    </option>
+                    {supportReasonOptions.map((option) => (
+                        <option key={option} value={option}>
+                            {option}
+                        </option>
+                    ))}
+                </select>
                 {errors.reason && (
                     <span className="font-XXS-regular text-color-support/alert">
                         {errors.reason.message}
@@ -180,30 +182,28 @@ export default function SupportForm(): JSX.Element {
                 )}
             </div>
 
-            {requiresCampaignCode && (
-                <div className="support-form-field">
-                    <label
-                        htmlFor="support-campaign-code"
-                        className="font-S-bold text-color-greyScale/950"
-                    >
-                        Código da campanha
-                    </label>
-                    <input
-                        id="support-campaign-code"
-                        type="text"
-                        placeholder="Digite o código da campanha"
-                        className={`input-default-light font-S-regular support-form-input${
-                            errors.campaignCode ? ' input-error-light' : ''
-                        }`}
-                        {...register('campaignCode')}
-                    />
-                    {errors.campaignCode && (
-                        <span className="font-XXS-regular text-color-support/alert">
-                            {errors.campaignCode.message}
-                        </span>
-                    )}
-                </div>
-            )}
+            <div className="support-form-field">
+                <label
+                    htmlFor="support-campaign-code"
+                    className="font-S-bold text-color-greyScale/950"
+                >
+                    Código da campanha
+                </label>
+                <input
+                    id="support-campaign-code"
+                    type="text"
+                    placeholder="Digite o código da campanha"
+                    className={`input-default-light font-S-regular support-form-input${
+                        errors.campaignCode ? ' input-error-light' : ''
+                    }`}
+                    {...register('campaignCode')}
+                />
+                {errors.campaignCode && (
+                    <span className="font-XXS-regular text-color-support/alert">
+                        {errors.campaignCode.message}
+                    </span>
+                )}
+            </div>
 
             <div className="support-form-field">
                 <label

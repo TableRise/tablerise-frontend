@@ -20,7 +20,7 @@ export const postLogin = async (payload: LoginPayload): Promise<AxiosResponse | 
         }
 
         if (response.status === 404) {
-            throw new Error('*Usuario não cadastrado');
+            throw new Error('*usuário não cadastrado');
         }
 
         if (response.status === 401) {
