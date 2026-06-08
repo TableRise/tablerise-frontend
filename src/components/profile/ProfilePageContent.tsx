@@ -541,7 +541,7 @@ export default function ProfilePageContent({
         return (
             <ProfileStateCard
                 title={<LoadingDots label="Carregando perfil" />}
-                description="Estamos buscando as informaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Âµes deste aventureiro."
+                description="Estamos buscando as informações deste aventureiro."
             />
         );
     }

@@ -18,17 +18,16 @@ export default function ProfileCoverInstructionsModal({
                 onClick={(event) => event.stopPropagation()}
             >
                 <h1 className="profile-action-modal-title font-L-semibold">
-                    Instrucoes para capa de perfil
+                    Instruções para capa de perfil
                 </h1>
                 <div className="profile-action-modal-copy">
                     <p className="profile-action-modal-description font-XS-regular">
-                        Para uma melhor experiencia envie uma imagem de pelo menos
+                        Para uma melhor experiência envie uma imagem de pelo menos
                         1280x720, no formato jpg / jpeg / webp.
                     </p>
                     <p className="profile-action-modal-description font-XS-regular">
-                        O formato png tambem e aceito mas e mais pesado em muitos casos, o
-                        que torna a experiencia de capa para o perfil mais lenta para quem
-                        visitar seu perfil.
+                        O formato png também é aceito mas em alguns casos pode tornar o
+                        carregamento mais lento.
                     </p>
                 </div>
 
