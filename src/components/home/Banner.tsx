@@ -12,9 +12,9 @@ export default function Banner(): JSX.Element {
                         <br /> jogar RPG de Mesa
                     </p>
                     <p className="font-M-regular">
-                        Crie e jogue suas hist&oacute;rias de maneira
+                        Crie e jogue suas histórias de maneira
                         <br />
-                        pr&aacute;tica e descomplicada
+                        prática e descomplicada
                     </p>
                     <Link
                         href="/register"
