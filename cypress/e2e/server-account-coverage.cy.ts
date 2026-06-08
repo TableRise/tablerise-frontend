@@ -22,7 +22,10 @@ import {
 } from '../../src/server/users/disable-two-factor';
 import { postLogout } from '../../src/server/users/logout';
 import { postRegister } from '../../src/server/users/register';
-import { toggleUserFriendFavorite } from '../../src/server/users/collections';
+import {
+    searchUserByNickname,
+    toggleUserFriendFavorite,
+} from '../../src/server/users/collections';
 import {
     confirmUpdateEmailCode,
     sendUpdateEmailCode,
@@ -374,7 +377,7 @@ describe('TableRise :: Server Account Coverage', () => {
         }).as('updateUserEmail404');
         cy.then(() =>
             expectRejectedIncludes(updateUserEmail('user-1', 'new@tablerise.dev'), [
-                'usuário',
+                'usuÃƒÂ¡rio',
                 'encontrado',
             ])
         );
@@ -493,7 +496,7 @@ describe('TableRise :: Server Account Coverage', () => {
             body: {},
         }).as('deleteUser404');
         cy.then(() =>
-            expectRejectedIncludes(deleteUser('user-1'), ['usuário', 'encontrado'])
+            expectRejectedIncludes(deleteUser('user-1'), ['usuÃƒÂ¡rio', 'encontrado'])
         );
         cy.wait('@deleteUser404');
 
@@ -1151,7 +1154,7 @@ describe('TableRise :: Server Account Coverage', () => {
         }).as('deactivateUserTwoFactor404');
         cy.then(() =>
             expectRejectedIncludes(deactivateUserTwoFactor('user-404'), [
-                'usuário',
+                'usuÃƒÂ¡rio',
                 'encontrado',
             ])
         );
@@ -1665,5 +1668,43 @@ describe('TableRise :: Server Account Coverage', () => {
             ])
         );
         cy.wait('@toggleUserFriendFavorite418');
+    });
+
+    it('covers the nickname search helper', () => {
+        cy.intercept('GET', `${usersApi}*nickname=Aria`, {
+            statusCode: 200,
+            body: {
+                userId: 'user-1',
+                nickname: 'Aria',
+                picture: {
+                    link: '/images/SideImageBackground.svg',
+                },
+            },
+        }).as('searchUserByNicknameSuccess');
+        cy.then(async () => {
+            expect(await searchUserByNickname('Aria')).to.deep.include({
+                userId: 'user-1',
+                nickname: 'Aria',
+            });
+        });
+        cy.wait('@searchUserByNicknameSuccess');
+
+        cy.intercept('GET', `${usersApi}*nickname=Missing`, {
+            statusCode: 404,
+            body: {},
+        }).as('searchUserByNickname404');
+        cy.then(async () => {
+            expect(await searchUserByNickname('Missing')).to.eq(null);
+        });
+        cy.wait('@searchUserByNickname404');
+
+        cy.intercept('GET', `${usersApi}*nickname=Explode`, {
+            statusCode: 500,
+            body: {},
+        }).as('searchUserByNickname500');
+        cy.then(() =>
+            expectRejectedIncludes(searchUserByNickname('Explode'), ['Erro no servidor'])
+        );
+        cy.wait('@searchUserByNickname500');
     });
 });

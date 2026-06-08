@@ -1,6 +1,7 @@
 import type { AxiosError, AxiosResponse } from 'axios';
 import { apiCall, usersBaseUrl } from '@/server/wrapper';
 import type { ImageObject } from '@/types/shared/general';
+import type { DatabaseUserWithDetails } from '@/types/shared/entities';
 
 export type UserFriendStatus = 'pending' | 'active';
 
@@ -61,6 +62,26 @@ function normalizeArrayResponse<T>(data: unknown, keys: string[]): T[] {
     return [];
 }
 
+function normalizeSingleResponse<T>(data: unknown): T | null {
+    if (!data || typeof data !== 'object') {
+        return null;
+    }
+
+    const record = data as Record<string, unknown>;
+
+    if (record.result && typeof record.result === 'object') {
+        return {
+            ...record.result,
+            result: record.result,
+        } as T;
+    }
+
+    return {
+        ...record,
+        result: record.result,
+    } as T;
+}
+
 export async function getUserFriends(userId: string): Promise<UserFriendRecord[]> {
     try {
         const { data }: AxiosResponse = await apiCall({
@@ -73,10 +94,34 @@ export async function getUserFriends(userId: string): Promise<UserFriendRecord[]
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
 
-        if (status === 404) throw new Error('usuário nao encontrado');
+        if (status === 404) throw new Error('usuÃ¡rio nao encontrado');
         if (status === 500) throw new Error('Erro no servidor');
 
         throw new Error('Nao foi possivel carregar a lista de amigos');
+    }
+}
+
+export async function searchUserByNickname(
+    nickname: string
+): Promise<DatabaseUserWithDetails | null> {
+    try {
+        const { data }: AxiosResponse = await apiCall({
+            baseUrl: usersBaseUrl,
+            endpoint: '',
+            method: 'GET',
+            params: {
+                nickname,
+            },
+        });
+
+        return normalizeSingleResponse<DatabaseUserWithDetails>(data);
+    } catch (error: AxiosError | any) {
+        const status = error?.response?.status;
+
+        if (status === 404) return null;
+        if (status === 500) throw new Error('Erro no servidor');
+
+        throw new Error('Nao foi possivel procurar aventureiros');
     }
 }
 
@@ -134,18 +179,18 @@ export async function sendUserFriendRequest(
         const status = error?.response?.status;
 
         if (status === 400) {
-            throw new Error('Nao foi possivel enviar esta solicitação de amizade');
+            throw new Error('Nao foi possivel enviar esta solicitaÃ§Ã£o de amizade');
         }
         if (status === 403) {
-            throw new Error('Voce nao pode enviar uma solicitação para este perfil');
+            throw new Error('Voce nao pode enviar uma solicitaÃ§Ã£o para este perfil');
         }
-        if (status === 404) throw new Error('usuário nao encontrado');
+        if (status === 404) throw new Error('usuÃ¡rio nao encontrado');
         if (status === 409) {
-            throw new Error('Ja existe uma amizade ou solicitação pendente');
+            throw new Error('Ja existe uma amizade ou solicitaÃ§Ã£o pendente');
         }
         if (status === 500) throw new Error('Erro no servidor');
 
-        throw new Error('Nao foi possivel enviar a solicitação de amizade');
+        throw new Error('Nao foi possivel enviar a solicitaÃ§Ã£o de amizade');
     }
 }
 
@@ -167,14 +212,14 @@ export async function respondToUserFriendRequest(
         const status = error?.response?.status;
 
         if (status === 400) {
-            throw new Error('Nao foi possivel atualizar esta solicitação de amizade');
+            throw new Error('Nao foi possivel atualizar esta solicitaÃ§Ã£o de amizade');
         }
         if (status === 404) {
-            throw new Error('solicitação de amizade nao encontrada');
+            throw new Error('solicitaÃ§Ã£o de amizade nao encontrada');
         }
         if (status === 500) throw new Error('Erro no servidor');
 
-        throw new Error('Nao foi possivel responder a solicitação de amizade');
+        throw new Error('Nao foi possivel responder a solicitaÃ§Ã£o de amizade');
     }
 }
 
@@ -215,7 +260,7 @@ export async function sendUserMessage(
         if (status === 403) {
             throw new Error('Voce so pode enviar mensagens para amigos ativos');
         }
-        if (status === 404) throw new Error('usuário ou destinatario nao encontrado');
+        if (status === 404) throw new Error('usuÃ¡rio ou destinatario nao encontrado');
         if (status === 500) throw new Error('Erro no servidor');
 
         throw new Error('Nao foi possivel enviar a mensagem');

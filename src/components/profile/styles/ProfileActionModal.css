@@ -25,12 +25,26 @@
         overflow-y: auto;
     }
 
+    .profile-action-modal-card--friend-search {
+        @apply max-w-[36rem] items-stretch;
+    }
+
+    .profile-action-modal-card--controls {
+        @apply items-stretch;
+        max-height: min(90vh, 48rem);
+        overflow-y: auto;
+    }
+
     .profile-action-modal-title {
         @apply text-color-primary/default_900;
     }
 
     .profile-action-modal-description {
         @apply text-center text-color-greyScale/950;
+    }
+
+    .profile-action-modal-copy {
+        @apply flex flex-col gap-3;
     }
 
     .profile-action-modal-form {
@@ -83,6 +97,18 @@
         @apply mt-2 flex w-full flex-col gap-2;
     }
 
+    .profile-action-modal-buttons--controls {
+        @apply grid grid-cols-2 gap-2;
+    }
+
+    .profile-action-modal-buttons--controls > * {
+        @apply min-w-0;
+    }
+
+    .profile-action-modal-buttons--controls .profile-action-modal-error {
+        grid-column: 1 / -1;
+    }
+
     .profile-action-modal-password-row {
         @apply relative;
     }
@@ -113,7 +139,7 @@
     }
 
     .profile-action-modal-button-subtle--danger {
-        @apply text-color-support/alert;
+        @apply text-color-greyScale/50;
     }
 
     .profile-action-modal-button-option:hover:enabled {
@@ -154,6 +180,10 @@
         @apply flex flex-col gap-2;
     }
 
+    .profile-gallery-picker__actions {
+        @apply flex items-center gap-2;
+    }
+
     .profile-gallery-picker__close {
         @apply flex h-10 w-10 items-center justify-center rounded-xl bg-transparent text-color-greyScale/700 transition-colors duration-150;
     }
@@ -188,6 +218,54 @@
 
     .profile-friends-modal__grid {
         @apply mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4;
+    }
+
+    .profile-friend-search-modal__form {
+        @apply mt-4 flex flex-col gap-3;
+    }
+
+    .profile-friend-search-modal__controls {
+        @apply flex items-center gap-3;
+    }
+
+    .profile-friend-search-modal__input {
+        @apply mt-0;
+    }
+
+    .profile-friend-search-modal__submit {
+        @apply flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl border border-color-greyScale/300 bg-color-greyScale/50 transition-colors duration-150;
+    }
+
+    .profile-friend-search-modal__submit:hover:enabled {
+        background-color: rgba(12, 37, 95, 0.08);
+    }
+
+    .profile-friend-search-modal__submit:disabled {
+        @apply cursor-not-allowed opacity-70;
+    }
+
+    .profile-friend-search-modal__body {
+        @apply mt-4;
+    }
+
+    .profile-friend-search-modal__state {
+        @apply flex min-h-[7rem] items-center justify-center rounded-2xl border border-color-greyScale/200 bg-color-greyScale/50 px-6 text-center;
+    }
+
+    .profile-friend-search-modal__result {
+        @apply flex w-full items-center gap-4 rounded-2xl border border-color-greyScale/200 bg-color-greyScale/50 p-4 text-left transition-transform duration-150;
+    }
+
+    .profile-friend-search-modal__result:hover {
+        transform: translateY(-2px);
+    }
+
+    .profile-friend-search-modal__avatar {
+        @apply h-16 w-16 flex-shrink-0;
+    }
+
+    .profile-friend-search-modal__copy {
+        @apply flex min-w-0 flex-col text-color-greyScale/950;
     }
 
     .profile-friend-requests-modal__list {
@@ -283,6 +361,22 @@
     html[data-theme='dark'] .profile-gallery-picker__empty {
         background-color: var(--theme-surface-muted);
         border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .profile-friend-search-modal__submit,
+    html[data-theme='dark'] .profile-friend-search-modal__state,
+    html[data-theme='dark'] .profile-friend-search-modal__result {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .profile-friend-search-modal__submit:hover:enabled,
+    html[data-theme='dark'] .profile-friend-search-modal__result:hover {
+        background-color: rgba(255, 255, 255, 0.06);
+    }
+
+    html[data-theme='dark'] .profile-friend-search-modal__copy {
+        color: var(--theme-text);
     }
 
     html[data-theme='dark'] .profile-friend-requests-modal__item {
