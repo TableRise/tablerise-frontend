@@ -45,13 +45,13 @@ export default function ProfileControlModal({
                     Escolha uma das opcoes abaixo para gerenciar sua conta e seu perfil.
                 </p>
 
-                <div className="profile-action-modal-buttons">
+                <div className="profile-action-modal-buttons profile-action-modal-buttons--controls">
                     <button
                         type="button"
                         onClick={onEditBiography}
                         className="font-S-bold button-L-fill profile-action-modal-button-option bg-color-primary/default_900 text-color-greyScale/100 w-full"
                     >
-                        Atualizar biografia e nome
+                        Atualizar dados
                     </button>
 
                     {!hasExternalProvider ? (
@@ -112,7 +112,7 @@ export default function ProfileControlModal({
                     <button
                         type="button"
                         onClick={onRequestDeleteAccount}
-                        className="font-S-bold button-L-fill profile-action-modal-button-subtle profile-action-modal-button-subtle--danger w-full"
+                        className="font-S-bold button-L-fill profile-action-modal-button-subtle profile-action-modal-button-subtle--danger w-full bg-color-support/alert"
                     >
                         Deletar conta
                     </button>

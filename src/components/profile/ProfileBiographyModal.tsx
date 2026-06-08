@@ -78,7 +78,7 @@ export default function ProfileBiographyModal({
                 onClick={(event) => event.stopPropagation()}
             >
                 <h1 className="profile-action-modal-title font-L-semibold">
-                    Atualizar biografia e nome
+                    Atualizar dados
                 </h1>
                 <p className="profile-action-modal-description font-XS-regular">
                     Atualize seu nome e escreva uma biografia para aparecer no seu perfil.

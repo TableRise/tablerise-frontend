@@ -160,6 +160,95 @@ describe('TableRise :: Profile And Support', () => {
             .should('have.text', 'Bianca');
     });
 
+    it('allows searching for another adventurer from the friend requests modal', () => {
+        const foundUser = {
+            ...profileUser,
+            userId: 'friend-search',
+            nickname: 'Luna',
+            username: 'Luna#2222',
+            tag: '#2222',
+            details: {
+                ...profileUser.details,
+                firstName: 'Luna',
+                lastName: 'Starfall',
+                gameInfo: {
+                    ...profileUser.details.gameInfo,
+                    characters: [],
+                    campaigns: [],
+                },
+            },
+        };
+
+        cy.intercept('GET', '**/users*nickname=Ghost', {
+            statusCode: 404,
+            body: {},
+        }).as('searchMissingFriend');
+        cy.intercept('GET', '**/users*nickname=Luna', {
+            statusCode: 200,
+            body: foundUser,
+        }).as('searchFoundFriend');
+        cy.intercept('GET', '**/users/friend-search', {
+            statusCode: 200,
+            body: foundUser,
+        }).as('getFoundProfileUser');
+        cy.intercept('GET', '**/users/friend-search/friends', {
+            statusCode: 200,
+            body: [],
+        }).as('getFoundProfileFriends');
+        cy.intercept('GET', '**/users/friend-search/messages', {
+            statusCode: 200,
+            body: [],
+        }).as('getFoundProfileMessages');
+        cy.intercept('GET', '**/users/friend-search/gallery', {
+            statusCode: 200,
+            body: [],
+        }).as('getFoundProfileGallery');
+        cy.intercept('GET', '**/users/friend-search/campaigns', {
+            statusCode: 200,
+            body: { master: [], player: [] },
+        }).as('getFoundProfileCampaigns');
+
+        cy.visitWithAppState('/profile', {
+            cookieToken: 'token-profile',
+            localStorageUser: storedUser,
+        });
+
+        cy.location('pathname', { timeout: 10000 }).should('eq', '/profile/user-1');
+        cy.wait('@getProfileUser');
+        cy.wait('@getProfileFriends');
+
+        cy.get('.profile-hero__requests-button').click();
+        cy.contains('.profile-action-modal-title', 'SolicitaÃ§Ãµes de amizade').should(
+            'be.visible'
+        );
+        cy.get('button[aria-label="Procurar aventureiros"]').should('be.visible').click();
+        cy.contains('.profile-action-modal-title', 'Procurar aventureiros').should(
+            'be.visible'
+        );
+
+        cy.get('.profile-friend-search-modal__submit').click();
+        cy.contains('Digite um nickname para procurar.').should('be.visible');
+
+        cy.get('.profile-friend-search-modal__input').type('Ghost');
+        cy.get('.profile-friend-search-modal__submit').click();
+        cy.wait('@searchMissingFriend');
+        cy.contains('Nenhum aventureiro encontrado com esse nickname.').should(
+            'be.visible'
+        );
+
+        cy.get('.profile-friend-search-modal__input').clear().type('Luna{enter}');
+        cy.wait('@searchFoundFriend');
+        cy.contains('.profile-friend-search-modal__result', 'Luna').should('be.visible');
+        cy.get('.profile-friend-search-modal__result').click();
+
+        cy.location('pathname', { timeout: 10000 }).should(
+            'eq',
+            '/profile/friend-search'
+        );
+        cy.wait('@getFoundProfileUser');
+        cy.contains('Luna Starfall').should('be.visible');
+    });
+
     it('allows the owner to validate, save, and remove a profile background', () => {
         cy.intercept('PATCH', '**/users/user-1/update/cover', (req) => {
             currentProfileUser = Cypress._.cloneDeep(profileUserWithCover);
@@ -190,12 +279,23 @@ describe('TableRise :: Profile And Support', () => {
         cy.contains('.profile-action-modal-title', 'Controle de Perfil').should(
             'be.visible'
         );
-        cy.contains('Atualizar biografia e nome').should('be.visible');
+        cy.contains('Atualizar dados').should('be.visible');
         cy.contains('Atualizar email').should('be.visible');
         cy.contains('Atualizar senha').should('be.visible');
         cy.contains('Habilitar dois fatores').should('be.visible');
         cy.contains('Deletar conta').should('be.visible');
         cy.contains('button', 'Definir plano de fundo').click();
+        cy.contains(
+            '.profile-action-modal-title',
+            'Instrucoes para capa de perfil'
+        ).should('be.visible');
+        cy.contains(
+            'Para uma melhor experiencia envie uma imagem de pelo menos 1280x720'
+        ).should('be.visible');
+        cy.contains(
+            'O formato png tambem e aceito mas e mais pesado em muitos casos'
+        ).should('be.visible');
+        cy.contains('button', 'Confirmar').click();
         cy.contains('.profile-action-modal-title', 'Definir plano de fundo').should(
             'be.visible'
         );

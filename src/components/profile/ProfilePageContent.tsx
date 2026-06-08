@@ -24,6 +24,7 @@ import ProfileTwoFactorActivationModal from '@/components/profile/ProfileTwoFact
 import ProfileTwoFactorDisableModal from '@/components/profile/ProfileTwoFactorDisableModal';
 import ProfileFlowWarningModal from '@/components/profile/ProfileFlowWarningModal';
 import ProfileBiographyModal from '@/components/profile/ProfileBiographyModal';
+import ProfileCoverInstructionsModal from '@/components/profile/ProfileCoverInstructionsModal';
 import ProfileDeleteAccountModal from '@/components/profile/ProfileDeleteAccountModal';
 import ProfileDeleteAccountVerificationModal from '@/components/profile/ProfileDeleteAccountVerificationModal';
 import ProfileEmailUpdateModal from '@/components/profile/ProfileEmailUpdateModal';
@@ -32,6 +33,7 @@ import ProfileControlModal from '@/components/profile/ProfileControlModal';
 import ProfilePasswordUpdateModal from '@/components/profile/ProfilePasswordUpdateModal';
 import ProfileFriendCard from '@/components/profile/ProfileFriendCard';
 import ProfileFriendsListModal from '@/components/profile/ProfileFriendsListModal';
+import ProfileFriendSearchModal from '@/components/profile/ProfileFriendSearchModal';
 import ProfileGalleryModal from '@/components/profile/ProfileGalleryModal';
 import ProfileMessagesModal from '@/components/profile/ProfileMessagesModal';
 import ProfileFriendRequestModal from '@/components/profile/ProfileFriendRequestModal';
@@ -128,6 +130,7 @@ export default function ProfilePageContent({
         useState(false);
     const [emailModalOpen, setEmailModalOpen] = useState(false);
     const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+    const [coverInstructionsModalOpen, setCoverInstructionsModalOpen] = useState(false);
     const [coverModalOpen, setCoverModalOpen] = useState(false);
     const [profileControlModalOpen, setProfileControlModalOpen] = useState(false);
     const [disableTwoFactorModalOpen, setDisableTwoFactorModalOpen] = useState(false);
@@ -152,6 +155,7 @@ export default function ProfilePageContent({
         null
     );
     const [friendsListModalOpen, setFriendsListModalOpen] = useState(false);
+    const [friendSearchModalOpen, setFriendSearchModalOpen] = useState(false);
     const [messagesModalOpen, setMessagesModalOpen] = useState(false);
     const [galleryModalOpen, setGalleryModalOpen] = useState(false);
     const [friendRequestModalOpen, setFriendRequestModalOpen] = useState(false);
@@ -280,7 +284,9 @@ export default function ProfilePageContent({
                     setCampaigns([]);
                     setCharacters([]);
                 } else {
-                    setFetchError('não foi possível carregar este perfil no momento.');
+                    setFetchError(
+                        'não foi possÃƒÆ’Ã‚Â­vel carregar este perfil no momento.'
+                    );
                 }
             } finally {
                 if (mounted) {
@@ -376,7 +382,7 @@ export default function ProfilePageContent({
 
         if (!profileCover) {
             setProfileControlModalOpen(false);
-            setCoverModalOpen(true);
+            setCoverInstructionsModalOpen(true);
             return;
         }
 
@@ -533,7 +539,7 @@ export default function ProfilePageContent({
         return (
             <ProfileStateCard
                 title={<LoadingDots label="Carregando perfil" />}
-                description="Estamos buscando as informações deste aventureiro."
+                description="Estamos buscando as informaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Âµes deste aventureiro."
             />
         );
     }
@@ -548,7 +554,7 @@ export default function ProfilePageContent({
         return (
             <ProfileStateCard
                 title="Perfil não encontrado"
-                description="não encontramos este perfil ou ele não está disponí­vel agora."
+                description="não encontramos este perfil ou ele não estÃƒÆ’Ã‚Â¡ disponível agora."
             />
         );
     }
@@ -607,7 +613,8 @@ export default function ProfilePageContent({
                     {campaign.title}
                 </h3>
                 <p className="font-XS-regular profile-campaign-card__description">
-                    {campaign.description || 'Sem descrição disponível.'}
+                    {campaign.description ||
+                        'Sem descriÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o disponÃƒÆ’Ã‚Â­vel.'}
                 </p>
                 <div className="profile-campaign-card__meta">
                     <span className="font-XXS-bold">
@@ -620,7 +627,8 @@ export default function ProfilePageContent({
                     </span>
                 </div>
                 <span className="font-XXS-regular profile-campaign-card__date">
-                    Próxima sessão: {formatCampaignDate(campaign.nextMatchDate)}
+                    PrÃƒÆ’Ã‚Â³xima sessÃƒÆ’Ã‚Â£o:{' '}
+                    {formatCampaignDate(campaign.nextMatchDate)}
                 </span>
             </div>
         </article>
@@ -666,7 +674,7 @@ export default function ProfilePageContent({
                     <span className="font-XXS-bold">{character.race}</span>
                 </div>
                 <span className="font-XS-regular text-color-greyScale/200">
-                    Ní­vel {character.level}
+                    NÃƒÆ’Ã‚Â­Ãƒâ€šÃ‚Â­vel {character.level}
                 </span>
             </div>
         </article>
@@ -723,6 +731,20 @@ export default function ProfilePageContent({
         await sendUserFriendRequest(currentUserId, userId);
         setViewerFriendStatus('pending');
         setFriendRequestModalOpen(false);
+    };
+
+    const handleOpenFriendSearch = () => {
+        setFriendSearchModalOpen(true);
+    };
+
+    const handleCloseFriendsListModal = () => {
+        setFriendsListModalOpen(false);
+    };
+
+    const handleNavigateToFoundProfile = (targetUserId: string) => {
+        setFriendSearchModalOpen(false);
+        setFriendRequestsInboxModalOpen(false);
+        router.push(`/profile/${targetUserId}`);
     };
 
     const handleToggleFavoriteFriend = (targetUserId: string) => {
@@ -920,12 +942,12 @@ export default function ProfilePageContent({
                     subtitle={
                         campaigns.length > 0
                             ? `${campaigns.length} campanha(s) encontrada(s)`
-                            : 'Nenhuma campanha disponí­vel'
+                            : 'Nenhuma campanha disponível'
                     }
                     items={campaignItems}
                     label="Campanhas do perfil"
                     variant="campaigns"
-                    emptyMessage="Este usuário ainda não possui campanhas visí­veis."
+                    emptyMessage="Este usuário ainda não possui campanhas visíveis."
                     cardLayout={true}
                 />
 
@@ -934,12 +956,12 @@ export default function ProfilePageContent({
                     subtitle={
                         characters.length > 0
                             ? `${characters.length} personagem(ns) encontrado(s)`
-                            : 'Nenhum personagem disponí­vel'
+                            : 'Nenhum personagem disponível'
                     }
                     items={characterItems}
                     label="Personagens do perfil"
                     variant="characters"
-                    emptyMessage="Este usuário ainda não criou personagens visí­veis."
+                    emptyMessage="Este usuário ainda não criou personagens visíveis."
                     cardLayout={true}
                 />
 
@@ -1077,6 +1099,16 @@ export default function ProfilePageContent({
                     />
                 ) : null}
 
+                {coverInstructionsModalOpen ? (
+                    <ProfileCoverInstructionsModal
+                        onClose={() => setCoverInstructionsModalOpen(false)}
+                        onConfirm={() => {
+                            setCoverInstructionsModalOpen(false);
+                            setCoverModalOpen(true);
+                        }}
+                    />
+                ) : null}
+
                 {coverModalOpen ? (
                     <ProfileCoverModal
                         userId={userId}
@@ -1124,6 +1156,7 @@ export default function ProfilePageContent({
                     <ProfileFriendRequestsInboxModal
                         requests={pendingFriendRequests}
                         onClose={() => setFriendRequestsInboxModalOpen(false)}
+                        onOpenSearch={handleOpenFriendSearch}
                         onAccept={handleAcceptFriendRequest}
                         onReject={handleRejectFriendRequest}
                     />
@@ -1146,7 +1179,14 @@ export default function ProfilePageContent({
                         canFavoriteFriend={isOwnProfile}
                         onRemoveFriend={handleRemoveFriend}
                         onToggleFavorite={handleToggleFavoriteFriend}
-                        onClose={() => setFriendsListModalOpen(false)}
+                        onClose={handleCloseFriendsListModal}
+                    />
+                ) : null}
+
+                {friendSearchModalOpen ? (
+                    <ProfileFriendSearchModal
+                        onClose={() => setFriendSearchModalOpen(false)}
+                        onSelectUser={handleNavigateToFoundProfile}
                     />
                 ) : null}
 
