@@ -10,10 +10,16 @@ import {
 describe('TableRise :: Profile And Support', () => {
     let currentProfileUser: typeof profileUser;
     let currentProfileFriends: typeof profileFriends;
+    let currentProfileGallery: Array<{
+        id: string;
+        link: string;
+        title: string;
+    }>;
 
     beforeEach(() => {
         currentProfileUser = Cypress._.cloneDeep(profileUser);
         currentProfileFriends = Cypress._.cloneDeep(profileFriends);
+        currentProfileGallery = [];
 
         cy.intercept('GET', '**/users/user-1', (req) => {
             req.reply({
@@ -31,9 +37,11 @@ describe('TableRise :: Profile And Support', () => {
             statusCode: 200,
             body: [],
         }).as('getProfileMessages');
-        cy.intercept('GET', '**/users/user-1/gallery', {
-            statusCode: 200,
-            body: [],
+        cy.intercept('GET', '**/users/user-1/gallery', (req) => {
+            req.reply({
+                statusCode: 200,
+                body: currentProfileGallery,
+            });
         }).as('getProfileGallery');
         cy.intercept('GET', '**/users/user-1/campaigns', userCampaignGroups).as(
             'getUserCampaigns'
@@ -247,6 +255,51 @@ describe('TableRise :: Profile And Support', () => {
         );
         cy.wait('@getFoundProfileUser');
         cy.contains('Luna Starfall').should('be.visible');
+    });
+
+    it('allows the owner to remove an image from the profile gallery', () => {
+        currentProfileGallery = [
+            {
+                id: 'gallery-1',
+                link: '/images/SideImageBackground.svg',
+                title: 'Mapa favorito',
+            },
+        ];
+
+        cy.intercept('DELETE', '**/users/user-1/gallery/gallery-1', (req) => {
+            currentProfileGallery = currentProfileGallery.filter(
+                (image) => image.id !== 'gallery-1'
+            );
+            req.reply({
+                statusCode: 200,
+                body: true,
+            });
+        }).as('deleteGalleryImage');
+
+        cy.visitWithAppState('/profile', {
+            cookieToken: 'token-profile',
+            localStorageUser: storedUser,
+        });
+
+        cy.location('pathname', { timeout: 10000 }).should('eq', '/profile/user-1');
+        cy.wait('@getProfileUser');
+        cy.wait('@getProfileGallery');
+
+        cy.get('.profile-hero__gallery-button').click();
+        cy.contains('.profile-action-modal-title', 'Galeria do perfil').should(
+            'be.visible'
+        );
+        cy.contains('.profile-gallery-picker__label', 'Mapa favorito').should(
+            'be.visible'
+        );
+
+        cy.get('button[aria-label="Remover Mapa favorito da galeria"]').click();
+        cy.wait('@deleteGalleryImage');
+        cy.wait('@getProfileGallery');
+        cy.contains('.profile-gallery-picker__label', 'Mapa favorito').should(
+            'not.exist'
+        );
+        cy.contains('Nenhuma imagem encontrada na galeria.').should('be.visible');
     });
 
     it('allows the owner to validate, save, and remove a profile background', () => {

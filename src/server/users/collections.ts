@@ -325,3 +325,23 @@ export async function getUserGallery(userId: string): Promise<ImageObject[]> {
         throw new Error('Nao foi possivel carregar a galeria');
     }
 }
+
+export async function deleteUserGalleryImage(
+    userId: string,
+    imageId: string
+): Promise<void> {
+    try {
+        await apiCall({
+            baseUrl: usersBaseUrl,
+            endpoint: `${userId}/gallery/${imageId}`,
+            method: 'DELETE',
+        });
+    } catch (error: AxiosError | any) {
+        const status = error?.response?.status;
+
+        if (status === 404) throw new Error('Imagem da galeria nao encontrada');
+        if (status === 500) throw new Error('Erro no servidor');
+
+        throw new Error('Nao foi possivel remover a imagem da galeria');
+    }
+}
