@@ -10,6 +10,7 @@ import {
     getCharacterById,
     type FullCharacterDnd,
 } from '@/server/characters/get-characters';
+import type { ImageObject } from '@/types/shared/general';
 import type { DatabaseUserWithDetails } from '@/types/shared/entities';
 import TableriseContext from '@/context/TableriseContext';
 import CharacterDetailModal from '@/components/lobby/CharacterDetailModal';
@@ -61,6 +62,7 @@ import {
 import {
     getUserFriends,
     getUserMessages,
+    deleteUserGalleryImage,
     removeUserFriend,
     respondToUserFriendRequest,
     sendUserFriendRequest,
@@ -778,6 +780,15 @@ export default function ProfilePageContent({
         setOwnerFriendRecords(refreshedFriends);
     };
 
+    const handleDeleteGalleryImage = async (image: ImageObject) => {
+        if (!image.id?.trim()) {
+            throw new Error('Imagem da galeria nao encontrada');
+        }
+
+        await deleteUserGalleryImage(userId, image.id);
+        await refreshGallery();
+    };
+
     const activeFriends = sortFriendRecords(
         ownerFriendRecords.filter((friend) => friend.status === 'active'),
         true
@@ -1165,6 +1176,7 @@ export default function ProfilePageContent({
                 {galleryModalOpen ? (
                     <ProfileGalleryModal
                         images={galleryImages}
+                        onDeleteImage={handleDeleteGalleryImage}
                         onClose={() => setGalleryModalOpen(false)}
                     />
                 ) : null}

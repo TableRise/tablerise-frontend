@@ -23,6 +23,7 @@ import {
 import { postLogout } from '../../src/server/users/logout';
 import { postRegister } from '../../src/server/users/register';
 import {
+    deleteUserGalleryImage,
     searchUserByNickname,
     toggleUserFriendFavorite,
 } from '../../src/server/users/collections';
@@ -1706,5 +1707,52 @@ describe('TableRise :: Server Account Coverage', () => {
             expectRejectedIncludes(searchUserByNickname('Explode'), ['Erro no servidor'])
         );
         cy.wait('@searchUserByNickname500');
+    });
+
+    it('covers the gallery delete helper', () => {
+        cy.intercept('DELETE', `${usersApi}/user-1/gallery/image-1`, {
+            statusCode: 200,
+            body: {},
+        }).as('deleteUserGalleryImageSuccess');
+        cy.then(async () => {
+            expect(await deleteUserGalleryImage('user-1', 'image-1')).to.eq(undefined);
+        });
+        cy.wait('@deleteUserGalleryImageSuccess');
+
+        cy.intercept('DELETE', `${usersApi}/user-1/gallery/image-404`, {
+            statusCode: 404,
+            body: {},
+        }).as('deleteUserGalleryImage404');
+        cy.then(() =>
+            expectRejectedIncludes(deleteUserGalleryImage('user-1', 'image-404'), [
+                'Imagem da galeria',
+                'encontrada',
+            ])
+        );
+        cy.wait('@deleteUserGalleryImage404');
+
+        cy.intercept('DELETE', `${usersApi}/user-1/gallery/image-500`, {
+            statusCode: 500,
+            body: {},
+        }).as('deleteUserGalleryImage500');
+        cy.then(() =>
+            expectRejectedIncludes(deleteUserGalleryImage('user-1', 'image-500'), [
+                'Erro no servidor',
+            ])
+        );
+        cy.wait('@deleteUserGalleryImage500');
+
+        cy.intercept('DELETE', `${usersApi}/user-1/gallery/image-418`, {
+            statusCode: 418,
+            body: {},
+        }).as('deleteUserGalleryImage418');
+        cy.then(() =>
+            expectRejectedIncludes(deleteUserGalleryImage('user-1', 'image-418'), [
+                'remover',
+                'imagem',
+                'galeria',
+            ])
+        );
+        cy.wait('@deleteUserGalleryImage418');
     });
 });
