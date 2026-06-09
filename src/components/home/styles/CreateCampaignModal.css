@@ -611,9 +611,13 @@
     }
 
     @media (max-width: 768px) {
+        .ccm-backdrop {
+            @apply items-center px-4 py-5;
+        }
+
         .ccm-modal {
             width: min(100vw - 1.5rem, 45rem);
-            max-height: 92vh;
+            max-height: min(84vh, calc(100dvh - 3rem));
         }
 
         .ccm-modal-header,
@@ -646,6 +650,7 @@
     @media (max-width: 480px) {
         .ccm-modal {
             width: min(100vw - 1rem, 45rem);
+            max-height: min(80vh, calc(100dvh - 2.5rem));
         }
 
         .ccm-modal-header,

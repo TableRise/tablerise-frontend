@@ -20,6 +20,11 @@ import {
     setSkipDonationPromptPreference,
     shouldSkipDonationPrompt,
 } from '../../src/components/home/helpers/donationPromptPreference';
+import {
+    buildInitialCroppedAreaPercentages,
+    createCroppedImageFile,
+    resolveImageCropState,
+} from '../../src/utils/imageCrop';
 import supportSchema, {
     supportReasonOptions,
     supportReasonsWithCampaignCode,
@@ -223,6 +228,73 @@ describe('TableRise :: Logic Coverage', () => {
 
             setSkipDonationPromptPreference(false);
             expect(shouldSkipDonationPrompt()).to.eq(false);
+        });
+    });
+
+    it('covers the image crop helpers', () => {
+        const squareCrop = buildInitialCroppedAreaPercentages(90, 1, 1200, 800);
+        expect(squareCrop).to.deep.eq({
+            x: 20,
+            y: 5,
+            width: 60,
+            height: 90,
+        });
+
+        const wideCrop = resolveImageCropState('campaign-cover', 1600, 900);
+        expect(wideCrop.aspect).to.eq(1600 / 900);
+        expect(wideCrop.initialZoom).to.eq(1);
+        expect(wideCrop.initialCrop).to.deep.eq({ x: 0, y: 0 });
+        expect(wideCrop.initialCroppedAreaPercentages).to.deep.eq({
+            x: 5,
+            y: 5,
+            width: 90,
+            height: 90,
+        });
+
+        const portraitCrop = resolveImageCropState('profile-avatar', 800, 1200);
+        expect(portraitCrop.aspect).to.eq(1);
+        expect(portraitCrop.initialCroppedAreaPercentages).to.deep.eq({
+            x: 5,
+            y: 20,
+            width: 90,
+            height: 60,
+        });
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 20;
+        canvas.height = 10;
+        const context = canvas.getContext('2d');
+        expect(context).to.not.eq(null);
+
+        if (context) {
+            context.fillStyle = '#ff0000';
+            context.fillRect(0, 0, 20, 10);
+            context.fillStyle = '#0000ff';
+            context.fillRect(10, 0, 10, 10);
+        }
+
+        return new Cypress.Promise<void>((resolve) => {
+            const image = new Image();
+
+            image.onload = async () => {
+                const croppedFile = await createCroppedImageFile(
+                    image,
+                    {
+                        x: 10,
+                        y: 0,
+                        width: 10,
+                        height: 10,
+                    },
+                    new File(['source'], 'avatar.png', { type: 'image/png' })
+                );
+
+                expect(croppedFile.type).to.eq('image/png');
+                expect(croppedFile.name).to.eq('avatar.png');
+                expect(croppedFile.size).to.be.greaterThan(0);
+                resolve();
+            };
+
+            image.src = canvas.toDataURL('image/png');
         });
     });
 

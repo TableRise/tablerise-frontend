@@ -4,7 +4,7 @@
 
 @layer base {
     .donation-support-modal-overlay {
-        @apply fixed inset-0 z-[220] flex items-start justify-center overflow-y-auto bg-black/60 px-4 py-4 sm:items-center sm:py-6;
+        @apply fixed inset-0 z-[220] flex items-center justify-center overflow-y-auto bg-black/60 px-4 py-4 sm:py-6;
     }
 
     .donation-support-modal-card {
@@ -85,6 +85,10 @@
     }
 
     @media (max-width: 480px) {
+        .donation-support-modal-overlay {
+            @apply py-5;
+        }
+
         .donation-support-modal-card {
             @apply p-5;
         }
