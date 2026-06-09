@@ -94,14 +94,33 @@
     }
 
     html[data-theme='dark'] .terms-card,
-    html[data-theme='dark'] .terms-note {
+    html[data-theme='dark'] .terms-page {
+        background-color: var(--theme-surface);
+    }
+
+    html[data-theme='dark'] .terms-card {
         background-color: var(--theme-surface);
         box-shadow: var(--theme-shadow);
+    }
+
+    html[data-theme='dark'] .terms-note {
+        background-color: var(--theme-surface-muted);
+        box-shadow: none;
     }
 
     html[data-theme='dark'] .terms-note,
     html[data-theme='dark'] .terms-section {
         border-color: var(--theme-border);
+    }
+
+    html[data-theme='dark'] .terms-eyebrow,
+    html[data-theme='dark'] .terms-title,
+    html[data-theme='dark'] .terms-note-title {
+        color: var(--theme-accent);
+    }
+
+    html[data-theme='dark'] .terms-section-title {
+        color: var(--theme-text);
     }
 
     html[data-theme='dark'] .terms-lead,

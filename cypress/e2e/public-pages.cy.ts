@@ -6,6 +6,7 @@ const publicRoutes = [
     { path: '/tutorial', text: 'Tutorial' },
     { path: '/tutorial/campanha', text: 'Outros tutoriais' },
     { path: '/terms', text: 'Termos de Uso' },
+    { path: '/privacy', text: 'Politica de Privacidade' },
     { path: '/support', text: 'Suporte' },
 ];
 
