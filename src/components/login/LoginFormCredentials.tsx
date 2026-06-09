@@ -6,6 +6,7 @@ import TableriseContext from '@/context/TableriseContext';
 import Input from '@/components/common/forms/Input';
 import Button from '@/components/common/forms/Button';
 import { postLogin } from '@/server/users/login';
+import { incrementDonationPromptLoginCount } from '@/components/home/helpers/donationPromptPreference';
 import ActivationCodeModal from './ActivationCodeModal';
 
 import loginZodSchema, { LoginPayload } from './schemas/LoginSchema';
@@ -35,6 +36,7 @@ export default function LoginFormCredentials(): JSX.Element {
             if (!loginResult) return;
 
             localStorage.setItem('userLogged', JSON.stringify(loginResult.data));
+            incrementDonationPromptLoginCount();
 
             window.location.replace('/');
 

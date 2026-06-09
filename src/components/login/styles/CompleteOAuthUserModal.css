@@ -4,11 +4,13 @@
 
 @layer base {
     .complete-oauth-modal-overlay {
-        @apply fixed inset-0 z-50 flex items-center justify-center bg-black/60;
+        @apply fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 px-3 py-4 sm:items-center sm:px-4 sm:py-6;
     }
 
     .complete-oauth-modal-card {
-        @apply w-[30rem] bg-white rounded-2xl p-8 flex flex-col items-center gap-4 shadow-xl;
+        @apply w-[30rem] max-w-full bg-white rounded-2xl p-8 flex flex-col items-center gap-4 shadow-xl;
+        max-height: min(90vh, calc(100dvh - 2rem));
+        overflow-y: auto;
     }
 
     .complete-oauth-modal-title {

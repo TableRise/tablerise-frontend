@@ -41,23 +41,6 @@
         @apply relative;
     }
 
-    .profile-orientation-overlay {
-        @apply fixed inset-0 z-[320] flex items-center justify-center bg-black/75 px-6;
-        backdrop-filter: blur(4px);
-    }
-
-    .profile-orientation-overlay-content {
-        @apply flex max-w-[18rem] flex-col items-center gap-5 text-center;
-    }
-
-    .profile-orientation-overlay-content img {
-        @apply h-16 w-16;
-    }
-
-    .profile-orientation-overlay-text {
-        @apply text-color-greyScale/50;
-    }
-
     .profile-content-top-cover {
         @apply pointer-events-none absolute top-0 overflow-hidden;
         left: calc(50% - 50vw);

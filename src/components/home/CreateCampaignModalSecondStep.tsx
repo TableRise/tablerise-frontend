@@ -379,7 +379,7 @@ export default function CreateCampaignModalSecondStep({
             {choiceOpen ? (
                 <ImageSourceChoiceModal
                     title="Selecionar mapa"
-                    description="Escolha uma imagem local ou uma imagem ja salva na sua galeria."
+                    description="Escolha uma imagem local ou uma imagem já salva na sua galeria."
                     onClose={() => setChoiceOpen(false)}
                     onSelectLocal={() => {
                         setChoiceOpen(false);

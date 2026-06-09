@@ -179,18 +179,18 @@ export async function sendUserFriendRequest(
         const status = error?.response?.status;
 
         if (status === 400) {
-            throw new Error('Nao foi possivel enviar esta solicitaÃ§Ã£o de amizade');
+            throw new Error('Nao foi possivel enviar esta solicitação de amizade');
         }
         if (status === 403) {
-            throw new Error('Voce nao pode enviar uma solicitaÃ§Ã£o para este perfil');
+            throw new Error('Voce nao pode enviar uma solicitação para este perfil');
         }
         if (status === 404) throw new Error('usuÃ¡rio nao encontrado');
         if (status === 409) {
-            throw new Error('Ja existe uma amizade ou solicitaÃ§Ã£o pendente');
+            throw new Error('Já existe uma amizade ou solicitação pendente');
         }
         if (status === 500) throw new Error('Erro no servidor');
 
-        throw new Error('Nao foi possivel enviar a solicitaÃ§Ã£o de amizade');
+        throw new Error('Nao foi possivel enviar a solicitação de amizade');
     }
 }
 
@@ -212,14 +212,14 @@ export async function respondToUserFriendRequest(
         const status = error?.response?.status;
 
         if (status === 400) {
-            throw new Error('Nao foi possivel atualizar esta solicitaÃ§Ã£o de amizade');
+            throw new Error('Nao foi possivel atualizar esta solicitação de amizade');
         }
         if (status === 404) {
-            throw new Error('solicitaÃ§Ã£o de amizade nao encontrada');
+            throw new Error('solicitação de amizade nao encontrada');
         }
         if (status === 500) throw new Error('Erro no servidor');
 
-        throw new Error('Nao foi possivel responder a solicitaÃ§Ã£o de amizade');
+        throw new Error('Nao foi possivel responder a solicitação de amizade');
     }
 }
 

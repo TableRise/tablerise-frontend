@@ -2610,7 +2610,7 @@ export default function CharacterDetailModal({
             {pictureSourceChoiceOpen ? (
                 <ImageSourceChoiceModal
                     title="Selecionar retrato do personagem"
-                    description="Escolha uma imagem local ou uma imagem ja salva na sua galeria."
+                    description="Escolha uma imagem local ou uma imagem já salva na sua galeria."
                     onClose={() => setPictureSourceChoiceOpen(false)}
                     onSelectLocal={() => {
                         setPictureSourceChoiceOpen(false);

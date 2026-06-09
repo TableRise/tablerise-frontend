@@ -128,12 +128,12 @@ p.copy-right {
 
     .footer-media-links {
         @apply mt-16 mb-6 gap-8;
-        width: min(calc(100% - 1.5rem), 70.5rem);
+        width: min(calc(100% - 2.5rem), 70.5rem);
     }
 
     .footer-bottom {
         @apply mb-16 items-start gap-5;
-        width: min(calc(100% - 1.5rem), 70.5rem);
+        width: min(calc(100% - 2.5rem), 70.5rem);
     }
 
     .social-media-icons {
@@ -148,7 +148,7 @@ p.copy-right {
 @media (max-width: 480px) {
     .footer-media-links,
     .footer-bottom {
-        width: min(calc(100% - 1rem), 70.5rem);
+        width: min(calc(100% - 2rem), 70.5rem);
     }
 
     .social-media-icons {

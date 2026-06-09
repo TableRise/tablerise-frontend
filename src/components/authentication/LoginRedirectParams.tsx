@@ -1,5 +1,6 @@
 'use client';
 import TableriseContext from '@/context/TableriseContext';
+import { incrementDonationPromptLoginCount } from '@/components/home/helpers/donationPromptPreference';
 import { getCurrentUser } from '@/server/users/get-current-user';
 import type { DatabaseUserWithDetails } from '@/types/shared/entities';
 import { useRouter } from 'next/navigation';
@@ -31,6 +32,7 @@ export default function LoginRedirectParams(): JSX.Element {
                 'userLogged',
                 JSON.stringify(buildStoredUserRecord(data))
             );
+            incrementDonationPromptLoginCount();
             await recoverUserCampaigns();
             router.replace('/');
         },
