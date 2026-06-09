@@ -1,7 +1,7 @@
 import { searchableCampaign, storedUser, userCampaignGroups } from '../support/mockData';
+import { DONATION_PROMPT_STATE_KEY } from '../../src/components/home/helpers/donationPromptPreference';
 
 const searchCampaignsRoute = /\/campaigns\/?\?.*(title=Guilda|code=AURO).*/;
-const donationPromptPreferenceKey = 'tablerise:dismiss-donation-prompt';
 
 describe('TableRise :: Logged Home And Campaigns', () => {
     beforeEach(() => {
@@ -31,7 +31,7 @@ describe('TableRise :: Logged Home And Campaigns', () => {
         cy.get('img[alt="QR Code para doacao ao Tablerise"]').should('be.visible');
         cy.contains('.donation-support-modal-card--qr button', 'Fechar').click();
         cy.get('.donation-support-modal-card--qr').should('not.exist');
-        cy.contains('.donation-support-modal-buttons button', 'Continuar').click();
+        cy.contains('.donation-support-modal-buttons button', 'Fechar').click();
 
         cy.get('.ccm-input').first().type('Rastros da Aurora');
         cy.get('.ccm-textarea').type('Uma campanha de exploracao com segredos antigos.');
@@ -73,7 +73,8 @@ describe('TableRise :: Logged Home And Campaigns', () => {
         cy.wait('@getUserCampaigns');
         cy.contains('button', 'Entrar em uma nova campanha').click();
         cy.contains('Antes de entrar na campanha').should('be.visible');
-        cy.contains('.donation-support-modal-buttons button', 'Continuar').click();
+        cy.contains('.donation-support-modal-buttons button', 'Fechar').click();
+        cy.contains('Antes de entrar na campanha').should('not.exist');
 
         cy.get('.jcm-input-title').type('Guilda');
         cy.contains('button', 'Pesquisar').click();
@@ -84,6 +85,7 @@ describe('TableRise :: Logged Home And Campaigns', () => {
         cy.contains('.jcm-results-cards .campaign-card', 'Guilda da Aurora')
             .contains('button', 'Entrar no Jogo')
             .click();
+        cy.contains('Antes de entrar na campanha').should('not.exist');
         cy.contains('Informe a senha da campanha').should('be.visible');
 
         cy.get('input[placeholder="A5BG"]').type('ZX90');
@@ -93,27 +95,52 @@ describe('TableRise :: Logged Home And Campaigns', () => {
         cy.get('.cpm-modal').should('not.exist');
     });
 
-    it('closes the join donation modal without opening the join flow', () => {
+    it('opens the donation prompt before entering a master campaign card', () => {
         cy.visitWithAppState('/', {
             cookieToken: 'token-home',
             localStorageUser: storedUser,
         });
 
         cy.wait('@getUserCampaigns');
-        cy.contains('button', 'Entrar em uma nova campanha').click();
+        cy.contains('.user-master-campaigns .campaign-card', 'Cronicas de Aether')
+            .contains('button', 'Entrar no Jogo')
+            .click();
         cy.contains('Antes de entrar na campanha').should('be.visible');
-        cy.contains('.donation-support-modal-buttons button', 'Cancelar').click();
+        cy.contains('.donation-support-modal-buttons button', 'Fechar').click();
 
-        cy.contains('Antes de entrar na campanha').should('not.exist');
-        cy.get('.jcm-card').should('not.exist');
+        cy.location('pathname', { timeout: 10000 }).should('eq', '/campaigns/lobby');
+        cy.location('search').should('include', 'campaignId=camp-1');
     });
 
-    it('opens the join flow directly when the donation prompt has been dismissed', () => {
+    it('opens the donation prompt before entering a participating campaign card', () => {
+        cy.visitWithAppState('/', {
+            cookieToken: 'token-home',
+            localStorageUser: storedUser,
+        });
+
+        cy.wait('@getUserCampaigns');
+        cy.contains('.user-player-campaigns .campaign-card', 'Sombras de Emberfall')
+            .contains('button', 'Entrar no Jogo')
+            .click();
+        cy.contains('Antes de entrar na campanha').should('be.visible');
+        cy.contains('.donation-support-modal-buttons button', 'Fechar').click();
+
+        cy.location('pathname', { timeout: 10000 }).should('eq', '/campaigns/lobby');
+        cy.location('search').should('include', 'campaignId=camp-2');
+    });
+
+    it('opens the join flow directly when the donation prompt suppression is active', () => {
         cy.visitWithAppState('/', {
             cookieToken: 'token-home',
             localStorageUser: storedUser,
             onBeforeLoad(win) {
-                win.localStorage.setItem(donationPromptPreferenceKey, 'true');
+                win.localStorage.setItem(
+                    DONATION_PROMPT_STATE_KEY,
+                    JSON.stringify({
+                        loginCount: 4,
+                        suppressedUntilLoginCount: 24,
+                    })
+                );
             },
         });
 

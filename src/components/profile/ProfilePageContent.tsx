@@ -3,7 +3,6 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import WhiteRotateSVG from '@assets/icons/sys/white-rotate.svg?url';
 import { getUser } from '@/server/users/get-user';
 import { getCampaignsByUserId } from '@/server/campaigns/get-campaigns';
 import {
@@ -169,7 +168,6 @@ export default function ProfilePageContent({
     const [checkingViewerFriendStatus, setCheckingViewerFriendStatus] = useState(false);
     const [profilePictureChoiceOpen, setProfilePictureChoiceOpen] = useState(false);
     const [profilePictureGalleryOpen, setProfilePictureGalleryOpen] = useState(false);
-    const [isLandscapeViewport, setIsLandscapeViewport] = useState(true);
     const pictureInputRef = useRef<HTMLInputElement>(null);
     const isOwnProfile =
         Boolean(currentUserId) &&
@@ -188,21 +186,6 @@ export default function ProfilePageContent({
         } catch {
             setCurrentUserId('');
         }
-    }, []);
-
-    useEffect(() => {
-        function syncViewportOrientation() {
-            setIsLandscapeViewport(window.innerWidth >= window.innerHeight);
-        }
-
-        syncViewportOrientation();
-        window.addEventListener('resize', syncViewportOrientation);
-        window.addEventListener('orientationchange', syncViewportOrientation);
-
-        return () => {
-            window.removeEventListener('resize', syncViewportOrientation);
-            window.removeEventListener('orientationchange', syncViewportOrientation);
-        };
     }, []);
 
     useEffect(() => {
@@ -832,23 +815,6 @@ export default function ProfilePageContent({
                 profileCover ? ' profile-content-shell--with-cover' : ''
             }`}
         >
-            {!isLandscapeViewport ? (
-                <div className="profile-orientation-overlay">
-                    <div className="profile-orientation-overlay-content">
-                        <Image
-                            src={WhiteRotateSVG.src}
-                            alt=""
-                            width={WhiteRotateSVG.width}
-                            height={WhiteRotateSVG.height}
-                            aria-hidden="true"
-                        />
-                        <p className="font-M-semibold profile-orientation-overlay-text">
-                            Por favor rotacione a tela para acessar o perfil
-                        </p>
-                    </div>
-                </div>
-            ) : null}
-
             {profileCover ? (
                 <div className="profile-content-top-cover" aria-hidden="true">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1205,7 +1171,7 @@ export default function ProfilePageContent({
                 {profilePictureChoiceOpen ? (
                     <ImageSourceChoiceModal
                         title="Selecionar foto do perfil"
-                        description="Escolha se deseja enviar uma nova imagem ou usar uma que ja esta na sua galeria."
+                        description="Escolha se deseja enviar uma nova imagem ou usar uma que já esta na sua galeria."
                         onClose={() => setProfilePictureChoiceOpen(false)}
                         onSelectLocal={() => {
                             setProfilePictureChoiceOpen(false);

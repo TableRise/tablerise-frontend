@@ -182,7 +182,7 @@ export default function CreateCampaignModalFirstStep({
             {choiceOpen ? (
                 <ImageSourceChoiceModal
                     title="Selecionar capa da campanha"
-                    description="Escolha uma imagem local ou uma imagem ja salva na sua galeria."
+                    description="Escolha uma imagem local ou uma imagem já salva na sua galeria."
                     onClose={() => setChoiceOpen(false)}
                     onSelectLocal={() => {
                         setChoiceOpen(false);

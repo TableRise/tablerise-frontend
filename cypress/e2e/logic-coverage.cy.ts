@@ -13,6 +13,10 @@ import {
     validateStep2Fields,
 } from '../../src/components/home/helpers/CreateCampaignModalHelpers';
 import {
+    DONATION_PROMPT_PREFERENCE_KEY,
+    DONATION_PROMPT_STATE_KEY,
+    DONATION_PROMPT_SUPPRESSION_LOGIN_WINDOW,
+    incrementDonationPromptLoginCount,
     setSkipDonationPromptPreference,
     shouldSkipDonationPrompt,
 } from '../../src/components/home/helpers/donationPromptPreference';
@@ -193,12 +197,29 @@ describe('TableRise :: Logic Coverage', () => {
 
     it('covers the donation prompt preference helper', () => {
         cy.window().then((win) => {
-            win.localStorage.removeItem('tablerise:dismiss-donation-prompt');
+            win.localStorage.removeItem(DONATION_PROMPT_PREFERENCE_KEY);
+            win.localStorage.removeItem(DONATION_PROMPT_STATE_KEY);
 
             expect(shouldSkipDonationPrompt()).to.eq(false);
 
             setSkipDonationPromptPreference(true);
             expect(shouldSkipDonationPrompt()).to.eq(true);
+
+            Array.from({ length: DONATION_PROMPT_SUPPRESSION_LOGIN_WINDOW - 1 }).forEach(
+                () => incrementDonationPromptLoginCount()
+            );
+            expect(shouldSkipDonationPrompt()).to.eq(true);
+
+            incrementDonationPromptLoginCount();
+            expect(shouldSkipDonationPrompt()).to.eq(false);
+
+            win.localStorage.setItem(DONATION_PROMPT_STATE_KEY, '{invalid-json');
+            expect(shouldSkipDonationPrompt()).to.eq(false);
+
+            win.localStorage.removeItem(DONATION_PROMPT_STATE_KEY);
+            win.localStorage.setItem(DONATION_PROMPT_PREFERENCE_KEY, 'true');
+            expect(shouldSkipDonationPrompt()).to.eq(true);
+            expect(win.localStorage.getItem(DONATION_PROMPT_PREFERENCE_KEY)).to.eq(null);
 
             setSkipDonationPromptPreference(false);
             expect(shouldSkipDonationPrompt()).to.eq(false);

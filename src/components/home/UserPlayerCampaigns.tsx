@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import CampaignCard from '@/components/common/CampaignCard';
 import CampaignPasswordModal from '@/components/home/CampaignPasswordModal';
+import DonationSupportModal from '@/components/home/DonationSupportModal';
 import ErrorModal from '@/components/home/ErrorModal';
 import { useJoinCampaign } from '@/components/home/helpers/useJoinCampaign';
 import { isCampaignPlayerPending } from '@/components/home/helpers/campaignPlayerStatus';
@@ -7,12 +9,17 @@ import { CampaignsToRender } from '@/types/modules/components/home/UserMasterCam
 import Carousel from '../common/Carousel';
 import BasicParticipationCard from '../common/BasicParticipationCard';
 import { useStoredUser } from '@/hooks/useStoredUser';
+import { shouldSkipDonationPrompt } from '@/components/home/helpers/donationPromptPreference';
 import '@/components/home/styles/UserPlayerCampaigns.css';
 
 export default function UserPlayerCampaigns({
     campaigns,
     onJoinClick,
 }: CampaignsToRender & { onJoinClick?: () => void }): JSX.Element {
+    const [donationModalOpen, setDonationModalOpen] = useState(false);
+    const [pendingDonationAction, setPendingDonationAction] = useState<
+        (() => void | Promise<void>) | null
+    >(null);
     const {
         handleJoinClick,
         passwordModalOpen,
@@ -24,6 +31,30 @@ export default function UserPlayerCampaigns({
     } = useJoinCampaign();
     const { storedUser } = useStoredUser();
     const currentUserId = storedUser?.userId ?? '';
+
+    const handleCardJoinIntent = (
+        campaignId: string,
+        campaignPlayers: (typeof campaigns)[number]['campaignPlayers']
+    ) => {
+        const joinAction = () => handleJoinClick(campaignId, campaignPlayers);
+
+        if (shouldSkipDonationPrompt()) {
+            void joinAction();
+            return;
+        }
+
+        setPendingDonationAction(() => joinAction);
+        setDonationModalOpen(true);
+    };
+
+    const handleDonationConfirm = async () => {
+        const nextAction = pendingDonationAction;
+
+        setDonationModalOpen(false);
+        setPendingDonationAction(null);
+
+        await nextAction?.();
+    };
 
     const cardMap = campaigns.map((campaign) => {
         const isPending = isCampaignPlayerPending(
@@ -50,7 +81,7 @@ export default function UserPlayerCampaigns({
                 playerAmountLimit={campaign.infos.playerAmountLimit}
                 campaignId={campaign.campaignId}
                 onButtonClick={() =>
-                    handleJoinClick(campaign.campaignId, campaign.campaignPlayers)
+                    handleCardJoinIntent(campaign.campaignId, campaign.campaignPlayers)
                 }
             />
         );
@@ -85,6 +116,14 @@ export default function UserPlayerCampaigns({
             <div className="user-player-campaigns-cards embla">
                 <Carousel elements={cards} />
             </div>
+
+            {donationModalOpen && (
+                <DonationSupportModal
+                    mode="join"
+                    onConfirm={handleDonationConfirm}
+                    onClose={() => setDonationModalOpen(false)}
+                />
+            )}
 
             {passwordModalOpen && (
                 <CampaignPasswordModal

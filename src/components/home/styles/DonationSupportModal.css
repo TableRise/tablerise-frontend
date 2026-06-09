@@ -4,11 +4,13 @@
 
 @layer base {
     .donation-support-modal-overlay {
-        @apply fixed inset-0 z-[220] flex items-center justify-center bg-black/60 px-4;
+        @apply fixed inset-0 z-[220] flex items-start justify-center overflow-y-auto bg-black/60 px-4 py-4 sm:items-center sm:py-6;
     }
 
     .donation-support-modal-card {
         @apply flex w-full max-w-[32rem] flex-col items-center gap-4 rounded-2xl bg-white p-8 shadow-xl;
+        max-height: min(90vh, calc(100dvh - 2rem));
+        overflow-y: auto;
     }
 
     .donation-support-modal-card--qr {

@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import type { CampaignPlayerStatusLike } from '@/components/home/helpers/campaignPlayerStatus';
 import CampaignCard from '@/components/common/CampaignCard';
 import BasicCreationCard from '@/components/common/BasicCreationCard';
 import CreateCampaignModal from '@/components/home/CreateCampaignModal';
@@ -16,6 +17,12 @@ export default function UserMasterCampaigns({
 }: CampaignsToRender): JSX.Element {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [donationModalOpen, setDonationModalOpen] = useState(false);
+    const [donationModalMode, setDonationModalMode] = useState<'create' | 'join'>(
+        'create'
+    );
+    const [pendingDonationAction, setPendingDonationAction] = useState<
+        (() => void | Promise<void>) | null
+    >(null);
     const openCreateModal = () => setCreateModalOpen(true);
     const closeCreateModal = () => setCreateModalOpen(false);
     const {
@@ -28,18 +35,38 @@ export default function UserMasterCampaigns({
         closeJoinError,
     } = useJoinCampaign();
 
-    const handleCreateIntent = () => {
+    const openDonationGate = (
+        mode: 'create' | 'join',
+        action: () => void | Promise<void>
+    ) => {
         if (shouldSkipDonationPrompt()) {
-            openCreateModal();
+            void action();
             return;
         }
 
+        setDonationModalMode(mode);
+        setPendingDonationAction(() => action);
         setDonationModalOpen(true);
     };
 
-    const handleDonationConfirm = () => {
+    const handleCreateIntent = () => {
+        openDonationGate('create', openCreateModal);
+    };
+
+    const handleCardJoinIntent = (
+        campaignId: string,
+        campaignPlayers: CampaignPlayerStatusLike[]
+    ) => {
+        openDonationGate('join', () => handleJoinClick(campaignId, campaignPlayers));
+    };
+
+    const handleDonationConfirm = async () => {
+        const nextAction = pendingDonationAction;
+
         setDonationModalOpen(false);
-        openCreateModal();
+        setPendingDonationAction(null);
+
+        await nextAction?.();
     };
 
     return (
@@ -82,7 +109,7 @@ export default function UserMasterCampaigns({
                         playerAmountLimit={campaigns[0].infos.playerAmountLimit}
                         campaignId={campaigns[0].campaignId}
                         onButtonClick={() =>
-                            handleJoinClick(
+                            handleCardJoinIntent(
                                 campaigns[0].campaignId,
                                 campaigns[0].campaignPlayers
                             )
@@ -106,7 +133,7 @@ export default function UserMasterCampaigns({
                         playerAmountLimit={campaigns[1].infos.playerAmountLimit}
                         campaignId={campaigns[1].campaignId}
                         onButtonClick={() =>
-                            handleJoinClick(
+                            handleCardJoinIntent(
                                 campaigns[1].campaignId,
                                 campaigns[1].campaignPlayers
                             )
@@ -119,7 +146,7 @@ export default function UserMasterCampaigns({
 
             {donationModalOpen && (
                 <DonationSupportModal
-                    mode="create"
+                    mode={donationModalMode}
                     onConfirm={handleDonationConfirm}
                     onClose={() => setDonationModalOpen(false)}
                 />

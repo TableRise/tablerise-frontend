@@ -1,4 +1,5 @@
 import { profileUser, storedUser, userCampaignGroups } from '../support/mockData';
+import { DONATION_PROMPT_STATE_KEY } from '../../src/components/home/helpers/donationPromptPreference';
 
 const publicRoutes = [
     { path: '/about', text: 'Sobre nós' },
@@ -85,10 +86,17 @@ describe('TableRise :: Public Pages', () => {
         openLoginRedirectWithSession(profileUser);
         cy.window().then((win) => {
             const savedUser = JSON.parse(win.localStorage.getItem('userLogged') ?? '{}');
+            const donationPromptState = JSON.parse(
+                win.localStorage.getItem(DONATION_PROMPT_STATE_KEY) ?? '{}'
+            );
 
             expect(savedUser).to.include({
                 userId: storedUser.userId,
                 nickname: storedUser.nickname,
+            });
+            expect(donationPromptState).to.deep.include({
+                loginCount: 1,
+                suppressedUntilLoginCount: 0,
             });
         });
     });

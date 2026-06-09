@@ -13,7 +13,7 @@ import '@/components/home/styles/DonationSupportModal.css';
 
 type DonationSupportModalProps = {
     mode: 'create' | 'join';
-    onConfirm: () => void;
+    onConfirm: () => void | Promise<void>;
     onClose: () => void;
 };
 
@@ -40,20 +40,11 @@ export default function DonationSupportModal({
         return () => window.clearTimeout(timeoutId);
     }, [copied]);
 
-    const handleClose = () => {
-        if (skipNextTime) {
-            setSkipDonationPromptPreference(true);
-        }
+    const handleClose = async () => {
+        setSkipDonationPromptPreference(skipNextTime);
 
         onClose();
-    };
-
-    const handleConfirm = () => {
-        if (skipNextTime) {
-            setSkipDonationPromptPreference(true);
-        }
-
-        onConfirm();
+        await onConfirm();
     };
 
     const handleCopyPixCode = async () => {
@@ -73,8 +64,8 @@ export default function DonationSupportModal({
             >
                 <h1 className="donation-support-modal-title font-L-semibold">
                     {mode === 'create'
-                        ? 'Antes de criar sua campanha'
-                        : 'Antes de entrar na campanha'}
+                        ? 'Antes de criar sua campanha :)'
+                        : 'Antes de entrar na campanha :)'}
                 </h1>
                 <p className="donation-support-modal-description font-XS-regular">
                     {DONATION_TEXT}
@@ -124,23 +115,16 @@ export default function DonationSupportModal({
                         checked={skipNextTime}
                         onChange={(event) => setSkipNextTime(event.target.checked)}
                     />
-                    <span className="font-XS-regular">Nao mostrar novamente</span>
+                    <span className="font-XS-regular">Não mostrar novamente</span>
                 </label>
 
                 <div className="donation-support-modal-buttons">
                     <button
                         type="button"
-                        onClick={handleConfirm}
+                        onClick={() => void handleClose()}
                         className="font-S-bold button-L-fill bg-color-primary/default_900 text-color-greyScale/100 w-full"
                     >
-                        Continuar
-                    </button>
-                    <button
-                        type="button"
-                        onClick={handleClose}
-                        className="font-S-bold form-button-cancel button-L-fill w-full"
-                    >
-                        Cancelar
+                        Fechar
                     </button>
                 </div>
             </div>

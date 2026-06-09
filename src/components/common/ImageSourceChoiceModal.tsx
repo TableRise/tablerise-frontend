@@ -34,7 +34,7 @@ export default function ImageSourceChoiceModal({
                         onClick={onSelectLocal}
                         className="font-S-bold button-L-fill profile-action-modal-button-option bg-color-primary/default_900 text-color-greyScale/100 w-full"
                     >
-                        Selecionar localmente
+                        Selecionar do dispositivo
                     </button>
                     <button
                         type="button"

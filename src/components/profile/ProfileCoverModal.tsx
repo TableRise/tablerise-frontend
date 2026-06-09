@@ -258,7 +258,7 @@ export default function ProfileCoverModal({
             {sourceChoiceOpen ? (
                 <ImageSourceChoiceModal
                     title="Selecionar plano de fundo"
-                    description="Escolha uma imagem local ou use uma ja salva na sua galeria."
+                    description="Escolha uma imagem local ou use uma já salva na sua galeria."
                     onClose={() => setSourceChoiceOpen(false)}
                     onSelectLocal={() => {
                         setSourceChoiceOpen(false);

@@ -1,4 +1,5 @@
 import { storedUser, userCampaignGroups } from '../support/mockData';
+import { DONATION_PROMPT_STATE_KEY } from '../../src/components/home/helpers/donationPromptPreference';
 
 function fillRegisterForm(email: string, nickname: string) {
     cy.get('#nickname').should('be.visible');
@@ -85,10 +86,17 @@ describe('TableRise :: Authentication', () => {
         cy.contains('Campanhas').should('be.visible');
         cy.window().then((win) => {
             const savedUser = JSON.parse(win.localStorage.getItem('userLogged') ?? '{}');
+            const donationPromptState = JSON.parse(
+                win.localStorage.getItem(DONATION_PROMPT_STATE_KEY) ?? '{}'
+            );
 
             expect(savedUser).to.include({
                 userId: storedUser.userId,
                 email: storedUser.email,
+            });
+            expect(donationPromptState).to.deep.include({
+                loginCount: 1,
+                suppressedUntilLoginCount: 0,
             });
         });
     });
@@ -133,5 +141,38 @@ describe('TableRise :: Authentication', () => {
 
         cy.wait('@confirmActivationCode');
         cy.contains('Conta confirmada com sucesso').should('be.visible');
+    });
+
+    it('does not increment the donation login counter when reusing an existing session', () => {
+        cy.intercept('GET', '**/users/user-1/campaigns', userCampaignGroups).as(
+            'getUserCampaigns'
+        );
+
+        cy.visitWithAppState('/', {
+            cookieToken: 'token-login',
+            localStorageUser: storedUser,
+            onBeforeLoad(win) {
+                win.localStorage.setItem(
+                    DONATION_PROMPT_STATE_KEY,
+                    JSON.stringify({
+                        loginCount: 7,
+                        suppressedUntilLoginCount: 19,
+                    })
+                );
+            },
+        });
+
+        cy.wait('@getUserCampaigns');
+        cy.contains('Campanhas').should('be.visible');
+        cy.window().then((win) => {
+            const donationPromptState = JSON.parse(
+                win.localStorage.getItem(DONATION_PROMPT_STATE_KEY) ?? '{}'
+            );
+
+            expect(donationPromptState).to.deep.include({
+                loginCount: 7,
+                suppressedUntilLoginCount: 19,
+            });
+        });
     });
 });
