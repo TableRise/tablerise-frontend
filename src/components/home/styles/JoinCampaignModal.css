@@ -5,7 +5,7 @@
 @layer base {
     /* ── Backdrop ─────────────────────────────────────────── */
     .jcm-backdrop {
-        @apply fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-3 py-4 sm:items-center sm:px-4 sm:py-6;
+        @apply fixed inset-0 z-[180] flex items-center justify-center overflow-y-auto px-3 py-4 sm:px-4 sm:py-6;
         background-color: rgba(0, 0, 0, 0.5);
     }
 
@@ -68,6 +68,16 @@
     }
 
     @media (max-width: 640px) {
+        .jcm-backdrop {
+            @apply px-4 py-5;
+        }
+
+        .jcm-modal {
+            width: min(100vw - 1.5rem, 45rem);
+            max-height: min(88vh, calc(100dvh - 3rem));
+            padding: 1.5rem;
+        }
+
         .jcm-search-row {
             @apply flex-wrap;
         }

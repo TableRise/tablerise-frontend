@@ -1,14 +1,16 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import ReactCrop, { type PercentCrop, type PixelCrop } from 'react-image-crop';
-import 'react-image-crop/dist/ReactCrop.css';
+import Cropper, { type Area, type Point } from 'react-easy-crop';
+import { useEffect, useMemo, useState } from 'react';
 import '@/components/common/styles/ImageCropModal.css';
 import {
-    buildInitialCrop,
     createCroppedImageFile,
     IMAGE_CROP_CONFIG,
-    percentCropToPixelCrop,
+    IMAGE_CROP_MAX_ZOOM,
+    IMAGE_CROP_MIN_ZOOM,
+    IMAGE_CROP_ZOOM_STEP,
+    loadImageFromUrl,
+    resolveImageCropState,
     type ImageUploadIntent,
 } from '@/utils/imageCrop';
 
@@ -20,6 +22,8 @@ interface ImageCropModalProps {
     onClose: () => void;
 }
 
+const DEFAULT_CROP_POSITION: Point = { x: 0, y: 0 };
+
 export default function ImageCropModal({
     file,
     intent,
@@ -28,24 +32,70 @@ export default function ImageCropModal({
     onClose,
 }: ImageCropModalProps): JSX.Element {
     const config = IMAGE_CROP_CONFIG[intent];
-    const imageRef = useRef<HTMLImageElement | null>(null);
     const [previewUrl, setPreviewUrl] = useState('');
-    const [crop, setCrop] = useState<PercentCrop>();
-    const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
+    const [crop, setCrop] = useState<Point>(DEFAULT_CROP_POSITION);
+    const [zoom, setZoom] = useState(IMAGE_CROP_MIN_ZOOM);
+    const [resolvedAspect, setResolvedAspect] = useState<number | null>(null);
+    const [initialCroppedAreaPercentages, setInitialCroppedAreaPercentages] = useState<
+        Area | undefined
+    >();
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
 
     useEffect(() => {
         const objectUrl = URL.createObjectURL(file);
+        let active = true;
+
         setPreviewUrl(objectUrl);
+        setResolvedAspect(null);
+        setInitialCroppedAreaPercentages(undefined);
+        setCroppedAreaPixels(null);
+        setCrop(DEFAULT_CROP_POSITION);
+        setZoom(IMAGE_CROP_MIN_ZOOM);
+        setError('');
+
+        void loadImageFromUrl(objectUrl)
+            .then((image) => {
+                if (!active) return;
+
+                const nextCropState = resolveImageCropState(
+                    intent,
+                    image.naturalWidth,
+                    image.naturalHeight
+                );
+
+                setResolvedAspect(nextCropState.aspect);
+                setInitialCroppedAreaPercentages(
+                    nextCropState.initialCroppedAreaPercentages
+                );
+                setCrop(nextCropState.initialCrop);
+                setZoom(nextCropState.initialZoom);
+            })
+            .catch((err: Error) => {
+                if (!active) return;
+
+                setError(
+                    err.message ?? 'Nao foi possivel carregar a imagem para recorte.'
+                );
+            });
 
         return () => {
+            active = false;
             URL.revokeObjectURL(objectUrl);
         };
-    }, [file]);
+    }, [file, intent]);
+
+    const cropperKey = useMemo(
+        () =>
+            previewUrl && resolvedAspect
+                ? `${previewUrl}-${resolvedAspect.toFixed(4)}`
+                : previewUrl || 'image-crop-modal',
+        [previewUrl, resolvedAspect]
+    );
 
     async function handleCropAndUse() {
-        if (!imageRef.current || !completedCrop?.width || !completedCrop?.height) {
+        if (!previewUrl || !croppedAreaPixels?.width || !croppedAreaPixels?.height) {
             setError('Selecione uma area da imagem para recortar.');
             return;
         }
@@ -54,9 +104,10 @@ export default function ImageCropModal({
         setError('');
 
         try {
+            const image = await loadImageFromUrl(previewUrl);
             const croppedFile = await createCroppedImageFile(
-                imageRef.current,
-                completedCrop,
+                image,
+                croppedAreaPixels,
                 file
             );
             await onConfirm(croppedFile);
@@ -97,49 +148,81 @@ export default function ImageCropModal({
                         disabled={submitting}
                         aria-label="Fechar recorte"
                     >
-                        ×
+                        x
                     </button>
                 </div>
 
                 <div className="icm-body">
-                    {previewUrl ? (
-                        <ReactCrop
-                            crop={crop}
-                            onChange={(_, percentCrop) => {
-                                setCrop(percentCrop);
-                                setError('');
-                            }}
-                            onComplete={(pixelCrop) => setCompletedCrop(pixelCrop)}
-                            aspect={config.aspect}
-                            className="icm-cropper"
-                            ruleOfThirds={Boolean(config.aspect)}
-                        >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                                ref={imageRef}
-                                src={previewUrl}
-                                alt="Prévia para recorte"
-                                className="icm-image"
-                                onLoad={(event) => {
-                                    const nextCrop = buildInitialCrop(
-                                        intent,
-                                        event.currentTarget.naturalWidth,
-                                        event.currentTarget.naturalHeight
-                                    );
-                                    setCrop(nextCrop);
-                                    setCompletedCrop(
-                                        nextCrop
-                                            ? percentCropToPixelCrop(
-                                                  nextCrop,
-                                                  event.currentTarget.width,
-                                                  event.currentTarget.height
-                                              )
-                                            : undefined
-                                    );
-                                }}
-                            />
-                        </ReactCrop>
-                    ) : null}
+                    {previewUrl && resolvedAspect ? (
+                        <>
+                            <div className="icm-crop-stage">
+                                <Cropper
+                                    key={cropperKey}
+                                    image={previewUrl}
+                                    crop={crop}
+                                    zoom={zoom}
+                                    rotation={0}
+                                    aspect={resolvedAspect}
+                                    minZoom={IMAGE_CROP_MIN_ZOOM}
+                                    maxZoom={IMAGE_CROP_MAX_ZOOM}
+                                    cropShape="rect"
+                                    showGrid={Boolean(config.aspect)}
+                                    restrictPosition
+                                    initialCroppedAreaPercentages={
+                                        initialCroppedAreaPercentages
+                                    }
+                                    onCropChange={(nextCrop) => {
+                                        setCrop(nextCrop);
+                                        setError('');
+                                    }}
+                                    onZoomChange={(nextZoom) => {
+                                        setZoom(nextZoom);
+                                        setError('');
+                                    }}
+                                    onCropComplete={(_, nextCroppedAreaPixels) =>
+                                        setCroppedAreaPixels(nextCroppedAreaPixels)
+                                    }
+                                    classes={{
+                                        containerClassName: 'icm-cropper-container',
+                                        mediaClassName: 'icm-cropper-media',
+                                        cropAreaClassName: 'icm-cropper-area',
+                                    }}
+                                    mediaProps={{
+                                        alt: 'Previa para recorte',
+                                    }}
+                                />
+                            </div>
+
+                            <div className="icm-zoom-panel">
+                                <div className="icm-zoom-copy">
+                                    <span className="font-XS-bold">Zoom</span>
+                                    <span className="font-XXS-regular">
+                                        {Math.round(zoom * 100)}%
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={IMAGE_CROP_MIN_ZOOM}
+                                    max={IMAGE_CROP_MAX_ZOOM}
+                                    step={IMAGE_CROP_ZOOM_STEP}
+                                    value={zoom}
+                                    onChange={(event) => {
+                                        setZoom(Number(event.target.value));
+                                        setError('');
+                                    }}
+                                    className="icm-zoom-slider"
+                                    aria-label="Ajustar zoom da imagem"
+                                    disabled={submitting}
+                                />
+                            </div>
+                        </>
+                    ) : (
+                        <div className="icm-loading-state font-XS-regular">
+                            {error
+                                ? 'Nao foi possivel preparar a imagem para recorte.'
+                                : 'Carregando imagem...'}
+                        </div>
+                    )}
                 </div>
 
                 {error ? <p className="font-XXS-regular icm-error">{error}</p> : null}
@@ -165,7 +248,7 @@ export default function ImageCropModal({
                         type="button"
                         className="button-L-fill font-S-bold icm-btn-primary bg-color-primary/default_900 text-color-greyScale/50"
                         onClick={handleCropAndUse}
-                        disabled={submitting}
+                        disabled={submitting || !resolvedAspect}
                     >
                         {submitting ? 'Processando...' : 'Recortar e usar'}
                     </button>
