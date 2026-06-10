@@ -39,6 +39,16 @@ const rawBadges = {
             label: 'campanhas encerradas',
         },
     },
+    friends: {
+        colorful: '/images/badges/friends.webp',
+        blackandwhite: '/images/badges/friends-bw.webp',
+        description: 'Concedida ao adicionar 5 players como amigos',
+        progress: {
+            counter: 'friendsAdded',
+            target: 5,
+            label: 'amigos conectados',
+        },
+    },
     enthusiast: {
         colorful: '/images/badges/enthusiat.webp',
         blackandwhite: '/images/badges/enthusiast-bw.webp',
@@ -87,6 +97,16 @@ const rawBadges = {
             counter: 'campaignsCreatedAmount',
             target: 30,
             label: 'campanhas criadas',
+        },
+    },
+    friends_rare: {
+        colorful: '/images/badges/friends-rare.webp',
+        blackandwhite: '/images/badges/friends-rare-bw.webp',
+        description: 'Concedida ao adicionar 15 players como amigos',
+        progress: {
+            counter: 'friendsAdded',
+            target: 15,
+            label: 'amigos conectados',
         },
     },
     imp: {
@@ -157,6 +177,16 @@ const rawBadges = {
             counter: 'campaignsJoinedAmount',
             target: 10,
             label: 'campanhas participadas',
+        },
+    },
+    friends_super_rare: {
+        colorful: '/images/badges/friends-super-rare.webp',
+        blackandwhite: '/images/badges/friends-super-rare-bw.webp',
+        description: 'Concedida ao adicionar 35 players como amigos',
+        progress: {
+            counter: 'friendsAdded',
+            target: 35,
+            label: 'amigos conectados',
         },
     },
     necromant: {
