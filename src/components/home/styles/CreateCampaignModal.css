@@ -87,6 +87,10 @@
         @apply text-color-greyScale/500 whitespace-nowrap;
     }
 
+    .ccm-step-label-mobile-break {
+        display: none;
+    }
+
     .ccm-step-label--active {
         @apply text-color-primary/default_900;
     }
@@ -662,6 +666,10 @@
 
         .ccm-footer {
             @apply flex-col items-stretch gap-3;
+        }
+
+        .ccm-step-label-mobile-break {
+            display: block;
         }
     }
 

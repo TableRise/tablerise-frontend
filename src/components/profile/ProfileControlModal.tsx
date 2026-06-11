@@ -95,11 +95,11 @@ export default function ProfileControlModal({
                         }`}
                     >
                         {coverActionLoading ? (
-                            <LoadingDots label="Atualizando plano de fundo" />
+                            <LoadingDots label="Atualizando capa" />
                         ) : hasCover ? (
-                            'Remover plano de fundo'
+                            'Remover capa'
                         ) : (
-                            'Definir plano de fundo'
+                            'Definir capa'
                         )}
                     </button>
 

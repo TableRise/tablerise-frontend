@@ -166,14 +166,6 @@ export default function CreateCampaignModalFirstStep({
                                 />
                                 Enviar uma imagem
                             </button>
-                            <div className="ccm-or-divider">
-                                <hr />
-                                <span className="font-XS-regular">ou</span>
-                                <hr />
-                            </div>
-                            <span className="font-XS-bold ccm-template-link">
-                                Escolher um template
-                            </span>
                         </>
                     )}
                 </div>
