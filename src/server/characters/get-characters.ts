@@ -13,6 +13,8 @@ export interface CharacterDnd {
         class: string;
         race: string;
         level: number;
+        prevLevel?: number;
+        notificationsOn?: boolean;
     };
     npc: boolean;
     createdAt: string;
@@ -41,6 +43,8 @@ export interface FullCharacterDnd {
             race: string;
             level: number;
             xp: number;
+            prevLevel?: number;
+            notificationsOn?: boolean;
             picture?: {
                 link: string;
             };
@@ -67,9 +71,9 @@ export interface FullCharacterDnd {
                 alliesAndOrgs?: string;
                 treasure?: string;
                 other?: {
-                    proficiencies?: string;
+                    languagesAndProficiencies?: string;
                     characteristicsAndAbilities?: string;
-                    extraCharacteristics?: string;
+                    characteristicsAndAdditionalAbilities?: string;
                 };
             };
         };

@@ -9,6 +9,7 @@ import TrashSVG from '../../../assets/icons/sys/trash.svg?url';
 import EditBlueSVG from '../../../assets/icons/sys/edit-blue.svg?url';
 import EditDarkSVG from '../../../assets/icons/sys/edit-dark.svg?url';
 import '@/components/lobby/styles/JournalPostModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 const CATEGORY_LABEL: Record<string, string> = {
     master: 'Mestre',
@@ -104,6 +105,7 @@ export default function JournalPostModal({
     onEdit,
     onClose,
 }: JournalPostModalProps): JSX.Element {
+    useBodyScrollLock();
     const { themeMode } = useContext(TableriseContext);
     const lines = normalizePostContent(post.content);
     const editIcon = themeMode === 'dark' ? EditDarkSVG : EditBlueSVG;

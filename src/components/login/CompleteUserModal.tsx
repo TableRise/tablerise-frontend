@@ -15,6 +15,7 @@ import completeOAuthUserSchema, {
 } from './schemas/CompleteOAuthUserSchema';
 import Input from '@/components/common/forms/Input';
 import './styles/CompleteOAuthUserModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type CompleteUserMode = 'oauth-complete' | 'profile-complete';
 
@@ -36,6 +37,7 @@ export default function CompleteUserModal({
     onSuccess,
     onCancel,
 }: CompleteUserModalProps): JSX.Element {
+    useBodyScrollLock();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [underageBlocked, setUnderageBlocked] = useState(false);

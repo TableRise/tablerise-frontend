@@ -4,6 +4,7 @@ import Image from 'next/image';
 import type { CampaignMusic } from '@/server/campaigns/create-campaign';
 import type { ImageObject } from '@/types/shared/general';
 import '@/components/lobby/styles/MatchMediaModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 interface MatchMediaModalProps {
     musics: CampaignMusic[];
@@ -22,6 +23,7 @@ export default function MatchMediaModal({
     onClose,
     onMapSelect,
 }: MatchMediaModalProps): JSX.Element {
+    useBodyScrollLock();
     const [activeTab, setActiveTab] = useState<'musics' | 'maps'>('musics');
 
     return (

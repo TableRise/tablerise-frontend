@@ -9,6 +9,7 @@ import { useUserGallery } from '@/hooks/useUserGallery';
 import type { ImageObject } from '@/types/shared/general';
 import type { UploadImageValue } from '@/utils/imageUploadPayload';
 import '@/components/match/styles/MatchImageHighlightModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 interface MatchImageHighlightManagerModalProps {
     images: ImageObject[];
@@ -29,6 +30,7 @@ export default function MatchImageHighlightManagerModal({
     onUpload,
     onSelect,
 }: MatchImageHighlightManagerModalProps): JSX.Element {
+    useBodyScrollLock();
     const { storedUser } = useStoredUser();
     const currentUserId = normalizeStoredUserId(storedUser);
     const { galleryImages, loadingGallery } = useUserGallery(currentUserId);

@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import LoadingDots from '@/components/common/LoadingDots';
 import '@/components/common/styles/XpIncreaseModal.css';
 import { applyXpGain } from '@/utils/characterXp';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 const BASE_HP_BY_DICE_SIDES: Record<number, number> = { 6: 4, 8: 5, 10: 6, 12: 7 };
 
@@ -58,6 +59,7 @@ export default function XpIncreaseModal({
     currentLevel,
     xpSystemEnabled = true,
 }: XpIncreaseModalProps): JSX.Element {
+    useBodyScrollLock();
     const [xpToAddInput, setXpToAddInput] = useState('');
     const [hpMethod, setHpMethod] = useState<'roll' | 'base'>('roll');
 

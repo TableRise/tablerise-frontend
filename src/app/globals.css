@@ -126,8 +126,12 @@ html[data-theme='dark'] .hover\:text-color-greyScale\/900:hover {
 html[data-theme='dark'] [style*='color:#0A358A'],
 html[data-theme='dark'] [style*='color: #0A358A'],
 html[data-theme='dark'] [style*='color:#0a358a'],
-html[data-theme='dark'] [style*='color: #0a358a'] {
-    color: #8ab5fc !important;
+html[data-theme='dark'] [style*='color: #0a358a'],
+html[data-theme='dark'] [style*='color:#0C255F'],
+html[data-theme='dark'] [style*='color: #0C255F'],
+html[data-theme='dark'] [style*='color:#0c255f'],
+html[data-theme='dark'] [style*='color: #0c255f'] {
+    color: var(--theme-accent) !important;
 }
 
 html[data-theme='dark'] .shadow-md,

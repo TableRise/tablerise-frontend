@@ -15,6 +15,7 @@ import {
 } from '@/server/users/activate-two-factor';
 import type { DatabaseUserWithDetails } from '@/types/shared/entities';
 import '@/components/profile/styles/ProfileTwoFactorActivationModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type ActivationStep = 'email-code' | 'qr-code' | 'authenticator-code';
 
@@ -43,6 +44,7 @@ export default function ProfileTwoFactorActivationModal({
     onCancel,
     onCompleted,
 }: ProfileTwoFactorActivationModalProps): JSX.Element {
+    useBodyScrollLock();
     const [step, setStep] = useState<ActivationStep>('email-code');
     const [emailDigits, setEmailDigits] = useState<string[]>(
         buildDigits(EMAIL_CODE_LENGTH)

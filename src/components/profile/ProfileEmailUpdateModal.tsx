@@ -12,6 +12,7 @@ import {
     updateUserEmail,
 } from '@/server/users/update-email';
 import '@/components/profile/styles/ProfileActionModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type ProfileEmailUpdateModalProps = {
     userId: string;
@@ -35,6 +36,7 @@ export default function ProfileEmailUpdateModal({
     onClose,
     onSaved,
 }: ProfileEmailUpdateModalProps): JSX.Element {
+    useBodyScrollLock();
     const [step, setStep] = useState<Step>('code');
     const [digits, setDigits] = useState<string[]>(buildDigits());
     const [newEmail, setNewEmail] = useState('');

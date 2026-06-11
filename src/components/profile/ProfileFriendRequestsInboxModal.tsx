@@ -9,6 +9,7 @@ import TableriseContext from '@/context/TableriseContext';
 import { defaultProfileImage } from '@/components/profile/profilePageHelpers';
 import type { UserFriendRecord } from '@/server/users/collections';
 import '@/components/profile/styles/ProfileActionModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type ProfileFriendRequestsInboxModalProps = {
     requests: UserFriendRecord[];
@@ -29,6 +30,7 @@ export default function ProfileFriendRequestsInboxModal({
     onAccept,
     onReject,
 }: ProfileFriendRequestsInboxModalProps): JSX.Element {
+    useBodyScrollLock();
     const { themeMode } = useContext(TableriseContext);
     const [processingRequestId, setProcessingRequestId] = useState<string | null>(null);
     const [error, setError] = useState('');

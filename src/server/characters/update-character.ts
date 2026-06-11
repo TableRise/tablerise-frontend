@@ -71,3 +71,18 @@ export const updateCharacterMoney = async (
         return false;
     }
 };
+
+export const updateCharacterNotificationsOff = async (
+    characterId: string
+): Promise<boolean> => {
+    try {
+        await apiCall({
+            baseUrl: charactersBaseUrl,
+            endpoint: `${characterId}/update/notifications/off`,
+            method: 'PATCH',
+        });
+        return true;
+    } catch {
+        return false;
+    }
+};

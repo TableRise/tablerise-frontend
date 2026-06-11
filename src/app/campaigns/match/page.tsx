@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import LoadingDots from '@/components/common/LoadingDots';
 import RankedAvatarFrame from '@/components/common/RankedAvatarFrame';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 import TableriseContext from '@/context/TableriseContext';
 import { getCampaignById } from '@/server/campaigns/join-campaign';
 import { getUser } from '@/server/users/get-user';
@@ -171,7 +172,11 @@ function requiresLandscapeViewportOnDevice(): boolean {
 }
 
 function getUserRank(user: any): string | undefined {
-    const rank = user?.details?.rank ?? user?.result?.details?.rank;
+    const rank =
+        user?.rank ??
+        user?.details?.rank ??
+        user?.result?.rank ??
+        user?.result?.details?.rank;
 
     return typeof rank === 'string' ? rank : undefined;
 }
@@ -488,6 +493,13 @@ export default function MatchPage(): JSX.Element {
         null
     );
     const [cloneLifeInput, setCloneLifeInput] = useState('');
+    useBodyScrollLock(
+        panelDetailSpell !== null ||
+            panelDetailLoading ||
+            cloneLifeEditor !== null ||
+            journalHighlightModalOpen ||
+            journalHighlightNoticeOpen
+    );
     const seenHighlightedMatchImageIdRef = useRef<string | null>(null);
 
     useEffect(() => {

@@ -3,6 +3,7 @@
 import type { UserFriendRecord } from '@/server/users/collections';
 import ProfileFriendCard from '@/components/profile/ProfileFriendCard';
 import '@/components/profile/styles/ProfileActionModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type ProfileFriendsListModalProps = {
     friends: UserFriendRecord[];
@@ -27,6 +28,7 @@ export default function ProfileFriendsListModal({
     onRemoveFriend,
     onToggleFavorite,
 }: ProfileFriendsListModalProps): JSX.Element {
+    useBodyScrollLock();
     return (
         <div className="profile-action-modal-overlay">
             <div

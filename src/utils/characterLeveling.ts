@@ -19,16 +19,12 @@ export interface LevelUpNotification {
 }
 
 const ABILITY_SCORE_IMPROVEMENT_MESSAGE =
-    'Parabéns, você ganhou Incremento no Valor de Habilidade, aumente o valor de 1 habildade em 2 ou de duas habilidades em 1 cada, ou caso preferir, ganhe um feat adicional';
+    'Parab\u00e9ns, voc\u00ea ganhou Incremento no Valor de Habilidade, aumente o valor de 1 habildade em 2 ou de duas habilidades em 1 cada, ou caso preferir, ganhe um feat adicional';
 
 function normalizeFeature(feature: string | undefined): string | null {
     const normalized = String(feature ?? '').trim();
-    if (!normalized || normalized === '-' || normalized === '—') return null;
+    if (!normalized || normalized === '-' || normalized === '\u2014') return null;
     return normalized;
-}
-
-function pluralizePortuguese(amount: number, singular: string, plural: string): string {
-    return amount === 1 ? singular : plural;
 }
 
 export function getProficiencyBonusForLevel(level: number): number {
@@ -114,85 +110,35 @@ export function buildLevelUpNotifications(
     previousLevel: number,
     nextLevel: number
 ): LevelUpNotification[] {
+    const normalizedPreviousLevel = Math.max(0, Math.floor(previousLevel));
+    const normalizedNextLevel = Math.max(0, Math.floor(nextLevel));
+
+    if (normalizedNextLevel <= normalizedPreviousLevel) {
+        return [];
+    }
+
     const notifications: LevelUpNotification[] = [];
-    let previousSnapshot = getLevelingSnapshot(levelingSpecs, previousLevel);
 
-    for (let level = previousLevel + 1; level <= nextLevel; level++) {
-        const currentSnapshot = getLevelingSnapshot(levelingSpecs, level);
+    for (let level = normalizedPreviousLevel + 1; level <= normalizedNextLevel; level++) {
+        const levelIndex = resolveLevelIndex(levelingSpecs, level);
+        const feature = normalizeFeature(levelingSpecs.features?.[levelIndex]);
 
-        if (currentSnapshot.feature === 'Incremento no Valor de Habilidade') {
+        if (feature === 'Incremento no Valor de Habilidade') {
             notifications.push({
                 level,
                 message: ABILITY_SCORE_IMPROVEMENT_MESSAGE,
             });
-        } else if (currentSnapshot.feature) {
-            notifications.push({
-                level,
-                message: `Você ganhou ${currentSnapshot.feature}.`,
-            });
+            continue;
         }
 
-        if (currentSnapshot.cantripsKnown > previousSnapshot.cantripsKnown) {
-            notifications.push({
-                level,
-                message: `Você agora conhece ${
-                    currentSnapshot.cantripsKnown
-                } ${pluralizePortuguese(
-                    currentSnapshot.cantripsKnown,
-                    'truque',
-                    'truques'
-                )}.`,
-            });
+        if (!feature) {
+            continue;
         }
 
-        if (currentSnapshot.spellsKnown > previousSnapshot.spellsKnown) {
-            const gainedSpells =
-                currentSnapshot.spellsKnown - previousSnapshot.spellsKnown;
-            notifications.push({
-                level,
-                message: `Você ganhou ${gainedSpells} ${pluralizePortuguese(
-                    gainedSpells,
-                    'magia conhecida',
-                    'magias conhecidas'
-                )}. Total atual: ${currentSnapshot.spellsKnown}.`,
-            });
-        }
-
-        for (
-            let spellLevel = previousSnapshot.highestUnlockedSpellLevel + 1;
-            spellLevel <= currentSnapshot.highestUnlockedSpellLevel;
-            spellLevel++
-        ) {
-            notifications.push({
-                level,
-                message: `Você agora pode usar magias de nível ${spellLevel}.`,
-            });
-        }
-
-        for (let spellLevel = 1; spellLevel <= 9; spellLevel++) {
-            const previousSlots = previousSnapshot.slotTotals[spellLevel] ?? 0;
-            const currentSlots = currentSnapshot.slotTotals[spellLevel] ?? 0;
-            if (currentSlots > previousSlots) {
-                const gainedSlots = currentSlots - previousSlots;
-                notifications.push({
-                    level,
-                    message: `Você ganhou +${gainedSlots} ${pluralizePortuguese(
-                        gainedSlots,
-                        'espaço de magia',
-                        'espaços de magia'
-                    )} de nível ${spellLevel}.`,
-                });
-            }
-        }
-
-        if (currentSnapshot.proficiencyBonus > previousSnapshot.proficiencyBonus) {
-            notifications.push({
-                level,
-                message: `Seu bônus de proficiência agora é +${currentSnapshot.proficiencyBonus}.`,
-            });
-        }
-
-        previousSnapshot = currentSnapshot;
+        notifications.push({
+            level,
+            message: `Voc\u00ea ganhou ${feature}.`,
+        });
     }
 
     return notifications;

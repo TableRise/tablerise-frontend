@@ -1,5 +1,5 @@
 'use client';
-import { Fragment, useState, useEffect } from 'react';
+import { Fragment, useState } from 'react';
 import Image from 'next/image';
 import EditSVG from '../../../assets/icons/sys/edit.svg?url';
 import SettingsSVG from '../../../assets/icons/sys/settings.svg?url';
@@ -21,6 +21,7 @@ import '@/components/home/styles/CreateCampaignModal.css';
 import type { ImageUploadIntent } from '@/utils/imageCrop';
 import type { ImageObject } from '@/types/shared/general';
 import type { UploadImageValue } from '@/utils/imageUploadPayload';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 interface Props {
     onClose: () => void;
@@ -28,6 +29,7 @@ interface Props {
 }
 
 export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.Element {
+    useBodyScrollLock();
     const [step, setStep] = useState<Step>(0);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
@@ -36,13 +38,6 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
         intent: ImageUploadIntent;
         target: 'cover' | 'map';
     } | null>(null);
-
-    useEffect(() => {
-        document.body.style.overflow = 'hidden';
-        return () => {
-            document.body.style.overflow = '';
-        };
-    }, []);
 
     /* ── step 1 fields ── */
     const [title, setTitle] = useState('');

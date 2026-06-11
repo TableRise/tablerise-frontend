@@ -11,6 +11,7 @@ import {
     deactivateUserTwoFactor,
 } from '@/server/users/disable-two-factor';
 import '@/components/profile/styles/ProfileActionModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type ProfileTwoFactorDisableModalProps = {
     userId: string;
@@ -31,6 +32,7 @@ export default function ProfileTwoFactorDisableModal({
     onClose,
     onSaved,
 }: ProfileTwoFactorDisableModalProps): JSX.Element {
+    useBodyScrollLock();
     const [digits, setDigits] = useState<string[]>(buildDigits());
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');

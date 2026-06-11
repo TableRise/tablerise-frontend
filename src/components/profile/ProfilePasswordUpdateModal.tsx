@@ -16,6 +16,7 @@ import {
 } from '@/server/users/update-password';
 import { newPasswordSchema } from '@/components/password-recover/forms/schemas/form-new-password-schema';
 import '@/components/profile/styles/ProfileActionModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type ProfilePasswordUpdateModalProps = {
     email: string;
@@ -65,6 +66,7 @@ export default function ProfilePasswordUpdateModal({
     onClose,
     onSaved,
 }: ProfilePasswordUpdateModalProps): JSX.Element {
+    useBodyScrollLock();
     const [step, setStep] = useState<Step>('email-code');
     const [digits, setDigits] = useState<string[]>(buildDigits());
     const [secretQuestion, setSecretQuestion] = useState('');

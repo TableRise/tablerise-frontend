@@ -5,6 +5,7 @@ import LoadingDots from '@/components/common/LoadingDots';
 import { deleteUser } from '@/server/users/delete-user';
 import { postLogout } from '@/server/users/logout';
 import '@/components/profile/styles/ProfileActionModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type ProfileDeleteAccountModalProps = {
     userId: string;
@@ -17,6 +18,7 @@ export default function ProfileDeleteAccountModal({
     onClose,
     onDeleted,
 }: ProfileDeleteAccountModalProps): JSX.Element {
+    useBodyScrollLock();
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState('');
 

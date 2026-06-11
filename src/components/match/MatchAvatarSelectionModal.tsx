@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import '@/components/match/styles/MatchAvatarSelectionModal.css';
 import type { CampaignCharacter } from '@/server/characters/get-characters';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 interface MatchAvatarSelectionModalProps {
     characters: CampaignCharacter[];
@@ -28,6 +29,7 @@ export default function MatchAvatarSelectionModal({
     onSearchChange,
     onToggleCharacter,
 }: MatchAvatarSelectionModalProps): JSX.Element {
+    useBodyScrollLock();
     return (
         <div className="masm-overlay">
             <div className="masm-modal" onClick={(e) => e.stopPropagation()}>

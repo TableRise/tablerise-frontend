@@ -7,6 +7,7 @@ import {
     type JournalPost,
 } from '@/server/campaigns/get-journal-posts';
 import '@/components/lobby/styles/CreatePostModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 const ALL_CATEGORY_OPTIONS = [
     { value: 'master', label: 'Mestre' },
@@ -68,6 +69,7 @@ export default function CreatePostModal({
     onClose,
     onCreated,
 }: CreatePostModalProps): JSX.Element {
+    useBodyScrollLock();
     const categoryOptions = getCategoryOptions(userRole);
     const [title, setTitle] = useState(initialPost?.title ?? '');
     const [content, setContent] = useState(initialPost?.content ?? '');

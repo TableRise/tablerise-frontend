@@ -1,6 +1,7 @@
 'use client';
 
 import '@/components/profile/styles/ProfileActionModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type ImageSourceChoiceModalProps = {
     title?: string;
@@ -17,6 +18,7 @@ export default function ImageSourceChoiceModal({
     onSelectLocal,
     onSelectGallery,
 }: ImageSourceChoiceModalProps): JSX.Element {
+    useBodyScrollLock();
     return (
         <div className="profile-action-modal-overlay">
             <div

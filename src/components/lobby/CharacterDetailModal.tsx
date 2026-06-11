@@ -28,6 +28,7 @@ import SheetHabilidades, {
 import { deleteCharacter } from '@/server/characters/create-character';
 import {
     updateCharacter,
+    updateCharacterNotificationsOff,
     removeCharacterEquipment,
     updateCharacterMoney,
 } from '@/server/characters/update-character';
@@ -49,6 +50,7 @@ import UserGalleryPickerModal from '@/components/common/UserGalleryPickerModal';
 import { normalizeStoredUserId, useStoredUser } from '@/hooks/useStoredUser';
 import { useUserGallery } from '@/hooks/useUserGallery';
 import type { UploadImageValue } from '@/utils/imageUploadPayload';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 interface CharacterDetailModalProps {
     characterId: string;
@@ -92,7 +94,7 @@ const SKILL_LABELS: Record<string, string> = {
     insight: 'Intuição',
     medicine: 'Medicina',
     perception: 'Percepção',
-    survival: 'Sobrevivíªncia',
+    survival: 'Sobrevivência',
     deception: 'Enganação',
     intimidation: 'Intimidação',
     performance: 'Atuação',
@@ -184,11 +186,11 @@ type CharacterOtherFields =
     FullCharacterDnd['data']['profile']['characteristics']['other'];
 
 function getOtherProficiencies(other?: CharacterOtherFields | null): string {
-    return other?.proficiencies ?? '';
+    return other?.languagesAndProficiencies ?? '';
 }
 
 function getOtherExtraCharacteristics(other?: CharacterOtherFields | null): string {
-    return other?.extraCharacteristics ?? '';
+    return other?.characteristicsAndAdditionalAbilities ?? '';
 }
 
 function hasOtherSectionContent(other?: CharacterOtherFields | null): boolean {
@@ -238,6 +240,7 @@ export default function CharacterDetailModal({
     onBack,
     onDeleted,
 }: CharacterDetailModalProps): JSX.Element {
+    useBodyScrollLock();
     const { themeMode } = useContext(TableriseContext);
     const { storedUser } = useStoredUser();
     const currentUserId = normalizeStoredUserId(storedUser);
@@ -257,6 +260,7 @@ export default function CharacterDetailModal({
         LevelUpNotification[]
     >([]);
     const [activeNotificationIndex, setActiveNotificationIndex] = useState(0);
+    const [notificationsSaving, setNotificationsSaving] = useState(false);
     const editMagiasRef = useRef<SheetMagiasHandle>(null);
     const editHabilidadesRef = useRef<SheetHabilidadesHandle>(null);
     const pictureInputRef = useRef<HTMLInputElement>(null);
@@ -394,7 +398,74 @@ export default function CharacterDetailModal({
         return result;
     };
 
-    const handleStartEdit = () => {
+    const clearLevelUpNotifications = () => {
+        setLevelUpNotifications([]);
+        setActiveNotificationIndex(0);
+    };
+
+    const markNotificationsOffLocally = () => {
+        setChar((current) => {
+            if (!current) return current;
+            return {
+                ...current,
+                data: {
+                    ...current.data,
+                    profile: {
+                        ...current.data.profile,
+                        notificationsOn: false,
+                    },
+                },
+            };
+        });
+    };
+
+    const handleNotificationsOff = async (): Promise<boolean> => {
+        if (notificationsSaving) return false;
+
+        setNotificationsSaving(true);
+        try {
+            const success = await updateCharacterNotificationsOff(characterId);
+            if (success) {
+                markNotificationsOffLocally();
+            }
+            return success;
+        } finally {
+            setNotificationsSaving(false);
+        }
+    };
+
+    const loadPendingLevelUpNotifications = async (
+        targetCharacter: FullCharacterDnd | null,
+        targetClassRecord: DndClassRecord | null
+    ) => {
+        const targetProfile = targetCharacter?.data?.profile;
+        if (!targetProfile?.notificationsOn) {
+            clearLevelUpNotifications();
+            return;
+        }
+
+        const levelingSpecs = targetClassRecord?.levelingSpecs;
+        if (!levelingSpecs) {
+            return;
+        }
+
+        const notifications = buildLevelUpNotifications(
+            levelingSpecs,
+            Number(targetProfile.prevLevel ?? 0),
+            Number(targetProfile.level ?? 0)
+        );
+
+        if (notifications.length === 0) {
+            clearLevelUpNotifications();
+            await handleNotificationsOff();
+            return;
+        }
+
+        setLevelUpNotifications(notifications);
+        setActiveNotificationIndex(0);
+    };
+
+    const handleStartEdit = async () => {
         if (!char || !profile || !stats) return;
         setEditAbilityScores(stats.abilityScores.map((ab) => ({ ...ab })));
         setEditCombat({
@@ -451,6 +522,11 @@ export default function CharacterDetailModal({
         setEditSkillProfs(skillProfsInit);
         setSelectedInventoryItemId(null);
         setIsEditing(true);
+        if (isAuthor) {
+            await loadPendingLevelUpNotifications(char, classRecord);
+        } else {
+            clearLevelUpNotifications();
+        }
     };
 
     const handleSell = async (item: {
@@ -541,8 +617,7 @@ export default function CharacterDetailModal({
             }
 
             await loadCharacterModalData();
-            setLevelUpNotifications([]);
-            setActiveNotificationIndex(0);
+            clearLevelUpNotifications();
             setXpUpdateSaving(false);
             setXpModalOpen(false);
             return;
@@ -559,10 +634,6 @@ export default function CharacterDetailModal({
             levelingSpecs && hasAnySpellProgression(levelingSpecs)
                 ? getLevelingSnapshot(levelingSpecs, nextLevel)
                 : null;
-        const nextNotifications =
-            nextLevel > currentLevel && levelingSpecs
-                ? buildLevelUpNotifications(levelingSpecs, currentLevel, nextLevel)
-                : [];
 
         const nextSkills = (stats.skills ?? [])
             .filter((skill) => skill.checked)
@@ -677,12 +748,8 @@ export default function CharacterDetailModal({
             return;
         }
 
-        const updated = await loadCharacterModalData();
-        if (updated) {
-            setLevelUpNotifications(nextNotifications);
-            setActiveNotificationIndex(0);
-        }
-
+        await loadCharacterModalData();
+        clearLevelUpNotifications();
         setXpUpdateSaving(false);
         setXpModalOpen(false);
     };
@@ -730,10 +797,11 @@ export default function CharacterDetailModal({
                         alliesAndOrgs: editHistorico.alliesAndOrgs,
                         treasure: editHistorico.treasure,
                         other: {
-                            proficiencies: editOther.languagesAndProficiencies,
+                            languagesAndProficiencies:
+                                editOther.languagesAndProficiencies,
                             characteristicsAndAbilities:
                                 editOther.characteristicsAndAbilities,
-                            extraCharacteristics:
+                            characteristicsAndAdditionalAbilities:
                                 editOther.characteristicsAndAdditionalAbilities,
                         },
                     },
@@ -814,6 +882,7 @@ export default function CharacterDetailModal({
         );
         if (success) {
             await loadCharacterModalData();
+            clearLevelUpNotifications();
             setIsEditing(false);
             setSelectedInventoryItemId(null);
         }
@@ -822,16 +891,11 @@ export default function CharacterDetailModal({
 
     useEffect(() => {
         setLoading(true);
+        clearLevelUpNotifications();
         loadCharacterModalData().finally(() => setLoading(false));
         // We intentionally reload this modal only when the selected character changes.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [characterId]);
-
-    useEffect(() => {
-        if (xpSystem) return;
-        setLevelUpNotifications([]);
-        setActiveNotificationIndex(0);
-    }, [xpSystem]);
 
     const profile = char?.data?.profile;
     const stats = char?.data?.stats;
@@ -965,7 +1029,7 @@ export default function CharacterDetailModal({
                                                         ? setDeleteConfirmOpen(true)
                                                         : isEditing
                                                         ? handleSave()
-                                                        : handleStartEdit()
+                                                        : void handleStartEdit()
                                                 }
                                                 disabled={
                                                     saving ||
@@ -1045,7 +1109,7 @@ export default function CharacterDetailModal({
                                 </div>
                             </div>
                             {/* Tabs */}
-                            {xpSystem && activeNotification && (
+                            {isEditing && activeNotification && (
                                 <div className="cdm-levelup-banner">
                                     <div className="cdm-levelup-copy">
                                         <span className="font-XXS-bold cdm-levelup-kicker">
@@ -1068,7 +1132,10 @@ export default function CharacterDetailModal({
                                                     Math.max(0, current - 1)
                                                 )
                                             }
-                                            disabled={activeNotificationIndex === 0}
+                                            disabled={
+                                                notificationsSaving ||
+                                                activeNotificationIndex === 0
+                                            }
                                         >
                                             <Image
                                                 src={ArrowBackIcon}
@@ -1089,8 +1156,9 @@ export default function CharacterDetailModal({
                                                 )
                                             }
                                             disabled={
+                                                notificationsSaving ||
                                                 activeNotificationIndex ===
-                                                levelUpNotifications.length - 1
+                                                    levelUpNotifications.length - 1
                                             }
                                         >
                                             <Image
@@ -1103,11 +1171,14 @@ export default function CharacterDetailModal({
                                         <button
                                             type="button"
                                             className="cdm-levelup-close"
-                                            onClick={() => {
-                                                setLevelUpNotifications([]);
-                                                setActiveNotificationIndex(0);
+                                            onClick={async () => {
+                                                clearLevelUpNotifications();
+                                                await handleNotificationsOff();
                                             }}
-                                            disabled={!canCloseNotifications}
+                                            disabled={
+                                                notificationsSaving ||
+                                                !canCloseNotifications
+                                            }
                                         >
                                             í—
                                         </button>
@@ -1479,7 +1550,7 @@ export default function CharacterDetailModal({
                                             </div>
                                             <div className="cdm-info-box">
                                                 <span className="font-XXS-regular cdm-info-label">
-                                                    Proficiíªncia
+                                                    Proficiência
                                                 </span>
                                                 <span className="font-M-semibold">
                                                     +{stats.proficiencyBonus}
@@ -2092,7 +2163,7 @@ export default function CharacterDetailModal({
                                                 placeholder="0"
                                             />
                                             <span className="cs-field-label">
-                                                CD Resistíªncia de Magia
+                                                CD Resistência de Magia
                                             </span>
                                         </div>
                                         <div className="cs-spell-header-box">

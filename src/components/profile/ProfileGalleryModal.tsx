@@ -6,6 +6,7 @@ import TrashSvg from '@assets/icons/sys/trash.svg?url';
 import MatchImageHighlightViewerModal from '@/components/match/MatchImageHighlightViewerModal';
 import type { ImageObject } from '@/types/shared/general';
 import '@/components/profile/styles/ProfileActionModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type ProfileGalleryModalProps = {
     images: ImageObject[];
@@ -18,6 +19,7 @@ export default function ProfileGalleryModal({
     onDeleteImage,
     onClose,
 }: ProfileGalleryModalProps): JSX.Element {
+    useBodyScrollLock();
     const [selectedImage, setSelectedImage] = useState<ImageObject | null>(null);
     const [deletingImageId, setDeletingImageId] = useState<string | null>(null);
     const [error, setError] = useState('');
