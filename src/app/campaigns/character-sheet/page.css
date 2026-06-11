@@ -261,16 +261,16 @@
     }
 
     .cs-inventory-currency-item {
-        @apply flex flex-col gap-1;
+        @apply flex flex-col gap-1 cursor-pointer;
     }
 
     .cs-inventory-currency-label {
-        @apply text-[0.6rem] font-bold uppercase tracking-wider text-color-greyScale/500 text-center;
+        @apply text-[0.6rem] font-bold uppercase tracking-wider text-color-greyScale/500 text-center cursor-pointer;
     }
 
     .cs-inventory-currency-input {
         @apply border border-color-greyScale/200 rounded-lg bg-color-greyScale/50 px-2 py-1 text-xs text-center outline-none
-            text-color-greyScale/900
+            text-color-greyScale/900 cursor-pointer
             focus:border-color-primary/default_900 focus:ring-1 focus:ring-color-primary/500 transition-all;
     }
 
