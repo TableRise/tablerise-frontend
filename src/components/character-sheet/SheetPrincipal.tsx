@@ -14,6 +14,7 @@ import {
     getDnd5eClassById,
 } from '@/server/dungeons&dragons5e/system';
 import GenerateScoresModal from '@/components/character-sheet/GenerateScoresModal';
+import LoadingDots from '@/components/common/LoadingDots';
 import XpIncreaseModal from '@/components/common/XpIncreaseModal';
 import { applyXpGain } from '@/utils/characterXp';
 import { type LevelingSpecs } from '@/utils/characterLeveling';
@@ -147,6 +148,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
         const [selectedRaceId, setSelectedRaceId] = useState('');
         const [raceSpeed, setRaceSpeed] = useState(0);
         const [raceBonusApplied, setRaceBonusApplied] = useState(false);
+        const [raceBonusSubmitting, setRaceBonusSubmitting] = useState(false);
         const [showGenerateModal, setShowGenerateModal] = useState(false);
         const [skillProfs, setSkillProfs] = useState<Record<string, boolean>>({});
         const [saveProfs, setSaveProfs] = useState<Record<string, boolean>>({});
@@ -413,19 +415,26 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
 
         const handleApplyRaceBonus = async () => {
             if (!selectedRaceId) return;
-            const race = await getDnd5eRaceById(selectedRaceId);
-            if (!race?.abilityScoreIncrease) return;
-            const increases: { name: string; value: number }[] =
-                race.abilityScoreIncrease;
-            const nextBonuses = { ...EMPTY_ABILITY_SCORES };
-            for (const entry of increases) {
-                const key = ABILITY_KEY_MAP[normalizeAbilityName(entry.name)];
-                if (key) {
-                    nextBonuses[key as AbilityKey] += Number(entry.value);
+
+            setRaceBonusSubmitting(true);
+            try {
+                const race = await getDnd5eRaceById(selectedRaceId);
+                if (!race?.abilityScoreIncrease) return;
+                const increases: { name: string; value: number }[] =
+                    race.abilityScoreIncrease;
+                const nextBonuses = { ...EMPTY_ABILITY_SCORES };
+                for (const entry of increases) {
+                    const key = ABILITY_KEY_MAP[normalizeAbilityName(entry.name)];
+                    if (key) {
+                        nextBonuses[key as AbilityKey] += Number(entry.value);
+                    }
                 }
+
+                setRaceAbilityBonuses(nextBonuses);
+                setRaceBonusApplied(true);
+            } finally {
+                setRaceBonusSubmitting(false);
             }
-            setRaceAbilityBonuses(nextBonuses);
-            setRaceBonusApplied(true);
         };
 
         useEffect(() => {
@@ -618,11 +627,16 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                                 disabled={
                                     !selectedRaceId ||
                                     !generatedScores.length ||
-                                    raceBonusApplied
+                                    raceBonusApplied ||
+                                    raceBonusSubmitting
                                 }
                                 onClick={handleApplyRaceBonus}
                             >
-                                Aplicar Bônus de Raças
+                                {raceBonusSubmitting ? (
+                                    <LoadingDots label="Aplicando bônus de raças" />
+                                ) : (
+                                    'Aplicar Bônus de Raças'
+                                )}
                             </button>
                             {selectedRaceId &&
                                 !generatedScores.length &&

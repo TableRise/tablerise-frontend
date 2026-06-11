@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import CopyBlueSVG from '@assets/icons/sys/copy-blue.svg?url';
 import CopyDarkSVG from '@assets/icons/sys/copy-dark.svg?url';
+import LoadingDots from '@/components/common/LoadingDots';
 import RankedAvatarFrame from '@/components/common/RankedAvatarFrame';
 import type { CampaignCharacter } from '@/server/characters/get-characters';
 import formatDate from '@/utils/formatDate';
@@ -15,6 +16,7 @@ type LobbyOverviewSectionProps = {
     campaign: CampaignData;
     themeMode: string;
     presenceConfirmed: boolean;
+    presenceSubmitting: boolean;
     sessionPreviewOpen: boolean;
     campaignHistoryOpen: boolean;
     confirmedPlayersInfo: ConfirmedPlayerInfo[];
@@ -114,6 +116,7 @@ export default function LobbyOverviewSection({
     campaign,
     themeMode,
     presenceConfirmed,
+    presenceSubmitting,
     sessionPreviewOpen,
     campaignHistoryOpen,
     confirmedPlayersInfo,
@@ -143,12 +146,12 @@ export default function LobbyOverviewSection({
             <div className="lobby-info-bar">
                 <div className="lobby-info-bar-row">
                     <div className="lobby-info-item">
-                        <span className="font-XS-bold">Próxima sessão:</span>
+                        <span className="font-XS-bold">Pr\u00f3xima sess\u00e3o:</span>
                         <span className="font-XS-regular">
                             {campaign.nextMatchDate &&
                             campaign.nextMatchDate !== 'no-date'
                                 ? formatDate(campaign.nextMatchDate)
-                                : 'não agendado'}
+                                : 'n\u00e3o agendado'}
                         </span>
                     </div>
                     {Object.entries(campaign.socialMedia)
@@ -171,14 +174,14 @@ export default function LobbyOverviewSection({
                 </div>
                 <div className="lobby-info-bar-row">
                     <div className="lobby-info-item lobby-code-item">
-                        <span className="font-XS-bold">Código da campanha:</span>
+                        <span className="font-XS-bold">C\u00f3digo da campanha:</span>
                         <span className="font-XS-regular">{campaign.code || '-'}</span>
                         <button
                             type="button"
                             className="lobby-copy-btn"
                             onClick={onCopyCampaignCode}
                             disabled={!campaign.code}
-                            aria-label="Copiar Código da campanha"
+                            aria-label="Copiar C\u00f3digo da campanha"
                         >
                             <Image
                                 src={
@@ -186,7 +189,7 @@ export default function LobbyOverviewSection({
                                         ? CopyDarkSVG.src
                                         : CopyBlueSVG.src
                                 }
-                                alt="Copiar Código da campanha"
+                                alt="Copiar C\u00f3digo da campanha"
                                 width={18}
                                 height={18}
                             />
@@ -198,16 +201,27 @@ export default function LobbyOverviewSection({
                         presenceConfirmed ? 'lobby-confirm-presence--confirmed' : ''
                     }`}
                     onClick={onTogglePresence}
+                    disabled={presenceSubmitting}
                 >
-                    {presenceConfirmed
-                        ? '\u2713 Presença Confirmada'
-                        : 'Clique aqui para confirmar a presença na próxima sessão'}
+                    {presenceSubmitting ? (
+                        <LoadingDots
+                            label={
+                                presenceConfirmed
+                                    ? 'Cancelando presen\u00e7a'
+                                    : 'Confirmando presen\u00e7a'
+                            }
+                        />
+                    ) : presenceConfirmed ? (
+                        '\u2713 Presen\u00e7a Confirmada'
+                    ) : (
+                        'Clique aqui para confirmar a presen\u00e7a na pr\u00f3xima sess\u00e3o'
+                    )}
                 </button>
                 <button
                     className="lobby-session-preview-btn font-XS-bold"
                     onClick={onOpenSessionPreview}
                 >
-                    Resumo da próxima sessão
+                    Resumo da pr\u00f3xima sess\u00e3o
                 </button>
                 <button
                     className="lobby-session-preview-btn font-XS-bold"
@@ -224,7 +238,9 @@ export default function LobbyOverviewSection({
                         onClick={(event) => event.stopPropagation()}
                     >
                         <div className="lobby-session-modal-header">
-                            <h3 className="font-M-semibold">Resumo da próxima sessão</h3>
+                            <h3 className="font-M-semibold">
+                                Resumo da pr\u00f3xima sess\u00e3o
+                            </h3>
                             <button
                                 className="lobby-session-modal-close font-M-semibold"
                                 onClick={onCloseSessionPreview}
@@ -232,10 +248,12 @@ export default function LobbyOverviewSection({
                                 x
                             </button>
                         </div>
-                        <p className="font-S-regular lobby-session-modal-text">
-                            {campaign.nextSessionResume ||
-                                'Sem resumo disponí­vel para a próxima sessão.'}
-                        </p>
+                        <div className="lobby-session-modal-body">
+                            <p className="font-S-regular lobby-session-modal-text">
+                                {campaign.nextSessionResume ||
+                                    'Sem resumo dispon\u00edvel para a pr\u00f3xima sess\u00e3o.'}
+                            </p>
+                        </div>
                     </div>
                 </div>
             ) : null}
@@ -257,23 +275,27 @@ export default function LobbyOverviewSection({
                                 &times;
                             </button>
                         </div>
-                        {campaign.mainHistory ? (
-                            <div className="lobby-session-modal-copy">
-                                {campaignHistoryLines.map((line, index) =>
-                                    renderRichTextLine(line, index)
-                                )}
-                            </div>
-                        ) : (
-                            <p className="font-S-regular lobby-session-modal-text">
-                                {'Sem hist\u00f3ria dispon\u00edvel para esta campanha.'}
-                            </p>
-                        )}
+                        <div className="lobby-session-modal-body">
+                            {campaign.mainHistory ? (
+                                <div className="lobby-session-modal-copy">
+                                    {campaignHistoryLines.map((line, index) =>
+                                        renderRichTextLine(line, index)
+                                    )}
+                                </div>
+                            ) : (
+                                <p className="font-S-regular lobby-session-modal-text">
+                                    {
+                                        'Sem hist\u00f3ria dispon\u00edvel para esta campanha.'
+                                    }
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
             ) : null}
 
             <div className="lobby-characters">
-                <h2 className="font-L-semibold">Confirmados próxima sessão</h2>
+                <h2 className="font-L-semibold">Confirmados pr\u00f3xima sess\u00e3o</h2>
                 <div className="lobby-characters-slider">
                     {confirmedPlayersInfo.length > 0 ? (
                         confirmedPlayersInfo.map((player) => (

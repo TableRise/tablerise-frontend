@@ -52,6 +52,7 @@ export default function CampaignLobby(): JSX.Element {
     }>();
     const [campaign, setCampaign] = useState<CampaignData | null>(null);
     const [presenceConfirmed, setPresenceConfirmed] = useState(false);
+    const [presenceSubmitting, setPresenceSubmitting] = useState(false);
     const [sessionPreviewOpen, setSessionPreviewOpen] = useState(false);
     const [campaignHistoryOpen, setCampaignHistoryOpen] = useState(false);
     const [confirmedPlayersInfo, setConfirmedPlayersInfo] = useState<
@@ -123,11 +124,10 @@ export default function CampaignLobby(): JSX.Element {
         getCharactersByCampaignLobby(campaignId).then(setLobbyCharacters);
     }, [campaignId]);
 
-    const refreshCampaign = useCallback(() => {
+    const refreshCampaign = useCallback(async () => {
         if (!campaignId) return;
-        getCampaignById(campaignId).then((data) => {
-            if (data) setCampaign(mapCampaignData(data));
-        });
+        const data = await getCampaignById(campaignId);
+        if (data) setCampaign(mapCampaignData(data));
     }, [campaignId]);
 
     const refreshLobbyCharacters = useCallback(() => {
@@ -326,6 +326,7 @@ export default function CampaignLobby(): JSX.Element {
                         campaign={campaign}
                         themeMode={themeMode}
                         presenceConfirmed={presenceConfirmed}
+                        presenceSubmitting={presenceSubmitting}
                         sessionPreviewOpen={sessionPreviewOpen}
                         campaignHistoryOpen={campaignHistoryOpen}
                         confirmedPlayersInfo={confirmedPlayersInfo}
@@ -333,14 +334,17 @@ export default function CampaignLobby(): JSX.Element {
                         characterAuthorRanksByUserId={characterAuthorRanksByUserId}
                         onCopyCampaignCode={handleCopyCampaignCode}
                         onTogglePresence={async () => {
+                            setPresenceSubmitting(true);
                             try {
                                 await confirmPlayerPresence(
                                     campaignId,
                                     presenceConfirmed
                                 );
-                                refreshCampaign();
+                                await refreshCampaign();
                             } catch {
                                 // silently ignore
+                            } finally {
+                                setPresenceSubmitting(false);
                             }
                         }}
                         onOpenSessionPreview={() => setSessionPreviewOpen(true)}

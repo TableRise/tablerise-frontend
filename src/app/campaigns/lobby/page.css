@@ -13,6 +13,7 @@
 
     .lobby-content {
         @apply w-[63rem] flex flex-col bg-color-greyScale/50 rounded-xl p-6;
+        min-width: 0;
     }
 
     .lobby-cover {
@@ -75,6 +76,10 @@
         @apply opacity-80;
     }
 
+    .lobby-confirm-presence:disabled {
+        @apply cursor-not-allowed opacity-80;
+    }
+
     .lobby-confirm-presence--confirmed {
         @apply bg-color-greyScale/300 text-color-greyScale/50 cursor-pointer;
     }
@@ -92,15 +97,20 @@
     }
 
     .lobby-session-modal-overlay {
-        @apply fixed inset-0 z-50 flex items-center justify-center bg-black/50;
+        @apply fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 px-4 py-4;
     }
 
     .lobby-session-modal {
-        @apply bg-color-greyScale/50 rounded-2xl p-6 w-[32rem] max-w-[90vw] shadow-xl flex flex-col gap-4;
+        @apply bg-color-greyScale/50 rounded-2xl p-6 w-[32rem] max-w-[90vw] shadow-xl flex flex-col gap-4 overflow-hidden;
+        max-height: min(85vh, calc(100dvh - 2rem));
     }
 
     .lobby-session-modal-header {
         @apply flex items-center justify-between text-color-primary/default_900;
+    }
+
+    .lobby-session-modal-body {
+        @apply flex-1 overflow-y-auto;
     }
 
     .lobby-session-modal-close {
@@ -269,10 +279,11 @@
     @media (max-width: 768px) {
         .lobby-wrapper {
             @apply mt-[7.25rem] flex-col px-3 py-6;
+            overflow-x: clip;
         }
 
         .lobby-content {
-            @apply p-5;
+            @apply w-full max-w-full p-5;
         }
 
         .lobby-cover {
@@ -294,16 +305,18 @@
 
         .lobby-session-modal {
             @apply p-5;
+            max-height: min(88vh, calc(100dvh - 2rem));
         }
     }
 
     @media (max-width: 480px) {
         .lobby-wrapper {
             @apply mt-[6.5rem] px-2 pb-5;
+            overflow-x: clip;
         }
 
         .lobby-content {
-            @apply rounded-[1rem] p-4;
+            @apply w-full max-w-full rounded-[1rem] p-4;
         }
 
         .lobby-cover {

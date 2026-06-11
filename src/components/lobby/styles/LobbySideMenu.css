@@ -102,7 +102,7 @@
         }
 
         .lobby-side-menu-mobile-toggle {
-            @apply absolute left-px top-3 z-0 flex h-12 w-12 -translate-x-full items-center justify-center rounded-l-xl !bg-color-greyScale/50 shadow-none;
+            @apply absolute left-px top-3 z-0 flex h-12 w-12 -translate-x-full items-center justify-center rounded-l-xl bg-color-greyScale/50 shadow-none;
         }
 
         .lobby-side-menu-nav {
