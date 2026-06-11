@@ -189,6 +189,18 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
         }
     }
 
+    function renderStepLabel(label: string) {
+        if (label !== 'Informações básicas') return label;
+
+        return (
+            <>
+                Informações
+                <br className="ccm-step-label-mobile-break" />
+                básicas
+            </>
+        );
+    }
+
     return (
         <div className="ccm-backdrop">
             <div className="ccm-modal" onClick={(e) => e.stopPropagation()}>
@@ -229,7 +241,7 @@ export default function CreateCampaignModal({ onClose, onSuccess }: Props): JSX.
                                                 : ''
                                         }`}
                                     >
-                                        {label}
+                                        {renderStepLabel(label)}
                                     </span>
                                 </div>
                                 {idx < STEPS.length - 1 && (

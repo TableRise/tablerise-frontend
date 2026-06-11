@@ -337,7 +337,7 @@ describe('TableRise :: Profile And Support', () => {
         cy.contains('Atualizar senha').should('be.visible');
         cy.contains('Habilitar dois fatores').should('be.visible');
         cy.contains('Deletar conta').should('be.visible');
-        cy.contains('button', 'Definir plano de fundo').click();
+        cy.contains('button', 'Definir capa').click();
         cy.contains(
             '.profile-action-modal-title',
             'Instrucoes para capa de perfil'
@@ -349,9 +349,7 @@ describe('TableRise :: Profile And Support', () => {
             'O formato png tambem e aceito mas e mais pesado em muitos casos'
         ).should('be.visible');
         cy.contains('button', 'Confirmar').click();
-        cy.contains('.profile-action-modal-title', 'Definir plano de fundo').should(
-            'be.visible'
-        );
+        cy.contains('.profile-action-modal-title', 'Definir capa').should('be.visible');
 
         cy.get('.profile-action-modal-card--cover input[type="file"]').selectFile(
             {
@@ -389,22 +387,20 @@ describe('TableRise :: Profile And Support', () => {
             .should('have.attr', 'src')
             .and('contain', '/images/SideImageBackground.svg');
         cy.get('.profile-hero__cover-overlay').should('exist');
-        cy.contains('.profile-action-modal-title', 'Definir plano de fundo').should(
-            'not.exist'
-        );
+        cy.contains('.profile-action-modal-title', 'Definir capa').should('not.exist');
 
         cy.get('.profile-hero__settings-button').click();
         cy.contains('.profile-action-modal-title', 'Controle de Perfil').should(
             'be.visible'
         );
-        cy.contains('button', 'Remover plano de fundo').scrollIntoView().click();
+        cy.contains('button', 'Remover capa').scrollIntoView().click();
         cy.wait('@removeProfileCover');
         cy.wait('@getProfileUser');
         cy.get('.profile-hero').should('not.have.class', 'profile-hero--has-cover');
         cy.contains('.profile-action-modal-title', 'Controle de Perfil').should(
             'be.visible'
         );
-        cy.contains('button', 'Definir plano de fundo').should('be.visible');
+        cy.contains('button', 'Definir capa').should('be.visible');
         cy.contains('button', 'Cancelar').click();
     });
 
