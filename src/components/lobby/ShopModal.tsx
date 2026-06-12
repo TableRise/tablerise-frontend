@@ -18,6 +18,7 @@ import {
 import { createCampaignBuy } from '@/server/campaigns/create-campaign-buy';
 import type { DatabaseCampaignBuyRecord } from '@/types/shared/entities';
 import '@/components/lobby/styles/ShopModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 // Currency helpers
 
@@ -105,6 +106,7 @@ export default function ShopModal({
     refreshCampaign,
     onClose,
 }: ShopModalProps): JSX.Element {
+    useBodyScrollLock();
     const userChars = useMemo(
         () => lobbyCharacters.filter((c) => c.authorUserId === userId),
         [lobbyCharacters, userId]

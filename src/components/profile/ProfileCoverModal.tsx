@@ -11,6 +11,7 @@ import '@/components/profile/styles/ProfileActionModal.css';
 import type { ImageObject } from '@/types/shared/general';
 import type { UploadImageValue } from '@/utils/imageUploadPayload';
 import { isGalleryImageObject } from '@/utils/imageUploadPayload';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 const MIN_COVER_WIDTH = 1280;
 const MIN_COVER_HEIGHT = 720;
@@ -57,6 +58,7 @@ export default function ProfileCoverModal({
     onClose,
     onSaved,
 }: ProfileCoverModalProps): JSX.Element {
+    useBodyScrollLock();
     const { storedUser } = useStoredUser();
     const currentUserId = normalizeStoredUserId(storedUser);
     const { galleryImages, loadingGallery } = useUserGallery(currentUserId);

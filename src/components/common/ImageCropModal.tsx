@@ -13,6 +13,7 @@ import {
     resolveImageCropState,
     type ImageUploadIntent,
 } from '@/utils/imageCrop';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 interface ImageCropModalProps {
     file: File;
@@ -31,6 +32,7 @@ export default function ImageCropModal({
     onUseOriginal,
     onClose,
 }: ImageCropModalProps): JSX.Element {
+    useBodyScrollLock();
     const config = IMAGE_CROP_CONFIG[intent];
     const [previewUrl, setPreviewUrl] = useState('');
     const [crop, setCrop] = useState<Point>(DEFAULT_CROP_POSITION);

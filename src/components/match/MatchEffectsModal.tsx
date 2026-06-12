@@ -1,6 +1,7 @@
 'use client';
 import '@/components/match/styles/MatchEffectsModal.css';
 import type { FogVariant } from './MapFogOverlay';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 export type MapEffect = FogVariant | 'rain';
 
@@ -15,6 +16,7 @@ export default function MatchEffectsModal({
     onClose,
     onToggleEffect,
 }: MatchEffectsModalProps): JSX.Element {
+    useBodyScrollLock();
     const handleEffectClick = (effect: MapEffect) => {
         onToggleEffect(effect);
     };

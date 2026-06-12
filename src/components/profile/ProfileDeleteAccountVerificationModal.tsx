@@ -11,6 +11,7 @@ import {
     sendDeleteUserEmailCode,
 } from '@/server/users/delete-user-verification';
 import '@/components/profile/styles/ProfileActionModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type ProfileDeleteAccountVerificationModalProps = {
     email: string;
@@ -29,6 +30,7 @@ export default function ProfileDeleteAccountVerificationModal({
     onClose,
     onVerified,
 }: ProfileDeleteAccountVerificationModalProps): JSX.Element {
+    useBodyScrollLock();
     const [digits, setDigits] = useState<string[]>(buildDigits());
     const [sendingCode, setSendingCode] = useState(false);
     const [submitting, setSubmitting] = useState(false);

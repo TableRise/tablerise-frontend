@@ -2,6 +2,7 @@
 import { useMemo, useState } from 'react';
 import formatDate from '@/utils/formatDate';
 import '@/components/lobby/styles/CampaignHistoryModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 interface CampaignHistoryLog {
     loggedAt: string;
@@ -27,6 +28,7 @@ export default function CampaignHistoryModal({
     logs,
     onClose,
 }: CampaignHistoryModalProps): JSX.Element {
+    useBodyScrollLock();
     const [expandedDates, setExpandedDates] = useState<Record<string, boolean>>({});
 
     const logsByDate = useMemo(() => {

@@ -9,6 +9,7 @@ import {
 import { getCampaignPlayers } from '@/server/campaigns/get-campaign-players';
 import { getUser } from '@/server/users/get-user';
 import '@/components/lobby/styles/EditCampaignModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 interface Props {
     campaignId: string;
@@ -21,6 +22,7 @@ export default function LeaveCampaignModal({
     isMaster,
     onClose,
 }: Props): JSX.Element {
+    useBodyScrollLock();
     const router = useRouter();
 
     const [leaving, setLeaving] = useState(false);

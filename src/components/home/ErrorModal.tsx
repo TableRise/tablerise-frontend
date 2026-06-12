@@ -1,5 +1,6 @@
 'use client';
 import '@/components/home/styles/ErrorModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 interface Props {
     message: string;
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export default function ErrorModal({ message, onClose }: Props): JSX.Element {
+    useBodyScrollLock();
     return (
         <div className="err-backdrop">
             <div className="err-modal" onClick={(e) => e.stopPropagation()}>

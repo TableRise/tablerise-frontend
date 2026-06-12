@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import LoadingDots from '@/components/common/LoadingDots';
 import '@/components/profile/styles/ProfileActionModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type ProfileFriendRequestModalProps = {
     recipientLabel: string;
@@ -15,6 +16,7 @@ export default function ProfileFriendRequestModal({
     onClose,
     onConfirm,
 }: ProfileFriendRequestModalProps): JSX.Element {
+    useBodyScrollLock();
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
 

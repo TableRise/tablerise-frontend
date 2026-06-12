@@ -1,6 +1,7 @@
 'use client';
 
 import '@/components/profile/styles/ProfileActionModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type ProfileCoverInstructionsModalProps = {
     onClose: () => void;
@@ -11,6 +12,7 @@ export default function ProfileCoverInstructionsModal({
     onClose,
     onConfirm,
 }: ProfileCoverInstructionsModalProps): JSX.Element {
+    useBodyScrollLock();
     return (
         <div className="profile-action-modal-overlay">
             <div

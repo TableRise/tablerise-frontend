@@ -2,6 +2,7 @@
 
 import LoadingDots from '@/components/common/LoadingDots';
 import '@/components/profile/styles/ProfileActionModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type ProfileControlModalProps = {
     hasExternalProvider: boolean;
@@ -32,6 +33,7 @@ export default function ProfileControlModal({
     onRequestCoverUpdate,
     onRequestDeleteAccount,
 }: ProfileControlModalProps): JSX.Element {
+    useBodyScrollLock();
     return (
         <div className="profile-action-modal-overlay">
             <div

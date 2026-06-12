@@ -12,6 +12,7 @@ import {
 import { getCharacterById } from '@/server/characters/get-characters';
 import { getUser } from '@/server/users/get-user';
 import '@/components/lobby/styles/ParticipantsModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 interface ParticipantsModalProps {
     campaignId: string;
@@ -43,6 +44,7 @@ export default function ParticipantsModal({
     onParticipantsChanged,
     onClose,
 }: ParticipantsModalProps): JSX.Element {
+    useBodyScrollLock();
     const router = useRouter();
     const [players, setPlayers] = useState<PlayerCard[]>([]);
     const [loading, setLoading] = useState(true);

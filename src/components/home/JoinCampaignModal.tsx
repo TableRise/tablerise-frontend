@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import CampaignCard from '@/components/common/CampaignCard';
 import LoadingDots from '@/components/common/LoadingDots';
 import ErrorModal from '@/components/home/ErrorModal';
@@ -10,6 +10,7 @@ import { useJoinCampaign } from '@/components/home/helpers/useJoinCampaign';
 import { getCampaignById } from '@/server/campaigns/join-campaign';
 import { searchCampaigns } from '@/server/campaigns/search-campaigns';
 import '@/components/home/styles/JoinCampaignModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 interface Props {
     onClose: () => void;
@@ -29,6 +30,7 @@ function getCampaignPlayerAmountLimit(campaign: any): number {
 }
 
 export default function JoinCampaignModal({ onClose }: Props): JSX.Element {
+    useBodyScrollLock();
     const [title, setTitle] = useState('');
     const [code, setCode] = useState('');
     const [results, setResults] = useState<any[]>([]);
@@ -49,13 +51,6 @@ export default function JoinCampaignModal({ onClose }: Props): JSX.Element {
     } = useJoinCampaign({
         onJoinRequested: onClose,
     });
-
-    useEffect(() => {
-        document.body.style.overflow = 'hidden';
-        return () => {
-            document.body.style.overflow = '';
-        };
-    }, []);
 
     async function handleSearch() {
         setSearching(true);

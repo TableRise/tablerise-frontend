@@ -25,6 +25,7 @@ import '@/components/lobby/styles/EditCampaignModal.css';
 import type { ImageUploadIntent } from '@/utils/imageCrop';
 import type { ImageObject } from '@/types/shared/general';
 import { isGalleryImageObject, type UploadImageValue } from '@/utils/imageUploadPayload';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 interface InitialData {
     title: string;
@@ -61,6 +62,7 @@ export default function EditCampaignModal({
     onClose,
     onSaved,
 }: Props): JSX.Element {
+    useBodyScrollLock();
     const { storedUser } = useStoredUser();
     const currentUserId = normalizeStoredUserId(storedUser);
     const { galleryImages, loadingGallery } = useUserGallery(currentUserId);

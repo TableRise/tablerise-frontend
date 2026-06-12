@@ -11,6 +11,7 @@ import { searchUserByNickname } from '@/server/users/collections';
 import type { DatabaseUserWithDetails } from '@/types/shared/entities';
 import { defaultProfileImage } from '@/components/profile/profilePageHelpers';
 import '@/components/profile/styles/ProfileActionModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type ProfileFriendSearchModalProps = {
     onClose: () => void;
@@ -25,6 +26,7 @@ export default function ProfileFriendSearchModal({
     onClose,
     onSelectUser,
 }: ProfileFriendSearchModalProps): JSX.Element {
+    useBodyScrollLock();
     const { themeMode } = useContext(TableriseContext);
     const [nickname, setNickname] = useState('');
     const [searching, setSearching] = useState(false);

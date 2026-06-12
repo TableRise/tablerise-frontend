@@ -2,6 +2,7 @@
 
 import type { ImageObject } from '@/types/shared/general';
 import '@/components/profile/styles/ProfileActionModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type UserGalleryPickerModalProps = {
     title?: string;
@@ -20,6 +21,7 @@ export default function UserGalleryPickerModal({
     onClose,
     onSelect,
 }: UserGalleryPickerModalProps): JSX.Element {
+    useBodyScrollLock();
     return (
         <div className="profile-action-modal-overlay">
             <div

@@ -1,6 +1,7 @@
 'use client';
 import type { ImageObject } from '@/types/shared/general';
 import '@/components/match/styles/MatchImageHighlightModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 interface MatchImageHighlightViewerModalProps {
     image: ImageObject;
@@ -11,6 +12,7 @@ export default function MatchImageHighlightViewerModal({
     image,
     onClose,
 }: MatchImageHighlightViewerModalProps): JSX.Element {
+    useBodyScrollLock();
     return (
         <div className="mhiv-overlay">
             <div className="mhiv-modal" onClick={(event) => event.stopPropagation()}>

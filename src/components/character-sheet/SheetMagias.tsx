@@ -5,6 +5,7 @@ import Book from '../../../assets/icons/nav/book.svg?url';
 import BookDark from '../../../assets/icons/nav/book-dark.svg?url';
 import LoadingDots from '@/components/common/LoadingDots';
 import TableriseContext from '@/context/TableriseContext';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 import {
     getDnd5eSpellsByLevel,
     getDnd5eSpellById,
@@ -120,6 +121,7 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
     );
     const [detailSpell, setDetailSpell] = useState<Spell | null>(null);
     const [detailLoading, setDetailLoading] = useState(false);
+    useBodyScrollLock(pickerLevel !== null || detailSpell !== null || detailLoading);
     const [slotsExpended, setSlotsExpended] = useState<Record<number, number>>(
         () =>
             initialSlotsExpendedProp ??

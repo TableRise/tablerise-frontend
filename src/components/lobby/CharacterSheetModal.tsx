@@ -12,6 +12,7 @@ import LoadingDots from '@/components/common/LoadingDots';
 import { removeCharacterFromCampaign } from '@/server/characters/create-character';
 import CharacterDetailModal from '@/components/lobby/CharacterDetailModal';
 import '@/components/lobby/styles/CharacterSheetModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 interface CharacterSheetModalProps {
     campaignId: string;
@@ -38,6 +39,7 @@ export default function CharacterSheetModal({
     xpSystem,
     onClose,
 }: CharacterSheetModalProps): JSX.Element {
+    useBodyScrollLock();
     const router = useRouter();
     const [myChars, setMyChars] = useState<CampaignCharacter[]>([]);
     const [playerChars, setPlayerChars] = useState<CampaignCharacter[]>([]);

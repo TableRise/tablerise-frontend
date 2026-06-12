@@ -1,6 +1,7 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import '@/components/home/styles/CampaignPasswordModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 interface Props {
     onConfirm: (password: string) => void;
@@ -13,14 +14,8 @@ export default function CampaignPasswordModal({
     onClose,
     error,
 }: Props): JSX.Element {
+    useBodyScrollLock();
     const [password, setPassword] = useState('');
-
-    useEffect(() => {
-        document.body.style.overflow = 'hidden';
-        return () => {
-            document.body.style.overflow = '';
-        };
-    }, []);
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         const value = e.target.value.slice(0, 4);

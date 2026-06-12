@@ -1,6 +1,7 @@
 'use client';
 
 import '@/components/profile/styles/ProfileActionModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type ProfileFlowWarningModalProps = {
     flowLabel: string;
@@ -13,6 +14,7 @@ export default function ProfileFlowWarningModal({
     onClose,
     onConfirm,
 }: ProfileFlowWarningModalProps): JSX.Element {
+    useBodyScrollLock();
     return (
         <div className="profile-action-modal-overlay">
             <div

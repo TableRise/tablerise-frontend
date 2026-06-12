@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import '@/components/character-sheet/styles/MoneyModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 interface MoneyModalProps {
     currencyLabel: string;
@@ -15,6 +16,7 @@ export default function MoneyModal({
     onConfirm,
     onClose,
 }: MoneyModalProps): JSX.Element {
+    useBodyScrollLock();
     const [operation, setOperation] = useState<'add' | 'subtract'>('add');
     const [amountInput, setAmountInput] = useState('');
 

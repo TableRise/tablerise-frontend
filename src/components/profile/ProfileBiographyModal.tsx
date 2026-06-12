@@ -4,6 +4,7 @@ import { FormEvent, useState } from 'react';
 import LoadingDots from '@/components/common/LoadingDots';
 import { updateUser } from '@/server/users/update-user';
 import '@/components/profile/styles/ProfileActionModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 const BIOGRAPHY_MAX_LENGTH = 300;
 
@@ -24,6 +25,7 @@ export default function ProfileBiographyModal({
     onClose,
     onSaved,
 }: ProfileBiographyModalProps): JSX.Element {
+    useBodyScrollLock();
     const [firstNameValue, setFirstNameValue] = useState(firstName);
     const [lastNameValue, setLastNameValue] = useState(lastName);
     const [value, setValue] = useState(biography);

@@ -89,9 +89,9 @@ export function buildCreateCharacterPayload({
                     alliesAndOrgs: characteristicsData.alliesAndOrgs,
                     treasure: characteristicsData.treasure,
                     other: {
-                        proficiencies: principalData.proficienciesText,
+                        languagesAndProficiencies: principalData.proficienciesText,
                         characteristicsAndAbilities: principalData.extraCharacteristics,
-                        extraCharacteristics:
+                        characteristicsAndAdditionalAbilities:
                             characteristicsData.extraCharacteristicsDetail,
                     },
                 },

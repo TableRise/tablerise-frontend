@@ -17,6 +17,7 @@ import { defaultProfileImage } from '@/components/profile/profilePageHelpers';
 import type { DatabaseUserWithDetails } from '@/types/shared/entities';
 import TrashSvg from '@assets/icons/sys/trash.svg?url';
 import '@/components/profile/styles/ProfileActionModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type ProfileMessagesModalProps = {
     mode: 'inbox' | 'compose';
@@ -135,6 +136,7 @@ export default function ProfileMessagesModal({
     onMessagesChange,
     onClose,
 }: ProfileMessagesModalProps): JSX.Element {
+    useBodyScrollLock();
     const [messages, setMessages] = useState<UserMessageRecord[]>([]);
     const [loading, setLoading] = useState(mode === 'inbox');
     const [submitting, setSubmitting] = useState(false);

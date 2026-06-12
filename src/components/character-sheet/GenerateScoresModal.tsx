@@ -1,6 +1,6 @@
 'use client';
-import { useEffect } from 'react';
 import '@/components/character-sheet/styles/GenerateScoresModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 interface Props {
     scores: number[];
@@ -36,12 +36,7 @@ export default function GenerateScoresModal({
     onSelectScore,
     infoMessage = '',
 }: Props): JSX.Element {
-    useEffect(() => {
-        document.body.style.overflow = 'hidden';
-        return () => {
-            document.body.style.overflow = '';
-        };
-    }, []);
+    useBodyScrollLock();
 
     const isIndexAvailable = (index: number): boolean =>
         !selectionEnabled || availableScoreIndexes[index] !== false;

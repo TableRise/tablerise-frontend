@@ -10,6 +10,7 @@ import {
     shouldSkipDonationPrompt,
 } from '@/components/home/helpers/donationPromptPreference';
 import '@/components/home/styles/DonationSupportModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type DonationSupportModalProps = {
     mode: 'create' | 'join';
@@ -27,6 +28,7 @@ export default function DonationSupportModal({
     onConfirm,
     onClose,
 }: DonationSupportModalProps): JSX.Element {
+    useBodyScrollLock();
     const { themeMode } = useContext(TableriseContext);
     const [skipNextTime, setSkipNextTime] = useState(shouldSkipDonationPrompt());
     const [copied, setCopied] = useState(false);

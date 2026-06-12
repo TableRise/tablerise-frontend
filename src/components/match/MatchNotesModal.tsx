@@ -16,6 +16,7 @@ import {
     updateCampaignNote,
 } from '@/server/users/campaign-notes';
 import '@/components/match/styles/MatchNotesModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type MatchNotesView = 'list' | 'create' | 'read' | 'edit';
 
@@ -101,6 +102,7 @@ export default function MatchNotesModal({
     userId,
     onClose,
 }: MatchNotesModalProps): JSX.Element {
+    useBodyScrollLock();
     const { themeMode } = useContext(TableriseContext);
     const [view, setView] = useState<MatchNotesView>('list');
     const [notes, setNotes] = useState<CampaignNote[]>([]);

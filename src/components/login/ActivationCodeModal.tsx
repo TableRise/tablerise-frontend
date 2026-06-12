@@ -4,6 +4,7 @@ import LoadingDots from '@/components/common/LoadingDots';
 import { postAuthenticateEmail } from '@/server/users/authenticate-email';
 import { handleOtpKeyDown, handleOtpPaste } from '@/utils/otpInputHelpers';
 import './styles/ActivationCodeModal.css';
+import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 interface ActivationCodeModalProps {
     email: string;
@@ -16,6 +17,7 @@ export default function ActivationCodeModal({
     onClose,
     onConfirmed,
 }: ActivationCodeModalProps): JSX.Element {
+    useBodyScrollLock();
     const LENGTH = 6;
     const [digits, setDigits] = useState<string[]>(new Array(LENGTH).fill(''));
     const [error, setError] = useState('');
