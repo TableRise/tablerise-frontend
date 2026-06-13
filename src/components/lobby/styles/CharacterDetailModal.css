@@ -44,6 +44,10 @@
         @apply shrink-0;
     }
 
+    .cdm-edit-actions {
+        @apply flex items-center gap-3 shrink-0;
+    }
+
     /* ── Header ───────────────────────────── */
     .cdm-header {
         @apply flex gap-6 items-start border-color-greyScale/200;

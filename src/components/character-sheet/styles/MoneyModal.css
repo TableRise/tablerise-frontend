@@ -12,7 +12,7 @@
     }
 
     .mmm-header {
-        @apply flex items-center justify-between;
+        @apply flex items-start justify-between gap-4;
     }
 
     .mmm-title {
@@ -20,7 +20,7 @@
     }
 
     .mmm-close {
-        @apply bg-transparent text-color-greyScale/500 transition-colors hover:text-color-primary/default_900;
+        @apply bg-transparent text-color-greyScale/500 leading-none transition-colors hover:text-color-primary/default_900;
     }
 
     .mmm-operation-row {

@@ -12,7 +12,7 @@ import {
 } from '@/server/characters/get-characters';
 import {
     getDnd5eClassById,
-    getDnd5eRaceById,
+    getDnd5eClassByName,
     getDnd5eSpellById,
     type DndClassRecord,
 } from '@/server/dungeons&dragons5e/system';
@@ -155,6 +155,9 @@ const ABILITY_KEY_MAP: Record<string, string> = {
     carisma: 'cha',
 };
 
+const HP_AUTO_RECALC_TOOLTIP =
+    'Edição de PV desabilitada pois o valor de constituição foi alterado para calculo automático.';
+
 function modifier(value: number): string {
     const mod = Math.floor((value - 10) / 2);
     return mod >= 0 ? `+${mod}` : `${mod}`;
@@ -199,6 +202,19 @@ function hasOtherSectionContent(other?: CharacterOtherFields | null): boolean {
             other?.characteristicsAndAbilities ||
             getOtherExtraCharacteristics(other)
     );
+}
+
+async function resolveCharacterClassRecord(
+    storedClassValue?: string | null
+): Promise<DndClassRecord | null> {
+    if (!storedClassValue) return null;
+
+    const namedClassRecord = await getDnd5eClassByName(storedClassValue);
+    if (namedClassRecord) {
+        return namedClassRecord;
+    }
+
+    return getDnd5eClassById(storedClassValue);
 }
 
 const SPELL_LEVELS = [
@@ -250,7 +266,6 @@ export default function CharacterDetailModal({
     const [loading, setLoading] = useState(true);
     const [classRecord, setClassRecord] = useState<DndClassRecord | null>(null);
     const [className, setClassName] = useState('');
-    const [raceName, setRaceName] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const [saving, setSaving] = useState(false);
     const [xpModalOpen, setXpModalOpen] = useState(false);
@@ -377,23 +392,20 @@ export default function CharacterDetailModal({
         setChar(result);
 
         if (result?.data?.profile) {
-            const { class: classId, race: raceId } = result.data.profile;
-            const [loadedClassRecord, raceData, nextSpellNameMap] = await Promise.all([
-                classId ? getDnd5eClassById(classId) : Promise.resolve(null),
-                raceId ? getDnd5eRaceById(raceId) : Promise.resolve(null),
+            const { class: storedClassValue } = result.data.profile;
+            const [loadedClassRecord, nextSpellNameMap] = await Promise.all([
+                resolveCharacterClassRecord(storedClassValue),
                 loadSpellNameMap(result),
             ]);
 
             setClassRecord(loadedClassRecord);
             setClassName(loadedClassRecord?.name ?? '');
-            setRaceName(raceData?.name ?? '');
             setSpellNameMap(nextSpellNameMap);
             return result;
         }
 
         setClassRecord(null);
         setClassName('');
-        setRaceName('');
         setSpellNameMap({});
         return result;
     };
@@ -529,6 +541,12 @@ export default function CharacterDetailModal({
         }
     };
 
+    const handleCancelEdit = () => {
+        setIsEditing(false);
+        setSelectedInventoryItemId(null);
+        clearLevelUpNotifications();
+    };
+
     const handleSell = async (item: {
         equipmentId: string;
         name: string;
@@ -628,7 +646,9 @@ export default function CharacterDetailModal({
         const nextLevel = Number(nextProgression.level ?? currentLevel);
         const levelsGained = Math.max(0, nextLevel - currentLevel);
         const nextProficiencyBonus = 2 + Math.floor((Math.max(1, nextLevel) - 1) / 4);
-        const levelingSpecs = classRecord?.levelingSpecs;
+        const resolvedClassRecord =
+            classRecord ?? (await resolveCharacterClassRecord(profile.class));
+        const levelingSpecs = resolvedClassRecord?.levelingSpecs;
         const nextHitPointTotal = Number(stats.hitPoints.points ?? 0) + hpGain;
         const nextLevelSnapshot =
             levelingSpecs && hasAnySpellProgression(levelingSpecs)
@@ -651,7 +671,7 @@ export default function CharacterDetailModal({
             });
 
         const spellAbilitySource =
-            classRecord?.magicClass ?? stats.spellCasting?.ability ?? '';
+            resolvedClassRecord?.magicClass ?? stats.spellCasting?.ability ?? '';
         const spellAbilityKey = getAbilityKeyFromLabel(spellAbilitySource);
         const spellAbilityScore =
             stats.abilityScores.find((ability) => ability.ability === spellAbilityKey)
@@ -663,10 +683,11 @@ export default function CharacterDetailModal({
         const shouldPersistSpellcasting = Boolean(stats.spellCasting || spellAbilityKey);
         const nextSpellCasting = shouldPersistSpellcasting
             ? {
-                  class: stats.spellCasting?.class ?? classRecord?.name ?? className,
+                  class:
+                      stats.spellCasting?.class ?? resolvedClassRecord?.name ?? className,
                   ability:
                       stats.spellCasting?.ability ??
-                      getLocalizedAbilityLabel(classRecord?.magicClass ?? ''),
+                      getLocalizedAbilityLabel(resolvedClassRecord?.magicClass ?? ''),
                   saveDc: spellAbilityKey
                       ? 8 + nextProficiencyBonus + spellAbilityModifier
                       : 0,
@@ -922,10 +943,17 @@ export default function CharacterDetailModal({
     const canCloseNotifications =
         levelUpNotifications.length > 0 &&
         activeNotificationIndex === levelUpNotifications.length - 1;
+    const originalConstitutionValue =
+        stats?.abilityScores?.find((ability) => ability.ability === 'con')?.value ?? 0;
+    const editedConstitutionValue =
+        editAbilityScores.find((ability) => ability.ability === 'con')?.value ??
+        originalConstitutionValue;
+    const constitutionChangedInEdit =
+        isEditing && editedConstitutionValue !== originalConstitutionValue;
     const inventoryText =
         typeof char?.data?.inventory === 'string' ? char.data.inventory : '';
 
-    const inventoryItems: Array<{
+    const equipmentItems: Array<{
         equipmentId: string;
         name: string;
         type: string;
@@ -936,7 +964,20 @@ export default function CharacterDetailModal({
         weight: string;
         damage?: string;
         properties?: string;
-    }> = Array.isArray(char?.data?.inventory)
+    }> = Array.isArray(char?.data?.equipments)
+        ? (char!.data.equipments as Array<{
+              equipmentId: string;
+              name: string;
+              type: string;
+              price: Array<number | string>;
+              armorClass?: Array<number | string>;
+              strength?: string;
+              stealth?: string;
+              weight: string;
+              damage?: string;
+              properties?: string;
+          }>)
+        : Array.isArray(char?.data?.inventory)
         ? (char!.data.inventory as Array<{
               equipmentId: string;
               name: string;
@@ -1017,40 +1058,54 @@ export default function CharacterDetailModal({
                                             {profile.name}
                                         </h2>
                                         {canEdit && (
-                                            <button
-                                                type="button"
-                                                className={`button-L-fill font-XS-bold cdm-edit-btn text-color-primary/default_900${
-                                                    hideInventoryTab
-                                                        ? ' profile-action-modal-button-danger'
-                                                        : ''
-                                                }`}
-                                                onClick={() =>
-                                                    hideInventoryTab && !isEditing
-                                                        ? setDeleteConfirmOpen(true)
-                                                        : isEditing
-                                                        ? handleSave()
-                                                        : void handleStartEdit()
-                                                }
-                                                disabled={
-                                                    saving ||
-                                                    deleteSubmitting ||
-                                                    (!isEditing &&
-                                                        !hideInventoryTab &&
-                                                        activeTab === 'equipamentos')
-                                                }
-                                            >
-                                                {isEditing ? (
-                                                    saving ? (
-                                                        <LoadingDots label="Salvando ficha" />
+                                            <div className="cdm-edit-actions">
+                                                <button
+                                                    type="button"
+                                                    className={`button-L-fill font-XS-bold cdm-edit-btn text-color-primary/default_900${
+                                                        hideInventoryTab
+                                                            ? ' profile-action-modal-button-danger'
+                                                            : ''
+                                                    }`}
+                                                    onClick={() =>
+                                                        hideInventoryTab && !isEditing
+                                                            ? setDeleteConfirmOpen(true)
+                                                            : isEditing
+                                                            ? handleSave()
+                                                            : void handleStartEdit()
+                                                    }
+                                                    disabled={
+                                                        saving ||
+                                                        deleteSubmitting ||
+                                                        (!isEditing &&
+                                                            !hideInventoryTab &&
+                                                            activeTab === 'equipamentos')
+                                                    }
+                                                >
+                                                    {isEditing ? (
+                                                        saving ? (
+                                                            <LoadingDots label="Salvando ficha" />
+                                                        ) : (
+                                                            'Salvar Ficha'
+                                                        )
+                                                    ) : hideInventoryTab ? (
+                                                        'Deletar Personagem'
                                                     ) : (
-                                                        'Salvar Ficha'
-                                                    )
-                                                ) : hideInventoryTab ? (
-                                                    'Deletar Personagem'
-                                                ) : (
-                                                    'Atualizar Ficha'
-                                                )}
-                                            </button>
+                                                        'Atualizar Ficha'
+                                                    )}
+                                                </button>
+                                                {isEditing && !hideInventoryTab ? (
+                                                    <button
+                                                        type="button"
+                                                        className="font-XS-bold form-button-cancel button-L-fill cdm-edit-btn"
+                                                        onClick={handleCancelEdit}
+                                                        disabled={
+                                                            saving || deleteSubmitting
+                                                        }
+                                                    >
+                                                        Cancelar Edição
+                                                    </button>
+                                                ) : null}
+                                            </div>
                                         )}
                                     </div>
                                     <div className="cdm-badges">
@@ -1061,7 +1116,7 @@ export default function CharacterDetailModal({
                                             {className || profile.class}
                                         </span>
                                         <span className="cdm-badge font-XXS-bold">
-                                            {raceName || profile.race}
+                                            {profile.race}
                                         </span>
                                     </div>
                                     {!xpSystem && isEditing && isMaster && (
@@ -1471,19 +1526,37 @@ export default function CharacterDetailModal({
                                                     PV Max
                                                 </span>
                                                 {isEditing ? (
-                                                    <input
-                                                        type="number"
-                                                        className="cdm-edit-number font-M-semibold"
-                                                        value={editCombat.hitPointsMax}
-                                                        onChange={(e) =>
-                                                            setEditCombat((p) => ({
-                                                                ...p,
-                                                                hitPointsMax: Number(
-                                                                    e.target.value
-                                                                ),
-                                                            }))
+                                                    <span
+                                                        title={
+                                                            constitutionChangedInEdit
+                                                                ? HP_AUTO_RECALC_TOOLTIP
+                                                                : ''
                                                         }
-                                                    />
+                                                        className="block"
+                                                    >
+                                                        <input
+                                                            type="number"
+                                                            className={`cdm-edit-number font-M-semibold${
+                                                                constitutionChangedInEdit
+                                                                    ? ' cursor-not-allowed opacity-70'
+                                                                    : ''
+                                                            }`}
+                                                            value={
+                                                                editCombat.hitPointsMax
+                                                            }
+                                                            onChange={(e) =>
+                                                                setEditCombat((p) => ({
+                                                                    ...p,
+                                                                    hitPointsMax: Number(
+                                                                        e.target.value
+                                                                    ),
+                                                                }))
+                                                            }
+                                                            disabled={
+                                                                constitutionChangedInEdit
+                                                            }
+                                                        />
+                                                    </span>
                                                 ) : (
                                                     <span className="font-M-semibold">
                                                         {stats.hitPoints.points}
@@ -1495,21 +1568,38 @@ export default function CharacterDetailModal({
                                                     PV Atual
                                                 </span>
                                                 {isEditing ? (
-                                                    <input
-                                                        type="number"
-                                                        className="cdm-edit-number font-M-semibold"
-                                                        value={
-                                                            editCombat.hitPointsCurrent
+                                                    <span
+                                                        title={
+                                                            constitutionChangedInEdit
+                                                                ? HP_AUTO_RECALC_TOOLTIP
+                                                                : ''
                                                         }
-                                                        onChange={(e) =>
-                                                            setEditCombat((p) => ({
-                                                                ...p,
-                                                                hitPointsCurrent: Number(
-                                                                    e.target.value
-                                                                ),
-                                                            }))
-                                                        }
-                                                    />
+                                                        className="block"
+                                                    >
+                                                        <input
+                                                            type="number"
+                                                            className={`cdm-edit-number font-M-semibold${
+                                                                constitutionChangedInEdit
+                                                                    ? ' cursor-not-allowed opacity-70'
+                                                                    : ''
+                                                            }`}
+                                                            value={
+                                                                editCombat.hitPointsCurrent
+                                                            }
+                                                            onChange={(e) =>
+                                                                setEditCombat((p) => ({
+                                                                    ...p,
+                                                                    hitPointsCurrent:
+                                                                        Number(
+                                                                            e.target.value
+                                                                        ),
+                                                                }))
+                                                            }
+                                                            disabled={
+                                                                constitutionChangedInEdit
+                                                            }
+                                                        />
+                                                    </span>
                                                 ) : (
                                                     <span className="font-M-semibold">
                                                         {stats.hitPoints.currentPoints}
@@ -1999,7 +2089,7 @@ export default function CharacterDetailModal({
                                                 </p>
                                             )}
                                         </div>
-                                        {inventoryItems.length > 0 && (
+                                        {equipmentItems.length > 0 && (
                                             <div className="cdm-inventory-wrapper">
                                                 <span className="font-XS-bold cdm-label">
                                                     Equipamentos
@@ -2018,7 +2108,7 @@ export default function CharacterDetailModal({
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            {inventoryItems.map(
+                                                            {equipmentItems.map(
                                                                 (item) => {
                                                                     const isSelected =
                                                                         selectedInventoryItemId ===
@@ -2099,7 +2189,7 @@ export default function CharacterDetailModal({
                                                 </div>
                                             </div>
                                         )}
-                                        {inventoryItems.length === 0 && (
+                                        {equipmentItems.length === 0 && (
                                             <div className="cdm-text-block">
                                                 <p className="font-XS-regular cdm-text-content">
                                                     Nenhum equipamento comprado.
@@ -2344,6 +2434,7 @@ export default function CharacterDetailModal({
                                                 initialSlotsExpended={initSlotsExp}
                                                 levelingSpecs={classRecord?.levelingSpecs}
                                                 currentLevel={profile.level}
+                                                disableLockedSpellInputs={false}
                                             />
                                         </div>
                                     );

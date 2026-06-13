@@ -68,6 +68,31 @@ export const getDnd5eClasses = async (): Promise<DndClassRecord[]> => {
     }
 };
 
+export const getDnd5eClassByName = async (
+    className: string
+): Promise<DndClassRecord | null> => {
+    try {
+        const { data }: AxiosResponse = await apiCall({
+            baseUrl: dndBaseUrl,
+            endpoint: 'classes',
+            method: 'GET',
+            params: { name: className },
+        });
+
+        if (Array.isArray(data)) {
+            return data.length > 0
+                ? normalizeLocalizedEntity<DndClassRecord>(data[0])
+                : null;
+        }
+
+        return data ? normalizeLocalizedEntity<DndClassRecord>(data) : null;
+    } catch (error: AxiosError | any) {
+        const status = error?.response?.status;
+        if (status === 500) throw new Error('Erro no servidor');
+        return null;
+    }
+};
+
 export const getDnd5eRaces = async (): Promise<DndRaceRecord[]> => {
     try {
         const { data }: AxiosResponse = await apiCall({
