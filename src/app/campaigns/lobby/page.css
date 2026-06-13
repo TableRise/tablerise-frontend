@@ -148,7 +148,7 @@
     }
 
     .lobby-characters-slider {
-        @apply flex gap-4 overflow-x-auto pb-2;
+        @apply flex min-h-[10.5rem] items-center gap-4 overflow-x-auto pb-2;
     }
 
     .lobby-character {
