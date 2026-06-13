@@ -1448,6 +1448,89 @@ export default function CharacterDetailModal({
                                         </div>
                                     </div>
 
+                                    <div className="cdm-section">
+                                        <h3 className="font-M-semibold cdm-section-title">
+                                            Testes de Resistência
+                                        </h3>
+                                        <div className="cdm-info-grid">
+                                            {(isEditing
+                                                ? editAbilityScores
+                                                : stats.abilityScores.filter(
+                                                      (ab) => !!ab.proficiency
+                                                  )
+                                            ).map((ab, idx) => {
+                                                const isProf = isEditing
+                                                    ? !!editAbilityScores[idx]
+                                                          ?.proficiency
+                                                    : !!ab.proficiency;
+                                                const currentValue = isEditing
+                                                    ? editAbilityScores[idx]?.value ?? 0
+                                                    : ab.value ?? 0;
+                                                const rawMod = Math.floor(
+                                                    (currentValue - 10) / 2
+                                                );
+                                                const bonus = isProf
+                                                    ? rawMod +
+                                                      (stats.proficiencyBonus ?? 2)
+                                                    : rawMod;
+
+                                                return (
+                                                    <div
+                                                        key={ab.ability}
+                                                        className="cdm-info-box"
+                                                        style={{
+                                                            flexDirection: 'row',
+                                                            alignItems: 'center',
+                                                            gap: '0.5rem',
+                                                        }}
+                                                    >
+                                                        {isEditing && (
+                                                            <input
+                                                                type="checkbox"
+                                                                className="cs-save-check"
+                                                                checked={isProf}
+                                                                onChange={(e) =>
+                                                                    setEditAbilityScores(
+                                                                        (prev) =>
+                                                                            prev.map(
+                                                                                (
+                                                                                    ability,
+                                                                                    abilityIdx
+                                                                                ) =>
+                                                                                    abilityIdx ===
+                                                                                    idx
+                                                                                        ? {
+                                                                                              ...ability,
+                                                                                              proficiency:
+                                                                                                  e
+                                                                                                      .target
+                                                                                                      .checked,
+                                                                                          }
+                                                                                        : ability
+                                                                            )
+                                                                    )
+                                                                }
+                                                                style={{
+                                                                    cursor: 'pointer',
+                                                                }}
+                                                            />
+                                                        )}
+                                                        <div style={{ flex: 1 }}>
+                                                            <span className="font-XXS-regular cdm-info-label mr-2">
+                                                                {ABILITY_FULL[
+                                                                    ab.ability
+                                                                ] ?? ab.ability}
+                                                            </span>
+                                                            <span className="font-S-bold">
+                                                                {signed(bonus)}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
                                     {/* Combate */}
                                     <div className="cdm-section">
                                         <h3 className="font-M-semibold cdm-section-title">
