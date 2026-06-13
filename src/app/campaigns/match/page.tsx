@@ -25,11 +25,7 @@ import {
     type CampaignCharacter,
     type FullCharacterDnd,
 } from '@/server/characters/get-characters';
-import {
-    getDnd5eClassById,
-    getDnd5eRaceById,
-    getDnd5eSpellById,
-} from '@/server/dungeons&dragons5e/system';
+import { getDnd5eClassById, getDnd5eSpellById } from '@/server/dungeons&dragons5e/system';
 import CharacterSheetModal from '@/components/lobby/CharacterSheetModal';
 import CharacterDetailModal from '@/components/lobby/CharacterDetailModal';
 import JournalPostModal from '@/components/lobby/JournalPostModal';
@@ -461,7 +457,6 @@ export default function MatchPage(): JSX.Element {
     );
     const [characterLoading, setCharacterLoading] = useState(false);
     const [className, setClassName] = useState('');
-    const [raceName, setRaceName] = useState('');
     const [spellNameMap, setSpellNameMap] = useState<Record<string, string>>({});
     const [spellUsed, setSpellUsed] = useState<Record<string, boolean>>({});
     const [spellSlotsUsed, setSpellSlotsUsed] = useState<Record<number, number>>({});
@@ -1850,7 +1845,6 @@ export default function MatchPage(): JSX.Element {
         if (!selectedCharacterId) {
             setSelectedCharacter(null);
             setClassName('');
-            setRaceName('');
             return;
         }
 
@@ -1862,22 +1856,18 @@ export default function MatchPage(): JSX.Element {
 
     useEffect(() => {
         const classId = selectedCharacter?.data?.profile?.class;
-        const raceId = selectedCharacter?.data?.profile?.race;
 
-        if (!classId && !raceId) {
+        if (!classId) {
             setClassName('');
-            setRaceName('');
             return;
         }
 
-        Promise.all([
-            classId ? getDnd5eClassById(classId) : Promise.resolve(null),
-            raceId ? getDnd5eRaceById(raceId) : Promise.resolve(null),
-        ]).then(([classData, raceData]) => {
-            setClassName(classData?.name ?? '');
-            setRaceName(raceData?.name ?? '');
-        });
-    }, [selectedCharacter?.data?.profile?.class, selectedCharacter?.data?.profile?.race]);
+        Promise.all([classId ? getDnd5eClassById(classId) : Promise.resolve(null)]).then(
+            ([classData]) => {
+                setClassName(classData?.name ?? '');
+            }
+        );
+    }, [selectedCharacter?.data?.profile?.class]);
 
     const spellData = (selectedCharacter?.data?.spells as any) ?? null;
     const selectedCharacterSpellIds = getUniqueSpellIds(spellData);
@@ -2682,7 +2672,7 @@ export default function MatchPage(): JSX.Element {
                                             <p className="font-XS-bold">{profile.name}</p>
                                             <p className="font-XXS-regular">
                                                 {className || profile.class} •{' '}
-                                                {raceName || profile.race}
+                                                {profile.race}
                                             </p>
                                         </div>
                                     </div>

@@ -20,6 +20,7 @@ import {
     type CharacterSheetTab,
     type SpellDataState,
 } from '@/app/campaigns/character-sheet/characterSheetHelpers';
+import { hasAnySpellProgression } from '@/utils/characterLeveling';
 import '@/app/campaigns/character-sheet/page.css';
 import Footer from '@/components/common/Footer';
 import { useStoredUser } from '@/hooks/useStoredUser';
@@ -109,8 +110,7 @@ export default function CharacterSheetPage(): JSX.Element {
 
     const magiasDisabled =
         spellData.levelingSpecs !== undefined &&
-        !spellData.levelingSpecs.cantripsKnown.isValidToThisClass &&
-        !spellData.levelingSpecs.spellsKnown.isValidToThisClass;
+        !hasAnySpellProgression(spellData.levelingSpecs);
 
     return (
         <main>

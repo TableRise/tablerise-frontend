@@ -54,6 +54,7 @@ interface SheetMagiasProps {
     initialSpellNames?: Record<number, { name: string; spellId: string }[]>;
     initialSlotTotals?: Record<number, number>;
     initialSlotsExpended?: Record<number, number>;
+    disableLockedSpellInputs?: boolean;
 }
 
 export interface SheetMagiasHandle {
@@ -76,12 +77,19 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
         initialSpellNames,
         initialSlotTotals,
         initialSlotsExpended: initialSlotsExpendedProp,
+        disableLockedSpellInputs = true,
     },
     ref
 ) {
     const { themeMode } = useContext(TableriseContext);
     const progressionSnapshot = levelingSpecs
         ? getLevelingSnapshot(levelingSpecs, currentLevel ?? 1)
+        : null;
+    const knownCantripsLimit = levelingSpecs?.cantripsKnown?.isValidToThisClass
+        ? progressionSnapshot?.cantripsKnown ?? 0
+        : null;
+    const spellsKnownLimit = levelingSpecs?.spellsKnown?.isValidToThisClass
+        ? progressionSnapshot?.spellsKnown ?? 0
         : null;
 
     const getActiveSlots = (spellLevel: number): number => {
@@ -180,10 +188,9 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
             return { spellNames, slotsExpended: coercedExpended, slotTotals };
         },
     }));
-
-    const spellsKnownLimit = levelingSpecs?.spellsKnown?.isValidToThisClass
-        ? progressionSnapshot?.spellsKnown ?? Infinity
-        : Infinity;
+    const totalFilledCantrips = spellNames[0]
+        .slice(0, getActiveSlots(0))
+        .filter((entry) => entry.name !== '').length;
 
     const totalFilledNonCantrip = [1, 2, 3, 4, 5, 6, 7, 8, 9].reduce((sum, level) => {
         const active = getActiveSlots(level);
@@ -241,6 +248,20 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                     <span className="cs-field-label">Bônus de Ataque com Magia</span>
                 </div>
             </div>
+            {(knownCantripsLimit !== null || spellsKnownLimit !== null) && (
+                <div className="mb-4 flex flex-col gap-1 text-sm text-color-greyScale/800 dark:text-color-greyScale/100">
+                    {spellsKnownLimit !== null && (
+                        <span>
+                            Magias conhecidas: {totalFilledNonCantrip}/{spellsKnownLimit}
+                        </span>
+                    )}
+                    {knownCantripsLimit !== null && (
+                        <span>
+                            Truques conhecidos: {totalFilledCantrips}/{knownCantripsLimit}
+                        </span>
+                    )}
+                </div>
+            )}
 
             {/* Spell levels grid */}
             <div className="cs-spell-grid">
@@ -254,10 +275,14 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                         .slice(0, activeSlots)
                                         .filter((e) => e.name !== '').length;
                                     const isGlobalCap =
-                                        sl.level > 0 &&
-                                        !!levelingSpecs?.spellsKnown?.isValidToThisClass;
+                                        sl.level > 0 && spellsKnownLimit !== null;
+                                    const isCantripCap =
+                                        sl.level === 0 && knownCantripsLimit !== null;
                                     const bookDisabled =
                                         activeSlots === 0 ||
+                                        (isCantripCap
+                                            ? totalFilledCantrips >= knownCantripsLimit
+                                            : false) ||
                                         (isGlobalCap
                                             ? totalFilledNonCantrip >= spellsKnownLimit
                                             : filledSlots >= activeSlots);
@@ -296,7 +321,8 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                         <div className="cs-spell-list">
                             {Array.from({ length: SPELLS_PER_LEVEL }).map((_, idx) => {
                                 const activeSlots = getActiveSlots(sl.level);
-                                const inactive = idx >= activeSlots;
+                                const inactive =
+                                    disableLockedSpellInputs && idx >= activeSlots;
                                 return (
                                     <div key={idx} className="cs-spell-row">
                                         <input
@@ -310,7 +336,8 @@ const SheetMagias = forwardRef<SheetMagiasHandle, SheetMagiasProps>(function She
                                             value={spellNames[sl.level][idx].name}
                                             readOnly
                                             onClick={() => {
-                                                if (inactive) return;
+                                                if (disableLockedSpellInputs && inactive)
+                                                    return;
                                                 const entry = spellNames[sl.level][idx];
                                                 if (entry.spellId)
                                                     handleOpenDetail(entry.spellId);

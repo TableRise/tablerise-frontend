@@ -74,6 +74,7 @@ export default function CharacterSheetPanels({
                     spellCd={spellData.spellCd}
                     spellAttackBonus={spellData.spellAttackBonus}
                     levelingSpecs={spellData.levelingSpecs}
+                    disableLockedSpellInputs={false}
                 />
             </div>
             <div className={activeTab === 'Habilidades' ? '' : 'hidden'}>
