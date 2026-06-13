@@ -401,12 +401,20 @@ export default function CharacterDetailModal({
             setClassRecord(loadedClassRecord);
             setClassName(loadedClassRecord?.name ?? '');
             setSpellNameMap(nextSpellNameMap);
+
+            if (currentUserId && currentUserId === result.author?.userId) {
+                await loadPendingLevelUpNotifications(result, loadedClassRecord);
+            } else {
+                clearLevelUpNotifications();
+            }
+
             return result;
         }
 
         setClassRecord(null);
         setClassName('');
         setSpellNameMap({});
+        clearLevelUpNotifications();
         return result;
     };
 
@@ -456,8 +464,17 @@ export default function CharacterDetailModal({
             return;
         }
 
-        const levelingSpecs = targetClassRecord?.levelingSpecs;
+        const resolvedClassRecord =
+            targetClassRecord ?? (await resolveCharacterClassRecord(targetProfile.class));
+
+        if (resolvedClassRecord && !targetClassRecord) {
+            setClassRecord(resolvedClassRecord);
+            setClassName(resolvedClassRecord.name ?? '');
+        }
+
+        const levelingSpecs = resolvedClassRecord?.levelingSpecs;
         if (!levelingSpecs) {
+            clearLevelUpNotifications();
             return;
         }
 
@@ -534,17 +551,11 @@ export default function CharacterDetailModal({
         setEditSkillProfs(skillProfsInit);
         setSelectedInventoryItemId(null);
         setIsEditing(true);
-        if (isAuthor) {
-            await loadPendingLevelUpNotifications(char, classRecord);
-        } else {
-            clearLevelUpNotifications();
-        }
     };
 
     const handleCancelEdit = () => {
         setIsEditing(false);
         setSelectedInventoryItemId(null);
-        clearLevelUpNotifications();
     };
 
     const handleSell = async (item: {
@@ -916,7 +927,7 @@ export default function CharacterDetailModal({
         loadCharacterModalData().finally(() => setLoading(false));
         // We intentionally reload this modal only when the selected character changes.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [characterId]);
+    }, [characterId, currentUserId]);
 
     const profile = char?.data?.profile;
     const stats = char?.data?.stats;
@@ -933,11 +944,7 @@ export default function CharacterDetailModal({
         char?.picture?.link ??
         '/images/SideImageBackground.svg';
 
-    const loggedUserId =
-        typeof window !== 'undefined'
-            ? JSON.parse(localStorage.getItem('userLogged') ?? 'null')?.userId
-            : null;
-    const isAuthor = !!loggedUserId && loggedUserId === char?.author?.userId;
+    const isAuthor = !!currentUserId && currentUserId === char?.author?.userId;
     const canEdit = hideInventoryTab ? isAuthor : isAuthor || isMaster;
     const activeNotification = levelUpNotifications[activeNotificationIndex] ?? null;
     const canCloseNotifications =
@@ -1164,7 +1171,7 @@ export default function CharacterDetailModal({
                                 </div>
                             </div>
                             {/* Tabs */}
-                            {isEditing && activeNotification && (
+                            {activeNotification && (
                                 <div className="cdm-levelup-banner">
                                     <div className="cdm-levelup-copy">
                                         <span className="font-XXS-bold cdm-levelup-kicker">
@@ -1235,7 +1242,7 @@ export default function CharacterDetailModal({
                                                 !canCloseNotifications
                                             }
                                         >
-                                            í—
+                                            x
                                         </button>
                                     </div>
                                 </div>

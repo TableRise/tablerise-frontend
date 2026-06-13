@@ -58,7 +58,7 @@ const SKILLS = [
     { key: 'arcana', label: 'Arcanismo', ability: 'Int' },
     { key: 'athletics', label: 'Atletismo', ability: 'For' },
     { key: 'performance', label: 'Atuação', ability: 'Car' },
-    { key: 'deception', label: 'Blefar', ability: 'Car' },
+    { key: 'deception', label: 'Enganação', ability: 'Car' },
     { key: 'stealth', label: 'Furtividade', ability: 'Des' },
     { key: 'history', label: 'História', ability: 'Int' },
     { key: 'intimidation', label: 'Intimidação', ability: 'Car' },
