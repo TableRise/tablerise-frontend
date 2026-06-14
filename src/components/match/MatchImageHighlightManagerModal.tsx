@@ -221,7 +221,6 @@ export default function MatchImageHighlightManagerModal({
                     file={pendingCropFile}
                     intent="match-highlight-image"
                     onConfirm={uploadFile}
-                    onUseOriginal={uploadFile}
                     onClose={() => {
                         setPendingCropFile(null);
                         if (inputRef.current) {

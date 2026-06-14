@@ -1202,7 +1202,6 @@ export default function ProfilePageContent({
                         file={pendingImageCrop.file}
                         intent={pendingImageCrop.intent}
                         onConfirm={handleProfilePictureUpload}
-                        onUseOriginal={handleProfilePictureUpload}
                         onClose={() => setPendingImageCrop(null)}
                     />
                 ) : null}
