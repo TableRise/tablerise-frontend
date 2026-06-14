@@ -156,15 +156,10 @@ function trimTrailingSlash(value: string): string {
 }
 
 function getCampaignSocketUrl(): string {
-    const configuredCampaignsUrl = process.env.NEXT_PUBLIC_API_CAMPAIGNS?.trim();
-    const configuredBaseUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+    const configuredCampaignsUrl = process.env.API_CAMPAIGNS?.trim();
 
     if (configuredCampaignsUrl) {
         return trimTrailingSlash(configuredCampaignsUrl);
-    }
-
-    if (configuredBaseUrl) {
-        return `${trimTrailingSlash(configuredBaseUrl)}/campaigns`;
     }
 
     if (typeof window !== 'undefined') {
