@@ -16,11 +16,6 @@ jobs:
       API_DD5E: http://127.0.0.1:3000/dnd5e
       API_GOOGLE_YOUTUBE: http://127.0.0.1:3000/youtube
       API_GOOGLE_KEY: test-key
-      TYPE_KEY: x-api-key
-      API_ACCESS_KEY: test-access-key
-      NEXT_PUBLIC_API_CAMPAIGNS: http://127.0.0.1:3000/campaigns
-      NEXT_PUBLIC_TYPE_KEY: x-api-key
-      NEXT_PUBLIC_API_ACCESS_KEY: test-access-key
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - name: Checkout
