@@ -2090,10 +2090,10 @@ export default function MatchPage(): JSX.Element {
             if (interaction?.didMove) {
                 suppressTokenClickIdRef.current = interaction.tokenId;
             }
-            activeTokenInteractionRef.current = null;
             setActiveTokenInteractionMeta(null);
 
             if (!interaction?.didMove) {
+                activeTokenInteractionRef.current = null;
                 return;
             }
 
@@ -2109,6 +2109,8 @@ export default function MatchPage(): JSX.Element {
                     },
                 }));
             }
+
+            activeTokenInteractionRef.current = null;
         };
 
         window.addEventListener('pointermove', handlePointerMove);
