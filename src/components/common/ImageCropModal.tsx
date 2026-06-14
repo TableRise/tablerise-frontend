@@ -19,7 +19,6 @@ interface ImageCropModalProps {
     file: File;
     intent: ImageUploadIntent;
     onConfirm: (file: File) => Promise<void> | void;
-    onUseOriginal: (file: File) => Promise<void> | void;
     onClose: () => void;
 }
 
@@ -29,7 +28,6 @@ export default function ImageCropModal({
     file,
     intent,
     onConfirm,
-    onUseOriginal,
     onClose,
 }: ImageCropModalProps): JSX.Element {
     useBodyScrollLock();
@@ -110,24 +108,13 @@ export default function ImageCropModal({
             const croppedFile = await createCroppedImageFile(
                 image,
                 croppedAreaPixels,
-                file
+                file,
+                config.outputWidth,
+                config.outputHeight
             );
             await onConfirm(croppedFile);
         } catch (err: Error | any) {
             setError(err?.message ?? 'Nao foi possivel recortar a imagem.');
-        } finally {
-            setSubmitting(false);
-        }
-    }
-
-    async function handleUseOriginal() {
-        setSubmitting(true);
-        setError('');
-
-        try {
-            await onUseOriginal(file);
-        } catch (err: Error | any) {
-            setError(err?.message ?? 'Nao foi possivel usar a imagem original.');
         } finally {
             setSubmitting(false);
         }
@@ -237,14 +224,6 @@ export default function ImageCropModal({
                         disabled={submitting}
                     >
                         Cancelar
-                    </button>
-                    <button
-                        type="button"
-                        className="font-S-bold icm-btn-secondary"
-                        onClick={handleUseOriginal}
-                        disabled={submitting}
-                    >
-                        Usar original
                     </button>
                     <button
                         type="button"

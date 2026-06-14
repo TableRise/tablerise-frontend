@@ -2854,7 +2854,6 @@ export default function CharacterDetailModal({
                     file={pendingImageCrop.file}
                     intent={pendingImageCrop.intent}
                     onConfirm={handleCharacterPictureUpload}
-                    onUseOriginal={handleCharacterPictureUpload}
                     onClose={() => setPendingImageCrop(null)}
                 />
             ) : null}

@@ -22,7 +22,15 @@ import UserGalleryPickerModal from '@/components/common/UserGalleryPickerModal';
 import { normalizeStoredUserId, useStoredUser } from '@/hooks/useStoredUser';
 import { useUserGallery } from '@/hooks/useUserGallery';
 import '@/components/lobby/styles/EditCampaignModal.css';
-import type { ImageUploadIntent } from '@/utils/imageCrop';
+import {
+    CAMPAIGN_MAP_MIN_HEIGHT,
+    CAMPAIGN_MAP_MIN_WIDTH,
+    createFileFromImageUrl,
+    getImageDimensionsFromFile,
+    getImageDimensionsFromUrl,
+    resolveCampaignMapUploadAction,
+    type ImageUploadIntent,
+} from '@/utils/imageCrop';
 import type { ImageObject } from '@/types/shared/general';
 import { isGalleryImageObject, type UploadImageValue } from '@/utils/imageUploadPayload';
 import useBodyScrollLock from '@/hooks/useBodyScrollLock';
@@ -168,12 +176,32 @@ export default function EditCampaignModal({
         });
     }
 
-    function handleMapImageSelected(file: File) {
-        setPendingImageCrop({
-            file,
-            intent: 'campaign-map',
-            target: 'map',
-        });
+    async function handleMapImageSelected(file: File) {
+        setError('');
+        try {
+            const { width, height } = await getImageDimensionsFromFile(file);
+            const nextAction = resolveCampaignMapUploadAction(width, height);
+
+            if (nextAction === 'reject') {
+                setError(
+                    `Mapas devem ter no minimo ${CAMPAIGN_MAP_MIN_WIDTH}x${CAMPAIGN_MAP_MIN_HEIGHT}.`
+                );
+                return;
+            }
+
+            if (nextAction === 'use-original') {
+                setNewMapFiles((prev) => [...prev, file]);
+                return;
+            }
+
+            setPendingImageCrop({
+                file,
+                intent: 'campaign-map',
+                target: 'map',
+            });
+        } catch (err: any) {
+            setError(err?.message ?? 'Nao foi possivel validar o mapa selecionado.');
+        }
     }
 
     async function handleCroppedImageResolved(file: File) {
@@ -189,12 +217,48 @@ export default function EditCampaignModal({
         setPendingImageCrop(null);
     }
 
-    function handleGalleryImageSelected(image: ImageObject) {
-        if (galleryPickerTarget === 'cover') {
-            setCoverFile(image);
-            setCoverRemoved(false);
-        } else if (galleryPickerTarget === 'map') {
-            setNewMapFiles((prev) => [...prev, image]);
+    async function handleGalleryImageSelected(image: ImageObject) {
+        try {
+            if (galleryPickerTarget === 'cover') {
+                setCoverFile(image);
+                setCoverRemoved(false);
+            } else if (galleryPickerTarget === 'map') {
+                setError('');
+
+                const dimensions =
+                    typeof image.width === 'number' && typeof image.height === 'number'
+                        ? { width: image.width, height: image.height }
+                        : await getImageDimensionsFromUrl(image.link);
+                const nextAction = resolveCampaignMapUploadAction(
+                    dimensions.width,
+                    dimensions.height
+                );
+
+                if (nextAction === 'reject') {
+                    setError(
+                        `Mapas devem ter no minimo ${CAMPAIGN_MAP_MIN_WIDTH}x${CAMPAIGN_MAP_MIN_HEIGHT}.`
+                    );
+                    setGalleryPickerTarget(null);
+                    return;
+                }
+
+                if (nextAction === 'use-original') {
+                    setNewMapFiles((prev) => [...prev, image]);
+                } else {
+                    const croppedSourceFile = await createFileFromImageUrl(
+                        image.link,
+                        image.title || 'campaign-map.png'
+                    );
+
+                    setPendingImageCrop({
+                        file: croppedSourceFile,
+                        intent: 'campaign-map',
+                        target: 'map',
+                    });
+                }
+            }
+        } catch (err: any) {
+            setError(err?.message ?? 'Nao foi possivel validar o mapa selecionado.');
         }
 
         setGalleryPickerTarget(null);
@@ -933,7 +997,6 @@ export default function EditCampaignModal({
                     file={pendingImageCrop.file}
                     intent={pendingImageCrop.intent}
                     onConfirm={handleCroppedImageResolved}
-                    onUseOriginal={handleCroppedImageResolved}
                     onClose={() => setPendingImageCrop(null)}
                 />
             ) : null}
