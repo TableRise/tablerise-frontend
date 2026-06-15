@@ -97,7 +97,7 @@
     }
 
     .lobby-session-modal-overlay {
-        @apply fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 px-4 py-4;
+        @apply fixed inset-0 z-[220] flex items-center justify-center overflow-y-auto bg-black/50 px-4 py-4;
     }
 
     .lobby-session-modal {
