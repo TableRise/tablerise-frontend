@@ -26,12 +26,20 @@ export default function TableriseProvider({
         master: [],
         player: [],
     } as UserCampaignsContract);
+    const [userCampaignsLoading, setUserCampaignsLoading] = useState(userLogged === 1);
     const [userLoggedToggle] = useState(userLogged);
 
     const recoverUserCampaigns = useCallback(async () => {
         const userInfos = JSON.parse(localStorage.getItem('userLogged') as string);
 
-        if (userInfos) {
+        if (!userInfos) {
+            setUserCampaignsLoading(false);
+            return;
+        }
+
+        setUserCampaignsLoading(true);
+
+        try {
             const userCampaigns = await getCampaignsByUserId(userInfos.userId);
 
             if (!userCampaigns) return;
@@ -96,6 +104,8 @@ export default function TableriseProvider({
             });
 
             setUserCampaigns(userCampaignsHomeData);
+        } finally {
+            setUserCampaignsLoading(false);
         }
     }, [setUserCampaigns]);
 
@@ -160,6 +170,7 @@ export default function TableriseProvider({
             themeMode,
             userLoggedToggle,
             userCampaigns,
+            userCampaignsLoading,
             setLoading,
             setNewPassVisible,
             toggleThemeMode,
@@ -172,6 +183,7 @@ export default function TableriseProvider({
             themeMode,
             userLoggedToggle,
             userCampaigns,
+            userCampaignsLoading,
             recoverUserCampaigns,
             toggleThemeMode,
         ]
