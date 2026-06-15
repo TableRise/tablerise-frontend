@@ -485,6 +485,7 @@ export default function MatchPage(): JSX.Element {
     const [activeMapPan, setActiveMapPan] = useState(false);
     const [isMobileTopBarOpen, setIsMobileTopBarOpen] = useState(true);
     const [isMobileBottomBarOpen, setIsMobileBottomBarOpen] = useState(true);
+    const mapZoomScale = mapZoomPercent / 100;
     const [charPanelOpen, setCharPanelOpen] = useState(false);
     const [charPanelTab, setCharPanelTab] = useState<'resumo' | 'magias' | 'habilidades'>(
         'resumo'
@@ -680,7 +681,6 @@ export default function MatchPage(): JSX.Element {
         { label: 'D6', icon: D6SVG, sides: 6 },
         { label: 'D4', icon: D4SVG, sides: 4 },
     ];
-    const mapZoomScale = mapZoomPercent / 100;
 
     const getImageIdentity = (image: ImageObject | null | undefined): string | null =>
         image?.id || image?.link || null;
