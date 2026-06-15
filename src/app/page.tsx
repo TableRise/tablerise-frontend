@@ -17,7 +17,8 @@ import JoinCampaignModal from '@/components/home/JoinCampaignModal';
 import { shouldSkipDonationPrompt } from '@/components/home/helpers/donationPromptPreference';
 
 export default function Home(): JSX.Element {
-    const { userLoggedToggle, userCampaigns } = useContext(TableriseContext);
+    const { userLoggedToggle, userCampaigns, userCampaignsLoading } =
+        useContext(TableriseContext);
     const [joinModalOpen, setJoinModalOpen] = useState(false);
     const [joinDonationModalOpen, setJoinDonationModalOpen] = useState(false);
 
@@ -56,7 +57,10 @@ export default function Home(): JSX.Element {
             <section className="main-logged-page">
                 <LoggedHeader />
                 <h2 className="font-XL-bold">Campanhas</h2>
-                <UserMasterCampaigns campaigns={userCampaigns.master} />
+                <UserMasterCampaigns
+                    campaigns={userCampaigns.master}
+                    isCampaignsLoading={userCampaignsLoading}
+                />
                 <UserPlayerCampaigns
                     campaigns={userCampaigns.player}
                     onJoinClick={handleJoinIntent}

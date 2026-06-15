@@ -7,14 +7,21 @@ import CreateCampaignModal from '@/components/home/CreateCampaignModal';
 import CampaignPasswordModal from '@/components/home/CampaignPasswordModal';
 import DonationSupportModal from '@/components/home/DonationSupportModal';
 import ErrorModal from '@/components/home/ErrorModal';
-import { CampaignsToRender } from '@/types/modules/components/home/UserMasterCampaigns';
+import LoadingDots from '@/components/common/LoadingDots';
+import type { UserCampaign } from '@/types/modules/context/TableriseContext';
 import '@/components/home/styles/UserMasterCampaigns.css';
 import { shouldSkipDonationPrompt } from '@/components/home/helpers/donationPromptPreference';
 import { useJoinCampaign } from '@/components/home/helpers/useJoinCampaign';
 
+type UserMasterCampaignsProps = {
+    campaigns: UserCampaign[];
+    isCampaignsLoading?: boolean;
+};
+
 export default function UserMasterCampaigns({
     campaigns,
-}: CampaignsToRender): JSX.Element {
+    isCampaignsLoading = false,
+}: UserMasterCampaignsProps): JSX.Element {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [donationModalOpen, setDonationModalOpen] = useState(false);
     const [donationModalMode, setDonationModalMode] = useState<'create' | 'join'>(
@@ -140,7 +147,25 @@ export default function UserMasterCampaigns({
                         }
                     />
                 ) : (
-                    <BasicCreationCard onClick={handleCreateIntent} />
+                    <>
+                        {isCampaignsLoading ? (
+                            <div
+                                className="basic-creation-card"
+                                style={{ width: '22.5rem', height: '22.5rem' }}
+                            >
+                                <button
+                                    type="button"
+                                    className="basic-add-button"
+                                    disabled
+                                    aria-label="Carregando campanhas"
+                                >
+                                    <LoadingDots label="Carregando campanhas" />
+                                </button>
+                            </div>
+                        ) : (
+                            <BasicCreationCard onClick={handleCreateIntent} />
+                        )}
+                    </>
                 )}
             </div>
 

@@ -49,6 +49,7 @@ export interface TableriseContextContract {
     themeMode: ThemeMode;
     userLoggedToggle: number;
     userCampaigns: UserCampaignsContract;
+    userCampaignsLoading: boolean;
     setLoading: (boolean: boolean) => void;
     setNewPassVisible: (boolean: boolean) => void;
     toggleThemeMode: () => void;
