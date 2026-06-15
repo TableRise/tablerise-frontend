@@ -69,7 +69,7 @@
         }
 
         .campaign-card .card-infos > span {
-            @apply text-center;
+            @apply text-left;
         }
 
         .campaign-card .card-infos .card-buttons {

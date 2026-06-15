@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 import { useSearchParams } from 'next/navigation';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import DiceBoxThreejs from '@3d-dice/dice-box-threejs';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
@@ -89,6 +89,8 @@ import BookmarkLightSVG from '../../../../assets/icons/game/bookmark.svg?url';
 import BookmarkDarkSVG from '../../../../assets/icons/game/bookmark-dark.svg?url';
 import VolumeLightSVG from '../../../../assets/icons/game/volume.svg?url';
 import VolumeDarkSVG from '../../../../assets/icons/game/volume-dark.svg?url';
+import ZoomLightSVG from '../../../../assets/icons/game/zoom.svg?url';
+import ZoomDarkSVG from '../../../../assets/icons/game/zoom-dark.svg?url';
 import DiceLightSVG from '../../../../assets/icons/dice/default.svg?url';
 import DiceDarkSVG from '../../../../assets/icons/dice/default-dark.svg?url';
 import D4LightSVG from '../../../../assets/icons/dice/d4.svg?url';
@@ -109,6 +111,12 @@ import GridOffLightSVG from '../../../../assets/icons/nav/grid-off-blue.svg?url'
 import GridOffDarkSVG from '../../../../assets/icons/nav/grid-off-dark.svg?url';
 import GridOnLightSVG from '../../../../assets/icons/nav/grind-on-blue.svg?url';
 import GridOnDarkSVG from '../../../../assets/icons/nav/grind-on-dark.svg?url';
+import ArrowRightBlueSVG from '../../../../assets/icons/nav/arrow-right-blue.svg?url';
+import ArrowRightDarkSVG from '../../../../assets/icons/nav/arrow-right-dark.svg?url';
+import ArrowUpSVG from '../../../../assets/icons/nav/arrow-up.svg?url';
+import ArrowDownSVG from '../../../../assets/icons/nav/arrow-down.svg?url';
+import ArrowUpDarkSVG from '../../../../assets/icons/nav/arrow-up-dark.svg?url';
+import ArrowDownDarkSVG from '../../../../assets/icons/nav/arrow-down-dark.svg?url';
 import SideImageBackground from '../../../../public/images/SideImageBackground.svg?url';
 import { useStoredUser } from '@/hooks/useStoredUser';
 import '@/app/campaigns/match/page.css';
@@ -165,6 +173,18 @@ function requiresLandscapeViewportOnDevice(): boolean {
     }
 
     return window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+}
+
+function getViewportOrientation(): boolean {
+    if (typeof window === 'undefined') {
+        return true;
+    }
+
+    const viewport = window.visualViewport;
+    const viewportWidth = viewport?.width ?? window.innerWidth;
+    const viewportHeight = viewport?.height ?? window.innerHeight;
+
+    return viewportWidth >= viewportHeight;
 }
 
 function getUserRank(user: any): string | undefined {
@@ -283,8 +303,45 @@ interface ActiveTokenInteraction {
     didMove: boolean;
 }
 
+interface ActiveMapPanInteraction {
+    startClientX: number;
+    startClientY: number;
+    startPanX: number;
+    startPanY: number;
+}
+
 function clamp(value: number, min: number, max: number): number {
     return Math.min(Math.max(value, min), max);
+}
+
+function getMapPanBounds(
+    viewportWidth: number,
+    viewportHeight: number,
+    scale: number
+): { maxPanX: number; maxPanY: number } {
+    if (scale <= 1) {
+        return { maxPanX: 0, maxPanY: 0 };
+    }
+
+    return {
+        maxPanX: (viewportWidth * scale - viewportWidth) / 2,
+        maxPanY: (viewportHeight * scale - viewportHeight) / 2,
+    };
+}
+
+function clampMapPanOffsets(
+    panX: number,
+    panY: number,
+    viewportWidth: number,
+    viewportHeight: number,
+    scale: number
+): { panX: number; panY: number } {
+    const { maxPanX, maxPanY } = getMapPanBounds(viewportWidth, viewportHeight, scale);
+
+    return {
+        panX: clamp(panX, -maxPanX, maxPanX),
+        panY: clamp(panY, -maxPanY, maxPanY),
+    };
 }
 
 function getTokenTotalHeightPx(widthPx: number): number {
@@ -360,13 +417,15 @@ export default function MatchPage(): JSX.Element {
     const router = useRouter();
     const { themeMode } = useContext(TableriseContext);
     const { storedUser: userInfo, hasResolvedStoredUser } = useStoredUser();
-    const mapContainerRef = useRef<HTMLDivElement>(null);
+    const mapViewportRef = useRef<HTMLDivElement>(null);
+    const mapSurfaceRef = useRef<HTMLDivElement>(null);
     const campaignSocketRef = useRef<CampaignSocket | null>(null);
     const diceBoxHostRef = useRef<HTMLDivElement>(null);
     const diceBoxRef = useRef<DiceBoxThreejs | null>(null);
     const diceBoxInitPromiseRef = useRef<Promise<DiceBoxThreejs> | null>(null);
     const diceRollSessionIdRef = useRef(0);
     const activeTokenInteractionRef = useRef<ActiveTokenInteraction | null>(null);
+    const activeMapPanRef = useRef<ActiveMapPanInteraction | null>(null);
     const suppressTokenClickIdRef = useRef<string | null>(null);
     const tokenBatchSyncTimeoutRef = useRef<number | null>(null);
     const pendingTokenSocketUpdatesRef = useRef<
@@ -384,13 +443,9 @@ export default function MatchPage(): JSX.Element {
     const [requiresLandscapeViewport, setRequiresLandscapeViewport] = useState<boolean>(
         () => requiresLandscapeViewportOnDevice()
     );
-    const [isLandscapeViewport, setIsLandscapeViewport] = useState<boolean>(() => {
-        if (typeof window === 'undefined') {
-            return true;
-        }
-
-        return window.innerWidth >= window.innerHeight;
-    });
+    const [isLandscapeViewport, setIsLandscapeViewport] = useState<boolean>(() =>
+        getViewportOrientation()
+    );
     const [sheetModalOpen, setSheetModalOpen] = useState(false);
     const [isMaster, setIsMaster] = useState(false);
     const [isAdminPlayer, setIsAdminPlayer] = useState(false);
@@ -423,6 +478,13 @@ export default function MatchPage(): JSX.Element {
     const [playingMusicId, setPlayingMusicId] = useState<string | null>(null);
     const [musicVolume, setMusicVolume] = useState(50);
     const [musicVolumeOpen, setMusicVolumeOpen] = useState(false);
+    const [mapZoomOpen, setMapZoomOpen] = useState(false);
+    const [mapZoomPercent, setMapZoomPercent] = useState(100);
+    const [mapPanX, setMapPanX] = useState(0);
+    const [mapPanY, setMapPanY] = useState(0);
+    const [activeMapPan, setActiveMapPan] = useState(false);
+    const [isMobileTopBarOpen, setIsMobileTopBarOpen] = useState(true);
+    const [isMobileBottomBarOpen, setIsMobileBottomBarOpen] = useState(true);
     const [charPanelOpen, setCharPanelOpen] = useState(false);
     const [charPanelTab, setCharPanelTab] = useState<'resumo' | 'magias' | 'habilidades'>(
         'resumo'
@@ -497,21 +559,82 @@ export default function MatchPage(): JSX.Element {
     );
     const seenHighlightedMatchImageIdRef = useRef<string | null>(null);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
         function syncViewportOrientation() {
             setRequiresLandscapeViewport(requiresLandscapeViewportOnDevice());
-            setIsLandscapeViewport(window.innerWidth >= window.innerHeight);
+            setIsLandscapeViewport(getViewportOrientation());
         }
 
         syncViewportOrientation();
+        const frameId = window.requestAnimationFrame(syncViewportOrientation);
+        const timeoutId = window.setTimeout(syncViewportOrientation, 180);
+        const visualViewport = window.visualViewport;
+
         window.addEventListener('resize', syncViewportOrientation);
         window.addEventListener('orientationchange', syncViewportOrientation);
+        visualViewport?.addEventListener('resize', syncViewportOrientation);
+        visualViewport?.addEventListener('scroll', syncViewportOrientation);
 
         return () => {
+            window.cancelAnimationFrame(frameId);
+            window.clearTimeout(timeoutId);
             window.removeEventListener('resize', syncViewportOrientation);
             window.removeEventListener('orientationchange', syncViewportOrientation);
+            visualViewport?.removeEventListener('resize', syncViewportOrientation);
+            visualViewport?.removeEventListener('scroll', syncViewportOrientation);
         };
     }, []);
+
+    useEffect(() => {
+        function syncMobileBarState() {
+            if (window.innerWidth > 768) {
+                setIsMobileTopBarOpen(true);
+                setIsMobileBottomBarOpen(true);
+            }
+        }
+
+        syncMobileBarState();
+        window.addEventListener('resize', syncMobileBarState);
+
+        return () => {
+            window.removeEventListener('resize', syncMobileBarState);
+        };
+    }, []);
+
+    useEffect(() => {
+        const container = mapViewportRef.current;
+        if (!container) return;
+
+        if (mapZoomScale <= 1) {
+            setMapPanX(0);
+            setMapPanY(0);
+            if (activeMapPanRef.current) {
+                activeMapPanRef.current = null;
+                setActiveMapPan(false);
+            }
+            return;
+        }
+
+        const containerRect = container.getBoundingClientRect();
+        const nextPan = clampMapPanOffsets(
+            mapPanX,
+            mapPanY,
+            containerRect.width,
+            containerRect.height,
+            mapZoomScale
+        );
+
+        if (nextPan.panX !== mapPanX) {
+            setMapPanX(nextPan.panX);
+        }
+        if (nextPan.panY !== mapPanY) {
+            setMapPanY(nextPan.panY);
+        }
+    }, [backgroundImage, isLandscapeViewport, mapPanX, mapPanY, mapZoomScale]);
 
     const isDarkTheme = themeMode === 'dark';
     const LogoSVG = isDarkTheme ? LogoDarkSVG : LogoLightSVG;
@@ -539,6 +662,15 @@ export default function MatchPage(): JSX.Element {
     const D20SVG = isDarkTheme ? D20DarkSVG : D20LightSVG;
     const GridOffSVG = isDarkTheme ? GridOffDarkSVG : GridOffLightSVG;
     const GridOnSVG = isDarkTheme ? GridOnDarkSVG : GridOnLightSVG;
+    const ZoomSVG = isDarkTheme ? ZoomDarkSVG : ZoomLightSVG;
+    const MobileTopBarArrowSVG = isDarkTheme ? ArrowRightDarkSVG : ArrowRightBlueSVG;
+    const MobileBottomBarArrowSVG = isDarkTheme
+        ? isMobileBottomBarOpen
+            ? ArrowDownDarkSVG
+            : ArrowUpDarkSVG
+        : isMobileBottomBarOpen
+        ? ArrowDownSVG
+        : ArrowUpSVG;
 
     const diceOptions = [
         { label: 'D20', icon: D20SVG, sides: 20 },
@@ -548,6 +680,7 @@ export default function MatchPage(): JSX.Element {
         { label: 'D6', icon: D6SVG, sides: 6 },
         { label: 'D4', icon: D4SVG, sides: 4 },
     ];
+    const mapZoomScale = mapZoomPercent / 100;
 
     const getImageIdentity = (image: ImageObject | null | undefined): string | null =>
         image?.id || image?.link || null;
@@ -1790,7 +1923,7 @@ export default function MatchPage(): JSX.Element {
                 visibleMapCharacterIds.includes(token.characterId)
             ),
         ];
-        const container = mapContainerRef.current;
+        const container = mapViewportRef.current;
 
         if (!container) return;
 
@@ -1990,6 +2123,144 @@ export default function MatchPage(): JSX.Element {
     const searchedCampaignCharacters = campaignCharacters.filter((character) =>
         character.name.toLowerCase().includes(avatarSearch.trim().toLowerCase())
     );
+    const mapTokenLayer =
+        visibleMapTokenInstances.length > 0 ? (
+            <div className="match-map-tokens" aria-label="Personagens da campanha">
+                {visibleMapTokenInstances.map((token) => {
+                    const character = campaignCharacterById[token.characterId];
+                    if (!character) {
+                        return null;
+                    }
+
+                    const summary = campaignCharacterSummaries[character.id];
+                    const tokenLayout = mapTokenLayoutById[token.tokenId];
+                    const isInspectable =
+                        token.isClone || character.authorUserId !== userInfo?.userId;
+                    const displayedHitPoints = token.isClone
+                        ? getCloneDisplayedHitPoints(token.tokenId, token.characterId)
+                        : summary?.currentHitPoints ?? null;
+                    const canMoveToken = canMoveCharacterToken(character);
+                    const isActiveToken =
+                        activeTokenInteractionMeta?.tokenId === token.tokenId;
+
+                    if (!tokenLayout) {
+                        return null;
+                    }
+
+                    return (
+                        <div
+                            key={token.tokenId}
+                            className={`match-map-token${
+                                isInspectable ? ' match-map-token--inspectable' : ''
+                            }${!canMoveToken ? ' match-map-token--locked' : ''}${
+                                isActiveToken
+                                    ? ` match-map-token--${activeTokenInteractionMeta?.type}`
+                                    : ''
+                            }`}
+                            title={character.name}
+                            style={{
+                                left: `${tokenLayout.xPct}%`,
+                                top: `${tokenLayout.yPct}%`,
+                                width: `${tokenLayout.widthPct}%`,
+                            }}
+                            onPointerDown={(event) =>
+                                startTokenInteraction(
+                                    'drag',
+                                    event,
+                                    token.tokenId,
+                                    canMoveToken
+                                )
+                            }
+                            onClick={() => handleTokenClick(token, character)}
+                        >
+                            <div className="match-map-token-shell">
+                                {isMaster && cloneModeOpen && (
+                                    <button
+                                        type="button"
+                                        className={`match-map-token-clone-handle${
+                                            token.isClone
+                                                ? ' match-map-token-clone-handle--delete'
+                                                : ''
+                                        }`}
+                                        aria-label={
+                                            token.isClone
+                                                ? `Remover clone de ${character.name}`
+                                                : `Duplicar ${character.name}`
+                                        }
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            if (token.isClone) {
+                                                handleDeleteCloneToken(token);
+                                                return;
+                                            }
+
+                                            handleCloneToken(token);
+                                        }}
+                                        onPointerDown={(event) => {
+                                            event.preventDefault();
+                                            event.stopPropagation();
+                                        }}
+                                    >
+                                        <span className="match-map-token-clone-icon">
+                                            {token.isClone ? 'Ã—' : '+'}
+                                        </span>
+                                    </button>
+                                )}
+                                <div className="match-map-token-frame">
+                                    <RankedAvatarFrame
+                                        image={character.image || SideImageBackground.src}
+                                        alt={character.name}
+                                        rank={
+                                            characterAuthorRanksByUserId[
+                                                character.authorUserId
+                                            ]
+                                        }
+                                        variant="avatar"
+                                        className="match-map-token-ranked-avatar"
+                                        sizes="(max-width: 768px) 6rem, 7rem"
+                                    />
+                                </div>
+                                {isMaster && resizeModeOpen && (
+                                    <button
+                                        type="button"
+                                        className="match-map-token-resize-handle"
+                                        aria-label={`Redimensionar ${character.name}`}
+                                        onClick={(event) => event.stopPropagation()}
+                                        onPointerDown={(event) =>
+                                            startTokenInteraction(
+                                                'resize',
+                                                event,
+                                                token.tokenId,
+                                                canMoveToken
+                                            )
+                                        }
+                                    >
+                                        <span className="match-map-token-resize-icon">
+                                            â†˜
+                                        </span>
+                                    </button>
+                                )}
+                            </div>
+                            <span
+                                className={`font-XXS-regular match-map-token-name${
+                                    token.isClone ? ' match-map-token-name--clone' : ''
+                                }`}
+                            >
+                                {character.name}
+                            </span>
+                            <div className="match-map-token-meta">
+                                <span className="font-XXS-regular match-map-token-stat">
+                                    &#9829; {displayedHitPoints ?? '-'}
+                                </span>
+                                <span className="font-XXS-regular match-map-token-stat">
+                                    <strong>LVL</strong> {summary?.level ?? '-'}
+                                </span>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        ) : null;
 
     useEffect(() => {
         if (!activeTokenInteractionMeta) {
@@ -1998,12 +2269,12 @@ export default function MatchPage(): JSX.Element {
 
         const handlePointerMove = (event: PointerEvent) => {
             const interaction = activeTokenInteractionRef.current;
-            const container = mapContainerRef.current;
+            const container = mapViewportRef.current;
             if (!interaction || !container) return;
 
             const containerRect = container.getBoundingClientRect();
-            const deltaX = event.clientX - interaction.startClientX;
-            const deltaY = event.clientY - interaction.startClientY;
+            const deltaX = (event.clientX - interaction.startClientX) / mapZoomScale;
+            const deltaY = (event.clientY - interaction.startClientY) / mapZoomScale;
 
             if (
                 Math.hypot(deltaX, deltaY) > DRAG_CLICK_THRESHOLD_PX &&
@@ -2122,7 +2393,64 @@ export default function MatchPage(): JSX.Element {
             window.removeEventListener('pointerup', handlePointerEnd);
             window.removeEventListener('pointercancel', handlePointerEnd);
         };
-    }, [activeTokenInteractionMeta]);
+    }, [activeTokenInteractionMeta, mapZoomScale]);
+
+    useEffect(() => {
+        if (!activeMapPan) {
+            return;
+        }
+
+        const handlePointerMove = (event: PointerEvent) => {
+            const interaction = activeMapPanRef.current;
+            const container = mapViewportRef.current;
+            if (!interaction || !container) return;
+
+            const containerRect = container.getBoundingClientRect();
+            const nextPan = clampMapPanOffsets(
+                interaction.startPanX + (event.clientX - interaction.startClientX),
+                interaction.startPanY + (event.clientY - interaction.startClientY),
+                containerRect.width,
+                containerRect.height,
+                mapZoomScale
+            );
+
+            setMapPanX(nextPan.panX);
+            setMapPanY(nextPan.panY);
+        };
+
+        const handlePointerEnd = () => {
+            activeMapPanRef.current = null;
+            setActiveMapPan(false);
+        };
+
+        window.addEventListener('pointermove', handlePointerMove);
+        window.addEventListener('pointerup', handlePointerEnd);
+        window.addEventListener('pointercancel', handlePointerEnd);
+
+        return () => {
+            window.removeEventListener('pointermove', handlePointerMove);
+            window.removeEventListener('pointerup', handlePointerEnd);
+            window.removeEventListener('pointercancel', handlePointerEnd);
+        };
+    }, [activeMapPan, mapZoomScale]);
+
+    const handleMapSurfacePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+        if (event.button !== 0 || mapZoomScale <= 1) return;
+
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('.match-map-token')) {
+            return;
+        }
+
+        activeMapPanRef.current = {
+            startClientX: event.clientX,
+            startClientY: event.clientY,
+            startPanX: mapPanX,
+            startPanY: mapPanY,
+        };
+        setActiveMapPan(true);
+        event.preventDefault();
+    };
 
     const startTokenInteraction = (
         type: TokenInteractionType,
@@ -2375,14 +2703,7 @@ export default function MatchPage(): JSX.Element {
     };
 
     return (
-        <div
-            ref={mapContainerRef}
-            className="match-page"
-            style={{
-                backgroundImage: `url(${backgroundImage})`,
-                backgroundSize: 'cover',
-            }}
-        >
+        <div className="match-page">
             {requiresLandscapeViewport && !isLandscapeViewport && (
                 <div className="match-orientation-overlay">
                     <div className="match-orientation-overlay-content">
@@ -2399,12 +2720,33 @@ export default function MatchPage(): JSX.Element {
                     </div>
                 </div>
             )}
-            {/* Grid overlay */}
-            {gridVisible && <div className="match-grid" />}
-            {(activeEffect === 'dark' || activeEffect === 'light') && (
-                <MapFogOverlay variant={activeEffect as FogVariant} />
-            )}
-            {activeEffect === 'rain' && <MapRainOverlay />}
+            <div ref={mapViewportRef} className="match-map-viewport">
+                <div
+                    className="match-map-surface-pan"
+                    style={{
+                        transform: `translate3d(${mapPanX}px, ${mapPanY}px, 0)`,
+                    }}
+                >
+                    <div
+                        ref={mapSurfaceRef}
+                        className={`match-map-surface${
+                            mapZoomScale > 1 ? ' match-map-surface--zoomable' : ''
+                        }${activeMapPan ? ' match-map-surface--panning' : ''}`}
+                        style={{
+                            backgroundImage: `url(${backgroundImage})`,
+                            transform: `scale(${mapZoomScale})`,
+                        }}
+                        onPointerDown={handleMapSurfacePointerDown}
+                    >
+                        {gridVisible && <div className="match-grid" />}
+                        {(activeEffect === 'dark' || activeEffect === 'light') && (
+                            <MapFogOverlay variant={activeEffect as FogVariant} />
+                        )}
+                        {activeEffect === 'rain' && <MapRainOverlay />}
+                        {mapTokenLayer}
+                    </div>
+                </div>
+            </div>
 
             {/* Top-left: Tablerise logo */}
             <div
@@ -2418,148 +2760,6 @@ export default function MatchPage(): JSX.Element {
                     height={LogoSVG.height}
                 />
             </div>
-
-            {visibleMapTokenInstances.length > 0 && (
-                <div className="match-map-tokens" aria-label="Personagens da campanha">
-                    {visibleMapTokenInstances.map((token) => {
-                        const character = campaignCharacterById[token.characterId];
-                        if (!character) {
-                            return null;
-                        }
-
-                        const summary = campaignCharacterSummaries[character.id];
-                        const tokenLayout = mapTokenLayoutById[token.tokenId];
-                        const isInspectable =
-                            token.isClone || character.authorUserId !== userInfo?.userId;
-                        const displayedHitPoints = token.isClone
-                            ? getCloneDisplayedHitPoints(token.tokenId, token.characterId)
-                            : summary?.currentHitPoints ?? null;
-                        const canMoveToken = canMoveCharacterToken(character);
-                        const isActiveToken =
-                            activeTokenInteractionMeta?.tokenId === token.tokenId;
-
-                        if (!tokenLayout) {
-                            return null;
-                        }
-
-                        return (
-                            <div
-                                key={token.tokenId}
-                                className={`match-map-token${
-                                    isInspectable ? ' match-map-token--inspectable' : ''
-                                }${!canMoveToken ? ' match-map-token--locked' : ''}${
-                                    isActiveToken
-                                        ? ` match-map-token--${activeTokenInteractionMeta?.type}`
-                                        : ''
-                                }`}
-                                title={character.name}
-                                style={{
-                                    left: `${tokenLayout.xPct}%`,
-                                    top: `${tokenLayout.yPct}%`,
-                                    width: `${tokenLayout.widthPct}%`,
-                                }}
-                                onPointerDown={(event) =>
-                                    startTokenInteraction(
-                                        'drag',
-                                        event,
-                                        token.tokenId,
-                                        canMoveToken
-                                    )
-                                }
-                                onClick={() => handleTokenClick(token, character)}
-                            >
-                                <div className="match-map-token-shell">
-                                    {isMaster && cloneModeOpen && (
-                                        <button
-                                            type="button"
-                                            className={`match-map-token-clone-handle${
-                                                token.isClone
-                                                    ? ' match-map-token-clone-handle--delete'
-                                                    : ''
-                                            }`}
-                                            aria-label={
-                                                token.isClone
-                                                    ? `Remover clone de ${character.name}`
-                                                    : `Duplicar ${character.name}`
-                                            }
-                                            onClick={(event) => {
-                                                event.stopPropagation();
-                                                if (token.isClone) {
-                                                    handleDeleteCloneToken(token);
-                                                    return;
-                                                }
-
-                                                handleCloneToken(token);
-                                            }}
-                                            onPointerDown={(event) => {
-                                                event.preventDefault();
-                                                event.stopPropagation();
-                                            }}
-                                        >
-                                            <span className="match-map-token-clone-icon">
-                                                {token.isClone ? '×' : '+'}
-                                            </span>
-                                        </button>
-                                    )}
-                                    <div className="match-map-token-frame">
-                                        <RankedAvatarFrame
-                                            image={
-                                                character.image || SideImageBackground.src
-                                            }
-                                            alt={character.name}
-                                            rank={
-                                                characterAuthorRanksByUserId[
-                                                    character.authorUserId
-                                                ]
-                                            }
-                                            variant="avatar"
-                                            className="match-map-token-ranked-avatar"
-                                            sizes="(max-width: 768px) 6rem, 7rem"
-                                        />
-                                    </div>
-                                    {isMaster && resizeModeOpen && (
-                                        <button
-                                            type="button"
-                                            className="match-map-token-resize-handle"
-                                            aria-label={`Redimensionar ${character.name}`}
-                                            onClick={(event) => event.stopPropagation()}
-                                            onPointerDown={(event) =>
-                                                startTokenInteraction(
-                                                    'resize',
-                                                    event,
-                                                    token.tokenId,
-                                                    canMoveToken
-                                                )
-                                            }
-                                        >
-                                            <span className="match-map-token-resize-icon">
-                                                ↘
-                                            </span>
-                                        </button>
-                                    )}
-                                </div>
-                                <span
-                                    className={`font-XXS-regular match-map-token-name${
-                                        token.isClone
-                                            ? ' match-map-token-name--clone'
-                                            : ''
-                                    }`}
-                                >
-                                    {character.name}
-                                </span>
-                                <div className="match-map-token-meta">
-                                    <span className="font-XXS-regular match-map-token-stat">
-                                        &#9829; {displayedHitPoints ?? '-'}
-                                    </span>
-                                    <span className="font-XXS-regular match-map-token-stat">
-                                        <strong>LVL</strong> {summary?.level ?? '-'}
-                                    </span>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            )}
 
             {/* Middle-left: character panel toggle + drawer */}
             <div className="match-char-panel-anchor">
@@ -2924,7 +3124,35 @@ export default function MatchPage(): JSX.Element {
 
             {/* Top-right: horizontal action bar */}
             {isMaster && (
-                <nav className="match-top-bar">
+                <nav
+                    className={`match-top-bar${
+                        isMobileTopBarOpen ? ' match-top-bar--mobile-open' : ''
+                    }`}
+                >
+                    <button
+                        type="button"
+                        className="match-top-bar-mobile-toggle"
+                        aria-label={
+                            isMobileTopBarOpen
+                                ? 'Ocultar menu superior da partida'
+                                : 'Mostrar menu superior da partida'
+                        }
+                        aria-expanded={isMobileTopBarOpen}
+                        onClick={() => setIsMobileTopBarOpen((current) => !current)}
+                    >
+                        <Image
+                            src={MobileTopBarArrowSVG}
+                            alt=""
+                            className={`match-mobile-bar-toggle-icon${
+                                isMobileTopBarOpen
+                                    ? ' match-mobile-bar-toggle-icon--open'
+                                    : ''
+                            }`}
+                            width={24}
+                            height={24}
+                            aria-hidden="true"
+                        />
+                    </button>
                     <button
                         className={`match-top-bar-item${
                             resizeModeOpen ? ' match-top-bar-item--active' : ''
@@ -3071,7 +3299,41 @@ export default function MatchPage(): JSX.Element {
             )}
 
             {/* Bottom-left: vertical action bar */}
-            <nav className="match-bottom-bar">
+            <nav
+                className={`match-bottom-bar${
+                    isMobileBottomBarOpen ? ' match-bottom-bar--mobile-open' : ''
+                }`}
+            >
+                <button
+                    type="button"
+                    className="match-bottom-bar-mobile-toggle"
+                    aria-label={
+                        isMobileBottomBarOpen
+                            ? 'Ocultar menu inferior da partida'
+                            : 'Mostrar menu inferior da partida'
+                    }
+                    aria-expanded={isMobileBottomBarOpen}
+                    onClick={() => {
+                        if (isMobileBottomBarOpen) {
+                            setMapZoomOpen(false);
+                            setMusicVolumeOpen(false);
+                        }
+                        setIsMobileBottomBarOpen((current) => !current);
+                    }}
+                >
+                    <Image
+                        src={MobileBottomBarArrowSVG}
+                        alt=""
+                        className={`match-mobile-bar-toggle-icon match-mobile-bar-toggle-icon--bottom${
+                            !isDarkTheme && isMobileBottomBarOpen
+                                ? ' match-mobile-bar-toggle-icon--bottom-light-open'
+                                : ''
+                        }`}
+                        width={24}
+                        height={24}
+                        aria-hidden="true"
+                    />
+                </button>
                 <button
                     className="match-bottom-bar-item"
                     title="Publicação em destaque"
@@ -3086,6 +3348,40 @@ export default function MatchPage(): JSX.Element {
                 </button>
                 <div className="match-bottom-bar-control">
                     <button
+                        className="match-bottom-bar-item"
+                        title="Zoom do mapa"
+                        onClick={() => {
+                            setMusicVolumeOpen(false);
+                            setMapZoomOpen((current) => !current);
+                        }}
+                    >
+                        <Image src={ZoomSVG.src} alt="Zoom" width={28} height={28} />
+                    </button>
+                    {mapZoomOpen && (
+                        <div className="match-map-zoom-panel">
+                            <span className="match-map-zoom-label font-XXS-bold">
+                                Zoom
+                            </span>
+                            <input
+                                className="match-map-zoom-slider"
+                                type="range"
+                                min={100}
+                                max={300}
+                                step={5}
+                                value={mapZoomPercent}
+                                onChange={(event) =>
+                                    setMapZoomPercent(Number(event.target.value))
+                                }
+                                aria-label="Controlar zoom do mapa"
+                            />
+                            <span className="match-map-zoom-value font-XXS-regular">
+                                {mapZoomPercent}%
+                            </span>
+                        </div>
+                    )}
+                </div>
+                <div className="match-bottom-bar-control">
+                    <button
                         className={`match-bottom-bar-item${
                             !playingMusicId ? ' match-bottom-bar-item--disabled' : ''
                         }`}
@@ -3096,6 +3392,7 @@ export default function MatchPage(): JSX.Element {
                         }
                         onClick={() => {
                             if (!playingMusicId) return;
+                            setMapZoomOpen(false);
                             setMusicVolumeOpen((current) => !current);
                         }}
                         disabled={!playingMusicId}

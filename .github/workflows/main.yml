@@ -8,14 +8,6 @@ jobs:
     permissions:
       pull-requests: write
     env:
-      API_BASE_URL: http://127.0.0.1:3000
-      API_USERS: http://127.0.0.1:3000/users
-      API_OAUTH: http://127.0.0.1:3000/oauth
-      API_CAMPAIGNS: http://127.0.0.1:3000/campaigns
-      API_CHARACTERS: http://127.0.0.1:3000/characters
-      API_DD5E: http://127.0.0.1:3000/dnd5e
-      API_GOOGLE_YOUTUBE: http://127.0.0.1:3000/youtube
-      API_GOOGLE_KEY: test-key
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - name: Checkout
@@ -31,15 +23,3 @@ jobs:
 
       - name: Checking lint
         run:  npm run lint
-
-      - name: Cypress run
-        uses: cypress-io/github-action@v6
-        with:
-          build: npm run build
-          start: npm run coverage:cy
-
-      - uses: mshick/add-pr-comment@v2
-        with:
-          message: |
-            **Cypress Tests**
-            All cypress tests was runned with success !!

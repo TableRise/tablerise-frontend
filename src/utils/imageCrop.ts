@@ -12,8 +12,6 @@ export interface ImageCropConfig {
     title: string;
     description: string;
     defaultCropWidthPercent: number;
-    outputWidth?: number;
-    outputHeight?: number;
 }
 
 export interface ResolvedImageCropState {
@@ -26,8 +24,6 @@ export interface ResolvedImageCropState {
 export const IMAGE_CROP_MIN_ZOOM = 1;
 export const IMAGE_CROP_MAX_ZOOM = 3;
 export const IMAGE_CROP_ZOOM_STEP = 0.05;
-export const CAMPAIGN_MAP_MIN_WIDTH = 1920;
-export const CAMPAIGN_MAP_MIN_HEIGHT = 1080;
 
 const DEFAULT_INITIAL_CROP: Point = { x: 0, y: 0 };
 
@@ -50,13 +46,9 @@ export const IMAGE_CROP_CONFIG: Record<ImageUploadIntent, ImageCropConfig> = {
         defaultCropWidthPercent: 90,
     },
     'campaign-map': {
-        aspect: CAMPAIGN_MAP_MIN_WIDTH / CAMPAIGN_MAP_MIN_HEIGHT,
         title: 'Recortar mapa',
-        description:
-            'Selecione uma area fixa de 1920x1080 para usar como mapa da campanha.',
+        description: 'Recorte o mapa se desejar.',
         defaultCropWidthPercent: 90,
-        outputWidth: CAMPAIGN_MAP_MIN_WIDTH,
-        outputHeight: CAMPAIGN_MAP_MIN_HEIGHT,
     },
     'match-highlight-image': {
         title: 'Recortar imagem em destaque',
@@ -129,68 +121,6 @@ export async function loadImageFromUrl(src: string): Promise<HTMLImageElement> {
             reject(new Error('Nao foi possivel carregar a imagem para recorte.'));
         };
         image.src = src;
-    });
-}
-
-export async function getImageDimensionsFromFile(
-    file: File
-): Promise<{ width: number; height: number }> {
-    const objectUrl = URL.createObjectURL(file);
-
-    try {
-        const image = await loadImageFromUrl(objectUrl);
-        return {
-            width: image.naturalWidth,
-            height: image.naturalHeight,
-        };
-    } finally {
-        URL.revokeObjectURL(objectUrl);
-    }
-}
-
-export async function getImageDimensionsFromUrl(
-    src: string
-): Promise<{ width: number; height: number }> {
-    const image = await loadImageFromUrl(src);
-
-    return {
-        width: image.naturalWidth,
-        height: image.naturalHeight,
-    };
-}
-
-export function resolveCampaignMapUploadAction(
-    width: number,
-    height: number
-): 'reject' | 'use-original' | 'crop' {
-    if (width < CAMPAIGN_MAP_MIN_WIDTH || height < CAMPAIGN_MAP_MIN_HEIGHT) {
-        return 'reject';
-    }
-
-    if (width === CAMPAIGN_MAP_MIN_WIDTH && height === CAMPAIGN_MAP_MIN_HEIGHT) {
-        return 'use-original';
-    }
-
-    return 'crop';
-}
-
-export async function createFileFromImageUrl(
-    src: string,
-    fileName = 'campaign-map.png'
-): Promise<File> {
-    const response = await fetch(src);
-
-    if (!response.ok) {
-        throw new Error('Nao foi possivel preparar a imagem da galeria.');
-    }
-
-    const blob = await response.blob();
-    const mimeType = blob.type || 'image/png';
-    const normalizedFileName = fileName.includes('.') ? fileName : `${fileName}.png`;
-
-    return new File([blob], normalizedFileName, {
-        type: mimeType,
-        lastModified: Date.now(),
     });
 }
 

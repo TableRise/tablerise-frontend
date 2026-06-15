@@ -108,9 +108,7 @@ export default function ImageCropModal({
             const croppedFile = await createCroppedImageFile(
                 image,
                 croppedAreaPixels,
-                file,
-                config.outputWidth,
-                config.outputHeight
+                file
             );
             await onConfirm(croppedFile);
         } catch (err: Error | any) {

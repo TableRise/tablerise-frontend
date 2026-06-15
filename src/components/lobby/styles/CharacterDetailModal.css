@@ -45,7 +45,7 @@
     }
 
     .cdm-edit-actions {
-        @apply flex items-center gap-3 shrink-0;
+        @apply flex flex-row-reverse items-center gap-3 shrink-0;
     }
 
     /* ── Header ───────────────────────────── */
@@ -72,7 +72,7 @@
     }
 
     .cdm-char-name {
-        @apply text-color-greyScale/950;
+        @apply min-w-0 flex-1 text-color-greyScale/950;
     }
 
     .cdm-badges {
@@ -147,11 +147,13 @@
     }
 
     .cdm-attr-box {
-        @apply flex flex-col items-center gap-0.5 bg-color-greyScale/50 border border-color-greyScale/200 rounded-xl py-3 px-2;
+        @apply flex min-w-0 flex-col items-center gap-0.5 bg-color-greyScale/50 border border-color-greyScale/200 rounded-xl py-3 px-2;
     }
 
     .cdm-attr-label {
-        @apply text-color-primary/default_900;
+        @apply w-full text-center text-color-primary/default_900;
+        overflow-wrap: anywhere;
+        word-break: break-word;
     }
 
     .cdm-attr-value {
@@ -163,7 +165,9 @@
     }
 
     .cdm-attr-full {
-        @apply text-color-greyScale/500 text-center leading-tight;
+        @apply w-full text-center text-color-greyScale/500 leading-tight;
+        overflow-wrap: anywhere;
+        word-break: break-word;
     }
 
     /* ── Info grid (combat / appearance) ─── */
@@ -301,12 +305,51 @@
     }
 
     @media (max-width: 768px) {
+        .cdm-modal {
+            @apply w-[calc(100vw-1.5rem)] p-4;
+        }
+
+        .cdm-header {
+            @apply flex-col items-center gap-4;
+        }
+
+        .cdm-picture-wrapper {
+            @apply self-center;
+        }
+
+        .cdm-header-info {
+            @apply w-full;
+        }
+
+        .cdm-name-row {
+            @apply w-full items-center;
+        }
+
+        .cdm-badges,
+        .cdm-header-meta {
+            @apply w-full;
+        }
+
         .cdm-levelup-banner {
             @apply flex-col;
         }
 
         .cdm-levelup-actions {
             @apply w-full justify-end;
+        }
+
+        .cdm-attributes-grid {
+            @apply grid-cols-3;
+        }
+
+        .cdm-attr-full {
+            @apply hidden;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .cdm-attributes-grid {
+            @apply grid-cols-2;
         }
     }
 
