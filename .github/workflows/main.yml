@@ -1,4 +1,4 @@
-name: Cypress Tests
+name: Lint verify
 
 on: push
 
