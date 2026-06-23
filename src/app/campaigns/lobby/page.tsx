@@ -44,6 +44,7 @@ import { updateUserXp } from '@/server/users/update-user-xp';
 const PLAY_MATCH_XP_REWARD = 200;
 const PLAY_MATCH_XP_REWARD_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000;
 const PLAY_MATCH_XP_STORAGE_PREFIX = 'tablerise-play-match-xp';
+const MOBILE_LOBBY_RELOAD_STORAGE_PREFIX = 'tablerise-lobby-mobile-reload';
 
 type PlayMatchXpStorageRecord = {
     status: 'pending' | 'awarded';
@@ -52,6 +53,10 @@ type PlayMatchXpStorageRecord = {
 
 function getPlayMatchXpStorageKey(userId: string): string {
     return `${PLAY_MATCH_XP_STORAGE_PREFIX}:${userId}`;
+}
+
+function getMobileLobbyReloadStorageKey(campaignId: string): string {
+    return `${MOBILE_LOBBY_RELOAD_STORAGE_PREFIX}:${campaignId}`;
 }
 
 function readPlayMatchXpStorage(userId: string): PlayMatchXpStorageRecord | null {
@@ -170,6 +175,30 @@ export default function CampaignLobby(): JSX.Element {
             window.cancelAnimationFrame(rafId);
         };
     }, []);
+
+    useEffect(() => {
+        if (typeof window === 'undefined' || !campaignId) return;
+
+        const isMobileViewport =
+            (window.visualViewport?.width ?? window.innerWidth) <= 768;
+
+        if (!isMobileViewport) {
+            window.sessionStorage.removeItem(getMobileLobbyReloadStorageKey(campaignId));
+            return;
+        }
+
+        const reloadStorageKey = getMobileLobbyReloadStorageKey(campaignId);
+        const hasReloadedForThisEntry =
+            window.sessionStorage.getItem(reloadStorageKey) === '1';
+
+        if (hasReloadedForThisEntry) {
+            window.sessionStorage.removeItem(reloadStorageKey);
+            return;
+        }
+
+        window.sessionStorage.setItem(reloadStorageKey, '1');
+        window.location.replace(`/campaigns/lobby?campaignId=${campaignId}`);
+    }, [campaignId]);
 
     useEffect(() => {
         if (!campaignId) {
