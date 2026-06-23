@@ -36,6 +36,10 @@ type BalloonContentProps = {
     progress: BadgeProgressModel;
 };
 
+const MOBILE_BALLOON_VIEWPORT_PADDING = 16;
+const MOBILE_HERO_BALLOON_MAX_WIDTH = 240;
+const CARD_BALLOON_MAX_WIDTH = 248;
+
 function BalloonContent({
     description,
     imageSrc,
@@ -89,13 +93,15 @@ export default function ProfileBadgePopover({
 }: ProfileBadgePopoverProps): JSX.Element {
     const tooltipId = `${popoverId}-tooltip`;
     const triggerRef = useRef<HTMLButtonElement | null>(null);
+    const shouldUsePortal = variant === 'card' || !supportsHover();
     const [portalPosition, setPortalPosition] = useState<{
         top: number;
         left: number;
+        width?: number;
     } | null>(null);
 
     useEffect(() => {
-        if (!isOpen || variant !== 'card') {
+        if (!isOpen || !shouldUsePortal) {
             setPortalPosition(null);
             return;
         }
@@ -106,14 +112,27 @@ export default function ProfileBadgePopover({
             if (!trigger) return;
 
             const rect = trigger.getBoundingClientRect();
+            const maxWidth =
+                variant === 'hero'
+                    ? MOBILE_HERO_BALLOON_MAX_WIDTH
+                    : CARD_BALLOON_MAX_WIDTH;
+            const width = Math.min(
+                window.innerWidth - MOBILE_BALLOON_VIEWPORT_PADDING * 2,
+                maxWidth
+            );
+            const halfWidth = width / 2;
             const nextLeft = Math.min(
-                Math.max(rect.left + rect.width / 2, 160),
-                window.innerWidth - 160
+                Math.max(
+                    rect.left + rect.width / 2,
+                    MOBILE_BALLOON_VIEWPORT_PADDING + halfWidth
+                ),
+                window.innerWidth - MOBILE_BALLOON_VIEWPORT_PADDING - halfWidth
             );
 
             setPortalPosition({
                 top: Math.max(rect.top - 12, 16),
                 left: nextLeft,
+                width,
             });
         };
 
@@ -125,7 +144,7 @@ export default function ProfileBadgePopover({
             window.removeEventListener('resize', updatePosition);
             window.removeEventListener('scroll', updatePosition, true);
         };
-    }, [isOpen, variant]);
+    }, [isOpen, shouldUsePortal, variant]);
 
     function handleClick(event: MouseEvent<HTMLButtonElement>) {
         if (variant === 'hero' && supportsHover()) return;
@@ -214,7 +233,7 @@ export default function ProfileBadgePopover({
                 )}
             </button>
 
-            {variant === 'hero' && (
+            {variant === 'hero' && !shouldUsePortal ? (
                 <div
                     id={tooltipId}
                     role="tooltip"
@@ -226,9 +245,9 @@ export default function ProfileBadgePopover({
                         progress={progress}
                     />
                 </div>
-            )}
+            ) : null}
 
-            {variant === 'card' && isOpen && portalPosition
+            {isOpen && portalPosition && shouldUsePortal
                 ? createPortal(
                       <div
                           id={tooltipId}
@@ -237,6 +256,7 @@ export default function ProfileBadgePopover({
                           style={{
                               top: `${portalPosition.top}px`,
                               left: `${portalPosition.left}px`,
+                              width: `${portalPosition.width}px`,
                           }}
                       >
                           <BalloonContent

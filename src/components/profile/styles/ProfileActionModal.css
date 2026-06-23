@@ -29,6 +29,10 @@
         @apply max-w-[36rem] items-stretch;
     }
 
+    .profile-action-modal-card--tips {
+        @apply max-w-[38rem] items-stretch;
+    }
+
     .profile-action-modal-card--controls {
         @apply items-stretch;
         max-height: min(90vh, 48rem);
@@ -344,6 +348,69 @@
         background-color: rgba(255, 89, 89, 0.08);
     }
 
+    .profile-tips-modal__body {
+        @apply flex flex-col gap-3;
+    }
+
+    .profile-tips-modal__step {
+        @apply text-color-primary/default_900;
+    }
+
+    .profile-tips-modal__content {
+        @apply flex flex-col gap-3;
+    }
+
+    .profile-tips-modal__paragraph {
+        @apply text-left;
+        line-height: 1.55;
+    }
+
+    .profile-tips-modal__list {
+        @apply flex list-disc flex-col gap-2 pl-5 text-color-greyScale/950;
+    }
+
+    .profile-tips-modal__list-item {
+        line-height: 1.55;
+    }
+
+    .profile-tips-modal__footer {
+        @apply mt-2 flex items-center justify-between gap-3;
+    }
+
+    .profile-tips-modal__navigation {
+        @apply flex items-center gap-2;
+    }
+
+    .profile-tips-modal__nav-button {
+        @apply flex h-11 w-11 items-center justify-center rounded-xl border border-color-greyScale/300 bg-color-greyScale/50 text-color-greyScale/950 transition-colors duration-150;
+    }
+
+    .profile-tips-modal__nav-button:hover:enabled {
+        background-color: rgba(12, 37, 95, 0.08);
+    }
+
+    .profile-tips-modal__nav-button:disabled {
+        @apply cursor-not-allowed opacity-45;
+    }
+
+    .profile-tips-modal__close {
+        @apply w-full max-w-[10rem];
+    }
+
+    @media (max-width: 640px) {
+        .profile-tips-modal__footer {
+            @apply flex-col items-stretch;
+        }
+
+        .profile-tips-modal__navigation {
+            @apply justify-between;
+        }
+
+        .profile-tips-modal__close {
+            @apply max-w-none;
+        }
+    }
+
     html[data-theme='dark'] .profile-action-modal-card {
         background-color: var(--theme-surface);
         box-shadow: var(--theme-shadow-strong);
@@ -429,6 +496,21 @@
 
     html[data-theme='dark'] .profile-friend-requests-modal__button--reject:hover:enabled {
         background-color: rgba(255, 89, 89, 0.12);
+    }
+
+    html[data-theme='dark'] .profile-tips-modal__step,
+    html[data-theme='dark'] .profile-tips-modal__list {
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .profile-tips-modal__nav-button {
+        background-color: var(--theme-surface-muted);
+        border-color: var(--theme-border);
+        color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .profile-tips-modal__nav-button:hover:enabled {
+        background-color: rgba(255, 255, 255, 0.06);
     }
 
     html[data-theme='dark'] .profile-gallery-picker__label {

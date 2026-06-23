@@ -154,6 +154,23 @@ export default function CampaignLobby(): JSX.Element {
     const [postDeleteSubmitting, setPostDeleteSubmitting] = useState(false);
     const [postActionError, setPostActionError] = useState('');
     const [activeFilter, setActiveFilter] = useState('all');
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+
+        const syncViewportLayout = () => {
+            window.dispatchEvent(new Event('resize'));
+        };
+
+        syncViewportLayout();
+
+        const rafId = window.requestAnimationFrame(syncViewportLayout);
+
+        return () => {
+            window.cancelAnimationFrame(rafId);
+        };
+    }, []);
+
     useEffect(() => {
         if (!campaignId) {
             router.push('/');

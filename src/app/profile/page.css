@@ -162,6 +162,7 @@
 
     .profile-hero__mail-button,
     .profile-hero__requests-button,
+    .profile-hero__tips-button,
     .profile-hero__friend-button,
     .profile-hero__settings-button,
     .profile-hero__gallery-button {
@@ -172,6 +173,7 @@
 
     .profile-hero__mail-button:hover,
     .profile-hero__requests-button:hover,
+    .profile-hero__tips-button:hover,
     .profile-hero__friend-button:hover,
     .profile-hero__settings-button:hover,
     .profile-hero__gallery-button:hover {
@@ -599,7 +601,7 @@
     }
 
     .profile-carousel--badges .profile-carousel__controls {
-        @apply justify-center;
+        @apply justify-between;
     }
 
     .profile-carousel__arrow {
@@ -1005,7 +1007,7 @@
         }
 
         .profile-carousel--badges .profile-carousel__controls {
-            @apply justify-center;
+            @apply justify-between;
         }
 
         .profile-message-modal__layout {
@@ -1074,6 +1076,7 @@
 
     html[data-theme='dark'] .profile-hero__mail-button,
     html[data-theme='dark'] .profile-hero__requests-button,
+    html[data-theme='dark'] .profile-hero__tips-button,
     html[data-theme='dark'] .profile-hero__friend-button,
     html[data-theme='dark'] .profile-hero__settings-button,
     html[data-theme='dark'] .profile-hero__gallery-button {

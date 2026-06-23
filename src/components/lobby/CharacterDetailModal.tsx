@@ -1382,7 +1382,7 @@ export default function CharacterDetailModal({
                                         <h3 className="font-M-semibold cdm-section-title">
                                             Perícias
                                         </h3>
-                                        <div className="cdm-info-grid">
+                                        <div className="cdm-info-grid cdm-info-grid--checks">
                                             {(isEditing
                                                 ? Object.keys(SKILL_LABELS)
                                                 : (stats.skills ?? []).map(
@@ -1417,12 +1417,7 @@ export default function CharacterDetailModal({
                                                 return (
                                                     <div
                                                         key={skillKey}
-                                                        className="cdm-info-box"
-                                                        style={{
-                                                            flexDirection: 'row',
-                                                            alignItems: 'center',
-                                                            gap: '0.5rem',
-                                                        }}
+                                                        className="cdm-info-box cdm-info-box--check"
                                                     >
                                                         {isEditing && (
                                                             <input
@@ -1444,12 +1439,12 @@ export default function CharacterDetailModal({
                                                                 }}
                                                             />
                                                         )}
-                                                        <div style={{ flex: 1 }}>
-                                                            <span className="font-XXS-regular cdm-info-label mr-2">
+                                                        <div className="cdm-info-box__content">
+                                                            <span className="font-XXS-regular cdm-info-label cdm-info-box__label">
                                                                 {SKILL_LABELS[skillKey] ||
                                                                     skillKey}
                                                             </span>
-                                                            <span className="font-S-bold">
+                                                            <span className="font-S-bold cdm-info-box__value">
                                                                 {signed(bonus)}
                                                             </span>
                                                         </div>
@@ -1463,7 +1458,7 @@ export default function CharacterDetailModal({
                                         <h3 className="font-M-semibold cdm-section-title">
                                             Testes de Resistência
                                         </h3>
-                                        <div className="cdm-info-grid">
+                                        <div className="cdm-info-grid cdm-info-grid--checks">
                                             {(isEditing
                                                 ? editAbilityScores
                                                 : stats.abilityScores.filter(
@@ -1488,12 +1483,7 @@ export default function CharacterDetailModal({
                                                 return (
                                                     <div
                                                         key={ab.ability}
-                                                        className="cdm-info-box"
-                                                        style={{
-                                                            flexDirection: 'row',
-                                                            alignItems: 'center',
-                                                            gap: '0.5rem',
-                                                        }}
+                                                        className="cdm-info-box cdm-info-box--check"
                                                     >
                                                         {isEditing && (
                                                             <input
@@ -1526,13 +1516,13 @@ export default function CharacterDetailModal({
                                                                 }}
                                                             />
                                                         )}
-                                                        <div style={{ flex: 1 }}>
-                                                            <span className="font-XXS-regular cdm-info-label mr-2">
+                                                        <div className="cdm-info-box__content">
+                                                            <span className="font-XXS-regular cdm-info-label cdm-info-box__label">
                                                                 {ABILITY_FULL[
                                                                     ab.ability
                                                                 ] ?? ab.ability}
                                                             </span>
-                                                            <span className="font-S-bold">
+                                                            <span className="font-S-bold cdm-info-box__value">
                                                                 {signed(bonus)}
                                                             </span>
                                                         </div>

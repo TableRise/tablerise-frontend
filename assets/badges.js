@@ -252,7 +252,7 @@ const rawBadges = {
     staff: {
         colorful: '/images/badges/staff.webp',
         blackandwhite: '/images/badges/staff-bw.webp',
-        description: 'Badge sem regra automatica de conquista ativa no backend.',
+        description: 'Badge sem progressão.',
     },
     student: {
         colorful: '/images/badges/student.webp',

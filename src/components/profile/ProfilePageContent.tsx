@@ -39,6 +39,7 @@ import ProfileGalleryModal from '@/components/profile/ProfileGalleryModal';
 import ProfileMessagesModal from '@/components/profile/ProfileMessagesModal';
 import ProfileFriendRequestModal from '@/components/profile/ProfileFriendRequestModal';
 import ProfileFriendRequestsInboxModal from '@/components/profile/ProfileFriendRequestsInboxModal';
+import ProfileTipsModal from '@/components/profile/ProfileTipsModal';
 import {
     badgeEntries,
     badgeMap,
@@ -84,6 +85,8 @@ type ProfilePageContentProps = {
     userId: string;
 };
 
+const PROFILE_TIPS_SEEN_STORAGE_PREFIX = 'tablerise-profile-tips-seen';
+
 function buildBadgePopoverId(scope: 'catalog', badgeKey: string): string {
     return `${scope}:${badgeKey}`;
 }
@@ -125,6 +128,7 @@ export default function ProfilePageContent({
     const [campaigns, setCampaigns] = useState<ProfileCampaign[]>([]);
     const [characters, setCharacters] = useState<ProfileCharacter[]>([]);
     const [currentUserId, setCurrentUserId] = useState('');
+    const [currentUserResolved, setCurrentUserResolved] = useState(false);
     const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
     const [gateStep, setGateStep] = useState<ProfileGateStep>('none');
     const [biographyModalOpen, setBiographyModalOpen] = useState(false);
@@ -161,6 +165,7 @@ export default function ProfilePageContent({
     const [friendsListModalOpen, setFriendsListModalOpen] = useState(false);
     const [friendSearchModalOpen, setFriendSearchModalOpen] = useState(false);
     const [messagesModalOpen, setMessagesModalOpen] = useState(false);
+    const [tipsModalOpen, setTipsModalOpen] = useState(false);
     const [galleryModalOpen, setGalleryModalOpen] = useState(false);
     const [friendRequestModalOpen, setFriendRequestModalOpen] = useState(false);
     const [friendRequestsInboxModalOpen, setFriendRequestsInboxModalOpen] =
@@ -188,6 +193,8 @@ export default function ProfilePageContent({
             setCurrentUserId(normalizeStoredUserId(storedUser));
         } catch {
             setCurrentUserId('');
+        } finally {
+            setCurrentUserResolved(true);
         }
     }, []);
 
@@ -463,6 +470,23 @@ export default function ProfilePageContent({
 
         setGateStep('none');
     }, [isOwnProfile, user, userDetails]);
+
+    useEffect(() => {
+        if (!currentUserResolved || !currentUserId) return;
+        if (loading || !user || !isOwnProfile) return;
+        if (gateStep !== 'none') return;
+
+        const seenStorageKey = `${PROFILE_TIPS_SEEN_STORAGE_PREFIX}:${currentUserId}`;
+
+        try {
+            if (localStorage.getItem(seenStorageKey) === '1') return;
+
+            localStorage.setItem(seenStorageKey, '1');
+            setTipsModalOpen(true);
+        } catch {
+            setTipsModalOpen(true);
+        }
+    }, [currentUserId, currentUserResolved, gateStep, isOwnProfile, loading, user]);
 
     useEffect(() => {
         let mounted = true;
@@ -902,12 +926,18 @@ export default function ProfilePageContent({
                     onOpenFriendRequestsInbox={() =>
                         setFriendRequestsInboxModalOpen(true)
                     }
+                    showTipsAction={isOwnProfile}
+                    onOpenTips={() => setTipsModalOpen(true)}
                     showProfileControlsAction={isOwnProfile}
                     showGalleryAction={isOwnProfile}
                     onOpenGallery={() => setGalleryModalOpen(true)}
                     showFriendRequestAction={showFriendRequestAction}
                     onOpenFriendRequest={() => setFriendRequestModalOpen(true)}
                 />
+
+                {tipsModalOpen ? (
+                    <ProfileTipsModal onClose={() => setTipsModalOpen(false)} />
+                ) : null}
 
                 {profileControlModalOpen ? (
                     <ProfileControlModal

@@ -10,6 +10,7 @@ import AddFriendDarkIcon from '@assets/icons/social/add-friend-dark.svg?url';
 import FriendRequestsIcon from '@assets/icons/social/friends-request.svg?url';
 import SettingsDarkIcon from '@assets/icons/menu-panel-lobby/settings-dark.svg?url';
 import GalleryIcon from '@assets/icons/sys/gallery.svg?url';
+import TipIcon from '@assets/icons/sys/tip.svg?url';
 import RankedAvatarFrame from '@/components/common/RankedAvatarFrame';
 import ProfileBadgePopover from '@/components/profile/ProfileBadgePopover';
 import type { DatabaseUserWithDetails } from '@/types/shared/entities';
@@ -52,6 +53,8 @@ type ProfileHeroSectionProps = {
     showFriendRequestsInboxAction: boolean;
     friendRequestsBadgeCount?: number;
     onOpenFriendRequestsInbox: () => void;
+    showTipsAction: boolean;
+    onOpenTips: () => void;
     showProfileControlsAction: boolean;
     showGalleryAction: boolean;
     onOpenGallery: () => void;
@@ -92,6 +95,8 @@ export default function ProfileHeroSection({
     showFriendRequestsInboxAction,
     friendRequestsBadgeCount = 0,
     onOpenFriendRequestsInbox,
+    showTipsAction,
+    onOpenTips,
     showProfileControlsAction,
     showGalleryAction,
     onOpenGallery,
@@ -124,6 +129,7 @@ export default function ProfileHeroSection({
             <div className="profile-hero__panel">
                 {showMessageAction ||
                 showFriendRequestsInboxAction ||
+                showTipsAction ||
                 showProfileControlsAction ||
                 showGalleryAction ||
                 showFriendRequestAction ? (
@@ -170,6 +176,18 @@ export default function ProfileHeroSection({
                                         {formatBadgeCount(friendRequestsBadgeCount)}
                                     </span>
                                 ) : null}
+                            </div>
+                        ) : null}
+                        {showTipsAction ? (
+                            <div className="profile-hero__action-shell">
+                                <button
+                                    type="button"
+                                    className="profile-hero__tips-button"
+                                    onClick={onOpenTips}
+                                    aria-label="Abrir dicas do perfil"
+                                >
+                                    <Image src={TipIcon} alt="" width={22} height={22} />
+                                </button>
                             </div>
                         ) : null}
                         {showProfileControlsAction ? (

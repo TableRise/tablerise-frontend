@@ -4,7 +4,14 @@ import Image from 'next/image';
 import shapes from '@assets/shapes.js';
 import '@/components/common/styles/RankedAvatarFrame.css';
 
-const VALID_RANKS = ['bronze', 'diamond', 'gold', 'divine'] as const;
+const VALID_RANKS = [
+    'bronze',
+    'diamond',
+    'gold',
+    'emerald',
+    'amethyst',
+    'divine',
+] as const;
 
 type RankKey = (typeof VALID_RANKS)[number];
 type RankedAvatarVariant = 'profile' | 'avatar';
@@ -24,7 +31,9 @@ function normalizeRank(rank?: string | null): RankKey | null {
 
     const normalizedRank = rank.trim().toLowerCase();
     const canonicalRank = normalizedRank === 'white' ? 'divine' : normalizedRank;
-    const matchedRank = canonicalRank.match(/bronze|diamond|gold|divine/)?.[0];
+    const matchedRank = canonicalRank.match(
+        /bronze|diamond|gold|emerald|amethyst|divine/
+    )?.[0];
 
     return VALID_RANKS.includes(canonicalRank as RankKey)
         ? (canonicalRank as RankKey)

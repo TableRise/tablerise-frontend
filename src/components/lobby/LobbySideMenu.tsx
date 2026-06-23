@@ -36,7 +36,11 @@ export default function LobbySideMenu({
 }: LobbySideMenuProps): JSX.Element {
     const { themeMode } = useContext(TableriseContext);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [isMobileViewport, setIsMobileViewport] = useState(false);
+    const [isMobileViewport, setIsMobileViewport] = useState<boolean>(() => {
+        if (typeof window === 'undefined') return false;
+
+        return (window.visualViewport?.width ?? window.innerWidth) <= 768;
+    });
     const isDarkMode = themeMode === 'dark';
 
     const playerMenuItems = useMemo(
@@ -106,7 +110,8 @@ export default function LobbySideMenu({
 
     useEffect(() => {
         function syncViewportState() {
-            const mobileViewport = window.innerWidth <= 768;
+            const mobileViewport =
+                (window.visualViewport?.width ?? window.innerWidth) <= 768;
 
             setIsMobileViewport(mobileViewport);
 
@@ -117,12 +122,17 @@ export default function LobbySideMenu({
 
         syncViewportState();
 
-        function handleResize() {
-            syncViewportState();
-        }
+        const visualViewport = window.visualViewport;
 
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        window.addEventListener('resize', syncViewportState);
+        window.addEventListener('orientationchange', syncViewportState);
+        visualViewport?.addEventListener('resize', syncViewportState);
+
+        return () => {
+            window.removeEventListener('resize', syncViewportState);
+            window.removeEventListener('orientationchange', syncViewportState);
+            visualViewport?.removeEventListener('resize', syncViewportState);
+        };
     }, []);
 
     return (
