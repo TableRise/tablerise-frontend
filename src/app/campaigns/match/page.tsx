@@ -25,6 +25,7 @@ import {
     type CampaignCharacter,
     type FullCharacterDnd,
 } from '@/server/characters/get-characters';
+import { updateCharacter } from '@/server/characters/update-character';
 import { getDnd5eClassById, getDnd5eSpellById } from '@/server/dungeons&dragons5e/system';
 import CharacterSheetModal from '@/components/lobby/CharacterSheetModal';
 import CharacterDetailModal from '@/components/lobby/CharacterDetailModal';
@@ -56,6 +57,8 @@ import type {
     CharacterUpdatedPayload,
     DiceRollResolvedPayload,
     MatchImageHighlightedChangedPayload,
+    MatchMusicPlaybackState,
+    MatchMusicTimeChangedPayload,
     MatchToken,
     SocketJournal,
     TokenBatchUpdatedPayload,
@@ -67,6 +70,8 @@ import type { ImageObject } from '@/types/shared/general';
 import type { UploadImageValue } from '@/utils/imageUploadPayload';
 import LogoLightSVG from '../../../../assets/icons/logo-blue.svg?url';
 import LogoDarkSVG from '../../../../assets/icons/logo-dark.svg?url';
+import LogoPureLightMobileSVG from '../../../../assets/icons/logo-pure-light-min-blue.svg?url';
+import LogoPureDarkMobileSVG from '../../../../assets/icons/logo-pure-dark-min-blue.svg?url';
 import SheetLightSVG from '../../../../assets/icons/menu-panel-lobby/sheet.svg?url';
 import SheetDarkSVG from '../../../../assets/icons/menu-panel-lobby/sheet-dark.svg?url';
 import MediaLightSVG from '../../../../assets/icons/menu-panel-lobby/media.svg?url';
@@ -111,12 +116,7 @@ import GridOffLightSVG from '../../../../assets/icons/nav/grid-off-blue.svg?url'
 import GridOffDarkSVG from '../../../../assets/icons/nav/grid-off-dark.svg?url';
 import GridOnLightSVG from '../../../../assets/icons/nav/grind-on-blue.svg?url';
 import GridOnDarkSVG from '../../../../assets/icons/nav/grind-on-dark.svg?url';
-import ArrowRightBlueSVG from '../../../../assets/icons/nav/arrow-right-blue.svg?url';
-import ArrowRightDarkSVG from '../../../../assets/icons/nav/arrow-right-dark.svg?url';
-import ArrowUpSVG from '../../../../assets/icons/nav/arrow-up.svg?url';
-import ArrowDownSVG from '../../../../assets/icons/nav/arrow-down.svg?url';
-import ArrowUpDarkSVG from '../../../../assets/icons/nav/arrow-up-dark.svg?url';
-import ArrowDownDarkSVG from '../../../../assets/icons/nav/arrow-down-dark.svg?url';
+import { ArrowLeft, ArrowRight } from '@/components/icons/Arrows';
 import SideImageBackground from '../../../../public/images/SideImageBackground.svg?url';
 import { useStoredUser } from '@/hooks/useStoredUser';
 import '@/app/campaigns/match/page.css';
@@ -223,6 +223,14 @@ function signed(value: number): string {
     return value >= 0 ? `+${value}` : `${value}`;
 }
 
+function formatPlaybackTime(totalSeconds: number): string {
+    const safeSeconds = Math.max(0, Math.floor(totalSeconds));
+    const minutes = Math.floor(safeSeconds / 60);
+    const seconds = safeSeconds % 60;
+
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
 function areJournalPostsEqual(
     first: JournalPost | null,
     second: JournalPost | null
@@ -263,6 +271,7 @@ function getMapTokenPosition(
 
 interface MapTokenSummary {
     currentHitPoints: number | null;
+    tempHitPoints: number | null;
     level: number | null;
 }
 
@@ -431,7 +440,15 @@ export default function MatchPage(): JSX.Element {
     const pendingTokenSocketUpdatesRef = useRef<
         Record<string, { tokenId: string; xPct: number; yPct: number; widthPct: number }>
     >({});
-    const musicPlayerFrameRef = useRef<HTMLIFrameElement | null>(null);
+    const musicPlayerContainerRef = useRef<HTMLDivElement | null>(null);
+    const musicPlayerRef = useRef<any>(null);
+    const musicPlayerApiReadyRef = useRef(false);
+    const musicProgressIntervalRef = useRef<number | null>(null);
+    const pendingMusicSeekTimeRef = useRef<number | null>(null);
+    const playingMusicIdRef = useRef<string | null>(null);
+    const serverClockOffsetMsRef = useRef(0);
+    const deathSavePopoverRef = useRef<HTMLDivElement | null>(null);
+    const hitPointPopoverRef = useRef<HTMLDivElement | null>(null);
     const hasHydratedMatchSyncRef = useRef(false);
     const hasAppliedVisibleCharacterSyncRef = useRef(false);
     const selectedCharacterIdRef = useRef('');
@@ -476,6 +493,8 @@ export default function MatchPage(): JSX.Element {
     >(null);
     const [mapImages, setMapImages] = useState<ImageObject[]>([]);
     const [playingMusicId, setPlayingMusicId] = useState<string | null>(null);
+    const [musicCurrentTime, setMusicCurrentTime] = useState(0);
+    const [musicDuration, setMusicDuration] = useState(0);
     const [musicVolume, setMusicVolume] = useState(50);
     const [musicVolumeOpen, setMusicVolumeOpen] = useState(false);
     const [mapZoomOpen, setMapZoomOpen] = useState(false);
@@ -483,9 +502,13 @@ export default function MatchPage(): JSX.Element {
     const [mapPanX, setMapPanX] = useState(0);
     const [mapPanY, setMapPanY] = useState(0);
     const [activeMapPan, setActiveMapPan] = useState(false);
-    const [isMobileTopBarOpen, setIsMobileTopBarOpen] = useState(true);
-    const [isMobileBottomBarOpen, setIsMobileBottomBarOpen] = useState(true);
+    const [isTopBarOpen, setIsTopBarOpen] = useState(true);
+    const [isBottomBarOpen, setIsBottomBarOpen] = useState(true);
+    const [isMobileViewport, setIsMobileViewport] = useState<boolean>(() =>
+        typeof window === 'undefined' ? false : window.innerWidth <= 768
+    );
     const mapZoomScale = mapZoomPercent / 100;
+    const activeMusic = musics.find((music) => music.id === playingMusicId) ?? null;
     const [charPanelOpen, setCharPanelOpen] = useState(false);
     const [charPanelTab, setCharPanelTab] = useState<'resumo' | 'magias' | 'habilidades'>(
         'resumo'
@@ -519,6 +542,15 @@ export default function MatchPage(): JSX.Element {
         null
     );
     const [characterLoading, setCharacterLoading] = useState(false);
+    const [hitPointEditorOpen, setHitPointEditorOpen] = useState<
+        'points' | 'currentPoints' | 'tempPoints' | null
+    >(null);
+    const [hitPointEditorValue, setHitPointEditorValue] = useState('');
+    const [hitPointUpdateSaving, setHitPointUpdateSaving] = useState(false);
+    const [hitPointUpdateError, setHitPointUpdateError] = useState('');
+    const [deathSaveModalOpen, setDeathSaveModalOpen] = useState(false);
+    const [deathSaveUpdateSaving, setDeathSaveUpdateSaving] = useState(false);
+    const [deathSaveUpdateError, setDeathSaveUpdateError] = useState('');
     const [className, setClassName] = useState('');
     const [spellNameMap, setSpellNameMap] = useState<Record<string, string>>({});
     const [spellUsed, setSpellUsed] = useState<Record<string, boolean>>({});
@@ -543,6 +575,10 @@ export default function MatchPage(): JSX.Element {
     const [journalHighlightError, setJournalHighlightError] = useState('');
     const [journalHighlightNoticeMessage, setJournalHighlightNoticeMessage] =
         useState('');
+
+    useEffect(() => {
+        playingMusicIdRef.current = playingMusicId;
+    }, [playingMusicId]);
     const [activeTokenInteractionMeta, setActiveTokenInteractionMeta] = useState<{
         tokenId: string;
         type: TokenInteractionType;
@@ -591,18 +627,54 @@ export default function MatchPage(): JSX.Element {
     }, []);
 
     useEffect(() => {
-        function syncMobileBarState() {
-            if (window.innerWidth > 768) {
-                setIsMobileTopBarOpen(true);
-                setIsMobileBottomBarOpen(true);
-            }
+        function syncViewportMode() {
+            setIsMobileViewport(window.innerWidth <= 768);
         }
 
-        syncMobileBarState();
-        window.addEventListener('resize', syncMobileBarState);
+        syncViewportMode();
+        window.addEventListener('resize', syncViewportMode);
 
         return () => {
-            window.removeEventListener('resize', syncMobileBarState);
+            window.removeEventListener('resize', syncViewportMode);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (isMobileViewport && isBottomBarOpen) {
+            setCharPanelOpen(false);
+        }
+    }, [isBottomBarOpen, isMobileViewport]);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        if ((window as any).YT?.Player) {
+            musicPlayerApiReadyRef.current = true;
+            return;
+        }
+
+        const previousReadyHandler = (window as any).onYouTubeIframeAPIReady;
+
+        (window as any).onYouTubeIframeAPIReady = () => {
+            musicPlayerApiReadyRef.current = true;
+            previousReadyHandler?.();
+        };
+
+        if (!document.getElementById('yt-iframe-api')) {
+            const script = document.createElement('script');
+            script.id = 'yt-iframe-api';
+            script.src = 'https://www.youtube.com/iframe_api';
+            document.head.appendChild(script);
+        }
+
+        return () => {
+            if ((window as any).onYouTubeIframeAPIReady === previousReadyHandler) {
+                return;
+            }
+
+            (window as any).onYouTubeIframeAPIReady = previousReadyHandler;
         };
     }, []);
 
@@ -638,7 +710,13 @@ export default function MatchPage(): JSX.Element {
     }, [backgroundImage, isLandscapeViewport, mapPanX, mapPanY, mapZoomScale]);
 
     const isDarkTheme = themeMode === 'dark';
-    const LogoSVG = isDarkTheme ? LogoDarkSVG : LogoLightSVG;
+    const LogoSVG = isMobileViewport
+        ? isDarkTheme
+            ? LogoPureDarkMobileSVG
+            : LogoPureLightMobileSVG
+        : isDarkTheme
+        ? LogoDarkSVG
+        : LogoLightSVG;
     const SheetSVG = isDarkTheme ? SheetDarkSVG : SheetLightSVG;
     const MediaSVG = isDarkTheme ? MediaDarkSVG : MediaLightSVG;
     const LeftPanelOpenSVG = isDarkTheme ? LeftPanelOpenDarkSVG : LeftPanelOpenLightSVG;
@@ -664,14 +742,7 @@ export default function MatchPage(): JSX.Element {
     const GridOffSVG = isDarkTheme ? GridOffDarkSVG : GridOffLightSVG;
     const GridOnSVG = isDarkTheme ? GridOnDarkSVG : GridOnLightSVG;
     const ZoomSVG = isDarkTheme ? ZoomDarkSVG : ZoomLightSVG;
-    const MobileTopBarArrowSVG = isDarkTheme ? ArrowRightDarkSVG : ArrowRightBlueSVG;
-    const MobileBottomBarArrowSVG = isDarkTheme
-        ? isMobileBottomBarOpen
-            ? ArrowDownDarkSVG
-            : ArrowUpDarkSVG
-        : isMobileBottomBarOpen
-        ? ArrowDownSVG
-        : ArrowUpSVG;
+    const shouldHideCharPanelTrigger = isMobileViewport && isBottomBarOpen;
 
     const diceOptions = [
         { label: 'D20', icon: D20SVG, sides: 20 },
@@ -712,12 +783,50 @@ export default function MatchPage(): JSX.Element {
     ): ImageObject | null =>
         matchData?.imageHighlighted ?? matchData?.imageHighlight ?? null;
 
-    const getCloneDisplayedHitPoints = (tokenId: string, characterId: string) => {
+    const getCloneCurrentHitPoints = (tokenId: string, characterId: string) => {
         if (Object.prototype.hasOwnProperty.call(cloneTokenHitPoints, tokenId)) {
             return cloneTokenHitPoints[tokenId];
         }
 
         return campaignCharacterSummaries[characterId]?.currentHitPoints ?? null;
+    };
+
+    const getCloneDisplayedHitPoints = (tokenId: string, characterId: string) => {
+        return getCloneCurrentHitPoints(tokenId, characterId);
+    };
+
+    const getDisplayedTokenHitPoints = (summary?: MapTokenSummary | null) => {
+        if (!summary) {
+            return null;
+        }
+
+        return summary.currentHitPoints;
+    };
+
+    const applyUpdatedCharacterLifeState = (
+        characterId: string,
+        updatedCharacter: FullCharacterDnd
+    ) => {
+        setCampaignCharacterSummaries((current) => ({
+            ...current,
+            [characterId]: {
+                currentHitPoints:
+                    updatedCharacter.data?.stats?.hitPoints?.currentPoints ?? null,
+                tempHitPoints: updatedCharacter.data?.stats?.hitPoints?.tempPoints ?? 0,
+                level:
+                    updatedCharacter.data?.profile?.level ??
+                    current[characterId]?.level ??
+                    null,
+            },
+        }));
+
+        if (selectedCharacterIdRef.current === characterId) {
+            setSelectedCharacter(updatedCharacter);
+        }
+
+        if (selectedMapCharacterIdRef.current === characterId) {
+            setCharacterDetailRefreshVersion((current) => current + 1);
+        }
     };
 
     const previousCampaignCharacterIdsRef = useRef<string[]>([]);
@@ -808,27 +917,251 @@ export default function MatchPage(): JSX.Element {
         dismissDiceRoll();
     };
 
-    const applyMusicVolume = (volume: number) => {
-        const playerWindow = musicPlayerFrameRef.current?.contentWindow;
+    const stopMusicProgressTracking = () => {
+        if (musicProgressIntervalRef.current !== null) {
+            window.clearInterval(musicProgressIntervalRef.current);
+            musicProgressIntervalRef.current = null;
+        }
+    };
 
-        if (!playerWindow) {
+    const normalizeMusicTimeSeconds = (nextTime: number) => {
+        if (!Number.isFinite(nextTime)) {
+            return 0;
+        }
+
+        return Math.max(0, Math.floor(nextTime));
+    };
+
+    const parseTimestampMs = (timestamp?: string | null) => {
+        if (!timestamp) {
+            return null;
+        }
+
+        const parsedMs = Date.parse(timestamp);
+
+        return Number.isFinite(parsedMs) ? parsedMs : null;
+    };
+
+    const syncServerClockOffset = (serverTime: string) => {
+        const serverTimeMs = parseTimestampMs(serverTime);
+
+        if (serverTimeMs === null) {
             return;
         }
 
-        const muteCommand =
-            volume <= 0
-                ? { event: 'command', func: 'mute', args: [] }
-                : { event: 'command', func: 'unMute', args: [] };
+        serverClockOffsetMsRef.current = serverTimeMs - Date.now();
+    };
 
-        playerWindow.postMessage(JSON.stringify(muteCommand), '*');
-        playerWindow.postMessage(
-            JSON.stringify({
-                event: 'command',
-                func: 'setVolume',
-                args: [volume],
-            }),
-            '*'
+    const getEstimatedServerNowMs = () => Date.now() + serverClockOffsetMsRef.current;
+
+    const getElapsedSecondsBetween = (
+        earlierTimestamp?: string | null,
+        laterTimestamp?: string | null
+    ) => {
+        const earlierMs = parseTimestampMs(earlierTimestamp);
+        const laterMs = parseTimestampMs(laterTimestamp);
+
+        if (earlierMs === null || laterMs === null) {
+            return 0;
+        }
+
+        return Math.max(0, (laterMs - earlierMs) / 1000);
+    };
+
+    const getElapsedSecondsSinceServerTimestamp = (serverTimestamp?: string | null) => {
+        const serverTimestampMs = parseTimestampMs(serverTimestamp);
+
+        if (serverTimestampMs === null) {
+            return 0;
+        }
+
+        return Math.max(0, (getEstimatedServerNowMs() - serverTimestampMs) / 1000);
+    };
+
+    const resolveMusicTimeFromPlaybackAnchor = (
+        musicPlayback: MatchMusicPlaybackState | null | undefined,
+        referenceServerTime?: string | null
+    ) => {
+        if (!musicPlayback) {
+            return 0;
+        }
+
+        const elapsedSeconds = musicPlayback.isPlaying
+            ? referenceServerTime
+                ? getElapsedSecondsBetween(
+                      musicPlayback.anchorUpdatedAt,
+                      referenceServerTime
+                  )
+                : getElapsedSecondsSinceServerTimestamp(musicPlayback.anchorUpdatedAt)
+            : 0;
+
+        return normalizeMusicTimeSeconds(
+            musicPlayback.anchorTimeSeconds + elapsedSeconds
         );
+    };
+
+    const resolveMusicTimeFromCampaignSync = (payload: CampaignSyncPayload) => {
+        if (!payload.match.playingMusicId) {
+            return 0;
+        }
+
+        if (typeof payload.match.playingMusicTimeSeconds === 'number') {
+            return normalizeMusicTimeSeconds(payload.match.playingMusicTimeSeconds);
+        }
+
+        return resolveMusicTimeFromPlaybackAnchor(
+            payload.match.musicPlayback,
+            payload.serverTime
+        );
+    };
+
+    const resolveMusicTimeFromSocketUpdate = (payload: MatchMusicTimeChangedPayload) =>
+        normalizeMusicTimeSeconds(
+            payload.currentTimeSeconds +
+                getElapsedSecondsSinceServerTimestamp(payload.updatedAt)
+        );
+
+    const queueMusicSeekTime = (nextTime: number) => {
+        const normalizedTime = normalizeMusicTimeSeconds(nextTime);
+        pendingMusicSeekTimeRef.current = normalizedTime;
+        setMusicCurrentTime(normalizedTime);
+    };
+
+    const flushPendingMusicSeekTime = (): boolean => {
+        if (pendingMusicSeekTimeRef.current === null) {
+            return true;
+        }
+
+        const player = musicPlayerRef.current;
+
+        if (!player?.seekTo) {
+            return false;
+        }
+
+        try {
+            player.seekTo(pendingMusicSeekTimeRef.current, true);
+            setMusicCurrentTime(pendingMusicSeekTimeRef.current);
+            pendingMusicSeekTimeRef.current = null;
+            return true;
+        } catch {
+            return false;
+        }
+    };
+
+    const syncMusicPlaybackProgress = () => {
+        if (!flushPendingMusicSeekTime()) {
+            return;
+        }
+
+        const player = musicPlayerRef.current;
+        if (!player?.getCurrentTime || !player?.getDuration) {
+            return;
+        }
+
+        try {
+            setMusicCurrentTime(player.getCurrentTime() ?? 0);
+            setMusicDuration(player.getDuration() ?? 0);
+        } catch {
+            // Ignore transient player access errors while the iframe initializes.
+        }
+    };
+
+    const startMusicProgressTracking = () => {
+        stopMusicProgressTracking();
+        syncMusicPlaybackProgress();
+        musicProgressIntervalRef.current = window.setInterval(
+            syncMusicPlaybackProgress,
+            500
+        );
+    };
+
+    const destroyMusicPlayer = () => {
+        stopMusicProgressTracking();
+
+        if (!musicPlayerRef.current) {
+            return;
+        }
+
+        try {
+            musicPlayerRef.current.destroy();
+        } catch {
+            // Ignore teardown errors if the player iframe is already gone.
+        }
+
+        musicPlayerRef.current = null;
+    };
+
+    const applyMusicVolume = (volume: number) => {
+        const player = musicPlayerRef.current;
+
+        if (!player?.setVolume) {
+            return;
+        }
+
+        try {
+            player.setVolume(volume);
+
+            if (volume <= 0) {
+                player.mute?.();
+                return;
+            }
+
+            player.unMute?.();
+        } catch {
+            // Ignore transient player access errors while the iframe initializes.
+        }
+    };
+
+    const createMusicPlayer = (videoId: string) => {
+        if (!(window as any).YT?.Player || !musicPlayerContainerRef.current) {
+            return;
+        }
+
+        destroyMusicPlayer();
+        setMusicCurrentTime(pendingMusicSeekTimeRef.current ?? 0);
+        setMusicDuration(0);
+
+        musicPlayerRef.current = new (window as any).YT.Player(
+            musicPlayerContainerRef.current,
+            {
+                height: '0',
+                width: '0',
+                videoId,
+                playerVars: {
+                    autoplay: 1,
+                    controls: 0,
+                    loop: 1,
+                    playlist: videoId,
+                },
+                events: {
+                    onReady: () => {
+                        applyMusicVolume(musicVolume);
+                        startMusicProgressTracking();
+                    },
+                    onStateChange: () => {
+                        syncMusicPlaybackProgress();
+                    },
+                },
+            }
+        );
+    };
+
+    const seekMusicTo = (nextTime: number) => {
+        queueMusicSeekTime(nextTime);
+
+        const player = musicPlayerRef.current;
+
+        if (!player?.seekTo) {
+            return;
+        }
+
+        try {
+            player.seekTo(Math.max(0, Math.floor(nextTime)), true);
+            setMusicCurrentTime(normalizeMusicTimeSeconds(nextTime));
+            pendingMusicSeekTimeRef.current = null;
+        } catch {
+            // Ignore transient player access errors while the iframe initializes.
+        }
     };
 
     const loadHighlightedJournalPost = async (options?: {
@@ -959,15 +1292,44 @@ export default function MatchPage(): JSX.Element {
     useEffect(() => {
         if (!playingMusicId) {
             setMusicVolumeOpen(false);
+            pendingMusicSeekTimeRef.current = null;
+            setMusicCurrentTime(0);
+            setMusicDuration(0);
+            destroyMusicPlayer();
             return;
         }
 
-        const timeoutId = window.setTimeout(() => {
-            applyMusicVolume(musicVolume);
-        }, 700);
+        if (musicPlayerApiReadyRef.current && (window as any).YT?.Player) {
+            createMusicPlayer(playingMusicId);
+            return;
+        }
 
-        return () => window.clearTimeout(timeoutId);
-    }, [playingMusicId, musicVolume]);
+        const intervalId = window.setInterval(() => {
+            if (!(window as any).YT?.Player) {
+                return;
+            }
+
+            musicPlayerApiReadyRef.current = true;
+            window.clearInterval(intervalId);
+            createMusicPlayer(playingMusicId);
+        }, 100);
+
+        return () => window.clearInterval(intervalId);
+    }, [playingMusicId]);
+
+    useEffect(() => {
+        if (!playingMusicId) {
+            return;
+        }
+
+        applyMusicVolume(musicVolume);
+    }, [musicVolume, playingMusicId]);
+
+    useEffect(() => {
+        return () => {
+            destroyMusicPlayer();
+        };
+    }, []);
 
     const ensureDiceBox = async (): Promise<DiceBoxThreejs> => {
         if (diceBoxRef.current) {
@@ -1384,6 +1746,7 @@ export default function MatchPage(): JSX.Element {
         const handleCampaignSync = (payload: CampaignSyncPayload) => {
             if (payload.campaignId !== campaignId) return;
 
+            syncServerClockOffset(payload.serverTime);
             hasHydratedMatchSyncRef.current = true;
             setBackgroundImage((current) => {
                 if (payload.match.activeMap) {
@@ -1394,6 +1757,7 @@ export default function MatchPage(): JSX.Element {
             });
             setGridVisible(payload.match.gridVisible);
             setActiveEffect(payload.match.activeEffect);
+            queueMusicSeekTime(resolveMusicTimeFromCampaignSync(payload));
             setPlayingMusicId(payload.match.playingMusicId);
             setMatchImages(payload.match.images ?? []);
 
@@ -1446,7 +1810,20 @@ export default function MatchPage(): JSX.Element {
             playingMusicId: string | null;
         }) => {
             if (payload.campaignId !== campaignId) return;
+            queueMusicSeekTime(0);
             setPlayingMusicId(payload.playingMusicId);
+        };
+
+        const handleMusicTimeChanged = (payload: MatchMusicTimeChangedPayload) => {
+            if (payload.campaignId !== campaignId) return;
+            if (
+                !payload.playingMusicId ||
+                payload.playingMusicId !== playingMusicIdRef.current
+            ) {
+                return;
+            }
+
+            seekMusicTo(resolveMusicTimeFromSocketUpdate(payload));
         };
 
         const handleVisibleCharactersChanged = (payload: {
@@ -1551,19 +1928,43 @@ export default function MatchPage(): JSX.Element {
         const handleCharacterUpdated = (payload: CharacterUpdatedPayload) => {
             if (payload.campaignId !== campaignId) return;
 
+            const nextCurrentHitPoints = payload.summary.currentHitPoints;
+
             setCampaignCharacterSummaries((current) => ({
                 ...current,
                 [payload.characterId]: {
-                    currentHitPoints: payload.summary.currentHitPoints,
-                    level: payload.summary.level,
+                    currentHitPoints: nextCurrentHitPoints,
+                    tempHitPoints: current[payload.characterId]?.tempHitPoints ?? 0,
+                    level:
+                        payload.summary.level ??
+                        current[payload.characterId]?.level ??
+                        null,
                 },
             }));
 
-            if (selectedCharacterIdRef.current === payload.characterId) {
-                setCharacterLoading(true);
-                getCharacterById(payload.characterId)
-                    .then((data) => setSelectedCharacter(data))
-                    .finally(() => setCharacterLoading(false));
+            if (
+                selectedCharacterIdRef.current === payload.characterId &&
+                payload.updatedFields.some((field) => field.startsWith('stats.hitPoints'))
+            ) {
+                setSelectedCharacter((current) => {
+                    if (!current) {
+                        return current;
+                    }
+
+                    return {
+                        ...current,
+                        data: {
+                            ...current.data,
+                            stats: {
+                                ...current.data.stats,
+                                hitPoints: {
+                                    ...current.data.stats.hitPoints,
+                                    currentPoints: nextCurrentHitPoints,
+                                },
+                            },
+                        },
+                    };
+                });
             }
 
             if (selectedMapCharacterIdRef.current === payload.characterId) {
@@ -1614,6 +2015,7 @@ export default function MatchPage(): JSX.Element {
         socket.on('match:grid_changed', handleGridChanged as never);
         socket.on('match:effect_changed', handleEffectChanged as never);
         socket.on('match:music_changed', handleMusicChanged as never);
+        socket.on('match:music_time_changed', handleMusicTimeChanged as never);
         socket.on(
             'match:visible_characters_changed',
             handleVisibleCharactersChanged as never
@@ -1647,6 +2049,7 @@ export default function MatchPage(): JSX.Element {
             socket.off('match:grid_changed', handleGridChanged as never);
             socket.off('match:effect_changed', handleEffectChanged as never);
             socket.off('match:music_changed', handleMusicChanged as never);
+            socket.off('match:music_time_changed', handleMusicTimeChanged as never);
             socket.off(
                 'match:visible_characters_changed',
                 handleVisibleCharactersChanged as never
@@ -1800,6 +2203,7 @@ export default function MatchPage(): JSX.Element {
                     {
                         currentHitPoints:
                             detail?.data?.stats?.hitPoints?.currentPoints ?? null,
+                        tempHitPoints: detail?.data?.stats?.hitPoints?.tempPoints ?? 0,
                         level: detail?.data?.profile?.level ?? null,
                     },
                 ] as const;
@@ -2040,6 +2444,59 @@ export default function MatchPage(): JSX.Element {
     }, [selectedCharacterId]);
 
     useEffect(() => {
+        setHitPointEditorOpen(null);
+        setHitPointEditorValue('');
+        setHitPointUpdateSaving(false);
+        setHitPointUpdateError('');
+        setDeathSaveModalOpen(false);
+        setDeathSaveUpdateSaving(false);
+        setDeathSaveUpdateError('');
+    }, [selectedCharacterId, charPanelOpen, charPanelTab]);
+
+    useEffect(() => {
+        if (!hitPointEditorOpen) {
+            return;
+        }
+
+        const handlePointerDown = (event: PointerEvent) => {
+            const target = event.target as Node | null;
+
+            if (!hitPointPopoverRef.current?.contains(target)) {
+                setHitPointEditorOpen(null);
+                setHitPointEditorValue('');
+                setHitPointUpdateError('');
+            }
+        };
+
+        window.addEventListener('pointerdown', handlePointerDown);
+
+        return () => {
+            window.removeEventListener('pointerdown', handlePointerDown);
+        };
+    }, [hitPointEditorOpen]);
+
+    useEffect(() => {
+        if (!deathSaveModalOpen) {
+            return;
+        }
+
+        const handlePointerDown = (event: PointerEvent) => {
+            const target = event.target as Node | null;
+
+            if (!deathSavePopoverRef.current?.contains(target)) {
+                setDeathSaveModalOpen(false);
+                setDeathSaveUpdateError('');
+            }
+        };
+
+        window.addEventListener('pointerdown', handlePointerDown);
+
+        return () => {
+            window.removeEventListener('pointerdown', handlePointerDown);
+        };
+    }, [deathSaveModalOpen]);
+
+    useEffect(() => {
         selectedMapCharacterIdRef.current = selectedMapCharacterId;
     }, [selectedMapCharacterId]);
 
@@ -2057,6 +2514,91 @@ export default function MatchPage(): JSX.Element {
     const hp = stats?.hitPoints;
     const deathSaves = stats?.deathSaves;
     const money = selectedCharacter?.data?.money;
+    const canUpdateHitPoints = Boolean(selectedCharacterId && stats && hp);
+    const canUpdateDeathSaves = Boolean(selectedCharacterId && stats && deathSaves);
+
+    const normalizeHitPointValue = (value: string) =>
+        Math.max(0, Math.trunc(Number(value.trim()) || 0));
+
+    const handleHitPointEditorOpen = (
+        kind: 'points' | 'currentPoints' | 'tempPoints'
+    ) => {
+        if (!hp) {
+            return;
+        }
+
+        setHitPointEditorOpen(kind);
+        setHitPointEditorValue(String(hp[kind] ?? 0));
+        setHitPointUpdateError('');
+    };
+
+    const handleHitPointSave = async () => {
+        if (!selectedCharacterId || !stats || !hp || !hitPointEditorOpen) {
+            return;
+        }
+
+        const normalizedValue = normalizeHitPointValue(hitPointEditorValue);
+
+        setHitPointUpdateSaving(true);
+        setHitPointUpdateError('');
+
+        const updatedCharacter = await updateCharacter(selectedCharacterId, {
+            data: {
+                stats: {
+                    ...stats,
+                    hitPoints: {
+                        [hitPointEditorOpen]: normalizedValue,
+                    },
+                },
+            },
+        });
+
+        if (!updatedCharacter) {
+            setHitPointUpdateSaving(false);
+            setHitPointUpdateError('Falha ao atualizar pontos de vida.');
+            return;
+        }
+
+        applyUpdatedCharacterLifeState(selectedCharacterId, updatedCharacter);
+        setHitPointEditorOpen(null);
+        setHitPointEditorValue('');
+        setHitPointUpdateSaving(false);
+        setHitPointUpdateError('');
+    };
+
+    const handleDeathSaveIncrement = async (kind: 'success' | 'failures') => {
+        if (!selectedCharacterId || !stats || !deathSaves) {
+            return;
+        }
+
+        setDeathSaveUpdateSaving(true);
+        setDeathSaveUpdateError('');
+
+        const updatedCharacter = await updateCharacter(selectedCharacterId, {
+            data: {
+                stats: {
+                    ...stats,
+                    deathSaves: {
+                        ...deathSaves,
+                        [kind]: (deathSaves[kind] ?? 0) + 1,
+                    },
+                },
+            },
+        });
+
+        if (!updatedCharacter) {
+            setDeathSaveUpdateSaving(false);
+            setDeathSaveUpdateError('Falha ao atualizar testes de morte.');
+            return;
+        }
+
+        if (selectedCharacterIdRef.current === selectedCharacterId) {
+            setSelectedCharacter(updatedCharacter);
+        }
+        setDeathSaveModalOpen(false);
+        setDeathSaveUpdateSaving(false);
+        setDeathSaveUpdateError('');
+    };
 
     const spellsByLevel: Array<{
         label: string;
@@ -2138,7 +2680,7 @@ export default function MatchPage(): JSX.Element {
                         token.isClone || character.authorUserId !== userInfo?.userId;
                     const displayedHitPoints = token.isClone
                         ? getCloneDisplayedHitPoints(token.tokenId, token.characterId)
-                        : summary?.currentHitPoints ?? null;
+                        : getDisplayedTokenHitPoints(summary);
                     const canMoveToken = canMoveCharacterToken(character);
                     const isActiveToken =
                         activeTokenInteractionMeta?.tokenId === token.tokenId;
@@ -2202,7 +2744,7 @@ export default function MatchPage(): JSX.Element {
                                         }}
                                     >
                                         <span className="match-map-token-clone-icon">
-                                            {token.isClone ? 'Ã—' : '+'}
+                                            {token.isClone ? '-' : '+'}
                                         </span>
                                     </button>
                                 )}
@@ -2236,7 +2778,7 @@ export default function MatchPage(): JSX.Element {
                                         }
                                     >
                                         <span className="match-map-token-resize-icon">
-                                            â†˜
+                                            ⛶
                                         </span>
                                     </button>
                                 )}
@@ -2491,7 +3033,7 @@ export default function MatchPage(): JSX.Element {
         }
 
         if (token.isClone) {
-            const currentHitPoints = getCloneDisplayedHitPoints(
+            const currentHitPoints = getCloneCurrentHitPoints(
                 token.tokenId,
                 token.characterId
             );
@@ -2653,6 +3195,7 @@ export default function MatchPage(): JSX.Element {
         const previousMusicId = playingMusicId;
         const nextMusicId = previousMusicId === musicId ? null : musicId;
 
+        queueMusicSeekTime(0);
         setPlayingMusicId(nextMusicId);
 
         const ack = await emitCampaignSocketAck(socket, 'match:set_music', {
@@ -2661,8 +3204,25 @@ export default function MatchPage(): JSX.Element {
         });
 
         if (!ack.ok) {
+            queueMusicSeekTime(0);
             setPlayingMusicId(previousMusicId);
         }
+    };
+
+    const handleMusicSeek = async (time: number) => {
+        const socket = campaignSocketRef.current;
+
+        if (!socket || !playingMusicId || !isMaster) {
+            return;
+        }
+
+        seekMusicTo(time);
+
+        await emitCampaignSocketAck(socket, 'match:set_music_time', {
+            campaignId,
+            playingMusicId,
+            currentTimeSeconds: Math.max(0, Math.floor(time)),
+        });
     };
 
     const handleMapSelection = async (mapId: string | null) => {
@@ -2762,396 +3322,799 @@ export default function MatchPage(): JSX.Element {
             </div>
 
             {/* Middle-left: character panel toggle + drawer */}
-            <div className="match-char-panel-anchor">
-                <button
-                    className="match-char-panel-toggle"
-                    title="Abrir resumo do personagem"
-                    onClick={() => setCharPanelOpen((v) => !v)}
-                >
-                    <Image
-                        src={LeftPanelOpenSVG.src}
-                        alt="Painel de personagem"
-                        width={30}
-                        height={30}
-                    />
-                </button>
+            {!shouldHideCharPanelTrigger && (
+                <div className="match-char-panel-anchor">
+                    <button
+                        className="match-char-panel-toggle"
+                        title="Abrir resumo do personagem"
+                        onClick={() => setCharPanelOpen((v) => !v)}
+                    >
+                        <Image
+                            src={LeftPanelOpenSVG.src}
+                            alt="Painel de personagem"
+                            width={30}
+                            height={30}
+                        />
+                    </button>
 
-                <aside
-                    className={`match-char-panel${
-                        charPanelOpen ? ' match-char-panel--open' : ''
-                    }`}
-                >
-                    <div className="match-char-panel-header">
-                        <h3 className="font-S-bold">Resumo da Ficha</h3>
-                        <button
-                            className="match-char-panel-open-sheet font-XXS-bold"
-                            onClick={() => setSheetModalOpen(true)}
-                        >
-                            Abrir ficha completa
-                        </button>
-                    </div>
+                    <aside
+                        className={`match-char-panel${
+                            charPanelOpen ? ' match-char-panel--open' : ''
+                        }`}
+                    >
+                        <div className="match-char-panel-header">
+                            <h3 className="font-S-bold">Resumo da Ficha</h3>
+                            <button
+                                className="match-char-panel-open-sheet font-XXS-bold"
+                                onClick={() => setSheetModalOpen(true)}
+                            >
+                                Abrir ficha completa
+                            </button>
+                        </div>
 
-                    {myCharacters.length === 0 && (
-                        <span className="font-XS-regular match-char-empty">
-                            Você não tem um personagem
-                        </span>
-                    )}
+                        {myCharacters.length === 0 && (
+                            <span className="font-XS-regular match-char-empty">
+                                Você não tem um personagem
+                            </span>
+                        )}
 
-                    {myCharacters.length > 1 && (
-                        <select
-                            className="match-char-select font-XS-regular"
-                            value={selectedCharacterId}
-                            onChange={(e) => setSelectedCharacterId(e.target.value)}
-                        >
-                            <option value="">Selecione um personagem</option>
-                            {myCharacters.map((char) => (
-                                <option key={char.id} value={char.id}>
-                                    {char.name}
-                                </option>
-                            ))}
-                        </select>
-                    )}
+                        {myCharacters.length > 1 && (
+                            <select
+                                className="match-char-select font-XS-regular"
+                                value={selectedCharacterId}
+                                onChange={(e) => setSelectedCharacterId(e.target.value)}
+                            >
+                                <option value="">Selecione um personagem</option>
+                                {myCharacters.map((char) => (
+                                    <option key={char.id} value={char.id}>
+                                        {char.name}
+                                    </option>
+                                ))}
+                            </select>
+                        )}
 
-                    {myCharacters.length === 1 && (
-                        <span className="match-char-single-name font-XS-bold">
-                            {myCharacters[0].name}
-                        </span>
-                    )}
+                        {myCharacters.length === 1 && (
+                            <span className="match-char-single-name font-XS-bold">
+                                {myCharacters[0].name}
+                            </span>
+                        )}
 
-                    {characterLoading && (
-                        <span className="font-XS-regular match-char-empty">
-                            <LoadingDots label="Carregando personagem" />
-                        </span>
-                    )}
+                        {characterLoading && (
+                            <span className="font-XS-regular match-char-empty">
+                                <LoadingDots label="Carregando personagem" />
+                            </span>
+                        )}
 
-                    {!characterLoading && selectedCharacter && profile && stats && (
-                        <>
-                            <div className="match-char-tabs">
-                                <button
-                                    className={`match-char-tab font-XXS-bold${
-                                        charPanelTab === 'resumo'
-                                            ? ' match-char-tab--active'
-                                            : ''
-                                    }`}
-                                    onClick={() => setCharPanelTab('resumo')}
-                                >
-                                    Resumo
-                                </button>
-                                <button
-                                    className={`match-char-tab font-XXS-bold${
-                                        charPanelTab === 'magias'
-                                            ? ' match-char-tab--active'
-                                            : ''
-                                    }`}
-                                    onClick={() => setCharPanelTab('magias')}
-                                >
-                                    Magias
-                                </button>
-                                <button
-                                    className={`match-char-tab font-XXS-bold${
-                                        charPanelTab === 'habilidades'
-                                            ? ' match-char-tab--active'
-                                            : ''
-                                    }`}
-                                    onClick={() => setCharPanelTab('habilidades')}
-                                >
-                                    Habilidades
-                                </button>
-                            </div>
+                        {!characterLoading && selectedCharacter && profile && stats && (
+                            <>
+                                <div className="match-char-tabs">
+                                    <button
+                                        className={`match-char-tab font-XXS-bold${
+                                            charPanelTab === 'resumo'
+                                                ? ' match-char-tab--active'
+                                                : ''
+                                        }`}
+                                        onClick={() => setCharPanelTab('resumo')}
+                                    >
+                                        Resumo
+                                    </button>
+                                    <button
+                                        className={`match-char-tab font-XXS-bold${
+                                            charPanelTab === 'magias'
+                                                ? ' match-char-tab--active'
+                                                : ''
+                                        }`}
+                                        onClick={() => setCharPanelTab('magias')}
+                                    >
+                                        Magias
+                                    </button>
+                                    <button
+                                        className={`match-char-tab font-XXS-bold${
+                                            charPanelTab === 'habilidades'
+                                                ? ' match-char-tab--active'
+                                                : ''
+                                        }`}
+                                        onClick={() => setCharPanelTab('habilidades')}
+                                    >
+                                        Habilidades
+                                    </button>
+                                </div>
 
-                            {charPanelTab === 'resumo' && (
-                                <div className="match-char-content">
-                                    <div className="match-char-profile">
-                                        <div className="match-char-avatar">
-                                            <Image
-                                                src={picture || SideImageBackground.src}
-                                                alt={profile.name}
-                                                fill
-                                                style={{ objectFit: 'cover' }}
-                                            />
-                                        </div>
-                                        <div>
-                                            <p className="font-XS-bold">{profile.name}</p>
-                                            <p className="font-XXS-regular">
-                                                {className || profile.class} •{' '}
-                                                {profile.race}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="match-char-grid-two">
-                                        <span className="font-XXS-regular">
-                                            Vida Total: <b>{hp?.points ?? 0}</b>
-                                        </span>
-                                        <span className="font-XXS-regular">
-                                            Vida Atual: <b>{hp?.currentPoints ?? 0}</b>
-                                        </span>
-                                        <span className="font-XXS-regular">
-                                            Vida Temporária: <b>{hp?.tempPoints ?? 0}</b>
-                                        </span>
-                                        <span className="font-XXS-regular">
-                                            Nível: <b>{profile.level ?? 0}</b>
-                                        </span>
-                                        <span className="font-XXS-regular">
-                                            XP: <b>{profile.xp ?? 0}</b>
-                                        </span>
-                                        <span className="font-XXS-regular">
-                                            Testes de Morte:{' '}
-                                            <b>{deathSaves?.success ?? 0}</b>/
-                                            <b>{deathSaves?.failures ?? 0}</b>
-                                        </span>
-                                        <span className="font-XXS-regular">
-                                            Dinheiro:{' '}
-                                            {(['cp', 'sp', 'ep', 'gp', 'pp'] as const)
-                                                .filter((key) => (money?.[key] ?? 0) > 0)
-                                                .map((key) => (
-                                                    <b key={key}>
-                                                        {money![key]}{' '}
-                                                        {CURRENCY_LABELS[key]}{' '}
-                                                    </b>
-                                                ))}
-                                            {(
-                                                ['cp', 'sp', 'ep', 'gp', 'pp'] as const
-                                            ).every(
-                                                (key) => (money?.[key] ?? 0) === 0
-                                            ) && <b>0 PO</b>}
-                                        </span>
-                                        <span className="font-XXS-regular">
-                                            Bonus de proficiência:{' '}
-                                            <b>{stats.proficiencyBonus ?? 0}</b>
-                                        </span>
-                                    </div>
-
-                                    <div className="match-char-section">
-                                        <p className="font-XXS-bold">Ability Scores</p>
-                                        <div className="match-char-tags">
-                                            {stats.abilityScores.map((ability) => (
-                                                <span
-                                                    key={ability.ability}
-                                                    className="match-char-tag font-XXS-regular"
-                                                >
-                                                    {ABILITY_LABELS[ability.ability] ||
-                                                        ability.ability.toUpperCase()}
-                                                    : {ability.value} (
-                                                    {signed(ability.modifier)})
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {(stats.skills?.length ?? 0) > 0 && (
-                                        <div className="match-char-section">
-                                            <p className="font-XXS-bold">Perícias</p>
-                                            <div className="match-char-tags">
-                                                {(stats.skills ?? [])
-                                                    .filter((sk) => sk.checked)
-                                                    .map((sk) => (
-                                                        <span
-                                                            key={sk.name}
-                                                            className="match-char-tag font-XXS-regular"
-                                                        >
-                                                            {SKILL_LABELS[sk.name] ||
-                                                                sk.name}
-                                                            : {signed(sk.value)}
-                                                        </span>
-                                                    ))}
+                                {charPanelTab === 'resumo' && (
+                                    <div className="match-char-content">
+                                        <div className="match-char-profile">
+                                            <div className="match-char-avatar">
+                                                <Image
+                                                    src={
+                                                        picture || SideImageBackground.src
+                                                    }
+                                                    alt={profile.name}
+                                                    fill
+                                                    style={{ objectFit: 'cover' }}
+                                                />
+                                            </div>
+                                            <div>
+                                                <p className="font-XS-bold">
+                                                    {profile.name}
+                                                </p>
+                                                <p className="font-XXS-regular">
+                                                    {className || profile.class} •{' '}
+                                                    {profile.race}
+                                                </p>
                                             </div>
                                         </div>
-                                    )}
 
-                                    <div className="match-char-section">
-                                        <p className="font-XXS-bold">
-                                            Testes de resistência
-                                        </p>
-                                        <div className="match-char-tags">
-                                            {stats.abilityScores
-                                                .filter((ability) => ability.proficiency)
-                                                .map((ability) => (
+                                        <div className="match-char-grid-two">
+                                            <div
+                                                className="match-char-death-saves font-XXS-regular"
+                                                ref={
+                                                    hitPointEditorOpen === 'points'
+                                                        ? hitPointPopoverRef
+                                                        : undefined
+                                                }
+                                            >
+                                                {canUpdateHitPoints ? (
+                                                    <div className="match-char-death-saves-control">
+                                                        <button
+                                                            type="button"
+                                                            className="match-char-death-saves-trigger font-XXS-regular"
+                                                            onClick={() => {
+                                                                handleHitPointEditorOpen(
+                                                                    'points'
+                                                                );
+                                                            }}
+                                                            aria-expanded={
+                                                                hitPointEditorOpen ===
+                                                                'points'
+                                                            }
+                                                            aria-haspopup="dialog"
+                                                        >
+                                                            <span>Vida Total:</span>
+                                                            <b>{hp?.points ?? 0}</b>
+                                                        </button>
+
+                                                        {hitPointEditorOpen ===
+                                                            'points' && (
+                                                            <div
+                                                                className="match-char-value-modal"
+                                                                role="dialog"
+                                                                aria-label="Atualizar vida total"
+                                                            >
+                                                                <div className="match-char-value-form">
+                                                                    <input
+                                                                        type="number"
+                                                                        min="0"
+                                                                        inputMode="numeric"
+                                                                        className="match-char-value-input font-XXS-regular"
+                                                                        value={
+                                                                            hitPointEditorValue
+                                                                        }
+                                                                        onChange={(
+                                                                            event
+                                                                        ) =>
+                                                                            setHitPointEditorValue(
+                                                                                event
+                                                                                    .target
+                                                                                    .value
+                                                                            )
+                                                                        }
+                                                                        placeholder="Vida total"
+                                                                        disabled={
+                                                                            hitPointUpdateSaving
+                                                                        }
+                                                                    />
+                                                                    <button
+                                                                        type="button"
+                                                                        className="match-char-value-submit font-XXS-bold"
+                                                                        onClick={
+                                                                            handleHitPointSave
+                                                                        }
+                                                                        disabled={
+                                                                            hitPointUpdateSaving
+                                                                        }
+                                                                    >
+                                                                        Salvar
+                                                                    </button>
+                                                                </div>
+
+                                                                {hitPointUpdateError && (
+                                                                    <span className="match-char-death-saves-error font-XXS-regular">
+                                                                        {
+                                                                            hitPointUpdateError
+                                                                        }
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <span>Vida Total:</span>
+                                                        <b>{hp?.points ?? 0}</b>
+                                                    </>
+                                                )}
+                                            </div>
+                                            <div
+                                                className="match-char-death-saves font-XXS-regular"
+                                                ref={
+                                                    hitPointEditorOpen === 'currentPoints'
+                                                        ? hitPointPopoverRef
+                                                        : undefined
+                                                }
+                                            >
+                                                {canUpdateHitPoints ? (
+                                                    <div className="match-char-death-saves-control">
+                                                        <button
+                                                            type="button"
+                                                            className="match-char-death-saves-trigger font-XXS-regular"
+                                                            onClick={() => {
+                                                                handleHitPointEditorOpen(
+                                                                    'currentPoints'
+                                                                );
+                                                            }}
+                                                            aria-expanded={
+                                                                hitPointEditorOpen ===
+                                                                'currentPoints'
+                                                            }
+                                                            aria-haspopup="dialog"
+                                                        >
+                                                            <span>Vida Atual:</span>
+                                                            <b>
+                                                                {hp?.currentPoints ?? 0}
+                                                            </b>
+                                                        </button>
+
+                                                        {hitPointEditorOpen ===
+                                                            'currentPoints' && (
+                                                            <div
+                                                                className="match-char-value-modal"
+                                                                role="dialog"
+                                                                aria-label="Atualizar vida atual"
+                                                            >
+                                                                <div className="match-char-value-form">
+                                                                    <input
+                                                                        type="number"
+                                                                        min="0"
+                                                                        inputMode="numeric"
+                                                                        className="match-char-value-input font-XXS-regular"
+                                                                        value={
+                                                                            hitPointEditorValue
+                                                                        }
+                                                                        onChange={(
+                                                                            event
+                                                                        ) =>
+                                                                            setHitPointEditorValue(
+                                                                                event
+                                                                                    .target
+                                                                                    .value
+                                                                            )
+                                                                        }
+                                                                        placeholder="Vida atual"
+                                                                        disabled={
+                                                                            hitPointUpdateSaving
+                                                                        }
+                                                                    />
+                                                                    <button
+                                                                        type="button"
+                                                                        className="match-char-value-submit font-XXS-bold"
+                                                                        onClick={
+                                                                            handleHitPointSave
+                                                                        }
+                                                                        disabled={
+                                                                            hitPointUpdateSaving
+                                                                        }
+                                                                    >
+                                                                        Salvar
+                                                                    </button>
+                                                                </div>
+
+                                                                {hitPointUpdateError && (
+                                                                    <span className="match-char-death-saves-error font-XXS-regular">
+                                                                        {
+                                                                            hitPointUpdateError
+                                                                        }
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <span>Vida Atual:</span>
+                                                        <b>{hp?.currentPoints ?? 0}</b>
+                                                    </>
+                                                )}
+                                            </div>
+                                            <div
+                                                className="match-char-death-saves font-XXS-regular"
+                                                ref={
+                                                    hitPointEditorOpen === 'tempPoints'
+                                                        ? hitPointPopoverRef
+                                                        : undefined
+                                                }
+                                            >
+                                                {canUpdateHitPoints ? (
+                                                    <div className="match-char-death-saves-control">
+                                                        <button
+                                                            type="button"
+                                                            className="match-char-death-saves-trigger font-XXS-regular"
+                                                            onClick={() => {
+                                                                handleHitPointEditorOpen(
+                                                                    'tempPoints'
+                                                                );
+                                                            }}
+                                                            aria-expanded={
+                                                                hitPointEditorOpen ===
+                                                                'tempPoints'
+                                                            }
+                                                            aria-haspopup="dialog"
+                                                        >
+                                                            <span>Vida Temporária:</span>
+                                                            <b>{hp?.tempPoints ?? 0}</b>
+                                                        </button>
+
+                                                        {hitPointEditorOpen ===
+                                                            'tempPoints' && (
+                                                            <div
+                                                                className="match-char-value-modal"
+                                                                role="dialog"
+                                                                aria-label="Atualizar vida temporária"
+                                                            >
+                                                                <div className="match-char-value-form">
+                                                                    <input
+                                                                        type="number"
+                                                                        min="0"
+                                                                        inputMode="numeric"
+                                                                        className="match-char-value-input font-XXS-regular"
+                                                                        value={
+                                                                            hitPointEditorValue
+                                                                        }
+                                                                        onChange={(
+                                                                            event
+                                                                        ) =>
+                                                                            setHitPointEditorValue(
+                                                                                event
+                                                                                    .target
+                                                                                    .value
+                                                                            )
+                                                                        }
+                                                                        placeholder="Vida temporária"
+                                                                        disabled={
+                                                                            hitPointUpdateSaving
+                                                                        }
+                                                                    />
+                                                                    <button
+                                                                        type="button"
+                                                                        className="match-char-value-submit font-XXS-bold"
+                                                                        onClick={
+                                                                            handleHitPointSave
+                                                                        }
+                                                                        disabled={
+                                                                            hitPointUpdateSaving
+                                                                        }
+                                                                    >
+                                                                        Salvar
+                                                                    </button>
+                                                                </div>
+
+                                                                {hitPointUpdateError && (
+                                                                    <span className="match-char-death-saves-error font-XXS-regular">
+                                                                        {
+                                                                            hitPointUpdateError
+                                                                        }
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <span>Vida Temporária:</span>
+                                                        <b>{hp?.tempPoints ?? 0}</b>
+                                                    </>
+                                                )}
+                                            </div>
+                                            <span className="font-XXS-regular">
+                                                Nível: <b>{profile.level ?? 0}</b>
+                                            </span>
+                                            <span className="font-XXS-regular">
+                                                XP: <b>{profile.xp ?? 0}</b>
+                                            </span>
+                                            <div
+                                                className="match-char-death-saves font-XXS-regular"
+                                                ref={deathSavePopoverRef}
+                                            >
+                                                {canUpdateDeathSaves ? (
+                                                    <div className="match-char-death-saves-control">
+                                                        <button
+                                                            type="button"
+                                                            className="match-char-death-saves-trigger font-XXS-regular"
+                                                            onClick={() => {
+                                                                setDeathSaveModalOpen(
+                                                                    (current) => !current
+                                                                );
+                                                                setDeathSaveUpdateError(
+                                                                    ''
+                                                                );
+                                                            }}
+                                                            aria-expanded={
+                                                                deathSaveModalOpen
+                                                            }
+                                                            aria-haspopup="dialog"
+                                                        >
+                                                            <span>Testes de Morte:</span>
+                                                            <b>
+                                                                {deathSaves?.success ?? 0}
+                                                            </b>
+                                                            /
+                                                            <b>
+                                                                {deathSaves?.failures ??
+                                                                    0}
+                                                            </b>
+                                                        </button>
+
+                                                        {deathSaveModalOpen && (
+                                                            <div
+                                                                className="match-char-death-saves-modal"
+                                                                role="dialog"
+                                                                aria-label="Atualizar testes de morte"
+                                                            >
+                                                                <div className="match-char-death-saves-actions">
+                                                                    <button
+                                                                        type="button"
+                                                                        className="match-char-death-saves-action font-XXS-bold"
+                                                                        onClick={() =>
+                                                                            handleDeathSaveIncrement(
+                                                                                'success'
+                                                                            )
+                                                                        }
+                                                                        disabled={
+                                                                            deathSaveUpdateSaving
+                                                                        }
+                                                                    >
+                                                                        Vivo
+                                                                    </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="match-char-death-saves-action font-XXS-bold"
+                                                                        onClick={() =>
+                                                                            handleDeathSaveIncrement(
+                                                                                'failures'
+                                                                            )
+                                                                        }
+                                                                        disabled={
+                                                                            deathSaveUpdateSaving
+                                                                        }
+                                                                    >
+                                                                        Morto
+                                                                    </button>
+                                                                </div>
+
+                                                                {deathSaveUpdateError && (
+                                                                    <span className="match-char-death-saves-error font-XXS-regular">
+                                                                        {
+                                                                            deathSaveUpdateError
+                                                                        }
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <span>Testes de Morte:</span>
+                                                        <b>{deathSaves?.success ?? 0}</b>/
+                                                        <b>{deathSaves?.failures ?? 0}</b>
+                                                    </>
+                                                )}
+                                            </div>
+                                            <span className="font-XXS-regular">
+                                                Dinheiro:{' '}
+                                                {(['cp', 'sp', 'ep', 'gp', 'pp'] as const)
+                                                    .filter(
+                                                        (key) => (money?.[key] ?? 0) > 0
+                                                    )
+                                                    .map((key) => (
+                                                        <b key={key}>
+                                                            {money![key]}{' '}
+                                                            {CURRENCY_LABELS[key]}{' '}
+                                                        </b>
+                                                    ))}
+                                                {(
+                                                    [
+                                                        'cp',
+                                                        'sp',
+                                                        'ep',
+                                                        'gp',
+                                                        'pp',
+                                                    ] as const
+                                                ).every(
+                                                    (key) => (money?.[key] ?? 0) === 0
+                                                ) && <b>0 PO</b>}
+                                            </span>
+                                            <span className="font-XXS-regular">
+                                                Bonus de proficiência:{' '}
+                                                <b>{stats.proficiencyBonus ?? 0}</b>
+                                            </span>
+                                        </div>
+
+                                        <div className="match-char-section">
+                                            <p className="font-XXS-bold">
+                                                Ability Scores
+                                            </p>
+                                            <div className="match-char-tags">
+                                                {stats.abilityScores.map((ability) => (
                                                     <span
                                                         key={ability.ability}
                                                         className="match-char-tag font-XXS-regular"
                                                     >
-                                                        {ability.ability.toUpperCase()}:{' '}
-                                                        {ability.modifier >= 0 ? '+' : ''}
-                                                        {ability.modifier}
+                                                        {ABILITY_LABELS[
+                                                            ability.ability
+                                                        ] ||
+                                                            ability.ability.toUpperCase()}
+                                                        : {ability.value} (
+                                                        {signed(ability.modifier)})
                                                     </span>
                                                 ))}
+                                            </div>
+                                        </div>
+
+                                        {(stats.skills?.length ?? 0) > 0 && (
+                                            <div className="match-char-section">
+                                                <p className="font-XXS-bold">Perícias</p>
+                                                <div className="match-char-tags">
+                                                    {(stats.skills ?? [])
+                                                        .filter((sk) => sk.checked)
+                                                        .map((sk) => (
+                                                            <span
+                                                                key={sk.name}
+                                                                className="match-char-tag font-XXS-regular"
+                                                            >
+                                                                {SKILL_LABELS[sk.name] ||
+                                                                    sk.name}
+                                                                : {signed(sk.value)}
+                                                            </span>
+                                                        ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div className="match-char-section">
+                                            <p className="font-XXS-bold">
+                                                Testes de resistência
+                                            </p>
+                                            <div className="match-char-tags">
+                                                {stats.abilityScores
+                                                    .filter(
+                                                        (ability) => ability.proficiency
+                                                    )
+                                                    .map((ability) => (
+                                                        <span
+                                                            key={ability.ability}
+                                                            className="match-char-tag font-XXS-regular"
+                                                        >
+                                                            {ability.ability.toUpperCase()}
+                                                            :{' '}
+                                                            {ability.modifier >= 0
+                                                                ? '+'
+                                                                : ''}
+                                                            {ability.modifier}
+                                                        </span>
+                                                    ))}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            )}
+                                )}
 
-                            {charPanelTab === 'magias' && (
-                                <div className="match-char-content">
-                                    {Object.values(spellUsed).some(Boolean) && (
-                                        <button
-                                            className="match-spell-reset-btn font-XXS-bold"
-                                            onClick={resetSpellMarks}
-                                        >
-                                            Resetar marcações de magias
-                                        </button>
-                                    )}
-                                    {spellsByLevel.map((level, levelIdx) => (
-                                        <div
-                                            key={level.label}
-                                            className="match-char-section"
-                                        >
-                                            <p className="font-XXS-bold">
-                                                {level.label}
-                                                {level.slotsTotal > 0
-                                                    ? ` • Slots ${
-                                                          spellSlotsUsed[levelIdx] ?? 0
-                                                      }/${level.slotsTotal}`
-                                                    : ''}
-                                            </p>
-                                            {level.items.length > 0 ? (
-                                                <div className="match-spell-list">
-                                                    {level.items.map((spellId) => {
-                                                        const key = `${levelIdx}-${spellId}`;
-                                                        const used = spellUsed[key];
-                                                        const blocked =
-                                                            !used &&
-                                                            level.slotsTotal > 0 &&
-                                                            (spellSlotsUsed[levelIdx] ??
-                                                                0) >= level.slotsTotal;
-                                                        return (
-                                                            <span
-                                                                key={spellId}
-                                                                className={`match-spell-item font-XXS-regular${
-                                                                    used
-                                                                        ? ' match-spell-item--used'
-                                                                        : ''
-                                                                }${
-                                                                    blocked
-                                                                        ? ' match-spell-item--blocked'
-                                                                        : ''
-                                                                }`}
-                                                                onClick={() =>
-                                                                    handleSpellClick(
-                                                                        levelIdx,
-                                                                        spellId,
-                                                                        level.slotsTotal
-                                                                    )
-                                                                }
-                                                            >
-                                                                {spellNameMap[spellId] ||
-                                                                    spellId}
-                                                            </span>
-                                                        );
-                                                    })}
-                                                </div>
-                                            ) : (
-                                                <p className="font-XXS-regular">
-                                                    Sem magias
+                                {charPanelTab === 'magias' && (
+                                    <div className="match-char-content">
+                                        {Object.values(spellUsed).some(Boolean) && (
+                                            <button
+                                                className="match-spell-reset-btn font-XXS-bold"
+                                                onClick={resetSpellMarks}
+                                            >
+                                                Resetar marcações de magias
+                                            </button>
+                                        )}
+                                        {spellsByLevel.map((level, levelIdx) => (
+                                            <div
+                                                key={level.label}
+                                                className="match-char-section"
+                                            >
+                                                <p className="font-XXS-bold">
+                                                    {level.label}
+                                                    {level.slotsTotal > 0
+                                                        ? ` • Slots ${
+                                                              spellSlotsUsed[levelIdx] ??
+                                                              0
+                                                          }/${level.slotsTotal}`
+                                                        : ''}
                                                 </p>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                                                {level.items.length > 0 ? (
+                                                    <div className="match-spell-list">
+                                                        {level.items.map((spellId) => {
+                                                            const key = `${levelIdx}-${spellId}`;
+                                                            const used = spellUsed[key];
+                                                            const blocked =
+                                                                !used &&
+                                                                level.slotsTotal > 0 &&
+                                                                (spellSlotsUsed[
+                                                                    levelIdx
+                                                                ] ?? 0) >=
+                                                                    level.slotsTotal;
+                                                            return (
+                                                                <span
+                                                                    key={spellId}
+                                                                    className={`match-spell-item font-XXS-regular${
+                                                                        used
+                                                                            ? ' match-spell-item--used'
+                                                                            : ''
+                                                                    }${
+                                                                        blocked
+                                                                            ? ' match-spell-item--blocked'
+                                                                            : ''
+                                                                    }`}
+                                                                    onClick={() =>
+                                                                        handleSpellClick(
+                                                                            levelIdx,
+                                                                            spellId,
+                                                                            level.slotsTotal
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    {spellNameMap[
+                                                                        spellId
+                                                                    ] || spellId}
+                                                                </span>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                ) : (
+                                                    <p className="font-XXS-regular">
+                                                        Sem magias
+                                                    </p>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
 
-                            {charPanelTab === 'habilidades' && (
-                                <div className="match-char-content">
-                                    {Object.values(abilityUsed).some(Boolean) && (
-                                        <button
-                                            className="match-spell-reset-btn"
-                                            onClick={resetAbilityMarks}
-                                        >
-                                            Resetar marcações de habilidades
-                                        </button>
-                                    )}
-                                    {abilitiesByLevel.map((level, levelIdx) => (
-                                        <div
-                                            key={level.label}
-                                            className="match-char-section"
-                                        >
-                                            <p className="font-XXS-bold">
-                                                {level.label}
-                                                {level.slotsTotal > 0
-                                                    ? ` • Slots ${
-                                                          abilitySlotsUsed[levelIdx] ?? 0
-                                                      }/${level.slotsTotal}`
-                                                    : ''}
-                                            </p>
-                                            {level.items.length > 0 ? (
-                                                <div className="match-spell-list">
-                                                    {level.items.map((abilityName) => {
-                                                        const key = `${levelIdx}-${abilityName}`;
-                                                        const used = abilityUsed[key];
-                                                        const blocked =
-                                                            !used &&
-                                                            level.slotsTotal > 0 &&
-                                                            (abilitySlotsUsed[levelIdx] ??
-                                                                0) >= level.slotsTotal;
-                                                        return (
-                                                            <span
-                                                                key={abilityName}
-                                                                className={`match-spell-item${
-                                                                    used
-                                                                        ? ' match-spell-item--used'
-                                                                        : ''
-                                                                }${
-                                                                    blocked
-                                                                        ? ' match-spell-item--blocked'
-                                                                        : ''
-                                                                }`}
-                                                                onClick={() =>
-                                                                    handleAbilityClick(
-                                                                        levelIdx,
-                                                                        abilityName,
-                                                                        level.slotsTotal
-                                                                    )
-                                                                }
-                                                            >
-                                                                {abilityName}
-                                                            </span>
-                                                        );
-                                                    })}
-                                                </div>
-                                            ) : (
-                                                <p className="font-XXS-regular">
-                                                    Sem habilidades
+                                {charPanelTab === 'habilidades' && (
+                                    <div className="match-char-content">
+                                        {Object.values(abilityUsed).some(Boolean) && (
+                                            <button
+                                                className="match-spell-reset-btn"
+                                                onClick={resetAbilityMarks}
+                                            >
+                                                Resetar marcações de habilidades
+                                            </button>
+                                        )}
+                                        {abilitiesByLevel.map((level, levelIdx) => (
+                                            <div
+                                                key={level.label}
+                                                className="match-char-section"
+                                            >
+                                                <p className="font-XXS-bold">
+                                                    {level.label}
+                                                    {level.slotsTotal > 0
+                                                        ? ` • Slots ${
+                                                              abilitySlotsUsed[
+                                                                  levelIdx
+                                                              ] ?? 0
+                                                          }/${level.slotsTotal}`
+                                                        : ''}
                                                 </p>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </>
-                    )}
-                </aside>
-            </div>
+                                                {level.items.length > 0 ? (
+                                                    <div className="match-spell-list">
+                                                        {level.items.map(
+                                                            (abilityName) => {
+                                                                const key = `${levelIdx}-${abilityName}`;
+                                                                const used =
+                                                                    abilityUsed[key];
+                                                                const blocked =
+                                                                    !used &&
+                                                                    level.slotsTotal >
+                                                                        0 &&
+                                                                    (abilitySlotsUsed[
+                                                                        levelIdx
+                                                                    ] ?? 0) >=
+                                                                        level.slotsTotal;
+                                                                return (
+                                                                    <span
+                                                                        key={abilityName}
+                                                                        className={`match-spell-item${
+                                                                            used
+                                                                                ? ' match-spell-item--used'
+                                                                                : ''
+                                                                        }${
+                                                                            blocked
+                                                                                ? ' match-spell-item--blocked'
+                                                                                : ''
+                                                                        }`}
+                                                                        onClick={() =>
+                                                                            handleAbilityClick(
+                                                                                levelIdx,
+                                                                                abilityName,
+                                                                                level.slotsTotal
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        {abilityName}
+                                                                    </span>
+                                                                );
+                                                            }
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <p className="font-XXS-regular">
+                                                        Sem habilidades
+                                                    </p>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </aside>
+                </div>
+            )}
 
             {/* Top-right: horizontal action bar */}
             {isMaster && (
                 <nav
                     className={`match-top-bar${
-                        isMobileTopBarOpen ? ' match-top-bar--mobile-open' : ''
+                        isTopBarOpen
+                            ? ' match-top-bar--open'
+                            : ' match-top-bar--collapsed'
                     }`}
                 >
                     <button
                         type="button"
-                        className="match-top-bar-mobile-toggle"
+                        className="match-top-bar-item match-top-bar-toggle"
                         aria-label={
-                            isMobileTopBarOpen
+                            isTopBarOpen
                                 ? 'Ocultar menu superior da partida'
                                 : 'Mostrar menu superior da partida'
                         }
-                        aria-expanded={isMobileTopBarOpen}
-                        onClick={() => setIsMobileTopBarOpen((current) => !current)}
+                        aria-expanded={isTopBarOpen}
+                        onClick={() => setIsTopBarOpen((current) => !current)}
                     >
-                        <Image
-                            src={MobileTopBarArrowSVG}
-                            alt=""
-                            className={`match-mobile-bar-toggle-icon${
-                                isMobileTopBarOpen
-                                    ? ' match-mobile-bar-toggle-icon--open'
-                                    : ''
-                            }`}
-                            width={24}
-                            height={24}
-                            aria-hidden="true"
-                        />
+                        {isTopBarOpen ? (
+                            isDarkTheme ? (
+                                <ArrowRight
+                                    mode="dark"
+                                    className="match-mobile-bar-toggle-icon"
+                                    width={24}
+                                    height={24}
+                                    aria-hidden="true"
+                                />
+                            ) : (
+                                <ArrowRight
+                                    mode="light"
+                                    className="match-mobile-bar-toggle-icon"
+                                    width={24}
+                                    height={24}
+                                    aria-hidden="true"
+                                />
+                            )
+                        ) : isDarkTheme ? (
+                            <ArrowLeft
+                                mode="dark"
+                                className="match-mobile-bar-toggle-icon"
+                                width={24}
+                                height={24}
+                                aria-hidden="true"
+                            />
+                        ) : (
+                            <ArrowLeft
+                                mode="light"
+                                className="match-mobile-bar-toggle-icon"
+                                width={24}
+                                height={24}
+                                aria-hidden="true"
+                            />
+                        )}
                     </button>
                     <button
                         className={`match-top-bar-item${
@@ -3184,7 +4147,7 @@ export default function MatchPage(): JSX.Element {
                             cloneModeOpen ? ' match-top-bar-item--active' : ''
                         }`}
                         title={
-                            cloneModeOpen ? 'Encerrar duplicacao' : 'Duplicar avatares'
+                            cloneModeOpen ? 'Encerrar duplicação' : 'Duplicar avatares'
                         }
                         onClick={() => {
                             setCloneModeOpen((current) => {
@@ -3235,12 +4198,12 @@ export default function MatchPage(): JSX.Element {
                     </button>
                     <button
                         className="match-top-bar-item"
-                        title="Selecao de avatares"
+                        title="Seleção de avatares"
                         onClick={() => setAvatarSelectionModalOpen(true)}
                     >
                         <Image
                             src={AvatarSelectionSVG.src}
-                            alt="Selecao de avatares"
+                            alt="Seleção de avatares"
                             width={28}
                             height={28}
                         />
@@ -3301,38 +4264,47 @@ export default function MatchPage(): JSX.Element {
             {/* Bottom-left: vertical action bar */}
             <nav
                 className={`match-bottom-bar${
-                    isMobileBottomBarOpen ? ' match-bottom-bar--mobile-open' : ''
+                    isBottomBarOpen
+                        ? ' match-bottom-bar--open'
+                        : ' match-bottom-bar--collapsed'
                 }`}
             >
                 <button
                     type="button"
-                    className="match-bottom-bar-mobile-toggle"
+                    className="match-bottom-bar-item match-bottom-bar-toggle"
                     aria-label={
-                        isMobileBottomBarOpen
+                        isBottomBarOpen
                             ? 'Ocultar menu inferior da partida'
                             : 'Mostrar menu inferior da partida'
                     }
-                    aria-expanded={isMobileBottomBarOpen}
+                    aria-expanded={isBottomBarOpen}
                     onClick={() => {
-                        if (isMobileBottomBarOpen) {
+                        if (isBottomBarOpen) {
                             setMapZoomOpen(false);
                             setMusicVolumeOpen(false);
                         }
-                        setIsMobileBottomBarOpen((current) => !current);
+                        setIsBottomBarOpen((current) => !current);
                     }}
                 >
-                    <Image
-                        src={MobileBottomBarArrowSVG}
-                        alt=""
-                        className={`match-mobile-bar-toggle-icon match-mobile-bar-toggle-icon--bottom${
-                            !isDarkTheme && isMobileBottomBarOpen
-                                ? ' match-mobile-bar-toggle-icon--bottom-light-open'
-                                : ''
-                        }`}
-                        width={24}
-                        height={24}
-                        aria-hidden="true"
-                    />
+                    {isDarkTheme ? (
+                        <ArrowRight
+                            mode="dark"
+                            rotate={isBottomBarOpen ? 90 : -90}
+                            className="match-mobile-bar-toggle-icon"
+                            width={24}
+                            height={24}
+                            aria-hidden="true"
+                        />
+                    ) : (
+                        <ArrowRight
+                            mode="light"
+                            rotate={isBottomBarOpen ? 90 : -90}
+                            className="match-mobile-bar-toggle-icon"
+                            width={24}
+                            height={24}
+                            aria-hidden="true"
+                        />
+                    )}
                 </button>
                 <button
                     className="match-bottom-bar-item"
@@ -3381,6 +4353,33 @@ export default function MatchPage(): JSX.Element {
                     )}
                 </div>
                 <div className="match-bottom-bar-control">
+                    {musicVolumeOpen && activeMusic && (
+                        <div className="match-music-preview" aria-live="polite">
+                            <div className="match-music-preview-thumb">
+                                <Image
+                                    src={`https://img.youtube.com/vi/${activeMusic.id}/mqdefault.jpg`}
+                                    alt=""
+                                    width={44}
+                                    height={44}
+                                    aria-hidden="true"
+                                />
+                            </div>
+                            <div className="match-music-preview-copy">
+                                <span className="match-music-preview-label font-XXS-bold">
+                                    Tocando agora
+                                </span>
+                                <span
+                                    className="match-music-preview-title font-XXS-regular"
+                                    title={activeMusic.title}
+                                >
+                                    {activeMusic.title}
+                                </span>
+                            </div>
+                            <span className="match-music-preview-time font-XXS-bold">
+                                {formatPlaybackTime(musicCurrentTime)}
+                            </span>
+                        </div>
+                    )}
                     <button
                         className={`match-bottom-bar-item${
                             !playingMusicId ? ' match-bottom-bar-item--disabled' : ''
@@ -3732,6 +4731,10 @@ export default function MatchPage(): JSX.Element {
                     mapImages={mapImages}
                     selectedMusic={playingMusicId}
                     onMusicSelect={handleMusicSelection}
+                    currentMusicTime={musicCurrentTime}
+                    currentMusicDuration={musicDuration}
+                    onMusicSeek={handleMusicSeek}
+                    canSeek={isMaster}
                     onClose={() => setMediaModalOpen(false)}
                     onMapSelect={handleMapSelection}
                 />
@@ -4006,17 +5009,12 @@ export default function MatchPage(): JSX.Element {
                 />
             )}
 
-            {/* Persistent YouTube player (hidden) */}
-            {playingMusicId && (
-                <iframe
-                    ref={musicPlayerFrameRef}
-                    key={playingMusicId}
-                    src={`https://www.youtube.com/embed/${playingMusicId}?autoplay=1&loop=1&playlist=${playingMusicId}&enablejsapi=1&controls=0`}
-                    allow="autoplay; encrypted-media"
-                    className="hidden"
-                    onLoad={() => applyMusicVolume(musicVolume)}
-                />
-            )}
+            <div
+                aria-hidden="true"
+                style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }}
+            >
+                <div ref={musicPlayerContainerRef} />
+            </div>
         </div>
     );
 }

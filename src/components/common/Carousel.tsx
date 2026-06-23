@@ -2,8 +2,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { CarouselProps } from '@/types/modules/components/common/Carousel';
 import useEmblaCarousel from 'embla-carousel-react';
-import ArrowRightGraySVG from '../../../assets/icons/nav/arrow-right-gray.svg?url';
-import Image from 'next/image';
+import { ArrowLeft, ArrowRight } from '@/components/icons/Arrows';
 import '@/components/common/styles/Carousel.css';
 
 export default function Carousel({ elements }: CarouselProps): JSX.Element {
@@ -47,11 +46,11 @@ export default function Carousel({ elements }: CarouselProps): JSX.Element {
                             className="carousel-arrow-prev embla__button embla__button--next"
                             onClick={handlePrev}
                         >
-                            <Image
-                                src={ArrowRightGraySVG.src}
-                                alt="arrrow right"
-                                width={ArrowRightGraySVG.width}
-                                height={ArrowRightGraySVG.height}
+                            <ArrowLeft
+                                mode="light"
+                                width={16}
+                                height={16}
+                                aria-hidden="true"
                             />
                         </button>
                     )}
@@ -62,11 +61,11 @@ export default function Carousel({ elements }: CarouselProps): JSX.Element {
                         className="carousel-arrow-next embla__button embla__button--next"
                         onClick={handleNext}
                     >
-                        <Image
-                            src={ArrowRightGraySVG.src}
-                            alt="arrrow right"
-                            width={ArrowRightGraySVG.width}
-                            height={ArrowRightGraySVG.height}
+                        <ArrowRight
+                            mode="light"
+                            width={16}
+                            height={16}
+                            aria-hidden="true"
                         />
                     </button>
                 </div>

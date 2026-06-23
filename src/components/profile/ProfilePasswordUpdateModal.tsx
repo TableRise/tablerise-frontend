@@ -90,7 +90,7 @@ export default function ProfilePasswordUpdateModal({
 
         async function sendCode() {
             if (!email.trim()) {
-                setError('*Nao foi possivel identificar o e-mail atual da conta.');
+                setError('*Não foi possivel identificar o e-mail atual da conta.');
                 return;
             }
 
@@ -103,7 +103,7 @@ export default function ProfilePasswordUpdateModal({
                 if (!active) return;
                 setError(
                     sendError?.message ??
-                        '*Nao foi possivel enviar o codigo de verificacao.'
+                        '*Não foi possivel enviar o codigo de verificação.'
                 );
             } finally {
                 if (active) {
@@ -150,7 +150,7 @@ export default function ProfilePasswordUpdateModal({
             setStep(nextStep);
         } catch (submitError: Error | any) {
             setError(
-                submitError?.message ?? '*Nao foi possivel validar o codigo informado.'
+                submitError?.message ?? '*Não foi possivel validar o codigo informado.'
             );
         } finally {
             setSubmitting(false);
@@ -173,7 +173,7 @@ export default function ProfilePasswordUpdateModal({
             setStep('new-password');
         } catch (submitError: Error | any) {
             setError(
-                submitError?.message ?? '*Nao foi possivel validar a resposta informada.'
+                submitError?.message ?? '*Não foi possivel validar a resposta informada.'
             );
         } finally {
             setSubmitting(false);
@@ -198,7 +198,7 @@ export default function ProfilePasswordUpdateModal({
             await sendNewPassword(email, newPassword);
             setStep('success');
         } catch (submitError: Error | any) {
-            setError(submitError?.message ?? '*Nao foi possivel atualizar a senha.');
+            setError(submitError?.message ?? '*Não foi possivel atualizar a senha.');
         } finally {
             setSubmitting(false);
         }
@@ -222,7 +222,7 @@ export default function ProfilePasswordUpdateModal({
                     <>
                         <p className="profile-action-modal-description font-XS-regular">
                             Digite o codigo enviado para o seu e-mail atual para continuar
-                            a atualizacao da senha.
+                            a atualização da senha.
                         </p>
 
                         <div className="profile-action-modal-otp">
@@ -267,7 +267,7 @@ export default function ProfilePasswordUpdateModal({
                     <div className="profile-action-modal-form">
                         <p className="profile-action-modal-description font-XS-regular">
                             Responda corretamente a sua pergunta secreta para seguir com a
-                            atualizacao.
+                            atualização.
                         </p>
                         <label className="profile-action-modal-field">
                             <span className="font-S-bold profile-action-modal-label">
@@ -290,7 +290,7 @@ export default function ProfilePasswordUpdateModal({
                     <div className="profile-action-modal-form">
                         <p className="profile-action-modal-description font-XS-regular">
                             Crie uma nova senha seguindo as mesmas regras de seguranca da
-                            recuperacao de senha.
+                            recuperação de senha.
                         </p>
                         <label className="profile-action-modal-field">
                             <span className="font-S-bold profile-action-modal-label">
@@ -353,8 +353,8 @@ export default function ProfilePasswordUpdateModal({
                                     }
                                     aria-label={
                                         confirmPasswordVisible
-                                            ? 'Ocultar confirmacao de senha'
-                                            : 'Mostrar confirmacao de senha'
+                                            ? 'Ocultar confirmação de senha'
+                                            : 'Mostrar confirmação de senha'
                                     }
                                 >
                                     {confirmPasswordVisible ? (

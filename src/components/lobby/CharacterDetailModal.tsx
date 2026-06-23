@@ -3,8 +3,7 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import EditIcon from '@assets/icons/sys/edit.svg?url';
 import EditDarkIcon from '@assets/icons/sys/edit-dark.svg?url';
-import ArrowBackIcon from '@assets/icons/nav/arrow-back.svg?url';
-import ArrowRightIcon from '@assets/icons/nav/arrow-right.svg?url';
+import { ArrowLeft, ArrowRight } from '@/components/icons/Arrows';
 import LoadingDots from '@/components/common/LoadingDots';
 import {
     getCharacterById,
@@ -149,7 +148,7 @@ const ABILITY_KEY_MAP: Record<string, string> = {
     charisma: 'cha',
     forca: 'str',
     destreza: 'dex',
-    constituicao: 'con',
+    constituição: 'con',
     inteligencia: 'int',
     sabedoria: 'wis',
     carisma: 'cha',
@@ -157,6 +156,19 @@ const ABILITY_KEY_MAP: Record<string, string> = {
 
 const HP_AUTO_RECALC_TOOLTIP =
     'Edição de PV desabilitada pois o valor de constituição foi alterado para calculo automático.';
+
+type CharacterEquipmentItem = {
+    equipmentId: string;
+    name: string;
+    type: string;
+    price: Array<number | string>;
+    armorClass?: Array<number | string>;
+    strength?: string;
+    stealth?: string;
+    weight: string;
+    damage?: string;
+    properties?: string;
+};
 
 function modifier(value: number): string {
     const mod = Math.floor((value - 10) / 2);
@@ -333,22 +345,12 @@ export default function CharacterDetailModal({
         characteristicsAndAdditionalAbilities: '',
     });
     const [editSkillProfs, setEditSkillProfs] = useState<Record<string, boolean>>({});
-    const [selectedInventoryItemId, setSelectedInventoryItemId] = useState<string | null>(
+    const [selectedInventoryItem, setSelectedInventoryItem] =
+        useState<CharacterEquipmentItem | null>(null);
+    const [selling, setSelling] = useState(false);
+    const [sellConfirmItem, setSellConfirmItem] = useState<CharacterEquipmentItem | null>(
         null
     );
-    const [selling, setSelling] = useState(false);
-    const [sellConfirmItem, setSellConfirmItem] = useState<{
-        equipmentId: string;
-        name: string;
-        type: string;
-        price: Array<number | string>;
-        armorClass?: Array<number | string>;
-        strength?: string;
-        stealth?: string;
-        weight: string;
-        damage?: string;
-        properties?: string;
-    } | null>(null);
     const [activeTab, setActiveTab] = useState<
         'principal' | 'magias' | 'habilidades' | 'equipamentos'
     >('principal');
@@ -549,33 +551,22 @@ export default function CharacterDetailModal({
             skillProfsInit[sk.name] = sk.checked;
         }
         setEditSkillProfs(skillProfsInit);
-        setSelectedInventoryItemId(null);
+        setSelectedInventoryItem(null);
         setIsEditing(true);
     };
 
     const handleCancelEdit = () => {
         setIsEditing(false);
-        setSelectedInventoryItemId(null);
+        setSelectedInventoryItem(null);
     };
 
-    const handleSell = async (item: {
-        equipmentId: string;
-        name: string;
-        type: string;
-        price: Array<number | string>;
-        armorClass?: Array<number | string>;
-        strength?: string;
-        stealth?: string;
-        weight: string;
-        damage?: string;
-        properties?: string;
-    }) => {
+    const handleSell = async (item: CharacterEquipmentItem) => {
         setSelling(true);
         const success = await removeCharacterEquipment(characterId, item.equipmentId);
         if (success) {
             await loadCharacterModalData();
         }
-        setSelectedInventoryItemId(null);
+        setSelectedInventoryItem(null);
         setSelling(false);
     };
 
@@ -814,6 +805,16 @@ export default function CharacterDetailModal({
             slotsTotal: Number(h?.slotsTotal[l]) || 0,
             slotsExpended: h?.slotsExpended[l] ?? 0,
         });
+        const originalHitPoints = char.data.stats.hitPoints;
+        const hitPointsMaxChanged = editCombat.hitPointsMax !== originalHitPoints.points;
+        const hitPointsCurrentChanged =
+            editCombat.hitPointsCurrent !== originalHitPoints.currentPoints;
+        const hitPointsTempChanged =
+            editCombat.hitPointsTemp !== originalHitPoints.tempPoints;
+        const nonCurrentHitPointsPayload = {
+            ...(hitPointsMaxChanged && { points: editCombat.hitPointsMax }),
+            ...(hitPointsTempChanged && { tempPoints: editCombat.hitPointsTemp }),
+        };
         const payload = {
             data: {
                 profile: {
@@ -849,12 +850,9 @@ export default function CharacterDetailModal({
                     initiative: editCombat.initiative,
                     speed: editCombat.speed,
                     passiveWisdom: editCombat.passiveWisdom,
-                    hitPoints: {
-                        points: editCombat.hitPointsMax,
-                        currentPoints: editCombat.hitPointsCurrent,
-                        tempPoints: editCombat.hitPointsTemp,
-                        dicePoints: char.data.stats.hitPoints.dicePoints,
-                    },
+                    ...(Object.keys(nonCurrentHitPointsPayload).length > 0 && {
+                        hitPoints: nonCurrentHitPointsPayload,
+                    }),
                     skills: (() => {
                         const profBonus = char.data.stats.proficiencyBonus ?? 2;
                         return Object.entries(editSkillProfs)
@@ -912,12 +910,32 @@ export default function CharacterDetailModal({
             characterId,
             payload as Record<string, any>
         );
-        if (success) {
-            await loadCharacterModalData();
-            clearLevelUpNotifications();
-            setIsEditing(false);
-            setSelectedInventoryItemId(null);
+        if (!success) {
+            setSaving(false);
+            return;
         }
+
+        if (hitPointsCurrentChanged) {
+            const currentPointsUpdated = await updateCharacter(characterId, {
+                data: {
+                    stats: {
+                        hitPoints: {
+                            currentPoints: editCombat.hitPointsCurrent,
+                        },
+                    },
+                },
+            });
+
+            if (!currentPointsUpdated) {
+                setSaving(false);
+                return;
+            }
+        }
+
+        await loadCharacterModalData();
+        clearLevelUpNotifications();
+        setIsEditing(false);
+        setSelectedInventoryItem(null);
         setSaving(false);
     };
 
@@ -957,47 +975,40 @@ export default function CharacterDetailModal({
         originalConstitutionValue;
     const constitutionChangedInEdit =
         isEditing && editedConstitutionValue !== originalConstitutionValue;
+    const originalHitPointsMax = stats?.hitPoints.points ?? 0;
+    const originalHitPointsCurrent = stats?.hitPoints.currentPoints ?? 0;
+    const originalHitPointsTemp = stats?.hitPoints.tempPoints ?? 0;
+    const hitPointsMaxChangedInEdit =
+        isEditing && editCombat.hitPointsMax !== originalHitPointsMax;
+    const hitPointsCurrentChangedInEdit =
+        isEditing && editCombat.hitPointsCurrent !== originalHitPointsCurrent;
+    const hitPointsTempChangedInEdit =
+        isEditing && editCombat.hitPointsTemp !== originalHitPointsTemp;
+    const disableHitPointsMaxEdit =
+        constitutionChangedInEdit || hitPointsCurrentChangedInEdit;
+    const disableHitPointsCurrentEdit =
+        constitutionChangedInEdit ||
+        hitPointsMaxChangedInEdit ||
+        hitPointsTempChangedInEdit;
+    const disableHitPointsTempEdit =
+        constitutionChangedInEdit || hitPointsCurrentChangedInEdit;
     const inventoryText =
         typeof char?.data?.inventory === 'string' ? char.data.inventory : '';
 
-    const equipmentItems: Array<{
-        equipmentId: string;
-        name: string;
-        type: string;
-        price: Array<number | string>;
-        armorClass?: Array<number | string>;
-        strength?: string;
-        stealth?: string;
-        weight: string;
-        damage?: string;
-        properties?: string;
-    }> = Array.isArray(char?.data?.equipments)
-        ? (char!.data.equipments as Array<{
-              equipmentId: string;
-              name: string;
-              type: string;
-              price: Array<number | string>;
-              armorClass?: Array<number | string>;
-              strength?: string;
-              stealth?: string;
-              weight: string;
-              damage?: string;
-              properties?: string;
-          }>)
+    const equipmentItems: CharacterEquipmentItem[] = Array.isArray(char?.data?.equipments)
+        ? (char!.data.equipments as CharacterEquipmentItem[])
         : Array.isArray(char?.data?.inventory)
-        ? (char!.data.inventory as Array<{
-              equipmentId: string;
-              name: string;
-              type: string;
-              price: Array<number | string>;
-              armorClass?: Array<number | string>;
-              strength?: string;
-              stealth?: string;
-              weight: string;
-              damage?: string;
-              properties?: string;
-          }>)
+        ? (char!.data.inventory as CharacterEquipmentItem[])
         : [];
+
+    const formatEquipmentPrice = (item: CharacterEquipmentItem): string =>
+        `${item.price[0]} ${item.price[1]}`;
+
+    const formatEquipmentArmorClass = (item: CharacterEquipmentItem): string =>
+        item.armorClass && item.armorClass.length > 0 ? item.armorClass.join(' ') : '-';
+
+    const formatEquipmentField = (value?: string): string =>
+        value && value.trim() !== '' ? value : '-';
 
     return (
         <>
@@ -1199,11 +1210,11 @@ export default function CharacterDetailModal({
                                                 activeNotificationIndex === 0
                                             }
                                         >
-                                            <Image
-                                                src={ArrowBackIcon}
-                                                alt="Anterior"
+                                            <ArrowLeft
+                                                mode="light"
                                                 width={18}
                                                 height={18}
+                                                aria-hidden="true"
                                             />
                                         </button>
                                         <button
@@ -1223,9 +1234,9 @@ export default function CharacterDetailModal({
                                                     levelUpNotifications.length - 1
                                             }
                                         >
-                                            <Image
-                                                src={ArrowRightIcon}
-                                                alt="próxima"
+                                            <ArrowRight
+                                                mode="light"
+                                                aria-hidden="true"
                                                 width={18}
                                                 height={18}
                                             />
@@ -1620,6 +1631,8 @@ export default function CharacterDetailModal({
                                                         title={
                                                             constitutionChangedInEdit
                                                                 ? HP_AUTO_RECALC_TOOLTIP
+                                                                : hitPointsCurrentChangedInEdit
+                                                                ? 'PV Atual está sendo editado.'
                                                                 : ''
                                                         }
                                                         className="block"
@@ -1627,7 +1640,7 @@ export default function CharacterDetailModal({
                                                         <input
                                                             type="number"
                                                             className={`cdm-edit-number font-M-semibold${
-                                                                constitutionChangedInEdit
+                                                                disableHitPointsMaxEdit
                                                                     ? ' cursor-not-allowed opacity-70'
                                                                     : ''
                                                             }`}
@@ -1643,7 +1656,7 @@ export default function CharacterDetailModal({
                                                                 }))
                                                             }
                                                             disabled={
-                                                                constitutionChangedInEdit
+                                                                disableHitPointsMaxEdit
                                                             }
                                                         />
                                                     </span>
@@ -1662,6 +1675,9 @@ export default function CharacterDetailModal({
                                                         title={
                                                             constitutionChangedInEdit
                                                                 ? HP_AUTO_RECALC_TOOLTIP
+                                                                : hitPointsMaxChangedInEdit ||
+                                                                  hitPointsTempChangedInEdit
+                                                                ? 'PV Max e PV Temp não podem ser editados junto com PV Atual.'
                                                                 : ''
                                                         }
                                                         className="block"
@@ -1669,7 +1685,7 @@ export default function CharacterDetailModal({
                                                         <input
                                                             type="number"
                                                             className={`cdm-edit-number font-M-semibold${
-                                                                constitutionChangedInEdit
+                                                                disableHitPointsCurrentEdit
                                                                     ? ' cursor-not-allowed opacity-70'
                                                                     : ''
                                                             }`}
@@ -1686,7 +1702,7 @@ export default function CharacterDetailModal({
                                                                 }))
                                                             }
                                                             disabled={
-                                                                constitutionChangedInEdit
+                                                                disableHitPointsCurrentEdit
                                                             }
                                                         />
                                                     </span>
@@ -1701,19 +1717,39 @@ export default function CharacterDetailModal({
                                                     PV Temp
                                                 </span>
                                                 {isEditing ? (
-                                                    <input
-                                                        type="number"
-                                                        className="cdm-edit-number font-M-semibold"
-                                                        value={editCombat.hitPointsTemp}
-                                                        onChange={(e) =>
-                                                            setEditCombat((p) => ({
-                                                                ...p,
-                                                                hitPointsTemp: Number(
-                                                                    e.target.value
-                                                                ),
-                                                            }))
+                                                    <span
+                                                        title={
+                                                            constitutionChangedInEdit
+                                                                ? HP_AUTO_RECALC_TOOLTIP
+                                                                : hitPointsCurrentChangedInEdit
+                                                                ? 'PV Atual está sendo editado.'
+                                                                : ''
                                                         }
-                                                    />
+                                                        className="block"
+                                                    >
+                                                        <input
+                                                            type="number"
+                                                            className={`cdm-edit-number font-M-semibold${
+                                                                disableHitPointsTempEdit
+                                                                    ? ' cursor-not-allowed opacity-70'
+                                                                    : ''
+                                                            }`}
+                                                            value={
+                                                                editCombat.hitPointsTemp
+                                                            }
+                                                            onChange={(e) =>
+                                                                setEditCombat((p) => ({
+                                                                    ...p,
+                                                                    hitPointsTemp: Number(
+                                                                        e.target.value
+                                                                    ),
+                                                                }))
+                                                            }
+                                                            disabled={
+                                                                disableHitPointsTempEdit
+                                                            }
+                                                        />
+                                                    </span>
                                                 ) : (
                                                     <span className="font-M-semibold">
                                                         {stats.hitPoints.tempPoints}
@@ -2190,34 +2226,20 @@ export default function CharacterDetailModal({
                                                             <tr>
                                                                 <th>Nome</th>
                                                                 <th>Tipo</th>
-                                                                <th>CA</th>
-                                                                <th>Peso</th>
-                                                                <th>Dano</th>
-                                                                <th>Propriedades</th>
-                                                                <th />
+                                                                <th>Preco</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             {equipmentItems.map(
                                                                 (item) => {
-                                                                    const isSelected =
-                                                                        selectedInventoryItemId ===
-                                                                        item.equipmentId;
                                                                     return (
                                                                         <tr
                                                                             key={
                                                                                 item.equipmentId
                                                                             }
-                                                                            className={
-                                                                                isSelected
-                                                                                    ? 'cdm-inventory-row--selected'
-                                                                                    : 'cdm-inventory-row--clickable'
-                                                                            }
                                                                             onClick={() =>
-                                                                                setSelectedInventoryItemId(
-                                                                                    isSelected
-                                                                                        ? null
-                                                                                        : item.equipmentId
+                                                                                setSelectedInventoryItem(
+                                                                                    item
                                                                                 )
                                                                             }
                                                                         >
@@ -2231,43 +2253,8 @@ export default function CharacterDetailModal({
                                                                                     '-'}
                                                                             </td>
                                                                             <td>
-                                                                                {item.armorClass?.join(
-                                                                                    ' '
-                                                                                ) || '-'}
-                                                                            </td>
-                                                                            <td>
-                                                                                {item.weight ||
-                                                                                    '-'}
-                                                                            </td>
-                                                                            <td>
-                                                                                {item.damage ||
-                                                                                    '-'}
-                                                                            </td>
-                                                                            <td>
-                                                                                {item.properties ||
-                                                                                    '-'}
-                                                                            </td>
-                                                                            <td>
-                                                                                {isSelected && (
-                                                                                    <button
-                                                                                        type="button"
-                                                                                        className="cdm-sell-btn"
-                                                                                        disabled={
-                                                                                            selling
-                                                                                        }
-                                                                                        onClick={(
-                                                                                            e
-                                                                                        ) => {
-                                                                                            e.stopPropagation();
-                                                                                            setSellConfirmItem(
-                                                                                                item
-                                                                                            );
-                                                                                        }}
-                                                                                    >
-                                                                                        {selling
-                                                                                            ? '...'
-                                                                                            : 'Vender'}
-                                                                                    </button>
+                                                                                {formatEquipmentPrice(
+                                                                                    item
                                                                                 )}
                                                                             </td>
                                                                         </tr>
@@ -2700,6 +2687,141 @@ export default function CharacterDetailModal({
                     )}
                 </div>
             </div>
+
+            {selectedInventoryItem !== null && (
+                <div
+                    className="cdm-overlay"
+                    onClick={() => {
+                        if (!selling) {
+                            setSelectedInventoryItem(null);
+                        }
+                    }}
+                >
+                    <div
+                        className="cdm-inventory-detail-modal"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <div className="cdm-inventory-detail-header">
+                            <div className="cdm-inventory-detail-header-copy">
+                                <h3 className="font-M-semibold cdm-inventory-detail-title">
+                                    {selectedInventoryItem.name}
+                                </h3>
+                                <p className="font-XS-regular cdm-inventory-detail-subtitle">
+                                    Veja os detalhes do equipamento antes de vender.
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                className="cdm-inventory-detail-close"
+                                aria-label="Fechar detalhes do equipamento"
+                                onClick={() => {
+                                    if (!selling) {
+                                        setSelectedInventoryItem(null);
+                                    }
+                                }}
+                            >
+                                x
+                            </button>
+                        </div>
+
+                        <div className="cdm-inventory-detail-grid">
+                            {[
+                                {
+                                    label: 'Nome',
+                                    value: selectedInventoryItem.name,
+                                },
+                                {
+                                    label: 'Tipo',
+                                    value: formatEquipmentField(
+                                        selectedInventoryItem.type
+                                    ),
+                                },
+                                {
+                                    label: 'Preco',
+                                    value: formatEquipmentPrice(selectedInventoryItem),
+                                },
+                                {
+                                    label: 'CA',
+                                    value: formatEquipmentArmorClass(
+                                        selectedInventoryItem
+                                    ),
+                                },
+                                {
+                                    label: 'Forca',
+                                    value: formatEquipmentField(
+                                        selectedInventoryItem.strength
+                                    ),
+                                },
+                                {
+                                    label: 'Furtividade',
+                                    value: formatEquipmentField(
+                                        selectedInventoryItem.stealth
+                                    ),
+                                },
+                                {
+                                    label: 'Peso',
+                                    value: formatEquipmentField(
+                                        selectedInventoryItem.weight
+                                    ),
+                                },
+                                {
+                                    label: 'Dano',
+                                    value: formatEquipmentField(
+                                        selectedInventoryItem.damage
+                                    ),
+                                },
+                                {
+                                    label: 'Propriedades',
+                                    value: formatEquipmentField(
+                                        selectedInventoryItem.properties
+                                    ),
+                                },
+                            ].map((field) => (
+                                <div
+                                    key={field.label}
+                                    className={`cdm-inventory-detail-field${
+                                        field.label === 'Propriedades'
+                                            ? ' cdm-inventory-detail-field--full'
+                                            : ''
+                                    }`}
+                                >
+                                    <span className="cdm-inventory-detail-label">
+                                        {field.label}
+                                    </span>
+                                    <span className="cdm-inventory-detail-value">
+                                        {field.value}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="cdm-inventory-detail-actions">
+                            <button
+                                type="button"
+                                className="cdm-inventory-detail-cancel"
+                                onClick={() => {
+                                    if (!selling) {
+                                        setSelectedInventoryItem(null);
+                                    }
+                                }}
+                            >
+                                Fechar
+                            </button>
+                            <button
+                                type="button"
+                                className="cdm-sell-btn"
+                                disabled={selling}
+                                onClick={() => {
+                                    setSellConfirmItem(selectedInventoryItem);
+                                    setSelectedInventoryItem(null);
+                                }}
+                            >
+                                {selling ? '...' : 'Vender'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {sellConfirmItem !== null &&
                 (() => {

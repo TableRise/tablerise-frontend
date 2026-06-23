@@ -35,7 +35,7 @@ export default function MatchAvatarSelectionModal({
             <div className="masm-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="masm-header">
                     <div>
-                        <h2 className="font-L-bold masm-title">Selecao de Avatares</h2>
+                        <h2 className="font-L-bold masm-title">Seleção de Avatares</h2>
                         <p className="font-XXS-regular masm-subtitle">
                             Escolha quais personagens aparecem como tokens no mapa.
                         </p>

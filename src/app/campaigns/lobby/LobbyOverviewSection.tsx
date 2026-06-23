@@ -5,6 +5,7 @@ import CopyBlueSVG from '@assets/icons/sys/copy-blue.svg?url';
 import CopyDarkSVG from '@assets/icons/sys/copy-dark.svg?url';
 import LoadingDots from '@/components/common/LoadingDots';
 import RankedAvatarFrame from '@/components/common/RankedAvatarFrame';
+import { getProfileTitleTextStyle } from '@/components/profile/profilePageHelpers';
 import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 import type { CampaignCharacter } from '@/server/characters/get-characters';
 import formatDate from '@/utils/formatDate';
@@ -137,9 +138,10 @@ export default function LobbyOverviewSection({
         <>
             <div className="lobby-cover">
                 <Image
-                    src={campaign.cover?.link}
+                    src={campaign.cover?.link || '/images/SideImageBackground.svg'}
                     alt={campaign.title}
                     fill
+                    priority
                     style={{ objectFit: 'cover' }}
                 />
             </div>
@@ -305,7 +307,17 @@ export default function LobbyOverviewSection({
                                         sizes="8rem"
                                     />
                                 </div>
-                                <span className="font-XXS-regular">{player.name}</span>
+                                <span className="font-XXS-regular lobby-confirmed-player-name">
+                                    {player.name}
+                                </span>
+                                {player.title ? (
+                                    <span
+                                        className="font-XXS-bold lobby-confirmed-player-title"
+                                        style={getProfileTitleTextStyle(player.titleType)}
+                                    >
+                                        {player.title}
+                                    </span>
+                                ) : null}
                             </div>
                         ))
                     ) : (

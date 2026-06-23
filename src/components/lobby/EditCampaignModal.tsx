@@ -30,6 +30,7 @@ import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 interface InitialData {
     title: string;
     description: string;
+    mainHistory: string;
     nextMatchDate: string;
     socialMedia: { discord?: string; twitter?: string; youtube?: string };
     nextSessionResume: string;
@@ -37,6 +38,7 @@ interface InitialData {
     ageRestriction: string;
     playerAmountLimit: number;
     shopOn: boolean;
+    playOn: boolean;
     adminId: string;
     cover: string;
     mapImages: string[];
@@ -72,6 +74,7 @@ export default function EditCampaignModal({
 
     const [title, setTitle] = useState(initialData.title);
     const [description, setDescription] = useState(initialData.description);
+    const [mainHistory, setMainHistory] = useState(initialData.mainHistory);
     const [date, setDate] = useState(initDate);
     const [start, setStart] = useState(initStart);
     const [discord, setDiscord] = useState(initialData.socialMedia.discord ?? '');
@@ -86,6 +89,7 @@ export default function EditCampaignModal({
         initialData.playerAmountLimit
     );
     const [shopOn, setShopOn] = useState(initialData.shopOn);
+    const [playOn, setPlayOn] = useState(initialData.playOn);
     const [adminId, setAdminId] = useState(initialData.adminId);
     const [activeTab, setActiveTab] = useState<'settings' | 'images' | 'musics'>(
         'settings'
@@ -226,6 +230,8 @@ export default function EditCampaignModal({
             if (title !== initialData.title) payload.title = title;
             if (description !== initialData.description)
                 payload.description = description;
+            if (mainHistory !== initialData.mainHistory)
+                payload.mainHistory = mainHistory;
             if (nextMatchDate !== initialData.nextMatchDate)
                 payload.nextMatchDate = nextMatchDate;
             if (nextSessionResume !== initialData.nextSessionResume)
@@ -235,8 +241,11 @@ export default function EditCampaignModal({
                 payload.ageRestriction = ageRestriction;
             if (playerAmountLimit !== initialData.playerAmountLimit)
                 payload.playerAmountLimit = playerAmountLimit;
-            if (shopOn !== initialData.shopOn) {
-                payload.configurations = { shopOn };
+            if (shopOn !== initialData.shopOn || playOn !== initialData.playOn) {
+                payload.configurations = {
+                    ...(shopOn !== initialData.shopOn && { shopOn }),
+                    ...(playOn !== initialData.playOn && { playOn }),
+                };
             }
             if (socialMediaChanged) payload.socialMedia = currentSocialMedia;
             if (
@@ -437,6 +446,25 @@ export default function EditCampaignModal({
                                 </div>
                             </label>
 
+                            <label className="ecm-field">
+                                <span className="font-S-bold ecm-field-label">
+                                    História da campanha
+                                </span>
+                                <div className="ecm-textarea-wrapper">
+                                    <textarea
+                                        className="ecm-textarea"
+                                        placeholder="Insira a história principal da campanha"
+                                        value={mainHistory}
+                                        maxLength={2500}
+                                        rows={8}
+                                        onChange={(e) => setMainHistory(e.target.value)}
+                                    />
+                                    <span className="font-XXS-regular ecm-char-count">
+                                        {mainHistory.length}/2500
+                                    </span>
+                                </div>
+                            </label>
+
                             {/* Next match date */}
                             <div className="ecm-field">
                                 <span className="font-S-bold ecm-field-label">
@@ -604,6 +632,24 @@ export default function EditCampaignModal({
                                     />
                                     <span className="font-XS-regular ecm-field-hint">
                                         Permite que a campanha use a loja de equipamentos.
+                                    </span>
+                                </div>
+                            </label>
+
+                            <label className="ecm-checkbox-field">
+                                <span className="font-S-bold ecm-field-label">
+                                    Habilitar entrada na partida
+                                </span>
+                                <div className="ecm-checkbox-row">
+                                    <input
+                                        type="checkbox"
+                                        className="ecm-checkbox"
+                                        checked={playOn}
+                                        onChange={(e) => setPlayOn(e.target.checked)}
+                                    />
+                                    <span className="font-XS-regular ecm-field-hint">
+                                        Permite que os jogadores usem o atalho para entrar
+                                        na partida.
                                     </span>
                                 </div>
                             </label>

@@ -25,7 +25,7 @@ export function useUserGallery(userId?: string) {
             return images;
         } catch (error: Error | any) {
             setGalleryImages([]);
-            setGalleryError(error?.message ?? 'Nao foi possivel carregar a galeria');
+            setGalleryError(error?.message ?? 'Não foi possivel carregar a galeria');
             return [];
         } finally {
             setLoadingGallery(false);

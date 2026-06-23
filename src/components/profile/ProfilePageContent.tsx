@@ -24,6 +24,7 @@ import ProfileTwoFactorActivationModal from '@/components/profile/ProfileTwoFact
 import ProfileTwoFactorDisableModal from '@/components/profile/ProfileTwoFactorDisableModal';
 import ProfileFlowWarningModal from '@/components/profile/ProfileFlowWarningModal';
 import ProfileBiographyModal from '@/components/profile/ProfileBiographyModal';
+import ProfileTitleModal from '@/components/profile/ProfileTitleModal';
 import ProfileCoverInstructionsModal from '@/components/profile/ProfileCoverInstructionsModal';
 import ProfileDeleteAccountModal from '@/components/profile/ProfileDeleteAccountModal';
 import ProfileDeleteAccountVerificationModal from '@/components/profile/ProfileDeleteAccountVerificationModal';
@@ -46,6 +47,7 @@ import {
     formatBadgeName,
     formatCampaignDate,
     getBadgeProgress,
+    getProfileTitleResolution,
     handleCardKeyDown,
     mapCharacter,
     mergeCampaigns,
@@ -126,6 +128,7 @@ export default function ProfilePageContent({
     const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
     const [gateStep, setGateStep] = useState<ProfileGateStep>('none');
     const [biographyModalOpen, setBiographyModalOpen] = useState(false);
+    const [titleModalOpen, setTitleModalOpen] = useState(false);
     const [deleteAccountModalOpen, setDeleteAccountModalOpen] = useState(false);
     const [deleteAccountVerificationModalOpen, setDeleteAccountVerificationModalOpen] =
         useState(false);
@@ -269,9 +272,7 @@ export default function ProfilePageContent({
                     setCampaigns([]);
                     setCharacters([]);
                 } else {
-                    setFetchError(
-                        'não foi possÃƒÆ’Ã‚Â­vel carregar este perfil no momento.'
-                    );
+                    setFetchError('não foi possível carregar este perfil no momento.');
                 }
             } finally {
                 if (mounted) {
@@ -288,6 +289,41 @@ export default function ProfilePageContent({
     }, [userId]);
 
     const userDetails = useMemo(() => normalizeUserDetails(user), [user]);
+    const profileLevel = useMemo(() => {
+        const rawLevel = userDetails?.level;
+        const normalizedLevel =
+            typeof rawLevel === 'number'
+                ? rawLevel
+                : typeof rawLevel === 'string'
+                ? Number(rawLevel)
+                : NaN;
+
+        return Number.isFinite(normalizedLevel) ? normalizedLevel : 0;
+    }, [userDetails]);
+    const profileXp = useMemo(() => {
+        const rawXp = userDetails?.xp;
+        const normalizedXp =
+            typeof rawXp === 'number'
+                ? rawXp
+                : typeof rawXp === 'string'
+                ? Number(rawXp)
+                : NaN;
+
+        return Number.isFinite(normalizedXp) ? normalizedXp : 0;
+    }, [userDetails]);
+    const {
+        availableTitles,
+        resolvedTitle: resolvedProfileTitle,
+        resolvedTitleType: resolvedProfileTitleType,
+    } = useMemo(
+        () =>
+            getProfileTitleResolution(
+                profileLevel,
+                userDetails?.title,
+                userDetails?.gender
+            ),
+        [profileLevel, userDetails?.title, userDetails?.gender]
+    );
     const accessibleCampaignIds = useMemo(
         () =>
             new Set([
@@ -341,6 +377,12 @@ export default function ProfilePageContent({
         setBiographyModalOpen(true);
     };
 
+    const handleRequestTitleChange = () => {
+        if (availableTitles.length === 0) return;
+        setProfileControlModalOpen(false);
+        setTitleModalOpen(true);
+    };
+
     const handleRequestEmailUpdate = () => {
         setProfileControlModalOpen(false);
         setPendingFlowWarning('update-email');
@@ -381,7 +423,7 @@ export default function ProfilePageContent({
             } catch (error: Error | any) {
                 setCoverFeedback(
                     error?.message ??
-                        'Nao foi possivel remover o plano de fundo do perfil.'
+                        'Não foi possivel remover o plano de fundo do perfil.'
                 );
             } finally {
                 setCoverActionLoading(false);
@@ -400,7 +442,7 @@ export default function ProfilePageContent({
             setPendingImageCrop(null);
         } catch (error: Error | any) {
             setPictureFeedback(
-                error?.message ?? 'Nao foi possivel atualizar a foto do perfil.'
+                error?.message ?? 'Não foi possivel atualizar a foto do perfil.'
             );
             throw error;
         } finally {
@@ -439,7 +481,7 @@ export default function ProfilePageContent({
 
                 setOwnerFriendRecords([]);
                 setFriendsError(
-                    error?.message ?? 'Nao foi possivel carregar a lista de amigos.'
+                    error?.message ?? 'Não foi possivel carregar a lista de amigos.'
                 );
             }
         }
@@ -539,7 +581,7 @@ export default function ProfilePageContent({
         return (
             <ProfileStateCard
                 title="Perfil não encontrado"
-                description="não encontramos este perfil ou ele não estÃƒÆ’Ã‚Â¡ disponível agora."
+                description="não encontramos este perfil ou ele não está disponível agora."
             />
         );
     }
@@ -598,8 +640,7 @@ export default function ProfilePageContent({
                     {campaign.title}
                 </h3>
                 <p className="font-XS-regular profile-campaign-card__description">
-                    {campaign.description ||
-                        'Sem descriÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o disponÃƒÆ’Ã‚Â­vel.'}
+                    {campaign.description || 'Sem descrição disponível.'}
                 </p>
                 <div className="profile-campaign-card__meta">
                     <span className="font-XXS-bold">
@@ -612,8 +653,7 @@ export default function ProfilePageContent({
                     </span>
                 </div>
                 <span className="font-XXS-regular profile-campaign-card__date">
-                    PrÃƒÆ’Ã‚Â³xima sessÃƒÆ’Ã‚Â£o:{' '}
-                    {formatCampaignDate(campaign.nextMatchDate)}
+                    Próxima sessão: {formatCampaignDate(campaign.nextMatchDate)}
                 </span>
             </div>
         </article>
@@ -659,7 +699,7 @@ export default function ProfilePageContent({
                     <span className="font-XXS-bold">{character.race}</span>
                 </div>
                 <span className="font-XS-regular text-color-greyScale/200">
-                    NÃƒÆ’Ã‚Â­Ãƒâ€šÃ‚Â­vel {character.level}
+                    Nível {character.level}
                 </span>
             </div>
         </article>
@@ -705,7 +745,7 @@ export default function ProfilePageContent({
                     previous.filter((friendItem) => friendItem.userId !== targetUserId)
                 );
             } catch (error: Error | any) {
-                setFriendsError(error?.message ?? 'Nao foi possivel desfazer a amizade.');
+                setFriendsError(error?.message ?? 'Não foi possivel desfazer a amizade.');
             } finally {
                 setRemovingFriendId(null);
             }
@@ -743,7 +783,7 @@ export default function ProfilePageContent({
                 setOwnerFriendRecords(refreshedFriends);
             } catch (error: Error | any) {
                 setFriendsError(
-                    error?.message ?? 'Nao foi possivel atualizar o favorito.'
+                    error?.message ?? 'Não foi possivel atualizar o favorito.'
                 );
             } finally {
                 setFavoriteLoadingFriendId(null);
@@ -765,7 +805,7 @@ export default function ProfilePageContent({
 
     const handleDeleteGalleryImage = async (image: ImageObject) => {
         if (!image.id?.trim()) {
-            throw new Error('Imagem da galeria nao encontrada');
+            throw new Error('Imagem da galeria não encontrada');
         }
 
         await deleteUserGalleryImage(userId, image.id);
@@ -834,6 +874,10 @@ export default function ProfilePageContent({
                     profileName={profileName}
                     profileHandle={profileHandle}
                     biography={biography}
+                    level={profileLevel}
+                    xp={profileXp}
+                    activeTitle={resolvedProfileTitle}
+                    activeTitleType={resolvedProfileTitleType}
                     profileCover={profileCover}
                     accountStatus={accountStatus}
                     accountStatusClass={accountStatusClass}
@@ -879,6 +923,7 @@ export default function ProfilePageContent({
                             setProfileControlModalOpen(false);
                         }}
                         onEditBiography={handleEditBiography}
+                        onRequestTitleChange={handleRequestTitleChange}
                         onRequestEmailUpdate={handleRequestEmailUpdate}
                         onRequestPasswordUpdate={handleRequestPasswordUpdate}
                         onRequestToggleTwoFactor={handleRequestToggleTwoFactor}
@@ -899,7 +944,7 @@ export default function ProfilePageContent({
                     emptyMessage={
                         isOwnProfile
                             ? 'Sua lista de amigos ainda esta vazia.'
-                            : 'Este usuário ainda nao possui amigos visíveis.'
+                            : 'Este usuário ainda não possui amigos visíveis.'
                     }
                     headerAction={
                         activeFriends.length > 0 ? (
@@ -977,6 +1022,7 @@ export default function ProfilePageContent({
                             firstName: userDetails.firstName ?? '',
                             lastName: userDetails.lastName ?? '',
                             birthday: normalizeBirthdayInput(userDetails.birthday),
+                            gender: userDetails.gender ?? 'male',
                         }}
                         onSuccess={async () => {
                             await refreshProfileUser();
@@ -1028,6 +1074,20 @@ export default function ProfilePageContent({
                         onSaved={async () => {
                             await refreshProfileUser();
                             setBiographyModalOpen(false);
+                        }}
+                    />
+                ) : null}
+
+                {titleModalOpen ? (
+                    <ProfileTitleModal
+                        userId={userId}
+                        gender={userDetails.gender ?? 'male'}
+                        availableTitles={availableTitles}
+                        selectedTitle={resolvedProfileTitle}
+                        onClose={() => setTitleModalOpen(false)}
+                        onSaved={async () => {
+                            await refreshProfileUser();
+                            setTitleModalOpen(false);
                         }}
                     />
                 ) : null}

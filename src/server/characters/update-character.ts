@@ -1,19 +1,20 @@
 import { apiCall, charactersBaseUrl } from '../wrapper';
+import type { FullCharacterDnd } from './get-characters';
 
 export const updateCharacter = async (
     characterId: string,
     payload: Record<string, any>
-): Promise<boolean> => {
+): Promise<FullCharacterDnd | null> => {
     try {
-        await apiCall({
+        const { data } = await apiCall({
             baseUrl: charactersBaseUrl,
             endpoint: `${characterId}/update`,
             method: 'PUT',
             data: payload,
         });
-        return true;
+        return data;
     } catch {
-        return false;
+        return null;
     }
 };
 

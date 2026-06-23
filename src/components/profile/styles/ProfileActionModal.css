@@ -69,7 +69,15 @@
         @apply mt-2 w-full rounded-lg border border-color-greyScale/300 bg-color-greyScale/50 p-3 text-color-greyScale/500 focus:outline-none;
     }
 
+    .profile-action-modal-select {
+        @apply mt-2 w-full rounded-lg border border-color-greyScale/300 bg-color-greyScale/50 p-3 text-color-greyScale/500 focus:outline-none;
+    }
+
     .profile-action-modal-input:focus {
+        border-color: rgb(10 53 138);
+    }
+
+    .profile-action-modal-select:focus {
         border-color: rgb(10 53 138);
     }
 
@@ -349,6 +357,7 @@
     }
 
     html[data-theme='dark'] .profile-action-modal-input,
+    html[data-theme='dark'] .profile-action-modal-select,
     html[data-theme='dark'] .profile-action-modal-textarea,
     html[data-theme='dark'] .profile-action-modal-digit {
         background-color: var(--theme-surface-muted);

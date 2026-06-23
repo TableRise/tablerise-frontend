@@ -35,10 +35,6 @@
         box-shadow: none;
     }
 
-    .user-player-campaigns .user-player-campaigns-cards .carousel-arrow-prev img {
-        @apply -scale-x-100;
-    }
-
     .carousel-arrow-next {
         @apply w-14 h-14 flex justify-center items-center bg-color-greyScale/50 rounded-xl cursor-pointer;
         box-shadow: none;

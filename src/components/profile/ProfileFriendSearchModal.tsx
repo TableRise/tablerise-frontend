@@ -59,7 +59,7 @@ export default function ProfileFriendSearchModal({
             setResult(foundUser);
             setHasSearched(true);
         } catch (searchError: Error | any) {
-            setError(searchError?.message ?? 'Nao foi possivel procurar aventureiros');
+            setError(searchError?.message ?? 'Não foi possivel procurar aventureiros');
         } finally {
             setSearching(false);
         }

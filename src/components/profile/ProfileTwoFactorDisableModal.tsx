@@ -62,7 +62,7 @@ export default function ProfileTwoFactorDisableModal({
             await onSaved();
         } catch (confirmError: Error | any) {
             setError(
-                confirmError?.message ?? '*Nao foi possivel desabilitar os dois fatores.'
+                confirmError?.message ?? '*Não foi possivel desabilitar os dois fatores.'
             );
             setSubmitting(false);
         }
@@ -79,7 +79,7 @@ export default function ProfileTwoFactorDisableModal({
                 </h1>
                 <p className="profile-action-modal-description font-XS-regular">
                     Digite o codigo do seu aplicativo autenticador para confirmar a
-                    desativacao da autenticacao em dois fatores.
+                    desativação da autenticação em dois fatores.
                 </p>
 
                 <div className="profile-action-modal-otp">

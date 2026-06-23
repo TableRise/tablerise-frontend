@@ -2,8 +2,7 @@
 
 import { ReactNode, useCallback, useEffect, useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
-import Image from 'next/image';
-import ArrowRightGraySVG from '../../../assets/icons/nav/arrow-right-gray.svg?url';
+import { ArrowLeft, ArrowRight } from '@/components/icons/Arrows';
 
 type ProfileCarouselProps = {
     items: ReactNode[];
@@ -79,11 +78,11 @@ export default function ProfileCarousel({
                         disabled={!canPrev}
                         aria-label="Voltar"
                     >
-                        <Image
-                            src={ArrowRightGraySVG.src}
-                            alt=""
-                            width={ArrowRightGraySVG.width}
-                            height={ArrowRightGraySVG.height}
+                        <ArrowLeft
+                            mode="light"
+                            width={16}
+                            height={16}
+                            aria-hidden="true"
                         />
                     </button>
                     <button
@@ -93,11 +92,11 @@ export default function ProfileCarousel({
                         disabled={!canNext}
                         aria-label="Avançar"
                     >
-                        <Image
-                            src={ArrowRightGraySVG.src}
-                            alt=""
-                            width={ArrowRightGraySVG.width}
-                            height={ArrowRightGraySVG.height}
+                        <ArrowRight
+                            mode="light"
+                            width={16}
+                            height={16}
+                            aria-hidden="true"
                         />
                     </button>
                 </div>

@@ -129,6 +129,62 @@
     }
 
     /* ── Warning message ─────────────── */
+    .sm-item-detail-overlay {
+        @apply fixed inset-0 z-[260] flex items-center justify-center bg-black/60 px-4;
+    }
+
+    .sm-item-detail-modal {
+        @apply w-full max-w-[44rem] max-h-[85vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl;
+    }
+
+    .sm-item-detail-header {
+        @apply flex items-start justify-between gap-4;
+    }
+
+    .sm-item-detail-header-copy {
+        @apply flex flex-col gap-1;
+    }
+
+    .sm-item-detail-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .sm-item-detail-subtitle {
+        @apply text-color-greyScale/500;
+    }
+
+    .sm-item-detail-close {
+        @apply h-8 w-8 flex items-center justify-center rounded-lg text-color-greyScale/500 transition-colors hover:bg-color-greyScale/100;
+    }
+
+    .sm-item-detail-grid {
+        @apply mt-5 grid grid-cols-2 gap-3;
+    }
+
+    .sm-item-detail-field {
+        @apply flex flex-col gap-1 rounded-xl border border-color-greyScale/200 bg-color-greyScale/50 px-4 py-3;
+    }
+
+    .sm-item-detail-field--full {
+        @apply col-span-2;
+    }
+
+    .sm-item-detail-label {
+        @apply text-[0.7rem] font-bold uppercase tracking-[0.08em] text-color-greyScale/500;
+    }
+
+    .sm-item-detail-value {
+        @apply text-sm font-semibold text-color-greyScale/700 whitespace-pre-wrap break-words;
+    }
+
+    .sm-item-detail-footer {
+        @apply mt-5 flex items-center justify-end gap-3;
+    }
+
+    .sm-item-detail-secondary {
+        @apply rounded-lg border border-color-greyScale/300 px-4 py-2 text-sm font-bold text-color-greyScale/700 transition-colors hover:bg-color-greyScale/100;
+    }
+
     .sm-warning {
         @apply text-red-500 font-semibold text-sm py-2;
     }
@@ -227,7 +283,8 @@
 
         .sm-buy-bar,
         .sm-picker-grid,
-        .sm-vault-money-grid {
+        .sm-vault-money-grid,
+        .sm-item-detail-grid {
             @apply grid-cols-1;
         }
 
@@ -236,7 +293,8 @@
         }
 
         .sm-buy-bar,
-        .sm-vault-form-row {
+        .sm-vault-form-row,
+        .sm-item-detail-footer {
             @apply flex-col items-stretch;
         }
 
@@ -268,7 +326,8 @@
 
     html[data-theme='dark'] .sm-modal,
     html[data-theme='dark'] .sm-picker-card,
-    html[data-theme='dark'] .sm-vault-form {
+    html[data-theme='dark'] .sm-vault-form,
+    html[data-theme='dark'] .sm-item-detail-modal {
         background-color: var(--theme-surface);
         box-shadow: var(--theme-shadow);
     }
@@ -277,7 +336,8 @@
     html[data-theme='dark'] .sm-vault-currency-box,
     html[data-theme='dark'] .sm-vault-preview,
     html[data-theme='dark'] .sm-table thead,
-    html[data-theme='dark'] .sm-picker-card:hover {
+    html[data-theme='dark'] .sm-picker-card:hover,
+    html[data-theme='dark'] .sm-item-detail-field {
         background-color: var(--theme-surface-muted);
     }
 
@@ -288,6 +348,7 @@
     html[data-theme='dark'] .sm-table tbody tr,
     html[data-theme='dark'] .sm-picker-card,
     html[data-theme='dark'] .sm-vault-form,
+    html[data-theme='dark'] .sm-item-detail-field,
     html[data-theme='dark'] .sm-vault-select,
     html[data-theme='dark'] .sm-vault-amount-input {
         border-color: var(--theme-border);
@@ -308,15 +369,28 @@
     html[data-theme='dark'] .sm-empty-row td,
     html[data-theme='dark'] .sm-picker-empty,
     html[data-theme='dark'] .sm-vault-preview-label,
-    html[data-theme='dark'] .sm-history-date {
+    html[data-theme='dark'] .sm-history-date,
+    html[data-theme='dark'] .sm-item-detail-subtitle,
+    html[data-theme='dark'] .sm-item-detail-label,
+    html[data-theme='dark'] .sm-item-detail-close {
         color: var(--theme-text-muted);
     }
 
     html[data-theme='dark'] .sm-char-name,
     html[data-theme='dark'] .sm-table th,
     html[data-theme='dark'] .sm-table td,
-    html[data-theme='dark'] .sm-vault-label {
+    html[data-theme='dark'] .sm-vault-label,
+    html[data-theme='dark'] .sm-item-detail-value,
+    html[data-theme='dark'] .sm-item-detail-secondary {
         color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .sm-item-detail-secondary:hover {
+        background-color: var(--theme-surface-strong);
+    }
+
+    html[data-theme='dark'] .sm-item-detail-title {
+        color: #8ab5fc;
     }
 
     html[data-theme='dark'] .sm-table tbody tr:nth-child(even),

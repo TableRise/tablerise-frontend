@@ -29,7 +29,7 @@ export default function ProfileFriendRequestModal({
         } catch (confirmError: Error | any) {
             setError(
                 confirmError?.message ??
-                    'Nao foi possivel enviar a solicitação de amizade'
+                    'Não foi possivel enviar a solicitação de amizade'
             );
             setSubmitting(false);
         }

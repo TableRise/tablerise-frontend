@@ -38,7 +38,7 @@ export default function ProfileDeleteAccountModal({
 
             onDeleted();
         } catch (submitError: Error | any) {
-            setError(submitError?.message ?? '*Nao foi possivel deletar a conta agora.');
+            setError(submitError?.message ?? '*Não foi possivel deletar a conta agora.');
             setLoading(false);
         }
     };
@@ -53,7 +53,7 @@ export default function ProfileDeleteAccountModal({
                     Deletar conta
                 </h1>
                 <p className="profile-action-modal-description font-XS-regular">
-                    Tem certeza que deseja deletar sua conta? Esta acao e permanente e nao
+                    Tem certeza que deseja deletar sua conta? Esta ação e permanente e não
                     pode ser desfeita.
                 </p>
 

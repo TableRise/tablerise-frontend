@@ -67,7 +67,7 @@ export default function ProfileBiographyModal({
         } catch (submitError: Error | any) {
             setError(
                 submitError?.message ??
-                    '*Nao foi possivel atualizar a biografia e o nome.'
+                    '*Não foi possivel atualizar a biografia e o nome.'
             );
             setLoading(false);
         }

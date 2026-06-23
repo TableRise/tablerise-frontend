@@ -1,5 +1,6 @@
-import { type KeyboardEvent } from 'react';
+import { type CSSProperties, type KeyboardEvent } from 'react';
 import badgesCatalog from '@assets/badges.js';
+import titlesCatalog from '@assets/titles.js';
 import type {
     DatabaseCampaign,
     DatabaseCampaignGroupsResponse,
@@ -41,6 +42,94 @@ export type BadgeProgressModel = {
     statusLabel: string;
     progressLabel: string;
 };
+
+export type TitleCatalogEntry = {
+    title: string;
+    type: string;
+    maxLevel: number;
+};
+
+export type TitleCatalogByGender = {
+    male: TitleCatalogEntry[];
+    female: TitleCatalogEntry[];
+};
+
+export type ProfileTitleResolution = {
+    availableTitles: string[];
+    resolvedTitle: string;
+    resolvedTitleType: string;
+    currentBracketMaxLevel: number;
+};
+
+function normalizeProfileTitleType(titleType?: string): string {
+    return titleType === 'white' ? 'divine' : titleType ?? '';
+}
+
+export function getProfileTitleTextStyle(titleType?: string): CSSProperties {
+    const normalizedTitleType = normalizeProfileTitleType(titleType);
+
+    if (normalizedTitleType === 'bronze') {
+        return {
+            color: '#CE8946',
+            fontWeight: 700,
+        };
+    }
+
+    if (normalizedTitleType === 'diamond') {
+        return {
+            color: '#0F52BA',
+            fontWeight: 700,
+        };
+    }
+
+    if (normalizedTitleType === 'gold') {
+        return {
+            color: '#D3AF37',
+            fontWeight: 700,
+        };
+    }
+
+    if (normalizedTitleType === 'emerald') {
+        return {
+            fontWeight: 700,
+            color: 'transparent',
+            WebkitTextFillColor: 'transparent',
+            backgroundImage:
+                'linear-gradient(110deg, rgba(255,255,255,0) 38%, rgba(255,255,255,0.65) 47%, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0.65) 53%, rgba(255,255,255,0) 62%), linear-gradient(180deg, #004736 0%, #0D8A69 18%, #D9FFF4 34%, #22A77F 50%, #003A2C 58%, #1B8E6D 74%, #8BE5CB 92%, #E8FFF8 100%)',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+        };
+    }
+
+    if (normalizedTitleType === 'amethyst') {
+        return {
+            fontWeight: 700,
+            color: 'transparent',
+            WebkitTextFillColor: 'transparent',
+            backgroundImage:
+                'linear-gradient(110deg, rgba(255,255,255,0) 38%, rgba(255,255,255,0.65) 47%, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0.65) 53%, rgba(255,255,255,0) 62%), linear-gradient(180deg, #5D2D8C 0%, #9C63D4 18%, #F4E5FF 34%, #B47AE6 50%, #47206E 58%, #8E56C8 74%, #D8B4F6 92%, #F8EEFF 100%)',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+        };
+    }
+
+    if (normalizedTitleType === 'divine') {
+        return {
+            fontWeight: 700,
+            color: 'transparent',
+            WebkitTextFillColor: 'transparent',
+            backgroundImage:
+                'linear-gradient(110deg, rgba(255,255,255,0) 38%, rgba(255,255,255,0.75) 47%, rgba(255,255,255,0.95) 50%, rgba(255,255,255,0.75) 53%, rgba(255,255,255,0) 62%), linear-gradient(180deg, #7B7B7B 0%, #CFCFCF 18%, #FFFFFF 34%, #DCDCDC 50%, #707070 58%, #C6C6C6 74%, #F1F1F1 92%, #FFFFFF 100%)',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+        };
+    }
+
+    return {
+        color: '#CE8946',
+        fontWeight: 700,
+    };
+}
 
 export type ProfileCampaign = {
     campaignId: string;
@@ -84,11 +173,53 @@ export type PendingProfileFlowWarning =
 export const badgeMap = badgesCatalog as Record<string, BadgeVariant>;
 export const badgeEntries = Object.entries(badgeMap);
 export const defaultProfileImage = '/images/SideImageBackground.svg';
+export const titleEntriesByGender = titlesCatalog as TitleCatalogByGender;
 
 export function normalizeUserDetails(
     user: DatabaseUserWithDetails | null
 ): DatabaseUserDetail | null {
     return user?.details ?? user?.result?.details ?? null;
+}
+
+export function getProfileTitleResolution(
+    level?: number,
+    currentTitle?: string,
+    gender?: 'male' | 'female'
+): ProfileTitleResolution {
+    const normalizedGender = gender === 'female' ? 'female' : 'male';
+    const titleEntries = titleEntriesByGender[normalizedGender];
+    const normalizedLevel =
+        typeof level === 'number' && Number.isFinite(level) && level > 0 ? level : 0;
+    const sortedBracketLevels = Array.from(
+        new Set(titleEntries.map((entry) => entry.maxLevel))
+    ).sort((left, right) => left - right);
+    const fallbackBracketMaxLevel = sortedBracketLevels[0] ?? 0;
+    const currentBracketMaxLevel =
+        sortedBracketLevels.find(
+            (bracketMaxLevel) => normalizedLevel <= bracketMaxLevel
+        ) ??
+        sortedBracketLevels[sortedBracketLevels.length - 1] ??
+        fallbackBracketMaxLevel;
+    const availableTitles = titleEntries
+        .filter((entry) => entry.maxLevel === currentBracketMaxLevel)
+        .map((entry) => entry.title);
+    const trimmedCurrentTitle = currentTitle?.trim() ?? '';
+    const resolvedTitle =
+        trimmedCurrentTitle && availableTitles.includes(trimmedCurrentTitle)
+            ? trimmedCurrentTitle
+            : availableTitles[0] ?? '';
+    const resolvedTitleType =
+        titleEntries.find(
+            (entry) =>
+                entry.maxLevel === currentBracketMaxLevel && entry.title === resolvedTitle
+        )?.type ?? 'bronze';
+
+    return {
+        availableTitles,
+        resolvedTitle,
+        resolvedTitleType,
+        currentBracketMaxLevel,
+    };
 }
 
 export function formatBirthday(dateString?: string): string {

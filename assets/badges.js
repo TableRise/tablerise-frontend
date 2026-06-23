@@ -39,6 +39,26 @@ const rawBadges = {
             label: 'campanhas encerradas',
         },
     },
+    supreme: {
+        colorful: '/images/badges/supreme.webp',
+        blackandwhite: '/images/badges/supreme-bw.webp',
+        description: 'Concedida ao alcançar o nível 30 de usuário.',
+        progress: {
+            counter: 'userLevelAmount',
+            target: 30,
+            label: 'nível alcançado',
+        },
+    },
+    newbie: {
+        colorful: '/images/badges/newbie.webp',
+        blackandwhite: '/images/badges/newbie-bw.webp',
+        description: 'Concedida ao se registrar na plataforma.',
+        progress: {
+            counter: 'userRegistered',
+            target: 1,
+            label: 'usuário registrado',
+        },
+    },
     friends: {
         colorful: '/images/badges/friends.webp',
         blackandwhite: '/images/badges/friends-bw.webp',

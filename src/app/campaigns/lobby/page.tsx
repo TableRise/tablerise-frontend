@@ -37,8 +37,85 @@ import {
 import Footer from '@/components/common/Footer';
 import { areJournalPostsEqual } from '@/utils/journalPosts';
 import { getUserRank } from '@/utils/userRank';
+import { getResolvedUserTitle } from '@/utils/userTitle';
 import { useStoredUser } from '@/hooks/useStoredUser';
-import '@/app/campaigns/lobby/page.css';
+import { updateUserXp } from '@/server/users/update-user-xp';
+
+const PLAY_MATCH_XP_REWARD = 200;
+const PLAY_MATCH_XP_REWARD_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000;
+const PLAY_MATCH_XP_STORAGE_PREFIX = 'tablerise-play-match-xp';
+
+type PlayMatchXpStorageRecord = {
+    status: 'pending' | 'awarded';
+    timestamp: number;
+};
+
+function getPlayMatchXpStorageKey(userId: string): string {
+    return `${PLAY_MATCH_XP_STORAGE_PREFIX}:${userId}`;
+}
+
+function readPlayMatchXpStorage(userId: string): PlayMatchXpStorageRecord | null {
+    try {
+        const rawValue = window.localStorage.getItem(getPlayMatchXpStorageKey(userId));
+
+        if (!rawValue) return null;
+
+        const parsedValue = JSON.parse(rawValue) as PlayMatchXpStorageRecord;
+
+        if (
+            !parsedValue ||
+            (parsedValue.status !== 'pending' && parsedValue.status !== 'awarded') ||
+            typeof parsedValue.timestamp !== 'number' ||
+            !Number.isFinite(parsedValue.timestamp)
+        ) {
+            window.localStorage.removeItem(getPlayMatchXpStorageKey(userId));
+            return null;
+        }
+
+        return parsedValue;
+    } catch {
+        window.localStorage.removeItem(getPlayMatchXpStorageKey(userId));
+        return null;
+    }
+}
+
+function hasRecentPlayMatchXpReward(userId: string, now: number): boolean {
+    const storedReward = readPlayMatchXpStorage(userId);
+
+    if (!storedReward) return false;
+
+    return now - storedReward.timestamp < PLAY_MATCH_XP_REWARD_INTERVAL_MS;
+}
+
+async function awardWeeklyPlayMatchXp(userId: string): Promise<void> {
+    const now = Date.now();
+
+    if (hasRecentPlayMatchXpReward(userId, now)) return;
+
+    const storageKey = getPlayMatchXpStorageKey(userId);
+
+    try {
+        window.localStorage.setItem(
+            storageKey,
+            JSON.stringify({
+                status: 'pending',
+                timestamp: now,
+            } satisfies PlayMatchXpStorageRecord)
+        );
+
+        await updateUserXp(userId, PLAY_MATCH_XP_REWARD);
+
+        window.localStorage.setItem(
+            storageKey,
+            JSON.stringify({
+                status: 'awarded',
+                timestamp: now,
+            } satisfies PlayMatchXpStorageRecord)
+        );
+    } catch {
+        window.localStorage.removeItem(storageKey);
+    }
+}
 
 export default function CampaignLobby(): JSX.Element {
     const searchParams = useSearchParams();
@@ -166,11 +243,14 @@ export default function CampaignLobby(): JSX.Element {
 
                 try {
                     const user = await getUser(confirmedUserId);
+                    const resolvedTitle = getResolvedUserTitle(user);
                     return {
                         userId: confirmedUserId,
                         name: user?.nickname ?? user?.username ?? confirmedUserId,
                         picture: user?.picture?.link ?? '/images/SideImageBackground.svg',
                         rank: getUserRank(user),
+                        title: resolvedTitle.title,
+                        titleType: resolvedTitle.titleType,
                     };
                 } catch {
                     return {
@@ -371,8 +451,12 @@ export default function CampaignLobby(): JSX.Element {
                     isPlayer={isPlayer}
                     isMaster={isMaster}
                     shopEnabled={campaign.shopSystem}
+                    playEnabled={campaign.playOn}
                     onMenuAction={(key) => {
-                        if (key === 'play-match') {
+                        if (key === 'play-match' && campaign.playOn) {
+                            if (userInfo?.userId) {
+                                void awardWeeklyPlayMatchXp(userInfo.userId);
+                            }
                             router.push(`/campaigns/match?campaignId=${campaignId}`);
                         }
                         if (key === 'create-sheet') setSheetModalOpen(true);
@@ -497,6 +581,7 @@ export default function CampaignLobby(): JSX.Element {
                     initialData={{
                         title: campaign.title,
                         description: campaign.description,
+                        mainHistory: campaign.mainHistory,
                         nextMatchDate: campaign.nextMatchDate,
                         socialMedia: campaign.socialMedia,
                         nextSessionResume: campaign.nextSessionResume,
@@ -504,6 +589,7 @@ export default function CampaignLobby(): JSX.Element {
                         ageRestriction: campaign.ageRestriction,
                         playerAmountLimit: campaign.playerAmountLimit,
                         shopOn: campaign.shopSystem,
+                        playOn: campaign.playOn,
                         adminId:
                             campaign.campaignPlayers.find(
                                 (entry) => entry.role === 'admin_player'

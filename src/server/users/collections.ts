@@ -94,10 +94,10 @@ export async function getUserFriends(userId: string): Promise<UserFriendRecord[]
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
 
-        if (status === 404) throw new Error('usuÃ¡rio nao encontrado');
+        if (status === 404) throw new Error('usuário não encontrado');
         if (status === 500) throw new Error('Erro no servidor');
 
-        throw new Error('Nao foi possivel carregar a lista de amigos');
+        throw new Error('Não foi possivel carregar a lista de amigos');
     }
 }
 
@@ -121,7 +121,7 @@ export async function searchUserByNickname(
         if (status === 404) return null;
         if (status === 500) throw new Error('Erro no servidor');
 
-        throw new Error('Nao foi possivel procurar aventureiros');
+        throw new Error('Não foi possivel procurar aventureiros');
     }
 }
 
@@ -138,10 +138,10 @@ export async function removeUserFriend(
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
 
-        if (status === 404) throw new Error('Amizade nao encontrada');
+        if (status === 404) throw new Error('Amizade não encontrada');
         if (status === 500) throw new Error('Erro no servidor');
 
-        throw new Error('Nao foi possivel desfazer a amizade');
+        throw new Error('Não foi possivel desfazer a amizade');
     }
 }
 
@@ -158,10 +158,10 @@ export async function toggleUserFriendFavorite(
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
 
-        if (status === 404) throw new Error('Amizade nao encontrada');
+        if (status === 404) throw new Error('Amizade não encontrada');
         if (status === 500) throw new Error('Erro no servidor');
 
-        throw new Error('Nao foi possivel atualizar o favorito');
+        throw new Error('Não foi possivel atualizar o favorito');
     }
 }
 
@@ -179,18 +179,18 @@ export async function sendUserFriendRequest(
         const status = error?.response?.status;
 
         if (status === 400) {
-            throw new Error('Nao foi possivel enviar esta solicitação de amizade');
+            throw new Error('Não foi possivel enviar esta solicitação de amizade');
         }
         if (status === 403) {
-            throw new Error('Voce nao pode enviar uma solicitação para este perfil');
+            throw new Error('Voce não pode enviar uma solicitação para este perfil');
         }
-        if (status === 404) throw new Error('usuÃ¡rio nao encontrado');
+        if (status === 404) throw new Error('usuário não encontrado');
         if (status === 409) {
             throw new Error('Já existe uma amizade ou solicitação pendente');
         }
         if (status === 500) throw new Error('Erro no servidor');
 
-        throw new Error('Nao foi possivel enviar a solicitação de amizade');
+        throw new Error('Não foi possivel enviar a solicitação de amizade');
     }
 }
 
@@ -212,14 +212,14 @@ export async function respondToUserFriendRequest(
         const status = error?.response?.status;
 
         if (status === 400) {
-            throw new Error('Nao foi possivel atualizar esta solicitação de amizade');
+            throw new Error('Não foi possivel atualizar esta solicitação de amizade');
         }
         if (status === 404) {
-            throw new Error('solicitação de amizade nao encontrada');
+            throw new Error('solicitação de amizade não encontrada');
         }
         if (status === 500) throw new Error('Erro no servidor');
 
-        throw new Error('Nao foi possivel responder a solicitação de amizade');
+        throw new Error('Não foi possivel responder a solicitação de amizade');
     }
 }
 
@@ -235,10 +235,10 @@ export async function getUserMessages(userId: string): Promise<UserMessageRecord
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
 
-        if (status === 404) throw new Error('Mensagens nao encontradas');
+        if (status === 404) throw new Error('Mensagens não encontradas');
         if (status === 500) throw new Error('Erro no servidor');
 
-        throw new Error('Nao foi possivel carregar as mensagens');
+        throw new Error('Não foi possivel carregar as mensagens');
     }
 }
 
@@ -260,10 +260,10 @@ export async function sendUserMessage(
         if (status === 403) {
             throw new Error('Voce so pode enviar mensagens para amigos ativos');
         }
-        if (status === 404) throw new Error('usuÃ¡rio ou destinatario nao encontrado');
+        if (status === 404) throw new Error('usuário ou destinatario não encontrado');
         if (status === 500) throw new Error('Erro no servidor');
 
-        throw new Error('Nao foi possivel enviar a mensagem');
+        throw new Error('Não foi possivel enviar a mensagem');
     }
 }
 
@@ -280,10 +280,10 @@ export async function deleteUserMessage(
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
 
-        if (status === 404) throw new Error('Mensagem nao encontrada');
+        if (status === 404) throw new Error('Mensagem não encontrada');
         if (status === 500) throw new Error('Erro no servidor');
 
-        throw new Error('Nao foi possivel remover a mensagem');
+        throw new Error('Não foi possivel remover a mensagem');
     }
 }
 
@@ -300,10 +300,10 @@ export async function markUserMessageAsRead(
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
 
-        if (status === 404) throw new Error('Mensagem nao encontrada');
+        if (status === 404) throw new Error('Mensagem não encontrada');
         if (status === 500) throw new Error('Erro no servidor');
 
-        throw new Error('Nao foi possivel marcar a mensagem como lida');
+        throw new Error('Não foi possivel marcar a mensagem como lida');
     }
 }
 
@@ -319,10 +319,10 @@ export async function getUserGallery(userId: string): Promise<ImageObject[]> {
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
 
-        if (status === 404) throw new Error('Galeria nao encontrada');
+        if (status === 404) throw new Error('Galeria não encontrada');
         if (status === 500) throw new Error('Erro no servidor');
 
-        throw new Error('Nao foi possivel carregar a galeria');
+        throw new Error('Não foi possivel carregar a galeria');
     }
 }
 
@@ -339,9 +339,9 @@ export async function deleteUserGalleryImage(
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
 
-        if (status === 404) throw new Error('Imagem da galeria nao encontrada');
+        if (status === 404) throw new Error('Imagem da galeria não encontrada');
         if (status === 500) throw new Error('Erro no servidor');
 
-        throw new Error('Nao foi possivel remover a imagem da galeria');
+        throw new Error('Não foi possivel remover a imagem da galeria');
     }
 }

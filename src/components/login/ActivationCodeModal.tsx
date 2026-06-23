@@ -84,7 +84,7 @@ export default function ActivationCodeModal({
                     Ative sua conta
                 </h1>
                 <p className="activation-modal-description font-XS-regular">
-                    Insira o codigo de ativacao enviado para o seu e-mail.
+                    Insira o codigo de ativação enviado para o seu e-mail.
                 </p>
 
                 <div className="activation-modal-inputs">

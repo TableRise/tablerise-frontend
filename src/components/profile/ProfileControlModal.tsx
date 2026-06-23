@@ -12,6 +12,7 @@ type ProfileControlModalProps = {
     coverFeedback: string;
     onClose: () => void;
     onEditBiography: () => void;
+    onRequestTitleChange: () => void;
     onRequestEmailUpdate: () => void;
     onRequestPasswordUpdate: () => void;
     onRequestToggleTwoFactor: () => void;
@@ -27,6 +28,7 @@ export default function ProfileControlModal({
     coverFeedback,
     onClose,
     onEditBiography,
+    onRequestTitleChange,
     onRequestEmailUpdate,
     onRequestPasswordUpdate,
     onRequestToggleTwoFactor,
@@ -54,6 +56,14 @@ export default function ProfileControlModal({
                         className="font-S-bold button-L-fill profile-action-modal-button-option bg-color-primary/default_900 text-color-greyScale/100 w-full"
                     >
                         Atualizar dados
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={onRequestTitleChange}
+                        className="font-S-bold button-L-fill profile-action-modal-button-option bg-color-primary/default_900 text-color-greyScale/100 w-full"
+                    >
+                        Trocar Titulo
                     </button>
 
                     {!hasExternalProvider ? (

@@ -261,6 +261,59 @@
     }
 
     /* ── Sell confirmation modal ──────────── */
+    .cdm-inventory-detail-modal {
+        @apply rounded-2xl shadow-2xl p-6 flex flex-col gap-4 w-full max-w-[42rem]
+            max-h-[85vh] overflow-y-auto mx-4 bg-color-greyScale/50;
+    }
+
+    .cdm-inventory-detail-header {
+        @apply flex items-start justify-between gap-4;
+    }
+
+    .cdm-inventory-detail-header-copy {
+        @apply flex flex-col gap-1;
+    }
+
+    .cdm-inventory-detail-title {
+        @apply text-color-primary/default_900;
+    }
+
+    .cdm-inventory-detail-subtitle {
+        @apply text-color-greyScale/500;
+    }
+
+    .cdm-inventory-detail-close {
+        @apply h-8 w-8 flex items-center justify-center rounded-lg text-color-greyScale/500 transition-colors hover:bg-color-greyScale/100;
+    }
+
+    .cdm-inventory-detail-grid {
+        @apply grid grid-cols-2 gap-3;
+    }
+
+    .cdm-inventory-detail-field {
+        @apply flex flex-col gap-1 rounded-xl border border-color-greyScale/200 bg-white px-4 py-3;
+    }
+
+    .cdm-inventory-detail-field--full {
+        @apply col-span-2;
+    }
+
+    .cdm-inventory-detail-label {
+        @apply text-[0.7rem] font-bold uppercase tracking-[0.08em] text-color-greyScale/500;
+    }
+
+    .cdm-inventory-detail-value {
+        @apply text-sm font-semibold text-color-greyScale/700 whitespace-pre-wrap break-words;
+    }
+
+    .cdm-inventory-detail-actions {
+        @apply flex items-center justify-end gap-3;
+    }
+
+    .cdm-inventory-detail-cancel {
+        @apply px-4 py-2 rounded-lg border border-color-greyScale/200 text-color-greyScale/700 font-bold text-xs transition-colors hover:bg-color-greyScale/100;
+    }
+
     .cdm-sell-confirm-modal {
         @apply rounded-2xl shadow-2xl p-6 flex flex-col gap-4
             w-full max-w-sm mx-4 bg-color-greyScale/50;
@@ -338,6 +391,18 @@
             @apply w-full justify-end;
         }
 
+        .cdm-inventory-detail-grid {
+            @apply grid-cols-1;
+        }
+
+        .cdm-inventory-detail-field--full {
+            @apply col-span-1;
+        }
+
+        .cdm-inventory-detail-actions {
+            @apply flex-col items-stretch;
+        }
+
         .cdm-attributes-grid {
             @apply grid-cols-3;
         }
@@ -357,6 +422,7 @@
     html[data-theme='dark'] .cdm-attr-box,
     html[data-theme='dark'] .cdm-info-box,
     html[data-theme='dark'] .cdm-text-block,
+    html[data-theme='dark'] .cdm-inventory-detail-modal,
     html[data-theme='dark'] .cdm-sell-confirm-modal {
         background-color: var(--theme-surface);
         box-shadow: var(--theme-shadow);
@@ -366,6 +432,7 @@
     html[data-theme='dark'] .cdm-section-title,
     html[data-theme='dark'] .cdm-attacks-table,
     html[data-theme='dark'] .cdm-inventory-table-wrapper,
+    html[data-theme='dark'] .cdm-inventory-detail-cancel,
     html[data-theme='dark'] .cdm-sell-confirm-cancel {
         border-color: var(--theme-border);
     }
@@ -380,6 +447,7 @@
     html[data-theme='dark'] .cdm-tab--active,
     html[data-theme='dark'] .cdm-section-title,
     html[data-theme='dark'] .cdm-attr-label,
+    html[data-theme='dark'] .cdm-inventory-detail-title,
     html[data-theme='dark'] .cdm-sell-confirm-title {
         color: var(--theme-accent);
     }
@@ -387,6 +455,7 @@
     html[data-theme='dark'] .cdm-attr-box,
     html[data-theme='dark'] .cdm-info-box,
     html[data-theme='dark'] .cdm-text-block,
+    html[data-theme='dark'] .cdm-inventory-detail-modal,
     html[data-theme='dark'] .cdm-sell-confirm-modal {
         background-color: var(--theme-surface-muted);
     }
@@ -396,6 +465,7 @@
     html[data-theme='dark'] .cdm-attacks-row,
     html[data-theme='dark'] .cdm-inventory-table thead,
     html[data-theme='dark'] .cdm-inventory-table tbody tr,
+    html[data-theme='dark'] .cdm-inventory-detail-field,
     html[data-theme='dark'] .cdm-sell-confirm-cancel {
         border-color: var(--theme-border);
     }
@@ -406,14 +476,31 @@
     html[data-theme='dark'] .cdm-attr-full,
     html[data-theme='dark'] .cdm-inventory-table th,
     html[data-theme='dark'] .cdm-inventory-table td,
+    html[data-theme='dark'] .cdm-inventory-detail-subtitle,
+    html[data-theme='dark'] .cdm-inventory-detail-label,
+    html[data-theme='dark'] .cdm-inventory-detail-close,
     html[data-theme='dark'] .cdm-sell-confirm-body {
         color: var(--theme-text-muted);
     }
 
+    html[data-theme='dark'] .cdm-inventory-detail-field {
+        background-color: var(--theme-surface);
+    }
+
+    html[data-theme='dark'] .cdm-inventory-detail-value,
+    html[data-theme='dark'] .cdm-inventory-detail-cancel {
+        color: var(--theme-text);
+    }
+
     html[data-theme='dark'] .cdm-inventory-table thead,
     html[data-theme='dark'] .cdm-inventory-table tbody tr:nth-child(even),
+    html[data-theme='dark'] .cdm-inventory-detail-cancel:hover,
     html[data-theme='dark'] .cdm-sell-confirm-cancel:hover {
         background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .cdm-inventory-detail-title {
+        color: #8ab5fc;
     }
 
     html[data-theme='dark'] .cdm-inventory-row--clickable:hover {

@@ -118,7 +118,7 @@ export async function loadImageFromUrl(src: string): Promise<HTMLImageElement> {
 
         image.onload = () => resolve(image);
         image.onerror = () => {
-            reject(new Error('Nao foi possivel carregar a imagem para recorte.'));
+            reject(new Error('Não foi possivel carregar a imagem para recorte.'));
         };
         image.src = src;
     });
@@ -143,7 +143,7 @@ export async function createCroppedImageFile(
     const ctx = canvas.getContext('2d');
 
     if (!ctx) {
-        throw new Error('Nao foi possivel preparar o recorte da imagem.');
+        throw new Error('Não foi possivel preparar o recorte da imagem.');
     }
 
     ctx.imageSmoothingQuality = 'high';
@@ -165,7 +165,7 @@ export async function createCroppedImageFile(
     });
 
     if (!blob) {
-        throw new Error('Nao foi possivel gerar a imagem recortada.');
+        throw new Error('Não foi possivel gerar a imagem recortada.');
     }
 
     return new File([blob], originalFile.name, {

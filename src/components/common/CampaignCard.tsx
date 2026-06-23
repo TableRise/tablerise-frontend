@@ -53,9 +53,7 @@ export default function CampaignCard(cardProps: CampaignCardProps): JSX.Element 
     const playerCount = campaignPlayers.filter(
         (p) => p.role === 'player' || p.role === 'admin_player'
     ).length;
-    const isPendingApprovalButton =
-        buttonTitle.includes('Aguardando aprova') ||
-        buttonTitle.includes('Aguardando aprovaÃ§Ã£o');
+    const isPendingApprovalButton = buttonTitle.includes('Aguardando aprovação');
 
     return (
         <div

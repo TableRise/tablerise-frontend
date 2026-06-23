@@ -140,7 +140,7 @@ export default function DonationSupportModal({
                         <div className="donation-support-modal-qr-wrapper">
                             <Image
                                 src="/images/donate-qrcode.png"
-                                alt="QR Code para doacao ao Tablerise"
+                                alt="QR Code para doação ao Tablerise"
                                 width={260}
                                 height={260}
                                 className="donation-support-modal-qr"

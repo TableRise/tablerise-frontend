@@ -18,6 +18,7 @@ import './styles/CompleteOAuthUserModal.css';
 import useBodyScrollLock from '@/hooks/useBodyScrollLock';
 
 type CompleteUserMode = 'oauth-complete' | 'profile-complete';
+type ProfileGender = 'male' | 'female';
 
 type CompleteUserModalProps = {
     userId: string;
@@ -57,7 +58,10 @@ export default function CompleteUserModal({
         handleSubmit,
     } = useForm<CompleteOAuthUserPayload | CompleteProfileUserPayload>({
         resolver,
-        defaultValues,
+        defaultValues: {
+            gender: 'male',
+            ...defaultValues,
+        },
     });
 
     const handleCancel = () => {
@@ -199,6 +203,33 @@ export default function CompleteUserModal({
                                 placeholder="DD/MM/AAAA"
                                 errorMessage={errors.birthday}
                             />
+
+                            <label className="generic-form-input">
+                                <span className="font-S-bold text-color-greyScale/950">
+                                    Genero
+                                </span>
+                                <span className="generic-form-input-shell">
+                                    <select
+                                        className={`input-default-light complete-oauth-select ${
+                                            errors.gender ? 'input-error-light' : ''
+                                        }`}
+                                        {...register('gender' as const)}
+                                        defaultValue={
+                                            (defaultValues?.gender as
+                                                | ProfileGender
+                                                | undefined) ?? 'male'
+                                        }
+                                    >
+                                        <option value="male">Masculino</option>
+                                        <option value="female">Feminino</option>
+                                    </select>
+                                </span>
+                                {errors.gender ? (
+                                    <span className="generic-input-error-message font-XXS-regular text-color-support/alert">
+                                        {errors.gender.message}
+                                    </span>
+                                ) : null}
+                            </label>
 
                             <div className="complete-oauth-modal-buttons">
                                 <button

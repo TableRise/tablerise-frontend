@@ -6,6 +6,7 @@ export interface CompleteOAuthUserPayload {
     firstName: string;
     lastName: string;
     birthday: string;
+    gender: 'male' | 'female';
 }
 
 export const postCompleteOAuthUser = async (

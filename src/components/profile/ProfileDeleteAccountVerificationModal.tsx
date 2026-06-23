@@ -46,7 +46,7 @@ export default function ProfileDeleteAccountVerificationModal({
 
         async function sendCode() {
             if (!email.trim()) {
-                setError('*Nao foi possivel identificar o e-mail atual da conta.');
+                setError('*Não foi possivel identificar o e-mail atual da conta.');
                 return;
             }
 
@@ -59,7 +59,7 @@ export default function ProfileDeleteAccountVerificationModal({
                 if (!active) return;
                 setError(
                     sendError?.message ??
-                        '*Nao foi possivel enviar o codigo de verificacao.'
+                        '*Não foi possivel enviar o codigo de verificação.'
                 );
             } finally {
                 if (active) {
@@ -94,7 +94,7 @@ export default function ProfileDeleteAccountVerificationModal({
             onVerified();
         } catch (submitError: Error | any) {
             setError(
-                submitError?.message ?? '*Nao foi possivel validar o codigo informado.'
+                submitError?.message ?? '*Não foi possivel validar o codigo informado.'
             );
             setSubmitting(false);
         }

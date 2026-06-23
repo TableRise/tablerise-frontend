@@ -36,6 +36,7 @@ export default function GeneralHeader(): JSX.Element {
                     src={TableRiseLightMark}
                     alt={alts.tablerise_logo_alt_txt}
                     className="logo-header"
+                    priority
                 />
             </Link>
 
