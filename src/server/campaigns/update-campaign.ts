@@ -4,6 +4,7 @@ import { apiCall, campaignsBaseUrl } from '../wrapper';
 export interface UpdateCampaignPayload {
     title?: string;
     description?: string;
+    mainHistory?: string;
     nextMatchDate?: string;
     socialMedia?: { discord?: string; twitter?: string; youtube?: string };
     nextSessionResume?: string;
@@ -11,7 +12,8 @@ export interface UpdateCampaignPayload {
     ageRestriction?: string;
     playerAmountLimit?: number;
     configurations?: {
-        shopOn: boolean;
+        shopOn?: boolean;
+        playOn?: boolean;
     };
     adminId?: string;
 }

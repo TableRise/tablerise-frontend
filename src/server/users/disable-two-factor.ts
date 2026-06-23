@@ -19,7 +19,7 @@ export const confirmDisableTwoFactorCode = async (
             throw new Error('*Codigo do autenticador invalido.');
         if (response?.status === 500)
             throw new Error('*Erro no servidor. Tente novamente.');
-        throw new Error('*Nao foi possivel validar o codigo do autenticador.');
+        throw new Error('*Não foi possivel validar o codigo do autenticador.');
     }
 };
 
@@ -31,9 +31,9 @@ export const deactivateUserTwoFactor = async (userId: string): Promise<void> => 
             method: 'PATCH',
         });
     } catch ({ response }: AxiosError | any) {
-        if (response?.status === 404) throw new Error('*usuário nao encontrado.');
+        if (response?.status === 404) throw new Error('*usuário não encontrado.');
         if (response?.status === 500)
             throw new Error('*Erro no servidor. Tente novamente.');
-        throw new Error('*Nao foi possivel desabilitar os dois fatores.');
+        throw new Error('*Não foi possivel desabilitar os dois fatores.');
     }
 };

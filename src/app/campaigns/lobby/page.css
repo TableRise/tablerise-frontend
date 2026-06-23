@@ -167,6 +167,19 @@
         @apply text-color-greyScale/700 whitespace-nowrap;
     }
 
+    .lobby-character .lobby-confirmed-player-name {
+        @apply max-w-[8rem] whitespace-normal text-center;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    .lobby-character .lobby-confirmed-player-title {
+        @apply max-w-[8rem] whitespace-normal text-center;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        line-height: 1.2;
+    }
+
     .lobby-articles {
         @apply mt-6 flex flex-col;
     }

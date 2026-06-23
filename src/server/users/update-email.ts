@@ -10,10 +10,10 @@ export const sendUpdateEmailCode = async (email: string): Promise<void> => {
             params: { email, flow: 'update-email' },
         });
     } catch ({ response }: AxiosError | any) {
-        if (response?.status === 404) throw new Error('*Email nao encontrado.');
+        if (response?.status === 404) throw new Error('*Email não encontrado.');
         if (response?.status === 500)
             throw new Error('*Erro no servidor ao enviar o codigo.');
-        throw new Error('*Nao foi possivel enviar o codigo de verificacao.');
+        throw new Error('*Não foi possivel enviar o codigo de verificação.');
     }
 };
 
@@ -32,10 +32,10 @@ export const confirmUpdateEmailCode = async (
         if (response?.status === 400)
             throw new Error('*Dados invalidos. Verifique o codigo e tente novamente.');
         if (response?.status === 422)
-            throw new Error('*Codigo de verificacao de e-mail invalido.');
+            throw new Error('*Codigo de verificação de e-mail invalido.');
         if (response?.status === 500)
             throw new Error('*Erro no servidor. Tente novamente.');
-        throw new Error('*Nao foi possivel validar o codigo informado.');
+        throw new Error('*Não foi possivel validar o codigo informado.');
     }
 };
 
@@ -52,9 +52,9 @@ export const updateUserEmail = async (userId: string, email: string): Promise<vo
             throw new Error('*Email invalido. Verifique o endereco informado.');
         if (response?.status === 409)
             throw new Error('*Este e-mail já esta em uso por outra conta.');
-        if (response?.status === 404) throw new Error('*usuário nao encontrado.');
+        if (response?.status === 404) throw new Error('*usuário não encontrado.');
         if (response?.status === 500)
             throw new Error('*Erro no servidor. Tente novamente.');
-        throw new Error('*Nao foi possivel atualizar o e-mail.');
+        throw new Error('*Não foi possivel atualizar o e-mail.');
     }
 };

@@ -19,6 +19,7 @@ import type {
     MatchImageHighlightedChangedPayload,
     MatchMapChangedPayload,
     MatchMusicChangedPayload,
+    MatchMusicTimeChangedPayload,
     MatchToken,
     PresenceUserChangedPayload,
     SocketAck,
@@ -49,6 +50,14 @@ interface ClientToServerEvents {
     ) => void;
     'match:set_music': (
         payload: { campaignId: string; playingMusicId: string | null },
+        ack: (response: SocketAck<void>) => void
+    ) => void;
+    'match:set_music_time': (
+        payload: {
+            campaignId: string;
+            playingMusicId: string | null;
+            currentTimeSeconds: number;
+        },
         ack: (response: SocketAck<void>) => void
     ) => void;
     'match:set_visible_characters': (
@@ -119,6 +128,7 @@ interface ServerToClientEvents {
     'match:grid_changed': (payload: MatchGridChangedPayload) => void;
     'match:effect_changed': (payload: MatchEffectChangedPayload) => void;
     'match:music_changed': (payload: MatchMusicChangedPayload) => void;
+    'match:music_time_changed': (payload: MatchMusicTimeChangedPayload) => void;
     'match:visible_characters_changed': (
         payload: VisibleCharactersChangedPayload
     ) => void;
@@ -220,6 +230,11 @@ export function emitCampaignSocketAck(
     socket: CampaignSocket,
     event: 'match:set_music',
     payload: Parameters<ClientToServerEvents['match:set_music']>[0]
+): Promise<SocketAck<void>>;
+export function emitCampaignSocketAck(
+    socket: CampaignSocket,
+    event: 'match:set_music_time',
+    payload: Parameters<ClientToServerEvents['match:set_music_time']>[0]
 ): Promise<SocketAck<void>>;
 export function emitCampaignSocketAck(
     socket: CampaignSocket,

@@ -10,11 +10,11 @@ export const sendDeleteUserEmailCode = async (email: string): Promise<void> => {
             params: { email, flow: 'delete-user' },
         });
     } catch ({ response }: AxiosError | any) {
-        if (response?.status === 404) throw new Error('*Email nao encontrado.');
+        if (response?.status === 404) throw new Error('*Email não encontrado.');
         if (response?.status === 500)
             throw new Error('*Erro no servidor ao enviar o codigo.');
 
-        throw new Error('*Nao foi possivel enviar o codigo de verificacao.');
+        throw new Error('*Não foi possivel enviar o codigo de verificação.');
     }
 };
 
@@ -33,10 +33,10 @@ export const confirmDeleteUserEmailCode = async (
         if (response?.status === 400)
             throw new Error('*Dados invalidos. Verifique o codigo e tente novamente.');
         if (response?.status === 422)
-            throw new Error('*Codigo de verificacao de e-mail invalido.');
+            throw new Error('*Codigo de verificação de e-mail invalido.');
         if (response?.status === 500)
             throw new Error('*Erro no servidor. Tente novamente.');
 
-        throw new Error('*Nao foi possivel validar o codigo informado.');
+        throw new Error('*Não foi possivel validar o codigo informado.');
     }
 };

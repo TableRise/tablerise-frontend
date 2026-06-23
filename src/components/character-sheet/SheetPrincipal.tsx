@@ -308,7 +308,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
             wisdom: 'wis',
             charisma: 'cha',
             forca: 'str',
-            constituicao: 'con',
+            constituição: 'con',
             inteligencia: 'int',
             força: 'str',
             destreza: 'dex',

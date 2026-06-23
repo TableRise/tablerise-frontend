@@ -31,7 +31,7 @@
     }
 
     .mmm-tab {
-        @apply px-4 py-3 text-color-greyScale/500 border-b-2 border-transparent transition-colors;
+        @apply w-1/2 px-4 py-3 text-center text-color-greyScale/500 border-b-2 border-transparent transition-colors;
         margin-bottom: -1px;
     }
 
@@ -51,6 +51,66 @@
     /* ── Music list ───────────────────────────────────────── */
     .mmm-list {
         @apply flex flex-col gap-2;
+    }
+
+    .mmm-player-card {
+        @apply mb-4 rounded-2xl border border-color-greyScale/200 bg-color-greyScale/50 p-4;
+    }
+
+    .mmm-player-header {
+        @apply mb-2 flex items-center justify-between gap-3;
+    }
+
+    .mmm-player-kicker {
+        @apply uppercase tracking-widest text-color-greyScale/500;
+        font-size: 0.65rem;
+    }
+
+    .mmm-player-title {
+        @apply mb-3 text-color-greyScale/950;
+    }
+
+    .mmm-player-slider {
+        @apply h-2 w-full cursor-pointer appearance-none rounded-full bg-color-greyScale/200;
+    }
+
+    .mmm-player-slider::-webkit-slider-runnable-track {
+        height: 0.5rem;
+        border-radius: 9999px;
+        background: rgb(223 227 236);
+    }
+
+    .mmm-player-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 9999px;
+        background: #0a358a;
+        border: none;
+        box-shadow: 0 2px 8px rgba(10, 53, 138, 0.24);
+        margin-top: -0.25rem;
+    }
+
+    .mmm-player-slider::-moz-range-thumb {
+        width: 1rem;
+        height: 1rem;
+        border-radius: 9999px;
+        background: #0a358a;
+        border: none;
+        box-shadow: 0 2px 8px rgba(10, 53, 138, 0.24);
+    }
+
+    .mmm-player-slider::-moz-range-track {
+        @apply h-2 rounded-full bg-color-greyScale/200;
+    }
+
+    .mmm-player-slider:disabled {
+        @apply cursor-not-allowed opacity-60;
+    }
+
+    .mmm-player-times {
+        @apply mt-2 flex items-center justify-between text-color-greyScale/500;
     }
 
     .mmm-music-item {
@@ -79,6 +139,10 @@
     .mmm-maps-grid {
         @apply grid gap-3;
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    .mmm-maps-grid--empty {
+        @apply flex min-h-[12rem] items-center justify-center;
     }
 
     .mmm-map-item {
@@ -141,11 +205,13 @@
     }
 
     html[data-theme='dark'] .mmm-tabs,
-    html[data-theme='dark'] .mmm-music-item {
+    html[data-theme='dark'] .mmm-music-item,
+    html[data-theme='dark'] .mmm-player-card {
         border-color: var(--theme-border);
     }
 
-    html[data-theme='dark'] .mmm-music-item {
+    html[data-theme='dark'] .mmm-music-item,
+    html[data-theme='dark'] .mmm-player-card {
         background-color: var(--theme-surface-muted);
     }
 
@@ -154,8 +220,14 @@
         color: var(--theme-text-muted);
     }
 
-    html[data-theme='dark'] .mmm-music-title {
+    html[data-theme='dark'] .mmm-music-title,
+    html[data-theme='dark'] .mmm-player-title {
         color: var(--theme-text);
+    }
+
+    html[data-theme='dark'] .mmm-player-kicker,
+    html[data-theme='dark'] .mmm-player-times {
+        color: var(--theme-text-muted);
     }
 
     html[data-theme='dark'] .mmm-music-item--active {

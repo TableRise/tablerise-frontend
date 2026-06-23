@@ -19,6 +19,7 @@ import {
     defaultProfileImage,
     formatBadgeName,
     getBadgeProgress,
+    getProfileTitleTextStyle,
 } from '@/components/profile/profilePageHelpers';
 import { getUserRank } from '@/utils/userRank';
 
@@ -27,6 +28,10 @@ type ProfileHeroSectionProps = {
     profileName: string;
     profileHandle: string;
     biography: string;
+    level: number;
+    xp: number;
+    activeTitle: string;
+    activeTitleType: string;
     profileCover: string;
     accountStatus: string;
     accountStatusClass: string;
@@ -63,6 +68,10 @@ export default function ProfileHeroSection({
     profileName,
     profileHandle,
     biography,
+    level,
+    xp,
+    activeTitle,
+    activeTitleType,
     profileCover,
     accountStatus,
     accountStatusClass,
@@ -274,6 +283,17 @@ export default function ProfileHeroSection({
                             {pictureFeedback}
                         </p>
                     ) : null}
+                    <div className="profile-hero__level-block">
+                        <p className="font-XXS-bold profile-hero__level-line">
+                            Nível: {level} / XP: {xp}
+                        </p>
+                        <p
+                            className={`font-XS-bold profile-hero__title-line profile-hero__title-line--${activeTitleType}`}
+                            style={getProfileTitleTextStyle(activeTitleType)}
+                        >
+                            {activeTitle || 'Sem título'}
+                        </p>
+                    </div>
                 </div>
 
                 <div className="profile-hero__copy">

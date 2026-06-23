@@ -57,7 +57,7 @@ export const uploadMatchHighlightImages = async (
         return normalizeImagesResponse(data);
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
-        if (status === 404) throw new Error('Campanha nao encontrada');
+        if (status === 404) throw new Error('Campanha não encontrada');
         if (status === 500) throw new Error('Erro no servidor');
         throw new Error('Erro ao enviar imagem');
     }
@@ -79,7 +79,7 @@ export const setMatchHighlightedImage = async (
         return normalizeHighlightedImageResponse(data);
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
-        if (status === 404) throw new Error('Campanha ou imagem nao encontrada');
+        if (status === 404) throw new Error('Campanha ou imagem não encontrada');
         if (status === 500) throw new Error('Erro no servidor');
         throw new Error(
             remove ? 'Erro ao remover imagem destacada' : 'Erro ao destacar imagem'

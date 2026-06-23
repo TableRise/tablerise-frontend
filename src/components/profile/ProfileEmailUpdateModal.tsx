@@ -62,7 +62,7 @@ export default function ProfileEmailUpdateModal({
                 if (!active) return;
                 setError(
                     sendError?.message ??
-                        '*Nao foi possivel enviar o codigo de verificacao.'
+                        '*Não foi possivel enviar o codigo de verificação.'
                 );
             } finally {
                 if (active) {
@@ -99,7 +99,7 @@ export default function ProfileEmailUpdateModal({
             setStep('new-email');
         } catch (submitError: Error | any) {
             setError(
-                submitError?.message ?? '*Nao foi possivel validar o codigo informado.'
+                submitError?.message ?? '*Não foi possivel validar o codigo informado.'
             );
         } finally {
             setSubmitting(false);
@@ -121,7 +121,7 @@ export default function ProfileEmailUpdateModal({
             await updateUserEmail(userId, trimmedEmail);
             await onSaved();
         } catch (submitError: Error | any) {
-            setError(submitError?.message ?? '*Nao foi possivel atualizar o e-mail.');
+            setError(submitError?.message ?? '*Não foi possivel atualizar o e-mail.');
             setSubmitting(false);
         }
     };
@@ -140,7 +140,7 @@ export default function ProfileEmailUpdateModal({
                     <>
                         <p className="profile-action-modal-description font-XS-regular">
                             Digite o codigo enviado para o seu e-mail atual para continuar
-                            a atualizacao.
+                            a atualização.
                         </p>
 
                         <div className="profile-action-modal-otp">

@@ -21,6 +21,7 @@ export interface CampaignData {
     playerAmountLimit: number;
     xpSystem: boolean;
     shopSystem: boolean;
+    playOn: boolean;
     mapImages: ImageObject[];
     logs: { loggedAt: string; content: string }[];
     musics: CampaignMusic[];
@@ -32,6 +33,8 @@ export interface ConfirmedPlayerInfo {
     name: string;
     picture: string;
     rank?: string;
+    title?: string;
+    titleType?: string;
 }
 
 export const CATEGORY_LABEL: Record<string, string> = {
@@ -94,5 +97,6 @@ export function mapCampaignData(data: any): CampaignData {
         xpSystem: data.configurations?.xpSystem ?? true,
         shopSystem:
             data.configurations?.shopOn ?? data.configurations?.shopSystem ?? false,
+        playOn: data.configurations?.playOn ?? true,
     };
 }

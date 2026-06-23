@@ -4,6 +4,7 @@ import type { CompleteProfileUserPayload } from '@/components/login/schemas/Comp
 
 export type UpdateUserDetailsPayload = Partial<CompleteProfileUserPayload> & {
     biography?: string;
+    title?: string;
 };
 
 export const updateUser = async (

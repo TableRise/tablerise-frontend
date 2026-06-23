@@ -17,14 +17,13 @@ import PlaySVG from '../../../assets/icons/menu-panel-lobby/play.svg?url';
 import PlayDarkSVG from '../../../assets/icons/menu-panel-lobby/play-dark.svg?url';
 import ShoppingBlueSVG from '../../../assets/icons/menu-panel-lobby/shopping-blue.svg?url';
 import ShoppingDarkSVG from '../../../assets/icons/menu-panel-lobby/shopping-dark.svg?url';
-import ArrowRightBlueSVG from '../../../assets/icons/nav/arrow-right-blue.svg?url';
-import ArrowRightDarkSVG from '../../../assets/icons/nav/arrow-right-dark.svg?url';
-import '@/components/lobby/styles/LobbySideMenu.css';
+import { ArrowLeft, ArrowRight } from '@/components/icons/Arrows';
 
 interface LobbySideMenuProps {
     isPlayer: boolean;
     isMaster: boolean;
     shopEnabled?: boolean;
+    playEnabled?: boolean;
     onMenuAction?: (key: string) => void;
 }
 
@@ -32,12 +31,13 @@ export default function LobbySideMenu({
     isPlayer,
     isMaster,
     shopEnabled = true,
+    playEnabled = true,
     onMenuAction,
 }: LobbySideMenuProps): JSX.Element {
     const { themeMode } = useContext(TableriseContext);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isMobileViewport, setIsMobileViewport] = useState(false);
     const isDarkMode = themeMode === 'dark';
-    const arrowIcon = isDarkMode ? ArrowRightDarkSVG : ArrowRightBlueSVG;
 
     const playerMenuItems = useMemo(
         () => [
@@ -45,6 +45,7 @@ export default function LobbySideMenu({
                 key: 'play-match',
                 icon: isDarkMode ? PlayDarkSVG : PlaySVG,
                 label: 'Entrar na Partida',
+                disabled: !playEnabled,
             },
             {
                 key: 'create-sheet',
@@ -65,6 +66,7 @@ export default function LobbySideMenu({
                 key: 'shop',
                 icon: isDarkMode ? ShoppingDarkSVG : ShoppingBlueSVG,
                 label: 'Loja de Equipamentos',
+                disabled: !shopEnabled,
             },
             {
                 key: 'leave',
@@ -73,7 +75,7 @@ export default function LobbySideMenu({
                 danger: true,
             },
         ],
-        [isDarkMode]
+        [isDarkMode, playEnabled, shopEnabled]
     );
 
     const masterExtraItems = useMemo(
@@ -103,10 +105,20 @@ export default function LobbySideMenu({
     }
 
     useEffect(() => {
-        function handleResize() {
-            if (window.innerWidth > 768) {
+        function syncViewportState() {
+            const mobileViewport = window.innerWidth <= 768;
+
+            setIsMobileViewport(mobileViewport);
+
+            if (!mobileViewport) {
                 setIsMobileMenuOpen(false);
             }
+        }
+
+        syncViewportState();
+
+        function handleResize() {
+            syncViewportState();
         }
 
         window.addEventListener('resize', handleResize);
@@ -119,75 +131,98 @@ export default function LobbySideMenu({
                 isMobileMenuOpen ? ' lobby-side-menu--mobile-open' : ''
             }`}
         >
-            <button
-                type="button"
-                className="lobby-side-menu-mobile-toggle"
-                aria-label={
-                    isMobileMenuOpen
-                        ? 'Fechar menu da campanha'
-                        : 'Abrir menu da campanha'
-                }
-                aria-expanded={isMobileMenuOpen}
-                aria-controls="lobby-side-menu-nav"
-                onClick={() => setIsMobileMenuOpen((current) => !current)}
-            >
-                <Image
-                    src={arrowIcon}
-                    alt=""
-                    className={`lobby-side-menu-mobile-toggle-icon${
-                        isMobileMenuOpen
-                            ? ' lobby-side-menu-mobile-toggle-icon--open'
-                            : ''
+            {isMobileViewport && (
+                <button
+                    type="button"
+                    className={`lobby-side-menu-mobile-toggle ${
+                        !isDarkMode && '!bg-white'
                     }`}
-                    width={24}
-                    height={24}
-                    aria-hidden="true"
-                />
-            </button>
+                    aria-label={
+                        isMobileMenuOpen
+                            ? 'Fechar menu da campanha'
+                            : 'Abrir menu da campanha'
+                    }
+                    aria-expanded={isMobileMenuOpen}
+                    aria-controls="lobby-side-menu-nav"
+                    onClick={() => setIsMobileMenuOpen((current) => !current)}
+                >
+                    {isDarkMode ? (
+                        isMobileMenuOpen ? (
+                            <ArrowRight
+                                mode="dark"
+                                className="lobby-side-menu-mobile-toggle-icon"
+                                width={24}
+                                height={24}
+                                aria-hidden="true"
+                            />
+                        ) : (
+                            <ArrowLeft
+                                mode="dark"
+                                className="lobby-side-menu-mobile-toggle-icon"
+                                width={24}
+                                height={24}
+                                aria-hidden="true"
+                            />
+                        )
+                    ) : isMobileMenuOpen ? (
+                        <ArrowRight
+                            mode="light"
+                            className="lobby-side-menu-mobile-toggle-icon"
+                            width={24}
+                            height={24}
+                            aria-hidden="true"
+                        />
+                    ) : (
+                        <ArrowLeft
+                            mode="light"
+                            className="lobby-side-menu-mobile-toggle-icon"
+                            width={24}
+                            height={24}
+                            aria-hidden="true"
+                        />
+                    )}
+                </button>
+            )}
             <nav className="lobby-side-menu-nav" id="lobby-side-menu-nav">
-                {menuItems.map((item) => {
-                    const isDisabled = item.key === 'shop' && !shopEnabled;
-
-                    return (
-                        <div key={item.key} className="lobby-menu-item-wrapper">
+                {menuItems.map((item) => (
+                    <div key={item.key} className="lobby-menu-item-wrapper">
+                        <span
+                            className={`lobby-menu-label font-XS-bold ${
+                                item.danger ? 'lobby-menu-label-danger' : ''
+                            } ${item.disabled ? 'lobby-menu-label-disabled' : ''}`}
+                        >
+                            {item.label}
+                        </span>
+                        <button
+                            type="button"
+                            className={`lobby-menu-item ${
+                                item.danger ? 'lobby-menu-item-danger' : ''
+                            } ${item.disabled ? 'lobby-menu-item-disabled' : ''}`}
+                            disabled={item.disabled}
+                            onClick={() => {
+                                if (item.disabled) return;
+                                onMenuAction?.(item.key);
+                                setIsMobileMenuOpen(false);
+                            }}
+                        >
+                            <Image
+                                src={item.icon}
+                                alt={item.label}
+                                width={32}
+                                height={32}
+                            />
                             <span
-                                className={`lobby-menu-label font-XS-bold ${
-                                    item.danger ? 'lobby-menu-label-danger' : ''
+                                className={`lobby-menu-item-mobile-label font-XS-bold ${
+                                    item.danger
+                                        ? 'lobby-menu-item-mobile-label-danger'
+                                        : ''
                                 }`}
                             >
                                 {item.label}
                             </span>
-                            <button
-                                type="button"
-                                className={`lobby-menu-item ${
-                                    item.danger ? 'lobby-menu-item-danger' : ''
-                                } ${isDisabled ? 'lobby-menu-item-disabled' : ''}`}
-                                onClick={() => {
-                                    if (isDisabled) return;
-                                    onMenuAction?.(item.key);
-                                    setIsMobileMenuOpen(false);
-                                }}
-                                disabled={isDisabled}
-                            >
-                                <Image
-                                    src={item.icon}
-                                    alt={item.label}
-                                    width={32}
-                                    height={32}
-                                />
-                                <span
-                                    className={`lobby-menu-item-mobile-label font-XS-bold ${
-                                        item.danger
-                                            ? 'lobby-menu-item-mobile-label-danger'
-                                            : ''
-                                    }`}
-                                >
-                                    {item.label}
-                                </span>
-                            </button>
-                        </div>
-                    );
-                })}
+                        </button>
+                    </div>
+                ))}
                 {menuItems.length === 0 && (
                     <span className="font-XS-regular text-color-greyScale/500">
                         Sem opções disponíveis

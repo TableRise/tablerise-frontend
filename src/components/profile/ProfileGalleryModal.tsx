@@ -39,7 +39,7 @@ export default function ProfileGalleryModal({
             }
         } catch (deleteError: Error | any) {
             setError(
-                deleteError?.message ?? 'Nao foi possivel remover a imagem da galeria'
+                deleteError?.message ?? 'Não foi possivel remover a imagem da galeria'
             );
         } finally {
             setDeletingImageId(null);

@@ -25,11 +25,11 @@ export const updateUserPicture = async (
     } catch (error: AxiosError | any) {
         const status = error?.response?.status;
 
-        if (status === 404) throw new Error('usuário nao encontrado');
+        if (status === 404) throw new Error('usuário não encontrado');
         if (status === 413) throw new Error('A imagem selecionada e muito grande');
-        if (status === 415) throw new Error('Formato de imagem nao suportado');
+        if (status === 415) throw new Error('Formato de imagem não suportado');
         if (status === 500) throw new Error('Erro no servidor');
 
-        throw new Error('Nao foi possivel atualizar a foto do perfil');
+        throw new Error('Não foi possivel atualizar a foto do perfil');
     }
 };

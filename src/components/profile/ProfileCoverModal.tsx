@@ -40,7 +40,7 @@ async function getImageDimensions(
                 };
 
                 image.onerror = () => {
-                    reject(new Error('Nao foi possivel ler a imagem selecionada.'));
+                    reject(new Error('Não foi possivel ler a imagem selecionada.'));
                 };
 
                 image.src = objectUrl;
@@ -108,7 +108,7 @@ export default function ProfileCoverModal({
             setSelectedFile(file);
         } catch (dimensionError: Error | any) {
             setSelectedFile(null);
-            setError(dimensionError?.message ?? '*Nao foi possivel validar a imagem.');
+            setError(dimensionError?.message ?? '*Não foi possivel validar a imagem.');
         }
     };
 
@@ -153,7 +153,7 @@ export default function ProfileCoverModal({
         } catch (submitError: Error | any) {
             setError(
                 submitError?.message ??
-                    '*Nao foi possivel atualizar o plano de fundo do perfil.'
+                    '*Não foi possivel atualizar o plano de fundo do perfil.'
             );
             setLoading(false);
         }

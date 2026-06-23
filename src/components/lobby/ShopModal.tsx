@@ -77,6 +77,20 @@ function calcConversion(
     return { gross, tax, net };
 }
 
+function formatEquipmentPrice(item: DndEquipmentRecord): string {
+    return `${item.price[0]} ${item.price[1]}`;
+}
+
+function formatEquipmentArmorClass(item: DndEquipmentRecord): string {
+    return item.armorClass && item.armorClass.length > 0
+        ? item.armorClass.join(' ')
+        : '-';
+}
+
+function formatEquipmentValue(value?: string): string {
+    return value && value.trim() !== '' ? value : '-';
+}
+
 // Purchase history
 
 // Props
@@ -502,6 +516,191 @@ export default function ShopModal({
         </div>
     );
 
+    const renderShopTableTab = () => (
+        <div className="flex flex-col gap-4">
+            <div className="sm-filters">
+                <input
+                    type="text"
+                    className="sm-search-input"
+                    placeholder="Buscar por nome..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setBuyWarning('');
+                        setSelectedItem(null);
+                    }}
+                />
+                <select
+                    className="sm-type-select"
+                    value={typeFilter}
+                    onChange={(e) => {
+                        setTypeFilter(e.target.value);
+                        setBuyWarning('');
+                        setSelectedItem(null);
+                    }}
+                >
+                    <option value="all">Todos os tipos</option>
+                    {uniqueTypes.map((t) => (
+                        <option key={t} value={t}>
+                            {t}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            {buyWarning && <p className="sm-warning">{buyWarning}</p>}
+
+            <div className="sm-table-wrapper">
+                <table className="sm-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Tipo</th>
+                            <th>Preco</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {equipLoading ? (
+                            <tr>
+                                <td
+                                    colSpan={3}
+                                    className="text-center py-8 text-color-greyScale/500"
+                                >
+                                    <LoadingDots label="Carregando equipamentos" />
+                                </td>
+                            </tr>
+                        ) : filteredEquipment.length === 0 ? (
+                            <tr className="sm-empty-row">
+                                <td colSpan={3}>Nenhum equipamento encontrado.</td>
+                            </tr>
+                        ) : (
+                            filteredEquipment.map((item, i) => (
+                                <tr
+                                    key={`${item.name}-${i}`}
+                                    onClick={() => {
+                                        setBuyWarning('');
+                                        setSelectedItem(item);
+                                    }}
+                                >
+                                    <td className="font-semibold">{item.name}</td>
+                                    <td>{item.type || '-'}</td>
+                                    <td>{formatEquipmentPrice(item)}</td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+
+    const renderSelectedItemModal = () => {
+        if (!selectedItem) {
+            return null;
+        }
+
+        const detailFields = [
+            { label: 'Nome', value: selectedItem.name },
+            { label: 'Tipo', value: formatEquipmentValue(selectedItem.type) },
+            { label: 'Preco', value: formatEquipmentPrice(selectedItem) },
+            { label: 'CA', value: formatEquipmentArmorClass(selectedItem) },
+            { label: 'Forca', value: formatEquipmentValue(selectedItem.strength) },
+            {
+                label: 'Furtividade',
+                value: formatEquipmentValue(selectedItem.stealth),
+            },
+            { label: 'Peso', value: formatEquipmentValue(selectedItem.weight) },
+            { label: 'Dano', value: formatEquipmentValue(selectedItem.damage) },
+            {
+                label: 'Propriedades',
+                value: formatEquipmentValue(selectedItem.properties),
+            },
+        ];
+
+        return (
+            <div
+                className="sm-item-detail-overlay"
+                onClick={() => {
+                    if (!buying) {
+                        setSelectedItem(null);
+                    }
+                }}
+            >
+                <div
+                    className="sm-item-detail-modal"
+                    onClick={(event) => event.stopPropagation()}
+                >
+                    <div className="sm-item-detail-header">
+                        <div className="sm-item-detail-header-copy">
+                            <h3 className="font-L-semibold sm-item-detail-title">
+                                {selectedItem.name}
+                            </h3>
+                            <p className="font-XS-regular sm-item-detail-subtitle">
+                                Veja os detalhes do equipamento antes de comprar.
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            className="sm-item-detail-close"
+                            aria-label="Fechar detalhes do item"
+                            onClick={() => {
+                                if (!buying) {
+                                    setSelectedItem(null);
+                                }
+                            }}
+                        >
+                            x
+                        </button>
+                    </div>
+
+                    {buyWarning && <p className="sm-warning">{buyWarning}</p>}
+
+                    <div className="sm-item-detail-grid">
+                        {detailFields.map((field) => (
+                            <div
+                                key={field.label}
+                                className={`sm-item-detail-field${
+                                    field.label === 'Propriedades'
+                                        ? ' sm-item-detail-field--full'
+                                        : ''
+                                }`}
+                            >
+                                <span className="sm-item-detail-label">
+                                    {field.label}
+                                </span>
+                                <span className="sm-item-detail-value">
+                                    {field.value}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="sm-item-detail-footer">
+                        <button
+                            type="button"
+                            className="sm-item-detail-secondary"
+                            onClick={() => {
+                                if (!buying) {
+                                    setSelectedItem(null);
+                                }
+                            }}
+                        >
+                            Fechar
+                        </button>
+                        <button
+                            type="button"
+                            className="sm-buy-btn !bg-color-primary/default_900"
+                            disabled={!selectedChar || buying}
+                            onClick={handleBuy}
+                        >
+                            {buying ? '...' : 'Comprar'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     const renderHistoryTab = () => (
         <div className="flex flex-col gap-4">
             {purchaseHistory.length === 0 ? (
@@ -747,6 +946,7 @@ export default function ShopModal({
                                             onClick={() => {
                                                 setActiveTab('vault');
                                                 setVaultWarning('');
+                                                setSelectedItem(null);
                                             }}
                                         >
                                             Cofre
@@ -759,7 +959,10 @@ export default function ShopModal({
                                                         ? ' sm-tab--active'
                                                         : ''
                                                 }`}
-                                                onClick={() => setActiveTab('history')}
+                                                onClick={() => {
+                                                    setActiveTab('history');
+                                                    setSelectedItem(null);
+                                                }}
                                             >
                                                 Histórico de Compras
                                             </button>
@@ -768,7 +971,7 @@ export default function ShopModal({
 
                                     {activeTab === 'shop' &&
                                         (selectedCharId ? (
-                                            renderShopTab()
+                                            renderShopTableTab()
                                         ) : (
                                             <p className="sm-loading">
                                                 Selecione um personagem para comprar
@@ -791,6 +994,7 @@ export default function ShopModal({
                             )}
                         </>
                     )}
+                {renderSelectedItemModal()}
             </div>
         </div>
     );

@@ -68,6 +68,11 @@
         @apply text-color-greyScale/900 truncate;
     }
 
+    .pm-user-title {
+        @apply truncate;
+        line-height: 1.2;
+    }
+
     .pm-role {
         @apply text-color-primary/default_900 truncate;
     }

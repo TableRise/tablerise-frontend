@@ -51,7 +51,7 @@ export default function ProfileFriendRequestsInboxModal({
         } catch (requestError: Error | any) {
             setError(
                 requestError?.message ??
-                    'Nao foi possivel atualizar esta solicitação de amizade'
+                    'Não foi possivel atualizar esta solicitação de amizade'
             );
         } finally {
             setProcessingRequestId(null);

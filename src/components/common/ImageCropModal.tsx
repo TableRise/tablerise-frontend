@@ -76,7 +76,7 @@ export default function ImageCropModal({
                 if (!active) return;
 
                 setError(
-                    err.message ?? 'Nao foi possivel carregar a imagem para recorte.'
+                    err.message ?? 'Não foi possivel carregar a imagem para recorte.'
                 );
             });
 
@@ -112,7 +112,7 @@ export default function ImageCropModal({
             );
             await onConfirm(croppedFile);
         } catch (err: Error | any) {
-            setError(err?.message ?? 'Nao foi possivel recortar a imagem.');
+            setError(err?.message ?? 'Não foi possivel recortar a imagem.');
         } finally {
             setSubmitting(false);
         }
@@ -206,7 +206,7 @@ export default function ImageCropModal({
                     ) : (
                         <div className="icm-loading-state font-XS-regular">
                             {error
-                                ? 'Nao foi possivel preparar a imagem para recorte.'
+                                ? 'Não foi possivel preparar a imagem para recorte.'
                                 : 'Carregando imagem...'}
                         </div>
                     )}

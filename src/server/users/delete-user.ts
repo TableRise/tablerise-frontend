@@ -26,7 +26,7 @@ export const deleteUser = async (userId: string): Promise<void> => {
             );
         }
 
-        if (response?.status === 404) throw new Error('*usuário nao encontrado.');
+        if (response?.status === 404) throw new Error('*usuário não encontrado.');
         if (response?.status === 500)
             throw new Error('*Erro no servidor. Tente novamente.');
 

@@ -15,7 +15,7 @@
         "@3d-dice/dice-box": "1.1.4",
         "@3d-dice/dice-box-threejs": "0.0.12",
         "@hookform/resolvers": "3.9.1",
-        "@tablerise/database-management": "7.2.15",
+        "@tablerise/database-management": "7.6.4",
         "@tsparticles/engine": "3.9.1",
         "@tsparticles/react": "3.0.0",
         "@tsparticles/slim": "3.9.1",

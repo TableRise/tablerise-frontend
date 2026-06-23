@@ -62,6 +62,8 @@ export interface CampaignSyncPayload {
         gridVisible: boolean;
         activeEffect: MatchEffect;
         playingMusicId: string | null;
+        playingMusicTimeSeconds?: number;
+        musicPlayback?: MatchMusicPlaybackState | null;
         visibleCharacterIds: string[];
         images: ImageObject[];
         imageHighlighted: ImageObject | null;
@@ -99,6 +101,20 @@ export interface MatchEffectChangedPayload {
 export interface MatchMusicChangedPayload {
     campaignId: string;
     playingMusicId: string | null;
+}
+
+export interface MatchMusicPlaybackState {
+    anchorTimeSeconds: number;
+    anchorUpdatedAt: string;
+    isPlaying: boolean;
+}
+
+export interface MatchMusicTimeChangedPayload {
+    campaignId: string;
+    playingMusicId: string | null;
+    currentTimeSeconds: number;
+    updatedBy: string;
+    updatedAt: string;
 }
 
 export interface VisibleCharactersChangedPayload {
@@ -154,6 +170,7 @@ export interface CharacterUpdatedPayload {
     updatedFields: string[];
     summary: {
         currentHitPoints: number | null;
+        tempHitPoints?: number | null;
         level: number | null;
     };
     updatedAt: string;

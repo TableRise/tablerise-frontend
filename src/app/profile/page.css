@@ -213,6 +213,75 @@
         @apply max-w-48 text-color-support/alert;
     }
 
+    .profile-hero__level-block {
+        @apply flex max-w-48 flex-col items-center gap-1 text-center;
+    }
+
+    .profile-hero__level-line {
+        color: #edf2ff;
+        line-height: 1.35;
+    }
+
+    .profile-hero__title-line {
+        font-weight: 700;
+        line-height: 1.35;
+    }
+
+    .profile-hero__title-line--bronze {
+        color: #ce8946;
+    }
+
+    .profile-hero__title-line--diamond {
+        color: #0f52ba;
+    }
+
+    .profile-hero__title-line--gold {
+        color: #d3af37;
+    }
+
+    .profile-hero__title-line--emerald,
+    .profile-hero__title-line--amethyst,
+    .profile-hero__title-line--divine,
+    .profile-hero__title-line--white {
+        color: transparent;
+        -webkit-background-clip: text;
+        background-clip: text;
+    }
+
+    .profile-hero__title-line--emerald {
+        background-image: linear-gradient(
+            180deg,
+            #d8fff3 0%,
+            #7bd5bb 22%,
+            #00674f 52%,
+            #d7fff1 78%,
+            #57b79b 100%
+        );
+    }
+
+    .profile-hero__title-line--amethyst {
+        background-image: linear-gradient(
+            180deg,
+            #f3ddff 0%,
+            #cf9cff 22%,
+            #9966cc 52%,
+            #f0d6ff 78%,
+            #b884e3 100%
+        );
+    }
+
+    .profile-hero__title-line--divine,
+    .profile-hero__title-line--white {
+        background-image: linear-gradient(
+            180deg,
+            #ffffff 0%,
+            #ededed 20%,
+            #c4c4c4 50%,
+            #fafafa 78%,
+            #b1b1b1 100%
+        );
+    }
+
     .profile-hero__copy {
         @apply flex flex-col gap-2 flex-1 pt-2;
     }
@@ -239,6 +308,7 @@
 
     .profile-hero__biography {
         color: #b8c5de;
+        margin-bottom: 0.8rem;
     }
 
     .profile-hero__actions {
@@ -282,7 +352,8 @@
     }
 
     .profile-hero__badges {
-        @apply flex flex-wrap gap-3;
+        @apply flex flex-wrap;
+        gap: 0.45rem;
     }
 
     .profile-hero__badge {
@@ -527,13 +598,13 @@
         @apply flex justify-end gap-3 mt-5;
     }
 
+    .profile-carousel--badges .profile-carousel__controls {
+        @apply justify-center;
+    }
+
     .profile-carousel__arrow {
         @apply w-12 h-12 rounded-xl bg-color-greyScale/50 flex items-center justify-center;
         box-shadow: none;
-    }
-
-    .profile-carousel__arrow--prev img {
-        @apply -scale-x-100;
     }
 
     .profile-campaign-card {
@@ -859,12 +930,16 @@
             @apply max-w-36;
         }
 
+        .profile-hero__level-block {
+            @apply max-w-36;
+        }
+
         .profile-hero__copy {
             @apply w-full pt-0;
         }
 
         .profile-hero__badges {
-            @apply gap-2;
+            gap: 0.35rem;
         }
 
         .profile-hero__badge {
@@ -927,6 +1002,10 @@
 
         .profile-carousel__controls {
             @apply justify-between;
+        }
+
+        .profile-carousel--badges .profile-carousel__controls {
+            @apply justify-center;
         }
 
         .profile-message-modal__layout {
@@ -1016,8 +1095,20 @@
     }
 
     html[data-theme='dark'] .profile-hero__meta strong,
+    html[data-theme='dark'] .profile-hero__level-line,
     html[data-theme='dark'] .profile-badge-card__label {
         color: var(--theme-text);
+    }
+
+    html[data-theme='dark']
+        .profile-hero__title-line:not(.profile-hero__title-line--bronze):not(
+            .profile-hero__title-line--diamond
+        ):not(.profile-hero__title-line--gold):not(
+            .profile-hero__title-line--emerald
+        ):not(.profile-hero__title-line--amethyst):not(
+            .profile-hero__title-line--divine
+        ):not(.profile-hero__title-line--white) {
+        color: var(--theme-text-muted);
     }
 
     html[data-theme='dark'] .profile-badge-popover__progress-head {

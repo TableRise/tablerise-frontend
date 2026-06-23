@@ -10,9 +10,11 @@ import {
     type CampaignPlayer,
 } from '@/server/campaigns/get-campaign-players';
 import { getCharacterById } from '@/server/characters/get-characters';
+import { getProfileTitleTextStyle } from '@/components/profile/profilePageHelpers';
 import { getUser } from '@/server/users/get-user';
 import '@/components/lobby/styles/ParticipantsModal.css';
 import useBodyScrollLock from '@/hooks/useBodyScrollLock';
+import { getResolvedUserTitle } from '@/utils/userTitle';
 
 interface ParticipantsModalProps {
     campaignId: string;
@@ -26,6 +28,8 @@ interface PlayerCard {
     userId: string;
     nickname: string;
     picture: string;
+    title: string;
+    titleType: string;
     characterName: string;
     role: string;
     status: string;
@@ -89,6 +93,8 @@ export default function ParticipantsModal({
                         let characterName = '—';
                         let nickname = '';
                         let picture = '/images/SideImageBackground.svg';
+                        let title = '';
+                        let titleType = '';
 
                         if (p.characterIds.length > 0) {
                             try {
@@ -105,8 +111,11 @@ export default function ParticipantsModal({
                         try {
                             const user = await getUser(p.userId);
                             if (user) {
+                                const resolvedTitle = getResolvedUserTitle(user);
                                 picture = user.picture?.link ?? picture;
                                 nickname = user.nickname ?? nickname;
+                                title = resolvedTitle.title;
+                                titleType = resolvedTitle.titleType;
                             }
                         } catch {
                             // keep defaults
@@ -116,6 +125,8 @@ export default function ParticipantsModal({
                             userId: p.userId,
                             nickname,
                             picture,
+                            title,
+                            titleType,
                             characterName,
                             role: p.role,
                             status: p.status,
@@ -206,6 +217,16 @@ export default function ParticipantsModal({
                                             <span className="font-S-bold pm-nickname">
                                                 {player.nickname}
                                             </span>
+                                            {player.title ? (
+                                                <span
+                                                    className="font-XXS-bold pm-user-title"
+                                                    style={getProfileTitleTextStyle(
+                                                        player.titleType
+                                                    )}
+                                                >
+                                                    {player.title}
+                                                </span>
+                                            ) : null}
                                             <span className="font-XXS-regular pm-char-name">
                                                 {player.characterName}
                                             </span>

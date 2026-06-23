@@ -199,7 +199,7 @@ export default function ProfileMessagesModal({
             } catch (loadError: Error | any) {
                 if (!mounted) return;
 
-                setError(loadError?.message ?? 'Nao foi possivel carregar as mensagens');
+                setError(loadError?.message ?? 'Não foi possivel carregar as mensagens');
             } finally {
                 if (mounted) {
                     setLoading(false);
@@ -248,7 +248,7 @@ export default function ProfileMessagesModal({
                 });
             } catch (markError: Error | any) {
                 setError(
-                    markError?.message ?? 'Nao foi possivel marcar a mensagem como lida'
+                    markError?.message ?? 'Não foi possivel marcar a mensagem como lida'
                 );
             } finally {
                 markingMessageIdsRef.current.delete(messageId);
@@ -312,7 +312,7 @@ export default function ProfileMessagesModal({
             onMessagesChange?.(nextMessages);
             setSelectedMessageId(nextMessages[0]?.messageId ?? null);
         } catch (deleteError: Error | any) {
-            setError(deleteError?.message ?? 'Nao foi possivel remover a mensagem');
+            setError(deleteError?.message ?? 'Não foi possivel remover a mensagem');
         } finally {
             setDeletingMessageId(null);
         }
@@ -323,7 +323,7 @@ export default function ProfileMessagesModal({
         const trimmedContent = normalizeEditorContent(content).trim();
 
         if (!trimmedTitle || !trimmedContent) {
-            setError('Titulo e conteudo sao obrigatorios.');
+            setError('Titulo e conteudo são obrigatorios.');
             return;
         }
 
@@ -345,7 +345,7 @@ export default function ProfileMessagesModal({
                 onClose();
             }, 700);
         } catch (submitError: Error | any) {
-            setError(submitError?.message ?? 'Nao foi possivel enviar a mensagem');
+            setError(submitError?.message ?? 'Não foi possivel enviar a mensagem');
         } finally {
             setSubmitting(false);
         }
@@ -504,6 +504,12 @@ export default function ProfileMessagesModal({
                         </h1>
                         <p className="profile-action-modal-description font-XS-regular">
                             Abra uma mensagem para ler o conteudo completo.
+                        </p>
+                        <p className="profile-action-modal-description font-XXS-regular">
+                            Suas menagens são criptografadas, e não são acessiveis atraves
+                            dos nossos servidores, caso haja algum problema e queira
+                            reportar alguma violação por favor tire um print e nos envie
+                            pela pagina de suporte.
                         </p>
                     </div>
                     <button

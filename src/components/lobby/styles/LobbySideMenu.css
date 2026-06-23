@@ -7,17 +7,12 @@
         @apply w-[fit] flex flex-col items-center bg-color-greyScale/50 rounded-xl p-4 h-fit sticky top-[10rem];
     }
 
-    .lobby-side-menu-mobile-toggle {
-        @apply hidden;
-    }
-
     .lobby-side-menu-mobile-toggle-icon {
         @apply transition-transform duration-300 ease-in-out;
-        transform: rotate(180deg);
     }
 
     .lobby-side-menu-mobile-toggle-icon--open {
-        transform: rotate(0deg);
+        transform: rotate(180deg);
     }
 
     .lobby-side-menu-nav {
@@ -37,6 +32,10 @@
 
     .lobby-menu-label-danger {
         @apply text-color-support/alert;
+    }
+
+    .lobby-menu-label-disabled {
+        color: color-mix(in srgb, currentColor 45%, transparent);
     }
 
     .lobby-menu-item-wrapper:hover .lobby-menu-label {
@@ -102,7 +101,7 @@
         }
 
         .lobby-side-menu-mobile-toggle {
-            @apply absolute left-px top-3 z-0 flex h-12 w-12 -translate-x-full items-center justify-center rounded-l-xl bg-color-greyScale/50 shadow-none;
+            @apply absolute left-px top-3 z-[1] flex h-12 w-12 -translate-x-full items-center justify-center rounded-l-xl shadow-none;
         }
 
         .lobby-side-menu-nav {
@@ -162,6 +161,10 @@
     html[data-theme='dark'] .lobby-menu-item-disabled,
     html[data-theme='dark'] .lobby-menu-item-disabled:hover {
         background-color: var(--theme-surface-muted);
+    }
+
+    html[data-theme='dark'] .lobby-menu-label-disabled {
+        color: color-mix(in srgb, var(--theme-accent) 45%, transparent);
     }
 
     html[data-theme='dark'] .lobby-menu-label,

@@ -22,6 +22,10 @@ import type {
 
 export type DatabaseUser = User;
 export type DatabaseUserDetail = Omit<UserDetail, 'gameInfo'> & {
+    level?: number;
+    xp?: number;
+    title?: string;
+    gender?: 'male' | 'female';
     gameInfo: Omit<UserDetail['gameInfo'], 'campaigns'> & {
         campaigns: string[];
     };
