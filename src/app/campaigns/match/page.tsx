@@ -122,10 +122,10 @@ import { useStoredUser } from '@/hooks/useStoredUser';
 import '@/app/campaigns/match/page.css';
 
 const ABILITY_LABELS: Record<string, string> = {
-    str: 'Força',
+    str: 'ForÃƒÂ§a',
     dex: 'Destreza',
-    con: 'Constituição',
-    int: 'Inteligência',
+    con: 'ConstituiÃƒÂ§ÃƒÂ£o',
+    int: 'InteligÃƒÂªncia',
     wis: 'Sabedoria',
     cha: 'Carisma',
 };
@@ -133,22 +133,22 @@ const ABILITY_LABELS: Record<string, string> = {
 const SKILL_LABELS: Record<string, string> = {
     athletics: 'Atletismo',
     acrobatics: 'Acrobacia',
-    sleightOfHand: 'Prestidigitação',
+    sleightOfHand: 'PrestidigitaÃƒÂ§ÃƒÂ£o',
     stealth: 'Furtividade',
     arcana: 'Arcanismo',
-    history: 'História',
-    investigation: 'Investigação',
+    history: 'HistÃƒÂ³ria',
+    investigation: 'InvestigaÃƒÂ§ÃƒÂ£o',
     nature: 'Natureza',
-    religion: 'Religião',
+    religion: 'ReligiÃƒÂ£o',
     animalHandling: 'Lidar com Animais',
-    insight: 'Intuição',
+    insight: 'IntuiÃƒÂ§ÃƒÂ£o',
     medicine: 'Medicina',
-    perception: 'Percepção',
-    survival: 'Sobrevivência',
-    deception: 'Enganação',
-    intimidation: 'Intimidação',
-    performance: 'Atuação',
-    persuasion: 'Persuasão',
+    perception: 'PercepÃƒÂ§ÃƒÂ£o',
+    survival: 'SobrevivÃƒÂªncia',
+    deception: 'EnganaÃƒÂ§ÃƒÂ£o',
+    intimidation: 'IntimidaÃƒÂ§ÃƒÂ£o',
+    performance: 'AtuaÃƒÂ§ÃƒÂ£o',
+    persuasion: 'PersuasÃƒÂ£o',
 };
 
 const CURRENCY_LABELS: Record<'cp' | 'sp' | 'ep' | 'gp' | 'pp', string> = {
@@ -185,6 +185,18 @@ function getViewportOrientation(): boolean {
     const viewportHeight = viewport?.height ?? window.innerHeight;
 
     return viewportWidth >= viewportHeight;
+}
+
+function isCompactViewport(): boolean {
+    if (typeof window === 'undefined') {
+        return false;
+    }
+
+    const viewport = window.visualViewport;
+    const viewportWidth = viewport?.width ?? window.innerWidth;
+    const viewportHeight = viewport?.height ?? window.innerHeight;
+
+    return Math.min(viewportWidth, viewportHeight) <= 768;
 }
 
 function getUserRank(user: any): string | undefined {
@@ -505,7 +517,7 @@ export default function MatchPage(): JSX.Element {
     const [isTopBarOpen, setIsTopBarOpen] = useState(true);
     const [isBottomBarOpen, setIsBottomBarOpen] = useState(true);
     const [isMobileViewport, setIsMobileViewport] = useState<boolean>(() =>
-        typeof window === 'undefined' ? false : window.innerWidth <= 768
+        isCompactViewport()
     );
     const mapZoomScale = mapZoomPercent / 100;
     const activeMusic = musics.find((music) => music.id === playingMusicId) ?? null;
@@ -628,14 +640,19 @@ export default function MatchPage(): JSX.Element {
 
     useEffect(() => {
         function syncViewportMode() {
-            setIsMobileViewport(window.innerWidth <= 768);
+            setIsMobileViewport(isCompactViewport());
         }
 
         syncViewportMode();
+        const visualViewport = window.visualViewport;
         window.addEventListener('resize', syncViewportMode);
+        window.addEventListener('orientationchange', syncViewportMode);
+        visualViewport?.addEventListener('resize', syncViewportMode);
 
         return () => {
             window.removeEventListener('resize', syncViewportMode);
+            window.removeEventListener('orientationchange', syncViewportMode);
+            visualViewport?.removeEventListener('resize', syncViewportMode);
         };
     }, []);
 
@@ -1186,7 +1203,8 @@ export default function MatchPage(): JSX.Element {
             setHighlightedJournalPost(recoveredHighlightedPost);
             return recoveredHighlightedPost;
         } catch (error: any) {
-            const message = error?.message ?? 'Erro ao carregar publicação em destaque.';
+            const message =
+                error?.message ?? 'Erro ao carregar publicaÃƒÂ§ÃƒÂ£o em destaque.';
 
             if (shouldSetErrorState) {
                 setJournalHighlightError(message);
@@ -1210,7 +1228,7 @@ export default function MatchPage(): JSX.Element {
             return recoveredPosts;
         } catch (error: any) {
             setJournalHighlightError(
-                error?.message ?? 'Erro ao carregar publicações do jornal.'
+                error?.message ?? 'Erro ao carregar publicaÃƒÂ§ÃƒÂµes do jornal.'
             );
             return [];
         } finally {
@@ -1255,7 +1273,7 @@ export default function MatchPage(): JSX.Element {
             setHighlightedJournalPost(post);
         } catch (error: any) {
             setJournalHighlightError(
-                error?.message ?? 'Erro ao atualizar publicação em destaque.'
+                error?.message ?? 'Erro ao atualizar publicaÃƒÂ§ÃƒÂ£o em destaque.'
             );
         } finally {
             setJournalHighlightSaving(false);
@@ -1277,13 +1295,13 @@ export default function MatchPage(): JSX.Element {
 
             setJournalHighlightReaderOpen(false);
             setJournalHighlightNoticeMessage(
-                'Nenhuma publicação em destaque no momento.'
+                'Nenhuma publicaÃƒÂ§ÃƒÂ£o em destaque no momento.'
             );
             setJournalHighlightNoticeOpen(true);
         } catch (error: any) {
             setJournalHighlightReaderOpen(false);
             setJournalHighlightNoticeMessage(
-                error?.message ?? 'Erro ao carregar publicação em destaque.'
+                error?.message ?? 'Erro ao carregar publicaÃƒÂ§ÃƒÂ£o em destaque.'
             );
             setJournalHighlightNoticeOpen(true);
         }
@@ -1719,7 +1737,7 @@ export default function MatchPage(): JSX.Element {
 
     useEffect(() => {
         const warningMessage =
-            'Atualizar esta pagina pode levar a comportamentos inesperados, por favor, se possível saia da partida e entre novamente.';
+            'Atualizar esta pagina pode levar a comportamentos inesperados, por favor, se possÃƒÂ­vel saia da partida e entre novamente.';
 
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
             event.preventDefault();
@@ -2613,7 +2631,7 @@ export default function MatchPage(): JSX.Element {
             const level = i + 1;
             const levelData = spellData?.[level];
             return {
-                label: `${level}º Círculo`,
+                label: `${level}Ã‚Âº CÃƒÂ­rculo`,
                 items: levelData?.spellIds ?? [],
                 slotsTotal:
                     typeof levelData?.slotsTotal === 'number' ? levelData.slotsTotal : 0,
@@ -2637,7 +2655,7 @@ export default function MatchPage(): JSX.Element {
             const level = i + 1;
             const levelData = abilitiesData?.[level];
             return {
-                label: `${level}º Nível`,
+                label: `${level}Ã‚Âº NÃƒÂ­vel`,
                 items: levelData?.extraAbilityNames ?? [],
                 slotsTotal:
                     typeof levelData?.slotsTotal === 'number' ? levelData.slotsTotal : 0,
@@ -2780,7 +2798,7 @@ export default function MatchPage(): JSX.Element {
                                         }
                                     >
                                         <span className="match-map-token-resize-icon">
-                                            ⛶
+                                            Ã¢â€ºÂ¶
                                         </span>
                                     </button>
                                 )}
@@ -3356,7 +3374,7 @@ export default function MatchPage(): JSX.Element {
 
                         {myCharacters.length === 0 && (
                             <span className="font-XS-regular match-char-empty">
-                                Você não tem um personagem
+                                VocÃƒÂª nÃƒÂ£o tem um personagem
                             </span>
                         )}
 
@@ -3440,7 +3458,7 @@ export default function MatchPage(): JSX.Element {
                                                     {profile.name}
                                                 </p>
                                                 <p className="font-XXS-regular">
-                                                    {className || profile.class} •{' '}
+                                                    {className || profile.class} Ã¢â‚¬Â¢{' '}
                                                     {profile.race}
                                                 </p>
                                             </div>
@@ -3651,7 +3669,9 @@ export default function MatchPage(): JSX.Element {
                                                             }
                                                             aria-haspopup="dialog"
                                                         >
-                                                            <span>Vida Temporária:</span>
+                                                            <span>
+                                                                Vida TemporÃƒÂ¡ria:
+                                                            </span>
                                                             <b>{hp?.tempPoints ?? 0}</b>
                                                         </button>
 
@@ -3660,7 +3680,7 @@ export default function MatchPage(): JSX.Element {
                                                             <div
                                                                 className="match-char-value-modal"
                                                                 role="dialog"
-                                                                aria-label="Atualizar vida temporária"
+                                                                aria-label="Atualizar vida temporÃƒÂ¡ria"
                                                             >
                                                                 <div className="match-char-value-form">
                                                                     <input
@@ -3680,7 +3700,7 @@ export default function MatchPage(): JSX.Element {
                                                                                     .value
                                                                             )
                                                                         }
-                                                                        placeholder="Vida temporária"
+                                                                        placeholder="Vida temporÃƒÂ¡ria"
                                                                         disabled={
                                                                             hitPointUpdateSaving
                                                                         }
@@ -3711,13 +3731,13 @@ export default function MatchPage(): JSX.Element {
                                                     </div>
                                                 ) : (
                                                     <>
-                                                        <span>Vida Temporária:</span>
+                                                        <span>Vida TemporÃƒÂ¡ria:</span>
                                                         <b>{hp?.tempPoints ?? 0}</b>
                                                     </>
                                                 )}
                                             </div>
                                             <span className="font-XXS-regular">
-                                                Nível: <b>{profile.level ?? 0}</b>
+                                                NÃƒÂ­vel: <b>{profile.level ?? 0}</b>
                                             </span>
                                             <span className="font-XXS-regular">
                                                 XP: <b>{profile.xp ?? 0}</b>
@@ -3835,7 +3855,7 @@ export default function MatchPage(): JSX.Element {
                                                 ) && <b>0 PO</b>}
                                             </span>
                                             <span className="font-XXS-regular">
-                                                Bonus de proficiência:{' '}
+                                                Bonus de proficiÃƒÂªncia:{' '}
                                                 <b>{stats.proficiencyBonus ?? 0}</b>
                                             </span>
                                         </div>
@@ -3863,7 +3883,9 @@ export default function MatchPage(): JSX.Element {
 
                                         {(stats.skills?.length ?? 0) > 0 && (
                                             <div className="match-char-section">
-                                                <p className="font-XXS-bold">Perícias</p>
+                                                <p className="font-XXS-bold">
+                                                    PerÃƒÂ­cias
+                                                </p>
                                                 <div className="match-char-tags">
                                                     {(stats.skills ?? [])
                                                         .filter((sk) => sk.checked)
@@ -3883,7 +3905,7 @@ export default function MatchPage(): JSX.Element {
 
                                         <div className="match-char-section">
                                             <p className="font-XXS-bold">
-                                                Testes de resistência
+                                                Testes de resistÃƒÂªncia
                                             </p>
                                             <div className="match-char-tags">
                                                 {stats.abilityScores
@@ -3915,7 +3937,7 @@ export default function MatchPage(): JSX.Element {
                                                 className="match-spell-reset-btn font-XXS-bold"
                                                 onClick={resetSpellMarks}
                                             >
-                                                Resetar marcações de magias
+                                                Resetar marcaÃƒÂ§ÃƒÂµes de magias
                                             </button>
                                         )}
                                         {spellsByLevel.map((level, levelIdx) => (
@@ -3926,7 +3948,7 @@ export default function MatchPage(): JSX.Element {
                                                 <p className="font-XXS-bold">
                                                     {level.label}
                                                     {level.slotsTotal > 0
-                                                        ? ` • Slots ${
+                                                        ? ` Ã¢â‚¬Â¢ Slots ${
                                                               spellSlotsUsed[levelIdx] ??
                                                               0
                                                           }/${level.slotsTotal}`
@@ -3988,7 +4010,7 @@ export default function MatchPage(): JSX.Element {
                                                 className="match-spell-reset-btn"
                                                 onClick={resetAbilityMarks}
                                             >
-                                                Resetar marcações de habilidades
+                                                Resetar marcaÃƒÂ§ÃƒÂµes de habilidades
                                             </button>
                                         )}
                                         {abilitiesByLevel.map((level, levelIdx) => (
@@ -3999,7 +4021,7 @@ export default function MatchPage(): JSX.Element {
                                                 <p className="font-XXS-bold">
                                                     {level.label}
                                                     {level.slotsTotal > 0
-                                                        ? ` • Slots ${
+                                                        ? ` Ã¢â‚¬Â¢ Slots ${
                                                               abilitySlotsUsed[
                                                                   levelIdx
                                                               ] ?? 0
@@ -4149,7 +4171,9 @@ export default function MatchPage(): JSX.Element {
                             cloneModeOpen ? ' match-top-bar-item--active' : ''
                         }`}
                         title={
-                            cloneModeOpen ? 'Encerrar duplicação' : 'Duplicar avatares'
+                            cloneModeOpen
+                                ? 'Encerrar duplicaÃƒÂ§ÃƒÂ£o'
+                                : 'Duplicar avatares'
                         }
                         onClick={() => {
                             setCloneModeOpen((current) => {
@@ -4200,12 +4224,12 @@ export default function MatchPage(): JSX.Element {
                     </button>
                     <button
                         className="match-top-bar-item"
-                        title="Seleção de avatares"
+                        title="SeleÃƒÂ§ÃƒÂ£o de avatares"
                         onClick={() => setAvatarSelectionModalOpen(true)}
                     >
                         <Image
                             src={AvatarSelectionSVG.src}
-                            alt="Seleção de avatares"
+                            alt="SeleÃƒÂ§ÃƒÂ£o de avatares"
                             width={28}
                             height={28}
                         />
@@ -4224,22 +4248,22 @@ export default function MatchPage(): JSX.Element {
                     </button>
                     <button
                         className="match-top-bar-item"
-                        title="Anotações"
+                        title="AnotaÃƒÂ§ÃƒÂµes"
                         onClick={() => setNotesModalOpen(true)}
                     >
                         <Image
                             src={EditBlueSVG.src}
-                            alt="Anotações"
+                            alt="AnotaÃƒÂ§ÃƒÂµes"
                             width={28}
                             height={28}
                         />
                     </button>
                     <button
                         className="match-top-bar-item"
-                        title="Mídia"
+                        title="MÃƒÂ­dia"
                         onClick={() => setMediaModalOpen(true)}
                     >
-                        <Image src={MediaSVG.src} alt="Mídia" width={28} height={28} />
+                        <Image src={MediaSVG.src} alt="MÃƒÂ­dia" width={28} height={28} />
                     </button>
                     <button
                         className="match-top-bar-item"
@@ -4310,12 +4334,12 @@ export default function MatchPage(): JSX.Element {
                 </button>
                 <button
                     className="match-bottom-bar-item"
-                    title="Publicação em destaque"
+                    title="PublicaÃƒÂ§ÃƒÂ£o em destaque"
                     onClick={handleOpenHighlightedJournalPost}
                 >
                     <Image
                         src={BookmarkSVG.src}
-                        alt="Publicação em destaque"
+                        alt="PublicaÃƒÂ§ÃƒÂ£o em destaque"
                         width={28}
                         height={28}
                     />
@@ -4388,8 +4412,8 @@ export default function MatchPage(): JSX.Element {
                         }`}
                         title={
                             playingMusicId
-                                ? 'Volume da música'
-                                : 'Nenhuma música em reprodução'
+                                ? 'Volume da mÃƒÂºsica'
+                                : 'Nenhuma mÃƒÂºsica em reproduÃƒÂ§ÃƒÂ£o'
                         }
                         onClick={() => {
                             if (!playingMusicId) return;
@@ -4415,7 +4439,7 @@ export default function MatchPage(): JSX.Element {
                                 onChange={(event) =>
                                     setMusicVolume(Number(event.target.value))
                                 }
-                                aria-label="Controlar volume da música"
+                                aria-label="Controlar volume da mÃƒÂºsica"
                             />
                             <span className="match-volume-value font-XXS-regular">
                                 {musicVolume}%
@@ -4426,12 +4450,12 @@ export default function MatchPage(): JSX.Element {
                 {isPlayer && (
                     <button
                         className="match-bottom-bar-item"
-                        title="Anotações"
+                        title="AnotaÃƒÂ§ÃƒÂµes"
                         onClick={() => setNotesModalOpen(true)}
                     >
                         <Image
                             src={EditBlueSVG.src}
-                            alt="Anotações"
+                            alt="AnotaÃƒÂ§ÃƒÂµes"
                             width={28}
                             height={28}
                         />
@@ -4482,7 +4506,7 @@ export default function MatchPage(): JSX.Element {
                                         )
                                     }
                                 >
-                                    −
+                                    Ã¢Ë†â€™
                                 </button>
                                 <span className="match-dice-picker-count font-S-bold">
                                     {dicePickerState.count}
@@ -4636,7 +4660,7 @@ export default function MatchPage(): JSX.Element {
                                 className="cs-spell-picker-close"
                                 onClick={closeSpellDetail}
                             >
-                                ✕
+                                Ã¢Å“â€¢
                             </button>
                         </div>
                         <div className="cs-spell-picker-list">
@@ -4661,7 +4685,7 @@ export default function MatchPage(): JSX.Element {
                                         </div>
                                         <div className="cs-spell-accordion-field">
                                             <span className="cs-spell-accordion-field-label">
-                                                Tempo de Conjuração
+                                                Tempo de ConjuraÃƒÂ§ÃƒÂ£o
                                             </span>
                                             <span className="cs-spell-accordion-field-value">
                                                 {panelDetailSpell.castingTime}
@@ -4669,7 +4693,7 @@ export default function MatchPage(): JSX.Element {
                                         </div>
                                         <div className="cs-spell-accordion-field">
                                             <span className="cs-spell-accordion-field-label">
-                                                Duração
+                                                DuraÃƒÂ§ÃƒÂ£o
                                             </span>
                                             <span className="cs-spell-accordion-field-value">
                                                 {panelDetailSpell.duration}
@@ -4694,7 +4718,7 @@ export default function MatchPage(): JSX.Element {
                                         {panelDetailSpell.higherLevels && (
                                             <div className="cs-spell-accordion-field cs-spell-accordion-field--full">
                                                 <span className="cs-spell-accordion-field-label">
-                                                    Em Níveis Superiores
+                                                    Em NÃƒÂ­veis Superiores
                                                 </span>
                                                 <span className="cs-spell-accordion-field-value">
                                                     {panelDetailSpell.higherLevels}
@@ -4895,7 +4919,8 @@ export default function MatchPage(): JSX.Element {
                                     Destaque do Jornal
                                 </h2>
                                 <p className="font-XXS-regular match-journal-highlight-subtitle">
-                                    Selecione uma publicação para destacar aos jogadores.
+                                    Selecione uma publicaÃƒÂ§ÃƒÂ£o para destacar aos
+                                    jogadores.
                                 </p>
                             </div>
                             <button
@@ -4921,11 +4946,12 @@ export default function MatchPage(): JSX.Element {
                         <div className="match-journal-highlight-body">
                             {journalHighlightLoading || journalPostsLoading ? (
                                 <span className="font-XS-regular match-journal-highlight-empty">
-                                    <LoadingDots label="Carregando publicações" />
+                                    <LoadingDots label="Carregando publicaÃƒÂ§ÃƒÂµes" />
                                 </span>
                             ) : journalPosts.length === 0 ? (
                                 <span className="font-XS-regular match-journal-highlight-empty">
-                                    Nenhuma publicação encontrada para esta campanha.
+                                    Nenhuma publicaÃƒÂ§ÃƒÂ£o encontrada para esta
+                                    campanha.
                                 </span>
                             ) : (
                                 <div className="match-journal-highlight-list">
@@ -4973,7 +4999,7 @@ export default function MatchPage(): JSX.Element {
                                 {journalHighlightSaving ? (
                                     <LoadingDots label="Salvando destaque" />
                                 ) : (
-                                    'Clique novamente em uma publicação destacada para remove-la.'
+                                    'Clique novamente em uma publicaÃƒÂ§ÃƒÂ£o destacada para remove-la.'
                                 )}
                             </span>
                         </div>
@@ -4988,7 +5014,7 @@ export default function MatchPage(): JSX.Element {
                         onClick={(event) => event.stopPropagation()}
                     >
                         <h2 className="font-L-bold match-journal-highlight-title">
-                            Publicação em Destaque
+                            PublicaÃƒÂ§ÃƒÂ£o em Destaque
                         </h2>
                         <p className="font-XS-regular match-journal-highlight-notice-text">
                             {journalHighlightNoticeMessage}

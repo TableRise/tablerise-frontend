@@ -1029,14 +1029,6 @@
         }
     }
 
-    @media (hover: none) and (pointer: coarse) and (orientation: landscape) {
-        .match-char-panel-anchor {
-            @apply left-4 top-auto;
-            bottom: 14.5rem;
-            transform: none;
-        }
-    }
-
     .match-orientation-overlay {
         @apply fixed inset-0 z-[200] flex items-center justify-center bg-black/75 px-6;
         backdrop-filter: blur(4px);
