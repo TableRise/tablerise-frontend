@@ -14,13 +14,12 @@ import ExitIcon from '@assets/icons/sys/exit-red.svg?url';
 import TableriseContext from '@/context/TableriseContext';
 import { postLogout } from '@/server/users/logout';
 import Link from 'next/link';
-import HeaderThemeButton from './HeaderThemeButton';
 import '@/components/common/styles/LoggedHeader.css';
 
 const alts = require('@assets/alts');
 
 export default function LoggedHeader(): JSX.Element {
-    const { themeMode } = useContext(TableriseContext);
+    const { themeMode, toggleThemeMode } = useContext(TableriseContext);
     const [open, setOpen] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const ref = useRef<HTMLElement>(null);
@@ -166,6 +165,17 @@ export default function LoggedHeader(): JSX.Element {
                                     />
                                     <span className="font-S-bold">Deslogar</span>
                                 </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        toggleThemeMode();
+                                        closeMenu();
+                                    }}
+                                    className="text-color-greyScale/900 my-3 font-bold text-sm"
+                                >
+                                    Mudar tema:{' '}
+                                    {themeMode === 'dark' ? 'Escuro' : 'Claro'}
+                                </button>
                             </div>
                         )}
                     </div>
@@ -186,7 +196,6 @@ export default function LoggedHeader(): JSX.Element {
                             aria-hidden="true"
                         />
                     </button>
-                    <HeaderThemeButton />
                 </div>
             </div>
         </header>

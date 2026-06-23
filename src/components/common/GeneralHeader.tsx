@@ -1,17 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import Image from 'next/image';
 import TableRiseLightMark from '@assets/icons/logo.svg?url';
 import MenuSVG from '@assets/icons/nav/menu.svg?url';
 import CloseSVG from '@assets/icons/nav/close.svg?url';
 import Link from 'next/link';
 import HeaderThemeButton from './HeaderThemeButton';
+import TableriseContext from '@/context/TableriseContext';
 import '@/components/common/styles/GeneralHeader.css';
 
 const alts = require('@assets/alts');
 
 export default function GeneralHeader(): JSX.Element {
+    const { themeMode, toggleThemeMode } = useContext(TableriseContext);
     const [menuOpen, setMenuOpen] = useState(false);
 
     useEffect(() => {
@@ -64,6 +66,18 @@ export default function GeneralHeader(): JSX.Element {
                                     Sobre
                                 </Link>
                             </li>
+                            <li>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        toggleThemeMode();
+                                        closeMenu();
+                                    }}
+                                    className="menu-theme-button"
+                                >
+                                    Tema: {themeMode === 'dark' ? 'Escuro' : 'Claro'}
+                                </button>
+                            </li>
                         </ul>
                     </nav>
                     <div className="buttons-header">
@@ -99,7 +113,6 @@ export default function GeneralHeader(): JSX.Element {
                             aria-hidden="true"
                         />
                     </button>
-                    <HeaderThemeButton />
                 </div>
             </div>
         </header>
