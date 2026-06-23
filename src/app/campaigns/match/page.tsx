@@ -1959,7 +1959,9 @@ export default function MatchPage(): JSX.Element {
                                 ...current.data.stats,
                                 hitPoints: {
                                     ...current.data.stats.hitPoints,
-                                    currentPoints: nextCurrentHitPoints,
+                                    currentPoints:
+                                        nextCurrentHitPoints ??
+                                        current.data.stats.hitPoints.currentPoints,
                                 },
                             },
                         },
