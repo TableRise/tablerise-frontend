@@ -32,6 +32,14 @@
         @apply relative flex items-center gap-4;
     }
 
+    .logged-header-end {
+        @apply flex items-center gap-3;
+    }
+
+    .logged-header-controls {
+        @apply flex items-center gap-3;
+    }
+
     .logged-header-account {
         @apply relative;
     }
@@ -93,6 +101,11 @@
         .logged-header .menu-and-buttons-logged {
             @apply gap-4;
         }
+
+        .logged-header-end,
+        .logged-header-controls {
+            @apply gap-2;
+        }
     }
 
     @media (max-width: 768px) {
@@ -111,6 +124,10 @@
 
         .logged-header .menu-and-buttons-logged {
             @apply absolute left-0 right-0 top-[calc(100%+0.5rem)] hidden flex-col items-stretch gap-4 rounded-[1.1rem] bg-color-primary/default_900 px-4 py-4 shadow-lg;
+        }
+
+        .logged-header-end {
+            @apply items-start;
         }
 
         .logged-header .menu-and-buttons-logged.menu-and-buttons-logged--open {

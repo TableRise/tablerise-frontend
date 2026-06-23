@@ -683,9 +683,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                                 value="+2"
                                 readOnly
                             />
-                            <span className="cs-field-label">
-                                Bônus de Proficiência
-                            </span>
+                            <span className="cs-field-label">Bônus de Proficiência</span>
                         </div>
 
                         {/* Saving Throws */}
@@ -829,9 +827,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                                 value={tempHp || ''}
                                 onChange={(e) => setTempHp(Number(e.target.value))}
                             />
-                            <p className="cs-section-title">
-                                Pontos de Vida Temporários
-                            </p>
+                            <p className="cs-section-title">Pontos de Vida Temporários</p>
                         </div>
 
                         {/* Hit Dice & Death Saves */}

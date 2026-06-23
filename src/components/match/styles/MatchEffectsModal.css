@@ -21,7 +21,12 @@
     }
 
     .mem-subtitle {
-        @apply mt-1 text-color-greyScale/500;
+        @apply mt-1 text-center text-color-greyScale/500;
+    }
+
+    .mem-header > div {
+        flex: 1;
+        min-width: 0;
     }
 
     .mem-close-btn {
@@ -64,6 +69,12 @@
 
     .mem-option-state {
         @apply rounded-full px-3 py-1 bg-color-primary/default_900 text-color-greyScale/50;
+    }
+
+    @media (max-width: 768px) {
+        .mem-header > div {
+            text-align: center;
+        }
     }
 
     html[data-theme='dark'] .mem-modal {

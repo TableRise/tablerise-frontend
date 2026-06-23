@@ -18,6 +18,8 @@
 
     .icm-header-copy {
         @apply flex flex-col gap-1;
+        flex: 1;
+        min-width: 0;
     }
 
     .icm-title {
@@ -25,7 +27,7 @@
     }
 
     .icm-description {
-        @apply text-color-greyScale/700;
+        @apply text-center text-color-greyScale/700;
     }
 
     .icm-close-btn {
@@ -147,6 +149,10 @@
 
         .icm-crop-stage {
             height: min(52vh, 22rem);
+        }
+
+        .icm-header-copy {
+            @apply text-center;
         }
 
         .icm-footer {
