@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import GitHubLogo from '@assets/icons/social-midia/github.svg?url';
 import '@/components/common/styles/Footer.css';
+import HeaderThemeButton from './HeaderThemeButton';
 
 export default function Footer(): JSX.Element {
     return (
@@ -56,6 +57,7 @@ export default function Footer(): JSX.Element {
                         matheusilva.art
                     </Link>
                 </p>
+                <HeaderThemeButton />
             </div>
         </footer>
     );
