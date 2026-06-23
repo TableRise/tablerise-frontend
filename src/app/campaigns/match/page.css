@@ -216,7 +216,12 @@
     }
 
     .match-journal-highlight-subtitle {
-        @apply mt-1 text-color-greyScale/500;
+        @apply mt-1 text-center text-color-greyScale/500;
+    }
+
+    .match-journal-highlight-header > div {
+        flex: 1;
+        min-width: 0;
     }
 
     .match-journal-highlight-close {
@@ -684,7 +689,12 @@
     }
 
     .match-clone-life-subtitle {
-        @apply mt-1 text-color-greyScale/500;
+        @apply mt-1 text-center text-color-greyScale/500;
+    }
+
+    .match-clone-life-header > div {
+        flex: 1;
+        min-width: 0;
     }
 
     .match-clone-life-close {
@@ -829,6 +839,11 @@
     }
 
     @media (max-width: 768px) {
+        .match-journal-highlight-header > div,
+        .match-clone-life-header > div {
+            text-align: center;
+        }
+
         .match-logo-badge {
             @apply top-3 left-3 px-2.5 py-2;
         }

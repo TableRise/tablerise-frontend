@@ -116,14 +116,6 @@ export default function ProfileTipsModal({
                             {'>'}
                         </button>
                     </div>
-
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="font-S-bold form-button-cancel button-L-fill profile-tips-modal__close"
-                    >
-                        Fechar
-                    </button>
                 </div>
             </div>
         </div>

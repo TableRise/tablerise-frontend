@@ -21,7 +21,12 @@
     }
 
     .masm-subtitle {
-        @apply mt-1 text-color-greyScale/500;
+        @apply mt-1 text-center text-color-greyScale/500;
+    }
+
+    .masm-header > div {
+        flex: 1;
+        min-width: 0;
     }
 
     .masm-close-btn {
@@ -94,6 +99,12 @@
 
     .masm-empty {
         @apply text-color-greyScale/500;
+    }
+
+    @media (max-width: 768px) {
+        .masm-header > div {
+            text-align: center;
+        }
     }
 
     html[data-theme='dark'] .masm-modal {

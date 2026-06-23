@@ -1,16 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import Image from 'next/image';
 import TableRiseLightMark from '@assets/icons/logo.svg?url';
 import MenuSVG from '@assets/icons/nav/menu.svg?url';
 import CloseSVG from '@assets/icons/nav/close.svg?url';
 import Link from 'next/link';
+import HeaderThemeButton from './HeaderThemeButton';
+import TableriseContext from '@/context/TableriseContext';
 import '@/components/common/styles/GeneralHeader.css';
 
 const alts = require('@assets/alts');
 
 export default function GeneralHeader(): JSX.Element {
+    const { themeMode, toggleThemeMode } = useContext(TableriseContext);
     const [menuOpen, setMenuOpen] = useState(false);
 
     useEffect(() => {
@@ -40,59 +43,76 @@ export default function GeneralHeader(): JSX.Element {
                 />
             </Link>
 
-            <button
-                type="button"
-                className="general-header-mobile-toggle"
-                aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
-                aria-expanded={menuOpen}
-                onClick={toggleMenu}
-            >
-                <Image
-                    src={menuOpen ? CloseSVG : MenuSVG}
-                    alt=""
-                    width={24}
-                    height={24}
-                    aria-hidden="true"
-                />
-            </button>
-
-            <div
-                className={`menu-and-buttons${menuOpen ? ' menu-and-buttons--open' : ''}`}
-            >
-                <nav className="menu">
-                    <ul className="menu-list font-XS-bold">
-                        <li>
-                            <Link href="/" onClick={closeMenu}>
-                                Inicio
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/tutorial" onClick={closeMenu}>
-                                Tutorial
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/about" onClick={closeMenu}>
-                                Sobre
-                            </Link>
-                        </li>
-                    </ul>
-                </nav>
-                <div className="buttons-header">
-                    <Link
-                        href="/login"
-                        onClick={closeMenu}
-                        className="font-XS-bold button-transparent-default"
+            <div className="general-header-end">
+                <div
+                    className={`menu-and-buttons${
+                        menuOpen ? ' menu-and-buttons--open' : ''
+                    }`}
+                >
+                    <nav className="menu">
+                        <ul className="menu-list font-XS-bold">
+                            <li>
+                                <Link href="/" onClick={closeMenu}>
+                                    Inicio
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/tutorial" onClick={closeMenu}>
+                                    Tutorial
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/about" onClick={closeMenu}>
+                                    Sobre
+                                </Link>
+                            </li>
+                            <li>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        toggleThemeMode();
+                                        closeMenu();
+                                    }}
+                                    className="menu-theme-button"
+                                >
+                                    Tema: {themeMode === 'dark' ? 'Escuro' : 'Claro'}
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                    <div className="buttons-header">
+                        <Link
+                            href="/login"
+                            onClick={closeMenu}
+                            className="font-XS-bold button-transparent-default"
+                        >
+                            Entrar
+                        </Link>
+                        <Link
+                            href="/register"
+                            onClick={closeMenu}
+                            className="font-XS-bold button-white-default"
+                        >
+                            Registrar
+                        </Link>
+                    </div>
+                </div>
+                <div className="general-header-controls">
+                    <button
+                        type="button"
+                        className="general-header-mobile-toggle"
+                        aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
+                        aria-expanded={menuOpen}
+                        onClick={toggleMenu}
                     >
-                        Entrar
-                    </Link>
-                    <Link
-                        href="/register"
-                        onClick={closeMenu}
-                        className="font-XS-bold button-white-default"
-                    >
-                        Registrar
-                    </Link>
+                        <Image
+                            src={menuOpen ? CloseSVG : MenuSVG}
+                            alt=""
+                            width={24}
+                            height={24}
+                            aria-hidden="true"
+                        />
+                    </button>
                 </div>
             </div>
         </header>

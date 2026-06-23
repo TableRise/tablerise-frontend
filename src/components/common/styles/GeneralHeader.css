@@ -20,6 +20,14 @@
         @apply flex items-center gap-6;
     }
 
+    .general-header-end {
+        @apply flex items-center gap-3;
+    }
+
+    .general-header-controls {
+        @apply flex items-center gap-3;
+    }
+
     .general-header .menu {
         @apply flex h-8 items-center justify-center;
     }
@@ -46,6 +54,11 @@
         .general-header .menu-list {
             @apply gap-4;
         }
+
+        .general-header-end,
+        .general-header-controls {
+            @apply gap-2;
+        }
     }
 
     @media (max-width: 768px) {
@@ -64,6 +77,10 @@
 
         .general-header .menu-and-buttons {
             @apply absolute left-0 right-0 top-[calc(100%+0.5rem)] hidden flex-col items-stretch gap-4 rounded-[1.1rem] bg-color-primary/default_900 px-4 py-4 shadow-lg;
+        }
+
+        .general-header-end {
+            @apply items-start;
         }
 
         .general-header .menu-and-buttons.menu-and-buttons--open {

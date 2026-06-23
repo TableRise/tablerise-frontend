@@ -8,7 +8,6 @@ import AccountBoxDark from '@assets/icons/social/account-box-dark.svg?url';
 import ExpandMore from '@assets/icons/nav/expand-more.svg?url';
 import MenuSVG from '@assets/icons/nav/menu.svg?url';
 import CloseSVG from '@assets/icons/nav/close.svg?url';
-import SettingsIcon from '@assets/icons/sys/settings-blue.svg?url';
 import HelpIcon from '@assets/icons/sys/help-blue.svg?url';
 import HelpDarkIcon from '@assets/icons/sys/help-dark.svg?url';
 import ExitIcon from '@assets/icons/sys/exit-red.svg?url';
@@ -20,7 +19,7 @@ import '@/components/common/styles/LoggedHeader.css';
 const alts = require('@assets/alts');
 
 export default function LoggedHeader(): JSX.Element {
-    const { themeMode } = useContext(TableriseContext);
+    const { themeMode, toggleThemeMode } = useContext(TableriseContext);
     const [open, setOpen] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const ref = useRef<HTMLElement>(null);
@@ -77,110 +76,126 @@ export default function LoggedHeader(): JSX.Element {
                 />
             </Link>
 
-            <button
-                type="button"
-                className="logged-header-mobile-toggle"
-                aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
-                aria-expanded={menuOpen}
-                onClick={() => setMenuOpen((current) => !current)}
-            >
-                <Image
-                    src={menuOpen ? CloseSVG : MenuSVG}
-                    alt=""
-                    width={24}
-                    height={24}
-                    aria-hidden="true"
-                />
-            </button>
+            <div className="logged-header-end">
+                <div
+                    className={`menu-and-buttons-logged${
+                        menuOpen ? ' menu-and-buttons-logged--open' : ''
+                    }`}
+                >
+                    <nav className="logged-header-nav">
+                        <ul className="font-XS-bold">
+                            <li>
+                                <Link href="/" onClick={closeMenu}>
+                                    Campanhas
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/tutorial" onClick={closeMenu}>
+                                    Tutorial
+                                </Link>
+                            </li>
+                        </ul>
+                    </nav>
+                    <div className="logged-header-account">
+                        <button
+                            type="button"
+                            className="logged-header-trigger"
+                            onClick={() => setOpen((v) => !v)}
+                        >
+                            <Image src={AccountBox} alt="user icon" />
+                            <Image
+                                src={ExpandMore}
+                                alt="down arrow to show menu"
+                                className={`logged-header-chevron${
+                                    open ? ' logged-header-chevron--open' : ''
+                                }`}
+                            />
+                        </button>
 
-            <div
-                className={`menu-and-buttons-logged${
-                    menuOpen ? ' menu-and-buttons-logged--open' : ''
-                }`}
-            >
-                <nav className="logged-header-nav">
-                    <ul className="font-XS-bold">
-                        <li>
-                            <Link href="/" onClick={closeMenu}>
-                                Campanhas
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/tutorial" onClick={closeMenu}>
-                                Tutorial
-                            </Link>
-                        </li>
-                    </ul>
-                </nav>
-                <div className="logged-header-account">
+                        {open && (
+                            <div className="logged-header-dropdown">
+                                <Link
+                                    href="/profile"
+                                    className="logged-header-dropdown-item"
+                                    onClick={() => {
+                                        setOpen(false);
+                                        closeMenu();
+                                    }}
+                                >
+                                    <Image
+                                        src={
+                                            themeMode === 'dark'
+                                                ? AccountBoxDark
+                                                : AccountBoxBlue
+                                        }
+                                        alt="perfil"
+                                        width={20}
+                                        height={20}
+                                    />
+                                    <span className="font-S-regular">Perfil</span>
+                                </Link>
+                                <Link
+                                    href="/support"
+                                    className="logged-header-dropdown-item"
+                                    onClick={() => {
+                                        setOpen(false);
+                                        closeMenu();
+                                    }}
+                                >
+                                    <Image
+                                        src={
+                                            themeMode === 'dark' ? HelpDarkIcon : HelpIcon
+                                        }
+                                        alt="suporte"
+                                        width={20}
+                                        height={20}
+                                    />
+                                    <span className="font-S-regular">Suporte</span>
+                                </Link>
+                                <button
+                                    type="button"
+                                    className="logged-header-dropdown-item logged-header-dropdown-item--danger"
+                                    onClick={handleLogout}
+                                >
+                                    <Image
+                                        src={ExitIcon}
+                                        alt="deslogar"
+                                        width={20}
+                                        height={20}
+                                    />
+                                    <span className="font-S-bold">Deslogar</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        toggleThemeMode();
+                                        closeMenu();
+                                    }}
+                                    className="text-color-greyScale/900 my-3 font-bold text-sm"
+                                >
+                                    Mudar tema:{' '}
+                                    {themeMode === 'dark' ? 'Escuro' : 'Claro'}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+                <div className="logged-header-controls">
                     <button
                         type="button"
-                        className="logged-header-trigger"
-                        onClick={() => setOpen((v) => !v)}
+                        className="logged-header-mobile-toggle"
+                        aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
+                        aria-expanded={menuOpen}
+                        onClick={() => setMenuOpen((current) => !current)}
                     >
-                        <Image src={AccountBox} alt="user icon" />
                         <Image
-                            src={ExpandMore}
-                            alt="down arrow to show menu"
-                            className={`logged-header-chevron${
-                                open ? ' logged-header-chevron--open' : ''
-                            }`}
+                            src={menuOpen ? CloseSVG : MenuSVG}
+                            alt=""
+                            width={24}
+                            height={24}
+                            aria-hidden="true"
                         />
                     </button>
-
-                    {open && (
-                        <div className="logged-header-dropdown">
-                            <Link
-                                href="/profile"
-                                className="logged-header-dropdown-item"
-                                onClick={() => {
-                                    setOpen(false);
-                                    closeMenu();
-                                }}
-                            >
-                                <Image
-                                    src={
-                                        themeMode === 'dark'
-                                            ? AccountBoxDark
-                                            : AccountBoxBlue
-                                    }
-                                    alt="perfil"
-                                    width={20}
-                                    height={20}
-                                />
-                                <span className="font-S-regular">Perfil</span>
-                            </Link>
-                            <Link
-                                href="/support"
-                                className="logged-header-dropdown-item"
-                                onClick={() => {
-                                    setOpen(false);
-                                    closeMenu();
-                                }}
-                            >
-                                <Image
-                                    src={themeMode === 'dark' ? HelpDarkIcon : HelpIcon}
-                                    alt="suporte"
-                                    width={20}
-                                    height={20}
-                                />
-                                <span className="font-S-regular">Suporte</span>
-                            </Link>
-                            <button
-                                type="button"
-                                className="logged-header-dropdown-item logged-header-dropdown-item--danger"
-                                onClick={handleLogout}
-                            >
-                                <Image
-                                    src={ExitIcon}
-                                    alt="deslogar"
-                                    width={20}
-                                    height={20}
-                                />
-                                <span className="font-S-bold">Deslogar</span>
-                            </button>
-                        </div>
-                    )}
                 </div>
             </div>
         </header>

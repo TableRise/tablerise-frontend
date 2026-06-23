@@ -190,6 +190,8 @@
 
     .profile-gallery-picker__copy {
         @apply flex flex-col gap-2;
+        flex: 1;
+        min-width: 0;
     }
 
     .profile-gallery-picker__actions {
@@ -374,7 +376,7 @@
     }
 
     .profile-tips-modal__footer {
-        @apply mt-2 flex items-center justify-between gap-3;
+        @apply mt-2 flex items-center justify-center gap-3;
     }
 
     .profile-tips-modal__navigation {
@@ -398,6 +400,10 @@
     }
 
     @media (max-width: 640px) {
+        .profile-gallery-picker__copy {
+            @apply items-center text-center;
+        }
+
         .profile-tips-modal__footer {
             @apply flex-col items-stretch;
         }

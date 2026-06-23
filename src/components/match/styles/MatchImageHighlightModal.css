@@ -34,7 +34,12 @@
 
     .mhim-subtitle,
     .mhim-gallery-hint {
-        @apply mt-1 text-color-greyScale/500;
+        @apply mt-1 text-center text-color-greyScale/500;
+    }
+
+    .mhim-header > div {
+        flex: 1;
+        min-width: 0;
     }
 
     .mhim-close,
@@ -131,6 +136,10 @@
     }
 
     @media (max-width: 768px) {
+        .mhim-header > div {
+            text-align: center;
+        }
+
         .mhim-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
