@@ -22,10 +22,10 @@ import { generateAbilityScores, rollStartingWealth } from '@/utils/rollAbilitySc
 import MoneyModal from '@/components/character-sheet/MoneyModal';
 
 const ABILITIES = [
-    { key: 'str', label: 'Força' },
+    { key: 'str', label: 'ForÃ§a' },
     { key: 'dex', label: 'Destreza' },
-    { key: 'con', label: 'Constituição' },
-    { key: 'int', label: 'Inteligência' },
+    { key: 'con', label: 'ConstituiÃ§Ã£o' },
+    { key: 'int', label: 'InteligÃªncia' },
     { key: 'wis', label: 'Sabedoria' },
     { key: 'cha', label: 'Carisma' },
 ] as const;
@@ -42,13 +42,13 @@ const EMPTY_ABILITY_SCORES: Record<AbilityKey, number> = {
 };
 
 const GENERATED_SCORES_INFO_MESSAGE =
-    'Caso hajam valores adicionais para distribuir, como de caracteristicas ou sub raças, os anote e distribua na edição de personagem, depois de criar a ficha.';
+    'Caso hajam valores adicionais para distribuir, como de caracteristicas ou sub raÃ§as, os anote e distribua na ediÃ§Ã£o de personagem, depois de criar a ficha.';
 
 const SAVES = [
-    { key: 'str', label: 'Força' },
+    { key: 'str', label: 'ForÃ§a' },
     { key: 'dex', label: 'Destreza' },
-    { key: 'con', label: 'Constituição' },
-    { key: 'int', label: 'Inteligência' },
+    { key: 'con', label: 'ConstituiÃ§Ã£o' },
+    { key: 'int', label: 'InteligÃªncia' },
     { key: 'wis', label: 'Sabedoria' },
     { key: 'cha', label: 'Carisma' },
 ] as const;
@@ -57,21 +57,21 @@ const SKILLS = [
     { key: 'acrobatics', label: 'Acrobacia', ability: 'Des' },
     { key: 'arcana', label: 'Arcanismo', ability: 'Int' },
     { key: 'athletics', label: 'Atletismo', ability: 'For' },
-    { key: 'performance', label: 'Atuação', ability: 'Car' },
-    { key: 'deception', label: 'Enganação', ability: 'Car' },
+    { key: 'performance', label: 'AtuaÃ§Ã£o', ability: 'Car' },
+    { key: 'deception', label: 'EnganaÃ§Ã£o', ability: 'Car' },
     { key: 'stealth', label: 'Furtividade', ability: 'Des' },
-    { key: 'history', label: 'História', ability: 'Int' },
-    { key: 'intimidation', label: 'Intimidação', ability: 'Car' },
-    { key: 'insight', label: 'Intuição', ability: 'Sab' },
-    { key: 'investigation', label: 'Investigação', ability: 'Int' },
+    { key: 'history', label: 'HistÃ³ria', ability: 'Int' },
+    { key: 'intimidation', label: 'IntimidaÃ§Ã£o', ability: 'Car' },
+    { key: 'insight', label: 'IntuiÃ§Ã£o', ability: 'Sab' },
+    { key: 'investigation', label: 'InvestigaÃ§Ã£o', ability: 'Int' },
     { key: 'animalHandling', label: 'Lidar com Animais', ability: 'Sab' },
     { key: 'medicine', label: 'Medicina', ability: 'Sab' },
     { key: 'nature', label: 'Natureza', ability: 'Int' },
-    { key: 'perception', label: 'Percepção', ability: 'Sab' },
-    { key: 'persuasion', label: 'Persuasão', ability: 'Car' },
-    { key: 'sleightOfHand', label: 'Prestidigitação', ability: 'Des' },
-    { key: 'religion', label: 'Religião', ability: 'Int' },
-    { key: 'survival', label: 'Sobrevivência', ability: 'Sab' },
+    { key: 'perception', label: 'PercepÃ§Ã£o', ability: 'Sab' },
+    { key: 'persuasion', label: 'PersuasÃ£o', ability: 'Car' },
+    { key: 'sleightOfHand', label: 'PrestidigitaÃ§Ã£o', ability: 'Des' },
+    { key: 'religion', label: 'ReligiÃ£o', ability: 'Int' },
+    { key: 'survival', label: 'SobrevivÃªncia', ability: 'Sab' },
 ] as const;
 
 const CURRENCY_LABELS: Record<'cp' | 'sp' | 'ep' | 'gp' | 'pp', string> = {
@@ -308,12 +308,9 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
             wisdom: 'wis',
             charisma: 'cha',
             forca: 'str',
-            constituição: 'con',
-            inteligencia: 'int',
-            força: 'str',
             destreza: 'dex',
-            constituição: 'con',
-            Inteligência: 'int',
+            constituicao: 'con',
+            inteligencia: 'int',
             sabedoria: 'wis',
             carisma: 'cha',
         };
@@ -400,10 +397,10 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                 setMoney((prev) => ({ ...prev, gp: rollStartingWealth(cls.name ?? '') }));
             }
             const MAGIC_CLASS_PT: Record<string, string> = {
-                strength: 'Força',
+                strength: 'ForÃ§a',
                 dexterity: 'Destreza',
-                constitution: 'Constituição',
-                intelligence: 'Inteligência',
+                constitution: 'ConstituiÃ§Ã£o',
+                intelligence: 'InteligÃªncia',
                 wisdom: 'Sabedoria',
                 charisma: 'Carisma',
             };
@@ -506,7 +503,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                         onClose={handleCloseGenerateModal}
                     />
                 )}
-                {/* ── Header ──────────────────────────────── */}
+                {/* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                 <div className="cs-header">
                     <div className="cs-field cs-header-name">
                         <input
@@ -546,7 +543,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                             }
                             readOnly={xpSystem}
                         />
-                        <span className="cs-field-label">Nível</span>
+                        <span className="cs-field-label">NÃ­vel</span>
                     </div>
                     <div className="cs-field">
                         <input
@@ -570,23 +567,23 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                                 resetGeneratedScoreState();
                             }}
                         >
-                            <option value="">Escolha sua Raça</option>
+                            <option value="">Escolha sua RaÃ§a</option>
                             {races.map((r) => (
                                 <option key={r.raceId} value={r.raceId}>
                                     {r.name}
                                 </option>
                             ))}
                         </select>
-                        <span className="cs-field-label">Raça</span>
+                        <span className="cs-field-label">RaÃ§a</span>
                     </div>
                     <div className="cs-field">
                         <input
                             className="cs-field-input"
-                            placeholder="Tendência"
+                            placeholder="TendÃªncia"
                             value={alignment}
                             onChange={(e) => setAlignment(e.target.value)}
                         />
-                        <span className="cs-field-label">Tendência</span>
+                        <span className="cs-field-label">TendÃªncia</span>
                     </div>
                     <div className="cs-field">
                         <input
@@ -595,15 +592,15 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                             value={xp}
                             readOnly
                         />
-                        <span className="cs-field-label">Pontos de Experiência</span>
+                        <span className="cs-field-label">Pontos de ExperiÃªncia</span>
                     </div>
                 </div>
 
-                {/* ── Body ────────────────────────────────── */}
+                {/* â”€â”€ Body â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                 <div className="cs-body">
-                    {/* ─ Left: Ability Scores ─ */}
+                    {/* â”€ Left: Ability Scores â”€ */}
                     <div className="cs-ability-col">
-                        {/* ── Generate Buttons ─── */}
+                        {/* â”€â”€ Generate Buttons â”€â”€â”€ */}
                         <div className="relative group w-full">
                             <button
                                 type="button"
@@ -616,7 +613,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                             {!selectedRaceId && (
                                 <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-64 -translate-x-1/2 rounded bg-gray-800 p-2 text-center text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
                                     Para gerar os valores de habilidade escolha primeiro a
-                                    raça
+                                    raÃ§a
                                 </div>
                             )}
                         </div>
@@ -633,17 +630,17 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                                 onClick={handleApplyRaceBonus}
                             >
                                 {raceBonusSubmitting ? (
-                                    <LoadingDots label="Aplicando bônus de raças" />
+                                    <LoadingDots label="Aplicando bÃ´nus de raÃ§as" />
                                 ) : (
-                                    'Aplicar Bônus de Raças'
+                                    'Aplicar BÃ´nus de RaÃ§as'
                                 )}
                             </button>
                             {selectedRaceId &&
                                 !generatedScores.length &&
                                 !raceBonusApplied && (
                                     <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-64 -translate-x-1/2 rounded bg-gray-800 p-2 text-center text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
-                                        Para aplicar os Bônus de Raças primeiro gere os
-                                        valores de habilidade no botão acima.
+                                        Para aplicar os BÃ´nus de RaÃ§as primeiro gere os
+                                        valores de habilidade no botÃ£o acima.
                                     </div>
                                 )}
                         </div>
@@ -667,7 +664,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                         ))}
                     </div>
 
-                    {/* ─ Middle ─ */}
+                    {/* â”€ Middle â”€ */}
                     <div className="cs-middle-col">
                         {/* Inspiration & Proficiency */}
                         <div className="cs-inspiration-row">
@@ -678,7 +675,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                             >
                                 OFF
                             </button>
-                            <span className="cs-field-label">Inspiração</span>
+                            <span className="cs-field-label">InspiraÃ§Ã£o</span>
                         </div>
                         <div className="cs-proficiency-row">
                             <input
@@ -686,7 +683,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                                 value="+2"
                                 readOnly
                             />
-                            <span className="cs-field-label">Bônus de Proficiência</span>
+                            <span className="cs-field-label">BÃ´nus de ProficiÃªncia</span>
                         </div>
 
                         {/* Saving Throws */}
@@ -716,7 +713,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                                     <span className="cs-save-name">{s.label}</span>
                                 </div>
                             ))}
-                            <p className="cs-section-title">Testes de Resistência</p>
+                            <p className="cs-section-title">Testes de ResistÃªncia</p>
                         </div>
 
                         {/* Skills */}
@@ -753,7 +750,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                                     </span>
                                 </div>
                             ))}
-                            <p className="cs-section-title">Perícias</p>
+                            <p className="cs-section-title">PerÃ­cias</p>
                         </div>
 
                         {/* Passive Wisdom */}
@@ -766,7 +763,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                                 />
                             </div>
                             <span className="cs-field-label">
-                                Sabedoria Passiva (Percepção)
+                                Sabedoria Passiva (PercepÃ§Ã£o)
                             </span>
                         </div>
 
@@ -830,7 +827,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                                 value={tempHp || ''}
                                 onChange={(e) => setTempHp(Number(e.target.value))}
                             />
-                            <p className="cs-section-title">Pontos de Vida Temporários</p>
+                            <p className="cs-section-title">Pontos de Vida TemporÃ¡rios</p>
                         </div>
 
                         {/* Hit Dice & Death Saves */}
@@ -908,7 +905,7 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                         <div className="cs-attacks-box">
                             <div className="cs-attack-header">
                                 <span>Nome</span>
-                                <span>Bônus</span>
+                                <span>BÃ´nus</span>
                                 <span>Dano/Tipo</span>
                             </div>
                             {attacks.map((atk, i) => (
@@ -985,25 +982,25 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                             <div className="cs-inventory-panel">
                                 <textarea
                                     className="cs-inventory-textarea"
-                                    placeholder="Itens, recursos e observações..."
+                                    placeholder="Itens, recursos e observaÃ§Ãµes..."
                                     value={inventory}
                                     onChange={(e) => setInventory(e.target.value)}
                                 />
                             </div>
-                            <p className="cs-section-title">Inventário</p>
+                            <p className="cs-section-title">InventÃ¡rio</p>
                         </div>
                     </div>
 
-                    {/* ─ Right: Personality ─ */}
+                    {/* â”€ Right: Personality â”€ */}
                     <div className="cs-right-col">
                         <div className="cs-trait-box">
                             <textarea
                                 className="cs-field-textarea w-full h-16"
-                                placeholder="Traços de Personalidade..."
+                                placeholder="TraÃ§os de Personalidade..."
                                 value={personalityTraits}
                                 onChange={(e) => setPersonalityTraits(e.target.value)}
                             />
-                            <p className="cs-section-title">Traços de Personalidade</p>
+                            <p className="cs-section-title">TraÃ§os de Personalidade</p>
                         </div>
                         <div className="cs-trait-box">
                             <textarea
@@ -1017,11 +1014,11 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                         <div className="cs-trait-box">
                             <textarea
                                 className="cs-field-textarea w-full h-16"
-                                placeholder="Ligações..."
+                                placeholder="LigaÃ§Ãµes..."
                                 value={bonds}
                                 onChange={(e) => setBonds(e.target.value)}
                             />
-                            <p className="cs-section-title">Ligações</p>
+                            <p className="cs-section-title">LigaÃ§Ãµes</p>
                         </div>
                         <div className="cs-trait-box">
                             <textarea
@@ -1035,28 +1032,28 @@ const SheetPrincipal = forwardRef<SheetPrincipalHandle, SheetPrincipalProps>(
                     </div>
                 </div>
 
-                {/* ── Bottom row ──────────────────────────── */}
+                {/* â”€â”€ Bottom row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
                 <div className="cs-bottom-row">
                     <div className="cs-bottom-box">
                         <textarea
                             className="cs-field-textarea w-full h-full"
-                            placeholder="Idiomas e proficiências..."
+                            placeholder="Idiomas e proficiÃªncias..."
                             value={proficienciesText}
                             onChange={(e) => setProficienciesText(e.target.value)}
                         />
                         <p className="cs-section-title my-4">
-                            Idiomas e Outras Proficiências
+                            Idiomas e Outras ProficiÃªncias
                         </p>
                     </div>
                     <div className="cs-bottom-box">
                         <textarea
                             className="cs-field-textarea w-full h-full"
-                            placeholder="Características e habilidades..."
+                            placeholder="CaracterÃ­sticas e habilidades..."
                             value={extraCharacteristics}
                             onChange={(e) => setExtraCharacteristics(e.target.value)}
                         />
                         <p className="cs-section-title my-4">
-                            Características e Habilidades
+                            CaracterÃ­sticas e Habilidades
                         </p>
                     </div>
                 </div>
