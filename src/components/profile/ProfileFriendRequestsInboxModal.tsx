@@ -69,46 +69,46 @@ export default function ProfileFriendRequestsInboxModal({
                         <h1 className="profile-action-modal-title font-L-semibold">
                             Solicitações de amizade
                         </h1>
-                        <p className="profile-action-modal-description font-XS-regular">
-                            Aceite ou recuse os pedidos pendentes recebidos no seu perfil.
-                        </p>
-                    </div>
-                    <div className="profile-gallery-picker__actions">
-                        <button
-                            type="button"
-                            onClick={onOpenSearch}
-                            className="profile-gallery-picker__close"
-                            aria-label="Procurar aventureiros"
-                        >
-                            <Image
-                                src={
-                                    themeMode === 'dark'
-                                        ? SearchDarkIcon
-                                        : SearchLightIcon
-                                }
-                                alt=""
-                                width={20}
-                                height={20}
-                            />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="profile-gallery-picker__close"
-                            aria-label="Fechar"
-                        >
-                            <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
+                        <div className="profile-gallery-picker__actions">
+                            <button
+                                type="button"
+                                onClick={onOpenSearch}
+                                className="profile-gallery-picker__close"
+                                aria-label="Procurar aventureiros"
                             >
-                                <path d="M18 6 6 18M6 6l12 12" />
-                            </svg>
-                        </button>
+                                <Image
+                                    src={
+                                        themeMode === 'dark'
+                                            ? SearchDarkIcon
+                                            : SearchLightIcon
+                                    }
+                                    alt=""
+                                    width={20}
+                                    height={20}
+                                />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                className="profile-gallery-picker__close"
+                                aria-label="Fechar"
+                            >
+                                <svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                >
+                                    <path d="M18 6 6 18M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
+                    <p className="profile-gallery-description__modal font-XS-regular">
+                        Aceite ou recuse os pedidos pendentes recebidos no seu perfil.
+                    </p>
                 </div>
 
                 {requests.length === 0 ? (

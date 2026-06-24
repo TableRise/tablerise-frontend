@@ -363,27 +363,18 @@ export default function ProfileMessagesModal({
                             <h1 className="profile-action-modal-title font-L-semibold">
                                 Enviar mensagem
                             </h1>
-                            <p className="profile-action-modal-description font-XS-regular">
-                                Escreva uma mensagem para {recipientLabel}.
-                            </p>
-                        </div>
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="profile-gallery-picker__close"
-                            aria-label="Fechar"
-                        >
-                            <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                className="profile-gallery-picker__close"
+                                aria-label="Fechar"
                             >
-                                <path d="M18 6 6 18M6 6l12 12" />
-                            </svg>
-                        </button>
+                                X
+                            </button>
+                        </div>
+                        <p className="profile-gallery-description__modal font-XS-regular">
+                            Escreva uma mensagem para {recipientLabel}.
+                        </p>
                     </div>
 
                     <div className="profile-message-modal__compose">
@@ -502,33 +493,27 @@ export default function ProfileMessagesModal({
                         <h1 className="profile-action-modal-title font-L-semibold">
                             Mensagens
                         </h1>
-                        <p className="profile-action-modal-description font-XS-regular">
-                            Abra uma mensagem para ler o conteudo completo.
-                        </p>
-                        <p className="profile-action-modal-description font-XXS-regular">
-                            Suas menagens são criptografadas, e não são acessiveis atraves
-                            dos nossos servidores, caso haja algum problema e queira
-                            reportar alguma violação por favor tire um print e nos envie
-                            pela pagina de suporte.
-                        </p>
-                    </div>
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="profile-gallery-picker__close"
-                        aria-label="Fechar"
-                    >
-                        <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="profile-gallery-picker__close"
+                            aria-label="Fechar"
                         >
-                            <path d="M18 6 6 18M6 6l12 12" />
-                        </svg>
-                    </button>
+                            X
+                        </button>
+                    </div>
+                </div>
+                <div className="profile-gallery-description__modal">
+                    <p className="profile-action-modal-description font-XS-regular">
+                        Abra uma mensagem para ler o conteudo completo.
+                    </p>
+                    <br />
+                    <p className="profile-action-modal-description font-XXS-regular">
+                        Suas menagens são criptografadas, e não são acessiveis atraves dos
+                        nossos servidores, caso haja algum problema e queira reportar
+                        alguma violação por favor tire um print e nos envie pela pagina de
+                        suporte.
+                    </p>
                 </div>
 
                 {loading ? (
