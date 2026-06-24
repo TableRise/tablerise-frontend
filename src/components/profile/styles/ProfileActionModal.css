@@ -185,13 +185,17 @@
     }
 
     .profile-gallery-picker__header {
-        @apply flex items-start justify-between gap-4;
+        @apply flex flex-col justify-between gap-4;
     }
 
     .profile-gallery-picker__copy {
-        @apply flex flex-col gap-2;
+        @apply flex items-center justify-between gap-2;
         flex: 1;
         min-width: 0;
+    }
+
+    .profile-gallery-description__modal {
+        @apply self-center;
     }
 
     .profile-gallery-picker__actions {

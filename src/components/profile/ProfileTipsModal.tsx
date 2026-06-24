@@ -30,28 +30,21 @@ export default function ProfileTipsModal({
                         <h1 className="profile-action-modal-title font-L-semibold">
                             Dicas do perfil
                         </h1>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="profile-gallery-picker__close"
+                            aria-label="Fechar"
+                        >
+                            X
+                        </button>
+                    </div>
+                    <div className="profile-gallery-description__modal">
                         <p className="profile-action-modal-description font-XS-regular">
                             Descubra como evoluir seu perfil e aproveitar melhor a
                             plataforma.
                         </p>
                     </div>
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="profile-gallery-picker__close"
-                        aria-label="Fechar"
-                    >
-                        <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                        >
-                            <path d="M18 6 6 18M6 6l12 12" />
-                        </svg>
-                    </button>
                 </div>
 
                 <div className="profile-tips-modal__body">
