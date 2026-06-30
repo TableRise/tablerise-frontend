@@ -319,11 +319,6 @@ export default function ProfileHeroSection({
                         <h1 className="font-L-bold profile-hero__name">
                             {profileName || 'Aventureiro sem nome'}
                         </h1>
-                        {user.email ? (
-                            <p className="font-XS-regular profile-hero__email">
-                                {user.email}
-                            </p>
-                        ) : null}
                         <p className="font-XS-bold profile-hero__handle">
                             {profileHandle || 'Sem nickname'}
                         </p>

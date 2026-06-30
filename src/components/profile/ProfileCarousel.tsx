@@ -1,8 +1,9 @@
 'use client';
 
-import { ReactNode, useCallback, useEffect, useState } from 'react';
+import { ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { ArrowLeft, ArrowRight } from '@/components/icons/Arrows';
+import TableriseContext from '@/context/TableriseContext';
 
 type ProfileCarouselProps = {
     items: ReactNode[];
@@ -15,6 +16,8 @@ export default function ProfileCarousel({
     label,
     variant = 'campaigns',
 }: ProfileCarouselProps): JSX.Element {
+    const { themeMode } = useContext(TableriseContext);
+    const arrowMode = themeMode === 'dark' ? 'dark' : 'light';
     const [emblaRef, emblaApi] = useEmblaCarousel({
         loop: false,
         align: 'start',
@@ -79,7 +82,7 @@ export default function ProfileCarousel({
                         aria-label="Voltar"
                     >
                         <ArrowLeft
-                            mode="light"
+                            mode={arrowMode}
                             width={16}
                             height={16}
                             aria-hidden="true"
@@ -93,7 +96,7 @@ export default function ProfileCarousel({
                         aria-label="Avançar"
                     >
                         <ArrowRight
-                            mode="light"
+                            mode={arrowMode}
                             width={16}
                             height={16}
                             aria-hidden="true"

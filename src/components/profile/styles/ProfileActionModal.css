@@ -33,6 +33,10 @@
         @apply max-w-[38rem] items-stretch;
     }
 
+    .profile-action-modal-card--onboarding {
+        @apply max-w-[34rem] items-stretch;
+    }
+
     .profile-action-modal-card--controls {
         @apply items-stretch;
         max-height: min(90vh, 48rem);
@@ -384,7 +388,7 @@
     }
 
     .profile-tips-modal__navigation {
-        @apply flex items-center gap-2;
+        @apply flex justify-between w-full;
     }
 
     .profile-tips-modal__nav-button {
@@ -403,6 +407,19 @@
         @apply w-full max-w-[10rem];
     }
 
+    .profile-onboarding-modal__copy {
+        @apply flex flex-col items-center gap-3 text-center;
+    }
+
+    .profile-onboarding-modal__warning {
+        @apply text-center text-color-support/alert;
+        line-height: 1.45;
+    }
+
+    .profile-onboarding-modal__footer {
+        @apply mt-2 grid w-full grid-cols-2 gap-2;
+    }
+
     @media (max-width: 640px) {
         .profile-gallery-picker__copy {
             @apply items-center text-center;
@@ -418,6 +435,10 @@
 
         .profile-tips-modal__close {
             @apply max-w-none;
+        }
+
+        .profile-onboarding-modal__footer {
+            @apply grid-cols-1;
         }
     }
 
