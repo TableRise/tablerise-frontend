@@ -296,10 +296,6 @@
         color: #8ab5fc;
     }
 
-    .profile-hero__email {
-        color: #b8c5de;
-    }
-
     .profile-hero__handle {
         color: #b8c5de;
     }
@@ -601,6 +597,10 @@
     }
 
     .profile-carousel--badges .profile-carousel__controls {
+        @apply justify-between;
+    }
+
+    .profile-carousel--friends .profile-carousel__controls {
         @apply justify-between;
     }
 
@@ -1090,7 +1090,6 @@
 
     html[data-theme='dark'] .profile-state-title,
     html[data-theme='dark'] .profile-hero__name,
-    html[data-theme='dark'] .profile-hero__email,
     html[data-theme='dark'] .profile-hero__actions,
     html[data-theme='dark'] .profile-hero__action:not(.profile-hero__action--danger),
     html[data-theme='dark'] .profile-section-heading {

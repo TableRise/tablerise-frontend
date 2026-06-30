@@ -40,6 +40,7 @@ import ProfileMessagesModal from '@/components/profile/ProfileMessagesModal';
 import ProfileFriendRequestModal from '@/components/profile/ProfileFriendRequestModal';
 import ProfileFriendRequestsInboxModal from '@/components/profile/ProfileFriendRequestsInboxModal';
 import ProfileTipsModal from '@/components/profile/ProfileTipsModal';
+import ProfileImageOnboardingModal from '@/components/profile/ProfileImageOnboardingModal';
 import {
     badgeEntries,
     badgeMap,
@@ -85,7 +86,10 @@ type ProfilePageContentProps = {
     userId: string;
 };
 
-const PROFILE_TIPS_SEEN_STORAGE_PREFIX = 'tablerise-profile-tips-seen';
+type ProfileImageOnboardingStep = 'avatar' | 'cover';
+type ProfilePictureSelectionOrigin = 'profile' | 'onboarding';
+
+const PROFILE_ONBOARDING_SEEN_STORAGE_PREFIX = 'tablerise-profile-onboarding-seen';
 
 function buildBadgePopoverId(scope: 'catalog', badgeKey: string): string {
     return `${scope}:${badgeKey}`;
@@ -166,6 +170,13 @@ export default function ProfilePageContent({
     const [friendSearchModalOpen, setFriendSearchModalOpen] = useState(false);
     const [messagesModalOpen, setMessagesModalOpen] = useState(false);
     const [tipsModalOpen, setTipsModalOpen] = useState(false);
+    const [profileOnboardingOpen, setProfileOnboardingOpen] = useState(false);
+    const [profileOnboardingStep, setProfileOnboardingStep] =
+        useState<ProfileImageOnboardingStep>('avatar');
+    const [profileOnboardingAvatarSelected, setProfileOnboardingAvatarSelected] =
+        useState(false);
+    const [profileOnboardingCoverModalOpen, setProfileOnboardingCoverModalOpen] =
+        useState(false);
     const [galleryModalOpen, setGalleryModalOpen] = useState(false);
     const [friendRequestModalOpen, setFriendRequestModalOpen] = useState(false);
     const [friendRequestsInboxModalOpen, setFriendRequestsInboxModalOpen] =
@@ -176,6 +187,8 @@ export default function ProfilePageContent({
     const [checkingViewerFriendStatus, setCheckingViewerFriendStatus] = useState(false);
     const [profilePictureChoiceOpen, setProfilePictureChoiceOpen] = useState(false);
     const [profilePictureGalleryOpen, setProfilePictureGalleryOpen] = useState(false);
+    const [profilePictureSelectionOrigin, setProfilePictureSelectionOrigin] =
+        useState<ProfilePictureSelectionOrigin>('profile');
     const pictureInputRef = useRef<HTMLInputElement>(null);
     const isOwnProfile =
         Boolean(currentUserId) &&
@@ -358,8 +371,31 @@ export default function ProfilePageContent({
         return refreshedUser;
     };
 
-    const handleProfilePictureClick = () => {
+    const completeProfileOnboarding = () => {
+        if (currentUserId) {
+            try {
+                localStorage.setItem(
+                    `${PROFILE_ONBOARDING_SEEN_STORAGE_PREFIX}:${currentUserId}`,
+                    '1'
+                );
+            } catch {
+                // Ignore storage failures; the modal should still close for this session.
+            }
+        }
+
+        setProfileOnboardingOpen(false);
+        setProfileOnboardingCoverModalOpen(false);
+        setProfileOnboardingStep('avatar');
+        setProfileOnboardingAvatarSelected(false);
+    };
+
+    const handleProfilePictureClick = (
+        origin: ProfilePictureSelectionOrigin = 'profile'
+    ) => {
         if (pictureUploading) return;
+
+        setProfilePictureSelectionOrigin(origin);
+
         if (loadingGallery) {
             setPictureFeedback('Carregando galeria...');
             return;
@@ -447,6 +483,10 @@ export default function ProfilePageContent({
             await refreshProfileUser();
             await refreshGallery();
             setPendingImageCrop(null);
+            if (profilePictureSelectionOrigin === 'onboarding') {
+                setProfileOnboardingAvatarSelected(true);
+            }
+            setProfilePictureSelectionOrigin('profile');
         } catch (error: Error | any) {
             setPictureFeedback(
                 error?.message ?? 'Não foi possivel atualizar a foto do perfil.'
@@ -475,18 +515,31 @@ export default function ProfilePageContent({
         if (!currentUserResolved || !currentUserId) return;
         if (loading || !user || !isOwnProfile) return;
         if (gateStep !== 'none') return;
+        if (profileOnboardingOpen || profileOnboardingCoverModalOpen) return;
 
-        const seenStorageKey = `${PROFILE_TIPS_SEEN_STORAGE_PREFIX}:${currentUserId}`;
+        const seenStorageKey = `${PROFILE_ONBOARDING_SEEN_STORAGE_PREFIX}:${currentUserId}`;
 
         try {
             if (localStorage.getItem(seenStorageKey) === '1') return;
 
-            localStorage.setItem(seenStorageKey, '1');
-            setTipsModalOpen(true);
+            setProfileOnboardingStep('avatar');
+            setProfileOnboardingAvatarSelected(false);
+            setProfileOnboardingOpen(true);
         } catch {
-            setTipsModalOpen(true);
+            setProfileOnboardingStep('avatar');
+            setProfileOnboardingAvatarSelected(false);
+            setProfileOnboardingOpen(true);
         }
-    }, [currentUserId, currentUserResolved, gateStep, isOwnProfile, loading, user]);
+    }, [
+        currentUserId,
+        currentUserResolved,
+        gateStep,
+        isOwnProfile,
+        loading,
+        profileOnboardingCoverModalOpen,
+        profileOnboardingOpen,
+        user,
+    ]);
 
     useEffect(() => {
         let mounted = true;
@@ -872,6 +925,16 @@ export default function ProfilePageContent({
         !isOwnProfile &&
         !checkingViewerFriendStatus &&
         viewerFriendStatus === null;
+    const handleProfileOnboardingAvatarSelect = () => {
+        setPictureFeedback('');
+        handleProfilePictureClick('onboarding');
+    };
+    const handleProfileOnboardingCoverSaved = async () => {
+        setCoverFeedback('');
+        await refreshProfileUser();
+        await refreshGallery();
+        completeProfileOnboarding();
+    };
 
     return (
         <div
@@ -934,6 +997,31 @@ export default function ProfilePageContent({
                     showFriendRequestAction={showFriendRequestAction}
                     onOpenFriendRequest={() => setFriendRequestModalOpen(true)}
                 />
+
+                {profileOnboardingOpen ? (
+                    <ProfileImageOnboardingModal
+                        step={profileOnboardingStep}
+                        avatarSelected={profileOnboardingAvatarSelected}
+                        avatarLoading={pictureUploading}
+                        avatarSelectionLoading={pictureUploading || loadingGallery}
+                        onSelectAvatar={handleProfileOnboardingAvatarSelect}
+                        onCancelAvatar={() => setProfileOnboardingStep('cover')}
+                        onConfirmAvatar={() => setProfileOnboardingStep('cover')}
+                        onCancelCover={completeProfileOnboarding}
+                        onChooseCover={() => {
+                            setProfileOnboardingOpen(false);
+                            setProfileOnboardingCoverModalOpen(true);
+                        }}
+                    />
+                ) : null}
+
+                {profileOnboardingCoverModalOpen ? (
+                    <ProfileCoverModal
+                        userId={userId}
+                        onClose={completeProfileOnboarding}
+                        onSaved={handleProfileOnboardingCoverSaved}
+                    />
+                ) : null}
 
                 {tipsModalOpen ? (
                     <ProfileTipsModal onClose={() => setTipsModalOpen(false)} />
@@ -1262,7 +1350,10 @@ export default function ProfilePageContent({
                     <ImageSourceChoiceModal
                         title="Selecionar foto do perfil"
                         description="Escolha se deseja enviar uma nova imagem ou usar uma que já esta na sua galeria."
-                        onClose={() => setProfilePictureChoiceOpen(false)}
+                        onClose={() => {
+                            setProfilePictureChoiceOpen(false);
+                            setProfilePictureSelectionOrigin('profile');
+                        }}
                         onSelectLocal={() => {
                             setProfilePictureChoiceOpen(false);
                             pictureInputRef.current?.click();
@@ -1279,7 +1370,10 @@ export default function ProfilePageContent({
                         title="Selecionar foto do perfil"
                         description="Escolha uma imagem da sua galeria para usar como avatar."
                         images={galleryImages}
-                        onClose={() => setProfilePictureGalleryOpen(false)}
+                        onClose={() => {
+                            setProfilePictureGalleryOpen(false);
+                            setProfilePictureSelectionOrigin('profile');
+                        }}
                         onSelect={(image) => {
                             setProfilePictureGalleryOpen(false);
                             void handleProfilePictureUpload(image).catch(() => undefined);
@@ -1292,7 +1386,10 @@ export default function ProfilePageContent({
                         file={pendingImageCrop.file}
                         intent={pendingImageCrop.intent}
                         onConfirm={handleProfilePictureUpload}
-                        onClose={() => setPendingImageCrop(null)}
+                        onClose={() => {
+                            setPendingImageCrop(null);
+                            setProfilePictureSelectionOrigin('profile');
+                        }}
                     />
                 ) : null}
             </div>
